@@ -676,7 +676,7 @@
   }
 
   /* ---------- 12. Enlaces, accesos directos y tema (Fase 7) ---------- */
-  const PAGES = 'https://eddy970728.github.io/pandaria-fit/';
+  const PAGES = 'https://eddy970728.github.io/PandarIA-Fit/';
   function importRoutineCode(code){
     try{ const d = decodeRoutine(code); const r = newRoutine({name:'Rutina compartida', items: d.items, pandaria: true, goal: d.goal, source:'enlace'}); openEditor(r, true); toast('Rutina importada: revísala y guarda'); }
     catch(e){ toast('El enlace de la rutina no es válido'); }
