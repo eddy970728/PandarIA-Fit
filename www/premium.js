@@ -98,12 +98,13 @@
     ['timer','Intervalos sin límite','HIIT, EMOM y AMRAP personalizados.'],
     ['camera','Fotos de progreso','Guarda fotos y compáralas lado a lado.'],
     ['leaf','Calorías y macros','Tu objetivo diario de calorías, proteína, carbohidratos y grasas.'],
-    ['edit','Ejercicios propios ilimitados','En la versión gratis, hasta 5.']
+    ['edit','Ejercicios propios ilimitados','En la versión gratis, hasta 5.'],
+    ['flame','Músculos en las animaciones','Mira en rojo qué músculos trabajan en cada ejercicio, y descansos ajustados por PandarIA en cada serie.']
   ];
   const REASONS = {
     pandaria:'Las rutinas diseñadas por PandarIA son parte de Premium.', explore:'Esta rutina es parte de Premium.', intervals:'Este modo de intervalos es parte de Premium.',
     history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.',
-    customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', notif:'Este aviso es parte de Premium.'
+    customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
   SCREENS.premium = p => {
     const on = isPremium();
