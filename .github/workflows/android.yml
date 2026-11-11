@@ -26,15 +26,20 @@ jobs:
       - name: Instalar Capacitor
         run: npm install
 
+      - name: Conectar el codigo nativo al HTML
+        run: |
+          grep -q 'native.js' www/index.html || sed -i 's#</body>#<script src="native.js"></script></body>#' www/index.html
+
       - name: Crear proyecto Android
         run: |
           npx cap add android
+          npx @capacitor/assets generate --android --iconBackgroundColor '#12151a' --iconBackgroundColorDark '#12151a' --splashBackgroundColor '#12151a' --splashBackgroundColorDark '#12151a'
           npx cap sync android
 
       - name: Numero de version automatico
         run: |
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
-          sed -i "s/versionName \"[^\"]*\"/versionName \"0.1.${{ github.run_number }}\"/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"0.2.${{ github.run_number }}\"/" android/app/build.gradle
 
       - name: Compilar
         run: |
@@ -62,7 +67,7 @@ jobs:
       - name: Publicar en Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.1.${{ github.run_number }}
-          name: PandarIA Fit 0.1.${{ github.run_number }}
-          body: Versión de prueba (Fase 0). Descarga PandarIA-Fit.apk e instálala encima de la anterior.
+          tag_name: v0.2.${{ github.run_number }}
+          name: PandarIA Fit 0.2.${{ github.run_number }}
+          body: Versión de prueba (Fase 1). Descarga PandarIA-Fit.apk e instálala encima de la anterior.
           files: PandarIA-Fit.apk
