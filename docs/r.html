@@ -1,0 +1,9 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rutina compartida · PandarIA Fit</title><style>body{margin:0;background:#12151a;color:#eef1f5;font:16px/1.55 -apple-system,Roboto,"Segoe UI",sans-serif;min-height:100vh;display:grid;place-items:center;padding:24px}main{max-width:420px;text-align:center}h1{font-size:26px;margin:12px 0 6px}p{color:#a9b1be}.logo{width:84px;height:84px;border-radius:22px;background:linear-gradient(135deg,#ff7a1a,#ff4f3a);display:grid;place-items:center;margin:0 auto;font-size:44px}a.btn{display:block;background:#ff7a1a;color:#1a0d02;font-weight:800;text-decoration:none;padding:15px;border-radius:14px;margin-top:16px}a.sec{background:#282e39;color:#eef1f5}code{display:block;background:#1f242d;border-radius:12px;padding:12px;margin-top:14px;word-break:break-all;font:700 14px ui-monospace,Menlo,monospace;user-select:all}</style></head><body><main>
+<div class="logo">🐼</div><h1>Rutina compartida</h1><p id="msg">Abriendo PandarIA Fit…</p><a class="btn" id="open" href="#">Abrir en la app</a>
+<p style="font-size:13px;margin-top:18px">¿No tienes la app? <a href="./" style="color:#ff9a4d">Descárgala aquí</a>. Si no se abre sola, copia el código y pégalo en Nueva rutina › Importar con código.</p><code id="code"></code>
+<script>
+var c=decodeURIComponent((location.hash||'').slice(1)).trim();document.getElementById('code').textContent=c||'(enlace incompleto)';
+var u='intent://rutina?c='+encodeURIComponent(c)+'#Intent;scheme=pandariafit;package=com.pandaria.fit;end';
+document.getElementById('open').href=/android/i.test(navigator.userAgent)?u:'pandariafit://rutina?c='+encodeURIComponent(c);
+if(c&&/android/i.test(navigator.userAgent)){setTimeout(function(){location.href=u},300);}
+</script></main></body></html>
