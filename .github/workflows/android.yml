@@ -40,7 +40,7 @@ jobs:
       - name: Numero de version automatico
         run: |
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
-          sed -i "s/versionName \"[^\"]*\"/versionName \"0.6.${{ github.run_number }}\"/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"0.7.${{ github.run_number }}\"/" android/app/build.gradle
 
       - name: Compilar
         run: |
@@ -68,7 +68,7 @@ jobs:
       - name: Publicar en Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.6.${{ github.run_number }}
-          name: PandarIA Fit 0.6.${{ github.run_number }}
-          body: Versión de prueba 0.6 (animaciones nuevas con equipos y descanso distinto en cada serie). Descarga PandarIA-Fit.apk e instálala encima de la anterior.
+          tag_name: v0.7.${{ github.run_number }}
+          name: PandarIA Fit 0.7.${{ github.run_number }}
+          body: Versión de prueba 0.7 (animaciones 3D de las máquinas y revisión de animaciones en Explorar). Descarga PandarIA-Fit.apk e instálala encima de la anterior.
           files: PandarIA-Fit.apk
