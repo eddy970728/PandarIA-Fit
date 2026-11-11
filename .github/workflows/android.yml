@@ -23,8 +23,6 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
-
       - name: Instalar Capacitor
         run: npm install
 
