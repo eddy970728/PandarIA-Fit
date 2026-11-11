@@ -1,4 +1,4 @@
-/* ============ PandarIA Fit · Integración nativa Android (Fases 1, 2 y N) ============
+/* ============ PandarIA Fit · Integración nativa Android (fases 1 a 7) ============
    Se carga después de index.html. En el navegador no hace nada:
    solo actúa dentro de la app instalada (Capacitor). */
 (function(){
@@ -45,7 +45,7 @@
   }
   const scheduleBackup = () => { clearTimeout(bkT); bkT = setTimeout(writeBackup, 3000); };
   const _save = save;
-  save = function(now){ _save(now); if (now) setTimeout(writeBackup, 50); else scheduleBackup(); if (scheduleNotifs) scheduleNotifs(); };
+  save = function(now){ _save(now); if (now) setTimeout(writeBackup, 50); else scheduleBackup(); if (scheduleNotifs) scheduleNotifs(); if (window.pushWidgets) window.pushWidgets(); };
 
   /* ---------- 2. Vibración nativa ---------- */
   vibrate = function(p){
@@ -402,6 +402,7 @@
 
   // Fin del descanso / serie por tiempo con la app en segundo plano (nunca en silencio)
   function onPauseNotif(){
+    if (PN) return; // el servicio nativo ya avisa del descanso
     const n = NS();
     if (!LN || !notifOk || !n.on || !n.rest || !S.active) return;
     const a = S.active, list = [], now = Date.now();
@@ -551,16 +552,327 @@
     return _va.apply(this, arguments).replace('<div class="sec">Recordatorios</div>', row + '<div class="sec">Recordatorios</div>');
   };
 
+  /* ---------- 10. Entreno con la pantalla apagada (Fase 3) ---------- */
+  const PN = P('PandaNative');
+  let svcOn = false, svcSig = '', intSkips = 0;
+  const intRunning = () => typeof INT !== 'undefined' && !!INT;
+  // Mientras el servicio nativo lleva el tiempo, los pitidos, la voz y la vibración los pone él (sin duplicados)
+  const nativeTiming = () => svcOn && (!!S.active || intRunning());
+  function intPhaseInfo(p, c){
+    const ex = p.ex ? getEx(p.ex).n : '';
+    const label = p.type === 'work' ? (p.amrap ? 'AMRAP' : p.emom ? 'EMOM' : 'TRABAJO') + (ex ? ' · ' + ex : '') : p.type === 'rest' ? (p.label || 'Descanso') : 'Prepárate';
+    const sub = p.round ? (p.emom ? `Minuto ${p.round} de ${p.rounds}` : `Ronda ${p.round} de ${p.rounds}`) + (p.sets > 1 ? ` · Tanda ${p.set} de ${p.sets}` : '') : INT_FMT[c.fmt].n;
+    const say = p.type === 'work' ? (p.amrap ? '¡Adelante! Máximo de rondas' : (p.emom ? `Minuto ${p.round}. ` : 'Trabajo. ') + ex) : p.type === 'rest' ? (p.label || 'Descanso') : 'Prepárate';
+    return {label, sub, dur: p.dur, say};
+  }
+  function svcState(){
+    const base = {sound: S.settings.sound !== false, vibrate: S.settings.vibrate !== false, voice: !!S.settings.voice};
+    if (intRunning()){
+      const c = INT.cfg;
+      return Object.assign(base, {mode:'intervals', title: INT_FMT[c.fmt].n, intervals: {id: INT.start, phases: INT.ph.map(p => intPhaseInfo(p, c)), idx: INT.i, startAt: INT.t0, paused: !!INT.paused, left: intLeft()}});
+    }
+    if (!S.active) return {mode:'none'};
+    const a = S.active;
+    Object.assign(base, {mode:'workout', title: a.name, startedAt: a.start});
+    if (a.timer){
+      const it = wkItem(a.timer.uid), n = it ? getEx(it.exId).n : 'Serie';
+      base.rest = {kind:'set', end: a.timer.end, total: a.timer.total, title: `Serie por tiempo · ${n}`, text: a.name, doneTitle: '✅ Tiempo cumplido', doneText: n, say: 'Tiempo'};
+    } else if (a.rest){
+      const np = nextPending(); let next = 'la siguiente serie', say = 'Descanso terminado';
+      if (np){ const ex = getEx(np.it.exId), wn = np.it.sets.slice(0, np.i + 1).filter(x => x.t !== 'c').length;
+        next = np.it.sets[np.i].t === 'c' ? `calentamiento de ${ex.n}` : `serie ${wn} de ${ex.n}`; say = `Descanso terminado. Siguiente: ${ex.n}`; }
+      base.rest = {kind:'rest', end: a.rest.end, total: a.rest.total, title: `Descanso · ${cap(next)}`, text: a.name, doneTitle: '⏱️ Descanso terminado', doneText: `¡A por la ${next}!`, say};
+    }
+    return base;
+  }
+  function svcSync(force){
+    if (!PN) return;
+    const st = svcState();
+    const sig = st.mode === 'intervals' ? `i|${st.intervals.id}|${st.intervals.paused}|${intSkips}|${st.voice}${st.sound}${st.vibrate}`
+      : st.mode === 'workout' ? `w|${st.startedAt}|${st.title}|${st.rest ? st.rest.end : 0}|${st.voice}${st.sound}${st.vibrate}` : 'none';
+    if (!force && sig === svcSig) return;
+    svcSig = sig;
+    if (st.mode !== 'none') svcOn = true;
+    PN.workout(st).then(() => { svcOn = st.mode !== 'none'; }).catch(() => { svcOn = false; });
+  }
+  setInterval(() => { if (!document.hidden) svcSync(); }, 600);
+  const _beepN = beep; beep = function(){ if (nativeTiming()) return; return _beepN.apply(this, arguments); };
+  const _sbN = shortBeep; shortBeep = function(){ if (nativeTiming()) return; return _sbN.apply(this, arguments); };
+  const _spN = speak; speak = function(t){ if (nativeTiming()) return; return _spN(t); };
+  const _viN = vibrate; vibrate = function(p){ const big = Array.isArray(p) ? p.reduce((a, b) => a + (+b || 0), 0) > 60 : (+p || 200) > 60; if (big && nativeTiming()) return; return _viN(p); };
+  const _isk = A.intSkip; A.intSkip = () => { intSkips++; _isk(); };
+  // Si el servicio avanzó fases con la app en segundo plano, se registran como hechas
+  function intCatchUp(toIdx){
+    if (!intRunning()) return;
+    while (INT.i < Math.min(toIdx, INT.ph.length)){
+      const p = INT.ph[INT.i];
+      if (p && p.type === 'work') INT.done.push({ex: p.ex, time: p.dur});
+      INT.i++;
+    }
+  }
+  async function svcResync(){
+    if (!PN || !intRunning()) return;
+    try{
+      const r = await PN.getState(), s = JSON.parse(r.state || '{}'), iv = s.intervals;
+      if (!iv || iv.id !== INT.start) return;
+      if (iv.idx > INT.i) intCatchUp(iv.idx);
+      if (INT.i >= INT.ph.length){ intFinish(); return; }
+      const dur = INT.ph[INT.i].dur;
+      if (iv.paused){ INT.paused = Date.now(); INT.t0 = INT.paused - (dur - (iv.left || 0)) * 1000; }
+      else { INT.paused = null; INT.t0 = iv.startAt; }
+      INT.lastSec = null; refreshTop();
+    }catch(e){}
+  }
+  function onNativeAction(ev){
+    const a = ev && ev.action;
+    setTimeout(() => { try{
+      if (a === 'skip' && S.active && S.active.rest) A.wkRestAdj('skip');
+      else if (a === 'plus30' && S.active && S.active.rest) A.wkRestAdj('30');
+      else if ((a === 'ipause' && intRunning() && !INT.paused) || (a === 'iresume' && intRunning() && INT.paused)) A.intPause();
+      else if (a === 'iskip' && intRunning()) intNext(true);
+      else if (a === 'idone' && intRunning()){ intCatchUp(INT.ph.length); intFinish(); }
+      else if (a === 'widgetWater') consumeWidget();
+    }catch(e){} }, 60);
+  }
+
+  /* ---------- 11. Widgets (Fase 4) ---------- */
+  let wT = null;
+  function widgetData(){
+    const prem = typeof isPremium === 'function' ? isPremium() : true;
+    const nx = typeof nextInPlan === 'function' ? nextInPlan() : null, r = nx && nx.r;
+    const dow = new Date().getDay(), done = trainedToday().length > 0;
+    const anyR = S.routines.find(x => !x.archived);
+    let today;
+    if (!prem) today = {locked: true};
+    else if (done) today = {label:'HOY', title:'¡Hecho por hoy! 💪', sub: r ? 'Próxima: ' + r.name : 'Descansa y recupera', rid:''};
+    else if (r && (!S.plan || S.plan.days.includes(dow))) today = {label:'HOY TOCA', title: r.name, sub: `~${routineMinutes(r)} min · ${plural(r.items.filter(i => !i.warm && !i.cool).length,'ejercicio','ejercicios')}`, rid: r.id};
+    else if (r) today = {label:'HOY', title:'Día de descanso', sub:'Próxima: ' + r.name, rid:''};
+    else if (anyR) today = {label:'TUS RUTINAS', title: anyR.name, sub:'Toca para empezar', rid: anyR.id};
+    else today = {label:'HOY TOCA', title:'Crea tu primera rutina', sub:'Toca para abrir la app', rid:''};
+    const f = S.nutri && S.nutri.fast;
+    const planN = f ? ((FAST_PLANS[f.plan] || {}).n || '') : '';
+    const fast = f && f.active ? {active: true, start: f.active.start, goalH: f.active.goalH || 0, plan: planN} : {active: false, plan: planN};
+    const water = {ml: (S.nutri && S.nutri.water && S.nutri.water[dayKey()]) || 0, goal: waterGoal(), day: dayKey()};
+    const wk = weekKey(Date.now());
+    const doneW = new Set(S.sessions.filter(s => weekKey(s.end) === wk).map(s => new Date(s.end).toDateString())).size;
+    const streak = prem ? {weeks: streakWeeks(), done: doneW, target: S.plan && S.plan.days.length ? S.plan.days.length : 1} : {locked: true};
+    return {today, fast, water, streak};
+  }
+  function pushWidgets(now){
+    if (!PN) return;
+    clearTimeout(wT);
+    const go = () => { try{ PN.setWidgetData({json: JSON.stringify(widgetData())}).catch(() => {}); }catch(e){} };
+    if (now) go(); else wT = setTimeout(go, 1500);
+  }
+  window.pushWidgets = pushWidgets;
+  async function consumeWidget(){
+    if (!PN) return;
+    try{
+      const r = await PN.consumeWidgetActions(), acts = r.actions || [];
+      let ml = 0;
+      acts.forEach(a => { if (a.type === 'water'){ const k = dayKey(a.at || Date.now()); const n = nut(); n.water[k] = (n.water[k] || 0) + (+a.ml || 250); n.waterLast = Math.max(n.waterLast || 0, a.at || 0); ml += +a.ml || 250; } });
+      if (ml){ save(); render.keep = true; render(); toast(`💧 +${ml} ml desde el widget`); }
+    }catch(e){}
+  }
+
+  /* ---------- 12. Enlaces, accesos directos y tema (Fase 7) ---------- */
+  const PAGES = 'https://eddy970728.github.io/pandaria-fit/';
+  function importRoutineCode(code){
+    try{ const d = decodeRoutine(code); const r = newRoutine({name:'Rutina compartida', items: d.items, pandaria: true, goal: d.goal, source:'enlace'}); openEditor(r, true); toast('Rutina importada: revísala y guarda'); }
+    catch(e){ toast('El enlace de la rutina no es válido'); }
+  }
+  function openUrl(url){
+    if (!url || !/^pandariafit:/i.test(url)) return;
+    let u; try{ u = new URL(url.replace(/^pandariafit:\/*/i, 'https://x/')); }catch(e){ return; }
+    const path = u.pathname.replace(/^\/+|\/+$/g, '').toLowerCase(), q = u.searchParams;
+    setTimeout(() => { try{
+      while (MODALS.length) closeModal();
+      if (path === 'entreno'){
+        const rid = q.get('rid'), nx = typeof nextInPlan === 'function' ? nextInPlan() : null;
+        const r = (rid && findR(rid)) || (nx && nx.r) || S.routines.find(x => !x.archived);
+        A.tab('rutinas'); if (r) A.startWorkout(r.id); else toast('Crea una rutina para empezar');
+      } else if (path.startsWith('agua')){
+        A.tab('nutricion'); if (path === 'agua/250'){ A.water(250); toast('💧 +250 ml'); }
+      } else if (path.startsWith('ayuno')){
+        A.tab('nutricion'); const f = nut().fast;
+        if (path === 'ayuno/empezar'){ if (!f.screened) A.fastScreen(); else if (f.blocked) toast('El ayuno no es recomendable para ti sin supervisión'); else if (!f.active) A.fastStart(); }
+        else if (path === 'ayuno/terminar' && f.active) A.fastEnd();
+      } else if (path === 'historial') A.tab('historial');
+      else if (path === 'premium'){ const c = q.get('c'); A.openPremium(); if (c) setTimeout(() => { const el = $('#pfcode'); if (el){ el.value = c; A.pfActivate(); } }, 400); }
+      else if (path === 'rutina'){ const c = q.get('c'); if (c) importRoutineCode(c); }
+    }catch(e){} }, 450);
+  }
+  // Compartir rutina con enlace
+  A.shareRoutine = id => {
+    const r = findR(id); if (!r) return;
+    const {code, skipped} = encodeRoutine(r), link = `${PAGES}r.html#${code}`;
+    const text = `Prueba mi rutina «${r.name}» en PandarIA Fit 💪\n${link}\n\nSi no se abre, copia este código en Nueva rutina › Importar con código: ${code}`;
+    openModal(`<div class="modal"><h3>Compartir rutina</h3><p class="sm mut" style="line-height:1.45">Comparte el enlace: abre la app e importa la rutina. También vale el código, en <b>Nueva rutina › Importar con código</b>.</p>
+      <div class="codebox" style="font-size:17px">${code}</div>${skipped ? `<p class="xs" style="color:var(--gold)">${plural(skipped,'ejercicio propio no se incluye','ejercicios propios no se incluyen')}.</p>` : ''}
+      <div class="row" style="gap:8px;margin-top:14px"><button class="btn grow" data-a="cbm" data-v="${cb(() => { try{ navigator.clipboard.writeText(text).then(() => toast('Copiado'), () => fallbackCopy(text)); }catch(e){ fallbackCopy(text); } })}">${I('copy',18)} Copiar</button>
+      <button class="btn pri grow" data-a="cbm" data-v="${cb(() => { const Sh = P('Share'); if (Sh) Sh.share({title:'Rutina de PandarIA Fit', text, dialogTitle:'Compartir rutina'}).catch(() => {}); })}">${I('upload',18)} Compartir</button></div></div>`, {center:true});
+  };
+  // Tema según el sistema
+  const darkMQ = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+  const _atS = applyTheme;
+  applyTheme = function(){
+    const s = S.settings, keep = s.theme;
+    if (keep === 'system') s.theme = darkMQ && darkMQ.matches ? 'dark' : 'light';
+    try{ _atS(); } finally { s.theme = keep; }
+  };
+  if (darkMQ && darkMQ.addEventListener) darkMQ.addEventListener('change', () => { if (S.settings.theme === 'system') applyTheme(); });
+  A.setThemeMode = v => { S.settings.theme = v; applyTheme(); save(); render.keep = true; render(); };
+  let APPV = '';
+
+  /* ---------- 13. Health Connect (Fase 6) ---------- */
+  const HC = P('Health');
+  const HCS = () => (S.settings.hc = Object.assign({on:false, steps:true, weight:true, hr:true, writeWeight:true, writeWorkouts:true, useInPandaria:true, lastWeightTs:0}, S.settings.hc || {}));
+  const HD = {available: null, reason: '', steps: null, steps7: null, weight: null, weightAt: 0, hr: null, hrKind: '', lastSync: 0};
+  const isPrem = () => typeof isPremium === 'function' ? isPremium() : true;
+  async function hcAvail(){ try{ const r = await HC.isAvailable(); HD.available = !!r.available; HD.reason = r.reason || ''; }catch(e){ HD.available = false; } return HD.available; }
+  async function hcConnect(){
+    if (!HC){ toast('Health Connect no está disponible'); return; }
+    if (!(await hcAvail())){ confirmBox({title:'Falta Health Connect', text:'Instala <b>Health Connect</b> de Google desde Play Store (en Android 14 o superior ya viene incluido) y vuelve a intentarlo.', okText:'Entendido', ok:() => {}}); return; }
+    try{
+      await HC.requestAuthorization({read: ['steps','weight','heartRate','restingHeartRate'], write: ['weight','calories']});
+      HCS().on = true; save(); await hcSync(true); refreshHc(); toast('Health Connect conectado');
+    }catch(e){ toast('No se pudo conectar. Revisa los permisos en Health Connect.'); }
+  }
+  const iso = d => new Date(d).toISOString();
+  async function hcSync(force){
+    const s = HCS(); if (!HC || !s.on) return;
+    if (!force && Date.now() - HD.lastSync < 10 * 60000) return;
+    HD.lastSync = Date.now();
+    const now = Date.now(), d0 = new Date(); d0.setHours(0, 0, 0, 0); const start7 = d0.getTime() - 6 * 86400000;
+    if (s.steps) try{
+      const r = await HC.queryAggregated({dataType:'steps', startDate: iso(start7), endDate: iso(now), bucket:'day', aggregation:'sum'});
+      const arr = (r.samples || []).slice().sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate));
+      const today = arr.find(x => Date.parse(x.startDate) >= d0.getTime() - 3600000 && Date.parse(x.startDate) <= d0.getTime() + 3600000);
+      HD.steps = Math.round(today ? today.value : 0);
+      HD.steps7 = arr.length ? Math.round(arr.reduce((a, b) => a + (b.value || 0), 0) / 7) : 0;
+    }catch(e){}
+    if (s.weight) try{
+      const r = await HC.readSamples({dataType:'weight', startDate: iso(now - 90 * 86400000), endDate: iso(now), limit: 30});
+      const last = (r.samples || []).filter(x => x.value > 20).sort((a, b) => Date.parse(b.startDate) - Date.parse(a.startDate))[0];
+      if (last){
+        HD.weight = Math.round(last.value * 10) / 10; HD.weightAt = Date.parse(last.startDate);
+        const mine = S.measures.filter(m => m.peso).sort((a, b) => b.date - a.date)[0];
+        if (HD.weightAt > (s.lastWeightTs || 0) && (!mine || HD.weightAt > mine.date + 60000) && (!mine || Math.abs(mine.peso - HD.weight) >= 0.05 || HD.weightAt - mine.date > 86400000)){
+          S.measures.push({id: uid(), date: HD.weightAt, peso: HD.weight, src: 'hc'}); s.lastWeightTs = HD.weightAt; save();
+        }
+      }
+    }catch(e){}
+    if (s.hr) try{
+      let r = await HC.readSamples({dataType:'restingHeartRate', startDate: iso(now - 14 * 86400000), endDate: iso(now), limit: 5});
+      let x = (r.samples || []).sort((a, b) => Date.parse(b.startDate) - Date.parse(a.startDate))[0];
+      if (x){ HD.hr = Math.round(x.value); HD.hrKind = 'en reposo'; }
+      else { r = await HC.readSamples({dataType:'heartRate', startDate: iso(now - 86400000), endDate: iso(now), limit: 1}); x = (r.samples || [])[0]; if (x){ HD.hr = Math.round(x.value); HD.hrKind = 'última medida'; } }
+    }catch(e){}
+  }
+  function refreshHc(){ if (LAYERS.length && LAYERS[LAYERS.length - 1].t === 'hcMenu') refreshTop(); else { render.keep = true; render(); } }
+  // Escribir entrenos (calorías activas estimadas) y peso en Health Connect (Premium)
+  const _fw = finishWorkout;
+  finishWorkout = function(mode){
+    _fw.apply(this, arguments);
+    const s = HCS(), sess = S.sessions[S.sessions.length - 1];
+    if (HC && s.on && s.writeWorkouts && isPrem() && sess){
+      const hours = Math.max(0.05, (sess.end - sess.start) / 3600000), met = 3 + (sess.intensity || 6) * 0.45;
+      HC.saveSample({dataType:'calories', value: Math.round(met * bodyWeight() * hours), startDate: iso(sess.start), endDate: iso(sess.end), metadata: {source:'PandarIA Fit', workout: sess.routineName}}).catch(() => {});
+    }
+  };
+  const _ms = A.mSave;
+  A.mSave = () => {
+    const n0 = S.measures.length; _ms();
+    const s = HCS(), m = S.measures[S.measures.length - 1];
+    if (HC && s.on && s.writeWeight && isPrem() && S.measures.length > n0 && m && m.peso && m.src !== 'hc')
+      HC.saveSample({dataType:'weight', value: +m.peso, startDate: iso(m.date)}).catch(() => {});
+  };
+  // PandarIA ajusta tus calorías con tus pasos (Premium)
+  const _cn = calcNutrition;
+  calcNutrition = function(){
+    const c = _cn.apply(this, arguments), s = HCS();
+    if (c && s.on && s.useInPandaria && isPrem() && HD.steps7){
+      const f = HD.steps7 >= 12000 ? 1.08 : HD.steps7 >= 9000 ? 1.04 : HD.steps7 < 4000 ? 0.96 : 1;
+      if (f !== 1){ c.tdee = Math.round(c.tdee * f); c.kcal = Math.round(c.kcal * f / 10) * 10; c.carbs = Math.max(0, Math.round((c.kcal - c.prot * 4 - c.fat * 9) / 4)); }
+      c.notes.push(`Ajustado con tus pasos de Health Connect (media de ${HD.steps7.toLocaleString('es')} al día).`);
+    }
+    return c;
+  };
+  SCREENS.hcMenu = () => {
+    const s = HCS(), prem = isPrem();
+    const tg = (k, l, d, premOnly) => { const lock = premOnly && !prem; return `<button class="srow" data-a="${lock ? 'pfPay' : 'hcTog'}" data-v="${k}"><span class="grow"><div class="b">${l}${lock ? ' 🔒' : ''}</div>${d ? `<div class="xs mut">${d}</div>` : ''}</span><span class="toggle ${s[k] && !lock ? 'on' : ''}"></span></button>`; };
+    let b = `<p class="sm mut" style="margin-top:0;line-height:1.5">Conecta PandarIA Fit con Health Connect para leer pasos, peso y pulso de Samsung Health u otras apps, y guardar allí tus entrenos y tu peso.</p>`;
+    if (!s.on) b += `<div class="card" style="text-align:center"><div style="font-size:38px">❤️</div><div class="b" style="margin:6px 0 4px">Health Connect no está conectado</div><div class="xs mut" style="margin-bottom:14px">Tú eliges qué datos compartir. Puedes desconectarlo cuando quieras.</div><button class="btn pri wide" data-a="hcConnect">Conectar Health Connect</button></div>`;
+    else {
+      const fmtN = n => n == null ? '—' : n.toLocaleString('es');
+      b += `<div class="stats"><div class="stat"><div class="v">${fmtN(HD.steps)}</div><div class="l">Pasos hoy</div></div><div class="stat"><div class="v">${fmtN(HD.steps7)}</div><div class="l">Media 7 días</div></div></div>
+        <div class="stats"><div class="stat"><div class="v">${HD.weight ? fmtNum(HD.weight) + ' kg' : '—'}</div><div class="l">Peso${HD.weightAt ? ' · ' + fmtDate(HD.weightAt) : ''}</div></div><div class="stat"><div class="v">${HD.hr ? HD.hr + ' lpm' : '—'}</div><div class="l">Pulso${HD.hrKind ? ' ' + HD.hrKind : ''}</div></div></div>
+        <button class="btn wide" data-a="hcSyncNow">${I('refresh',18)} Actualizar ahora</button>
+        <div class="sec">Leer de Health Connect</div><div class="card" style="padding:4px 12px">${tg('steps','Pasos','Hoy y media de 7 días')}${tg('weight','Peso','Se añade solo a Mi historial › Cuerpo')}${tg('hr','Pulso','En reposo o la última medida')}</div>
+        <div class="sec">Guardar en Health Connect</div><div class="card" style="padding:4px 12px">${tg('writeWorkouts','Entrenos','Como calorías activas estimadas por duración e intensidad', true)}${tg('writeWeight','Peso','Cuando registras tu peso en Cuerpo', true)}</div>
+        <div class="sec">PandarIA</div><div class="card" style="padding:4px 12px">${tg('useInPandaria','Usar mis pasos en las recomendaciones','Ajusta tus calorías diarias según tu actividad', true)}</div>
+        <div class="row" style="gap:8px;margin-top:14px"><button class="btn grow sm" data-a="hcSettings">Permisos en Health Connect</button><button class="btn grow sm danger" data-a="hcOff">Desconectar</button></div>`;
+    }
+    b += `<p class="xs mut" style="line-height:1.5;margin-top:16px">Tus datos de salud se quedan en tu teléfono: PandarIA Fit no los envía a ningún servidor. <button class="link xs" data-a="hcPrivacy">Política de privacidad</button></p>`;
+    return lhdr('Health Connect') + `<div class="lbody">${b}</div>`;
+  };
+  A.hcMenu = () => { openLayer('hcMenu'); if (HCS().on) hcSync(true).then(refreshHc); };
+  A.hcConnect = () => hcConnect();
+  A.hcTog = k => { const s = HCS(); s[k] = !s[k]; save(); refreshTop(); };
+  A.hcSyncNow = async () => { toast('Actualizando…'); await hcSync(true); refreshHc(); };
+  A.hcSettings = () => { try{ HC.openHealthConnectSettings(); }catch(e){} };
+  A.hcOff = () => confirmBox({title:'¿Desconectar Health Connect?', text:'Dejaremos de leer y guardar datos. Para quitar también los permisos, hazlo en los ajustes de Health Connect.', okText:'Desconectar', danger:true, ok:() => { HCS().on = false; save(); refreshTop(); }});
+  SCREENS.privacy = p => lhdr('Privacidad') + `<div class="lbody" style="line-height:1.55">${p.html || 'Cargando…'}</div>`;
+  A.hcPrivacy = async () => { let html = ''; try{ const t = await (await fetch('privacypolicy.html')).text(); html = (t.match(/<main[^>]*>([\s\S]*)<\/main>/) || [,''])[1]; }catch(e){} openLayer('privacy', {html: html || 'No se pudo cargar la política de privacidad.'}); };
+
+  // Ajustes: tema del sistema, Health Connect y versión real
+  const _vaN = viewAjustes;
+  viewAjustes = function(){
+    let h = _vaN.apply(this, arguments);
+    const t = S.settings.theme;
+    h = h.replace(/<button class="srow" data-a="toggleSet" data-v="theme">[\s\S]*?<\/button>/, `<div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('moon',20)}</span><span class="b grow">Tema</span></div><div class="seg">${[['system','Sistema'],['light','Claro'],['dark','Oscuro']].map(([k, n]) => `<button class="${t === k ? 'on' : ''}" data-a="setThemeMode" data-v="${k}">${n}</button>`).join('')}</div></div>`);
+    const s = HCS();
+    const row = `<div class="sec">Salud</div><div class="card" style="padding:0 12px"><button class="srow" data-a="hcMenu"><span class="si">${I('flame',20)}</span><span class="grow"><div class="b">Health Connect</div><div class="xs mut">${s.on ? 'Conectado' + (HD.steps != null ? ` · ${HD.steps.toLocaleString('es')} pasos hoy` : '') : 'Pasos, peso y pulso de Samsung Health'}</div></span>${I('right',18)}</button></div>`;
+    h = h.replace('<div class="sec">Notificaciones</div>', row + '<div class="sec">Notificaciones</div>');
+    if (APPV) h = h.replace(/versión 2\.0[^<]*/, `versión ${APPV}`);
+    h = h.replace(/<div class="sec">Recordatorios<\/div><div class="card">[\s\S]*?<\/div>\s*(?=<div class="sec">Tus datos<\/div>)/, '');
+    return h;
+  };
+  // Historial › Resumen: tarjeta de Health Connect
+  const _vhN = viewHistorial;
+  viewHistorial = function(){
+    let h = _vhN.apply(this, arguments);
+    if (HSEG === 'resumen' && HCS().on && HD.steps != null){
+      const card = `<div class="card row" data-a="hcMenu" style="gap:12px;cursor:pointer"><span style="color:var(--bad)">${I('flame',22)}</span><div class="grow"><div class="b">${HD.steps.toLocaleString('es')} pasos hoy</div><div class="xs mut">Media 7 días: ${(HD.steps7 || 0).toLocaleString('es')}${HD.hr ? ` · Pulso ${HD.hrKind}: ${HD.hr} lpm` : ''}</div></div>${I('right',18)}</div>`;
+      h = h.replace('<div class="stats">', card + '<div class="stats">');
+    }
+    return h;
+  };
+
+  // Arranque de las fases 3 a 7
+  function init2(){
+    if (PN) PN.addListener('nativeAction', onNativeAction);
+    if (App){
+      App.addListener('appUrlOpen', e => openUrl(e && e.url));
+      safe(() => App.getLaunchUrl().then(r => r && r.url && openUrl(r.url)));
+      safe(() => App.getInfo().then(i => { APPV = i.version || ''; }));
+    }
+    if (S.settings.theme === 'system') applyTheme();
+    consumeWidget(); pushWidgets(true); svcResync(); svcSync(true);
+    setTimeout(() => hcSync(false).then(() => { if (HD.steps != null){ render.keep = true; render(); } }), 2500);
+  }
+
   /* ---------- 8. Ciclo de vida ---------- */
   function init(){
     syncBars();
     if (App){
       App.addListener('backButton', onBack);
-      App.addListener('pause', () => { save(true); writeBackup(); onPauseNotif(); });
-      App.addListener('resume', () => { onResumeNotif(); if (S.active || (typeof INT !== 'undefined' && INT)) { awakeOn = false; keepAwake(); } render.keep = true; render(); if (LAYERS.length) refreshTop(); });
+      App.addListener('pause', () => { save(true); writeBackup(); onPauseNotif(); svcSync(true); pushWidgets(true); });
+      App.addListener('resume', () => { onResumeNotif(); svcResync(); consumeWidget(); hcSync(false); if (S.active || (typeof INT !== 'undefined' && INT)) { awakeOn = false; keepAwake(); } render.keep = true; render(); if (LAYERS.length) refreshTop(); });
     }
     if (S.active) keepAwake();
     setupNotif();
+    init2();
     setTimeout(() => safe(() => Splash.hide({fadeOutDuration: 250})), 150);
     if (sessionStorage.getItem('pf-restored')){ sessionStorage.removeItem('pf-restored'); setTimeout(() => toast('Recuperamos tus datos de la copia interna'), 800); }
     setTimeout(writeBackup, 4000);
