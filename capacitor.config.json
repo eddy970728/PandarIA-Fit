@@ -13,6 +13,10 @@
       "backgroundColor": "#12151a",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_pandaria",
+      "iconColor": "#ff7a1a"
     }
   }
 }
