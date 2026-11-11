@@ -1,14 +1,14 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>PandarIA Fit</title>
-
-
-
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="theme-color" content="#181c23">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="PandarIA Fit: rutinas, entrenamiento guiado, historial y un algoritmo que te ayuda a progresar.">
-
+<title>PandarIA Fit</title>
 <style>
 :root{
   --bg:#12151a; --bg2:#181c23; --card:#1f242d; --card2:#282e39; --line:#2f3642;
@@ -324,7 +324,8 @@ html[data-fx=on] #nav button.fx-splash .pill{animation:splash .4s ease}
 html[data-fx=off] *,html[data-fx=off] *::before{animation:none!important;transition:none!important}
 
 </style>
-
+</head>
+<body>
 <div id="app"></div>
 <script>
 /* ============ PandarIA Fit · DATOS ============ */
@@ -344,10 +345,12 @@ const EQUIP = {
   pc:'Peso corporal', est:'Esterilla', man:'Mancuernas', bar:'Barra y discos', ban:'Banco', maq:'Máquinas de gimnasio',
   pol:'Poleas', kb:'Kettlebell', bnd:'Bandas elásticas', dom:'Barra de dominadas', par:'Paralelas',
   trx:'TRX / anillas', rue:'Rueda abdominal', cue:'Comba', caj:'Cajón / escalón', cin:'Cinta de correr',
-  bic:'Bicicleta estática', eli:'Elíptica', rem:'Remo ergómetro'
+  bic:'Bicicleta estática', eli:'Elíptica', rem:'Remo ergómetro',
+  smi:'Máquina Smith', lmn:'Landmine', hex:'Barra hexagonal', ez:'Barra Z', ghd:'Banco GHD / glúteo-isquio', trn:'Trineo', bal:'Balón medicinal', fit:'Fitball',
+  cdb:'Cuerdas de batalla', esc:'Escaladora / stepper', ski:'SkiErg', aib:'Bicicleta de aire'
 };
 const EQUIP_DEFAULT = ['pc','est'];
-const EQUIP_GYM = ['pc','est','man','bar','ban','maq','pol','kb','bnd','dom','par','trx','rue','cue','caj','cin','bic','eli','rem'];
+const EQUIP_GYM = ['pc','est','man','bar','ban','maq','pol','kb','bnd','dom','par','trx','rue','cue','caj','cin','bic','eli','rem','smi','lmn','hex','ez','fit','bal','esc']; // GHD, trineo, cuerdas, SkiErg y air bike se marcan a mano
 
 /* Formato: id|nombre|patrón|equipo(+)|primarios(,)|secundarios(,)|tipo c/a|nivel 1-3|modo p/r/t|consejo */
 const EX_RAW = `
@@ -361,7 +364,7 @@ press_pecho_maq|Press de pecho en máquina|empuje_h|maq|pecho|triceps|c|1|p|Ajus
 press_cerrado|Press de banca agarre cerrado|empuje_h|bar+ban|triceps|pecho|c|2|p|Manos al ancho de hombros, codos pegados al cuerpo.
 aperturas_man|Aperturas con mancuernas|apertura|man+ban|pecho|hombros|a|1|p|Codos ligeramente flexionados todo el recorrido, como abrazando un árbol.
 cruce_poleas|Cruce de poleas|apertura|pol|pecho||a|1|p|Junta las manos delante del pecho y aprieta un segundo.
-pec_deck|Contractora de pecho|apertura|maq|pecho||a|1|p|Espalda pegada al respaldo, movimiento lento.
+pec_deck|Contractora de pecho (mariposa)|apertura|maq|pecho||a|1|p|Espalda pegada al respaldo, movimiento lento.
 pullover_man|Pullover con mancuerna|apertura|man+ban|pecho|dorsales|a|2|p|Brazos casi rectos, baja detrás de la cabeza sin arquear la espalda.
 fondos_pecho|Fondos en paralelas (pecho)|empuje_h|par|pecho|triceps,hombros|c|2|r|Inclina el torso hacia delante para cargar más el pecho.
 flexiones_pared|Flexiones en pared|empuje_h|pc|pecho|triceps|c|1|r|Cuerpo recto como una tabla, aleja los pies para hacerlo más difícil.
@@ -561,10 +564,190 @@ pil_una_pierna|Estiramiento de una pierna|pilates|est|abdomen||a|1|r|Cabeza elev
 pil_patada_lateral|Patada lateral tumbado|pilates|est|abductores|gluteos|a|1|r|Cuerpo alineado, pierna a la altura de la cadera.
 pil_rodar|Rodar como pelota|pilates|est|abdomen|lumbar|a|1|r|Mantén la forma de bola.
 pil_teaser|Teaser|pilates|est|abdomen||a|3|r|Equilibrio sobre los isquiones formando una V.
+smith_sentadilla|Sentadilla en Smith|sentadilla|smi|cuadriceps|gluteos|c|1|p|Pies un poco por delante de la barra; baja controlado hasta el paralelo.
+smith_frontal|Sentadilla frontal en Smith|sentadilla|smi|cuadriceps|gluteos,abdomen|c|2|p|Codos altos y torso erguido; la barra descansa sobre los hombros.
+sentadilla_pendulo|Sentadilla péndulo|sentadilla|maq|cuadriceps|gluteos|c|1|p|Espalda pegada al respaldo; baja profundo sin despegar los talones.
+v_squat|Sentadilla en V (V-squat)|sentadilla|maq|cuadriceps|gluteos|c|1|p|Hombros bajo las almohadillas, empuja con todo el pie.
+hack_inversa|Sentadilla hack inversa|sentadilla|maq|gluteos|cuadriceps,isquios|c|2|p|Pecho contra el respaldo; lleva la cadera atrás al bajar.
+belt_squat|Sentadilla con cinturón (belt squat)|sentadilla|maq|cuadriceps|gluteos|c|1|p|La carga va en la cadera: ideal si te molesta la espalda.
+prensa_vertical|Prensa vertical|sentadilla|maq|cuadriceps|gluteos|c|2|p|Zona lumbar siempre apoyada; no bloquees las rodillas arriba.
+prensa_sentada|Prensa sentada (de placas)|sentadilla|maq|cuadriceps|gluteos|c|1|p|Ajusta el asiento para que las rodillas lleguen a 90°.
+prensa_unilateral|Prensa a una pierna|sentadilla|maq|cuadriceps|gluteos|c|2|p|Pie en el centro de la plataforma; rodilla alineada con la punta.
+ext_cuad_unilateral|Extensión de cuádriceps a una pierna|ext_pierna|maq|cuadriceps||a|1|p|Sube en 1 segundo, aprieta arriba y baja en 3.
+ext_cuad_polea|Extensión de cuádriceps en polea, de pie|ext_pierna|pol|cuadriceps||a|1|p|Tobillera en la polea baja; extiende la rodilla sin mover el muslo.
+sentadilla_landmine|Sentadilla landmine|sentadilla|lmn|cuadriceps|gluteos|c|1|p|Sujeta el extremo de la barra junto al pecho y baja recto.
+sentadilla_zercher|Sentadilla Zercher|sentadilla|bar|cuadriceps|abdomen,gluteos|c|3|p|La barra en el pliegue de los codos; abdomen muy firme.
+box_squat|Sentadilla al cajón (box squat)|sentadilla|bar+caj|gluteos|cuadriceps,isquios|c|2|p|Siéntate atrás hasta tocar el cajón sin relajarte y sube.
+sentadilla_sissy|Sentadilla sissy|sentadilla|pc|cuadriceps||a|3|r|Talones arriba y cadera adelante; baja inclinando el cuerpo atrás.
+nordico_inverso|Nórdico inverso|ext_pierna|pc|cuadriceps||a|3|r|De rodillas, inclínate atrás en bloque y vuelve con los cuádriceps.
+smith_zancada|Zancada en Smith|zancada|smi|cuadriceps|gluteos|c|1|p|Paso largo; la rodilla de atrás baja hacia el suelo.
+smith_bulgara|Búlgara en Smith|zancada|smi+ban|cuadriceps|gluteos|c|2|p|Pie trasero en el banco; baja vertical guiado por la barra.
+zancada_caminando_barra|Zancadas caminando con barra|zancada|bar|cuadriceps|gluteos|c|2|p|Pasos firmes y torso erguido; necesitas espacio libre.
+zancada_caminando_man|Zancadas caminando con mancuernas|zancada|man|cuadriceps|gluteos|c|1|p|Da pasos largos y alterna piernas sin parar.
+zancada_inversa_barra|Zancada inversa con barra|zancada|bar|gluteos|cuadriceps|c|2|p|Da el paso atrás: es más amable con las rodillas.
+step_up_man|Subida al cajón con mancuernas|zancada|man+caj|cuadriceps|gluteos|c|1|p|Empuja con el pie de arriba, sin impulsarte con el de abajo.
+pm_hexagonal|Peso muerto con barra hexagonal|bisagra|hex|cuadriceps|gluteos,isquios,lumbar|c|1|p|Colócate en el centro de la barra y empuja el suelo con las piernas.
+trineo_empuje|Empuje de trineo|cardio|trn|cuadriceps|gluteos,gemelos|c|1|t|Brazos firmes, cuerpo inclinado y pasos cortos y potentes.
+trineo_arrastre|Arrastre de trineo hacia atrás|cardio|trn|cuadriceps|gemelos|c|1|t|Camina hacia atrás con pasos cortos; muy suave con las rodillas.
+curl_femoral_pie|Curl femoral de pie (a una pierna)|curl_pierna|maq|isquios||a|1|p|Cadera quieta; lleva el talón hacia el glúteo.
+curl_femoral_rodillas|Curl femoral arrodillado|curl_pierna|maq|isquios||a|1|p|Apoya bien la rodilla y no arquees la espalda.
+curl_femoral_unilateral|Curl femoral tumbado a una pierna|curl_pierna|maq|isquios||a|1|p|Trabaja cada pierna por separado para igualarlas.
+curl_femoral_polea|Curl femoral en polea, de pie|curl_pierna|pol|isquios||a|1|p|Tobillera en la polea baja; muslo quieto.
+curl_femoral_fitball|Curl femoral con fitball|curl_pierna|fit|isquios|gluteos|a|1|r|Cadera arriba y arrastra la pelota hacia ti con los talones.
+nordico_maquina|Curl nórdico asistido en máquina|curl_pierna|maq|isquios||a|2|r|Baja lo más lento posible; la máquina te ayuda a subir.
+glute_ham|Glute-ham raise|curl_pierna|ghd|isquios|gluteos|a|3|r|Cuerpo recto de rodillas a cabeza; sube con los isquios.
+smith_rumano|Peso muerto rumano en Smith|bisagra|smi|isquios|gluteos|c|1|p|Cadera atrás con la barra pegada a las piernas.
+pm_piernas_rigidas|Peso muerto piernas rígidas|bisagra|bar|isquios|lumbar,gluteos|c|2|p|Rodillas casi rectas, baja hasta notar el estiramiento.
+hip_thrust_maq|Hip thrust en máquina|gluteo|maq|gluteos|isquios|c|1|p|Barbilla al pecho y sube hasta alinear rodillas, cadera y hombros.
+smith_hip_thrust|Hip thrust en Smith|gluteo|smi+ban|gluteos|isquios|c|1|p|Espalda alta en el banco; pausa arriba un segundo.
+hip_thrust_unilateral|Hip thrust a una pierna|gluteo|pc+ban|gluteos|isquios|a|2|r|Cadera nivelada, sin girar al subir.
+patada_gluteo_maq|Patada de glúteo en máquina|gluteo|maq|gluteos|isquios|a|1|p|Empuja la plataforma atrás sin arquear la zona lumbar.
+multicadera_ext|Extensión de cadera en multicadera|gluteo|maq|gluteos|isquios|a|1|p|Torso quieto; lleva la pierna atrás con el glúteo.
+pull_through|Pull through en polea|bisagra|pol|gluteos|isquios|c|1|p|De espaldas a la polea, cadera atrás y adelante con fuerza.
+hiper_gluteo|Hiperextensión 45° para glúteo|gluteo|maq|gluteos|isquios,lumbar|a|1|r|Espalda algo redondeada y aprieta el glúteo al subir.
+hiper_inversa|Hiperextensión inversa|gluteo|ghd|gluteos|lumbar,isquios|a|2|r|Torso apoyado; eleva las piernas hasta la línea del cuerpo.
+abduccion_polea|Abducción de cadera en polea|abduccion|pol|abductores|gluteos|a|1|p|Tobillera en la polea baja; separa la pierna sin inclinarte.
+abduccion_multicadera|Abducción de pie en multicadera|abduccion|maq|abductores|gluteos|a|1|p|Sujétate bien y abre la pierna lateralmente.
+fire_hydrant|Patada lateral en cuadrupedia (fire hydrant)|abduccion|est|abductores|gluteos|a|1|r|Rodilla doblada; elévala de lado sin girar el tronco.
+frog_pumps|Frog pumps|gluteo|est|gluteos||a|1|r|Plantas de los pies juntas y rodillas abiertas; sube rápido.
+rack_pull|Rack pull|bisagra|bar|gluteos|lumbar,trapecio,isquios|c|2|p|La barra sale de los soportes a la altura de las rodillas.
+aduccion_polea|Aducción en polea|abduccion|pol|aductores||a|1|p|Lleva la pierna hacia la de apoyo cruzando por delante.
+aduccion_multicadera|Aducción en multicadera|abduccion|maq|aductores||a|1|p|Movimiento lento; no balancees el cuerpo.
+copenhague|Plancha Copenhague|core|est+ban|aductores|oblicuos|a|2|t|Pierna de arriba sobre el banco; cadera alta como una plancha lateral.
+sentadilla_cosaca|Sentadilla cosaca|zancada|kb|aductores|cuadriceps,gluteos|c|2|p|Baja hacia un lado con la otra pierna estirada y el talón apoyado.
+gemelos_prensa|Gemelos en prensa|gemelo|maq|gemelos||a|1|p|Solo la punta del pie en la plataforma; recorrido completo.
+gemelos_smith|Gemelos en Smith|gemelo|smi|gemelos||a|1|p|Pon un disco bajo las puntas para más recorrido.
+gemelo_burro|Gemelo burro (donkey)|gemelo|maq|gemelos||a|2|p|Cadera flexionada; estira bien abajo.
+gemelos_barra|Gemelos de pie con barra|gemelo|bar|gemelos||a|1|p|Barra en la espalda, sube en puntas sin doblar las rodillas.
+gemelo_unilateral_man|Gemelos a una pierna con mancuerna|gemelo|man|gemelos||a|1|p|Sujétate de algo y trabaja una pierna cada vez.
+gemelo_excentrico|Bajada excéntrica de talón|gemelo|pc+caj|gemelos||a|1|r|Sube con dos pies y baja muy lento con uno: protege el tendón.
+tibial|Elevación de tibial (máquina o pared)|gemelo|pc|gemelos||a|1|r|Espalda en la pared, pies adelante; sube las puntas.
+jalon_maquina|Jalón en máquina (convergente)|tiron_v|maq|dorsales|biceps|c|1|p|Pecho alto; lleva los codos hacia las costillas.
+jalon_unilateral_maq|Jalón unilateral en máquina|tiron_v|maq|dorsales|biceps|c|1|p|Un brazo cada vez; estira bien arriba.
+jalon_supino|Jalón agarre supino|tiron_v|pol|dorsales|biceps|c|1|p|Palmas hacia ti al ancho de hombros; baja al pecho.
+jalon_neutro|Jalón agarre neutro|tiron_v|pol|dorsales|biceps|c|1|p|Palmas enfrentadas; codos pegados al bajar.
+jalon_una_mano|Jalón a una mano en polea|tiron_v|pol|dorsales||c|1|p|Inclínate un poco hacia el brazo que trabaja.
+dominadas_maquina|Dominadas asistidas en máquina|tiron_v|maq|dorsales|biceps|c|1|r|Más peso de asistencia = más fácil. Ve bajándolo con el tiempo.
+dominadas_neutras|Dominadas agarre neutro|tiron_v|dom|dorsales|biceps|c|2|r|Palmas enfrentadas; suele ser más cómodo para los hombros.
+muscle_up|Muscle-up|tiron_v|dom|dorsales|pecho,triceps|c|3|r|Tirón explosivo hasta la cadera y pasa los codos por encima de la barra.
+remo_alto_maq|Remo alto en máquina (high row)|tiron_v|maq|dorsales|trapecio,biceps|c|1|p|Tira de arriba abajo y atrás, juntando las escápulas.
+remo_bajo_maq|Remo bajo en máquina (low row)|tiron_h|maq|dorsales|biceps,trapecio|c|1|p|Pecho apoyado; lleva los codos atrás.
+remo_t_apoyado|Remo en T con pecho apoyado|tiron_h|maq|dorsales|trapecio,biceps|c|1|p|Pecho en la almohadilla; no te despegues al tirar.
+remo_apoyado_man|Remo con pecho apoyado con mancuernas|tiron_h|man+ban|dorsales|hombros,biceps|c|1|p|Boca abajo en un banco inclinado, tira hacia la cadera.
+remo_seal|Remo Seal|tiron_h|bar+ban|dorsales|trapecio|c|2|p|Tumbado en un banco alto; sin impulso, solo espalda.
+remo_pendlay|Remo Pendlay|tiron_h|bar|dorsales|lumbar,trapecio|c|2|p|Torso paralelo al suelo; cada repetición parte del suelo.
+remo_kroc|Remo Kroc|tiron_h|man|dorsales|antebrazos|c|2|p|Muchas repeticiones con mancuerna pesada, algo de impulso permitido.
+remo_polea_unilateral|Remo a una mano en polea|tiron_h|pol|dorsales|biceps|c|1|p|Gira un poco el torso al estirar y al tirar.
+smith_remo|Remo en Smith|tiron_h|smi|dorsales|biceps|c|1|p|Bisagra de cadera, barra a la parte baja del abdomen.
+remo_meadows|Remo Meadows|tiron_h|lmn|dorsales|antebrazos|c|2|p|De lado a la landmine, agarra el extremo y tira con el codo alto.
+pullover_maq|Pullover en máquina|apertura|maq|dorsales|pecho|a|1|p|Codos en las almohadillas; baja los brazos en arco.
+ext_lumbar_maq|Extensión lumbar en máquina|core|maq|lumbar|gluteos|a|1|p|Movimiento lento y sin tirones; peso moderado.
+encog_maq|Encogimientos en máquina|elevacion|maq|trapecio||a|1|p|Sube los hombros a las orejas y aguanta 1 segundo.
+encog_smith|Encogimientos en Smith|elevacion|smi|trapecio||a|1|p|Brazos estirados; solo se mueven los hombros.
+encog_polea|Encogimientos en polea|elevacion|pol|trapecio||a|1|p|Tensión constante del cable arriba y abajo.
+smith_banca|Press de banca en Smith|empuje_h|smi+ban|pecho|triceps,hombros|c|1|p|Coloca el banco para que la barra baje a la mitad del pecho.
+smith_inclinado|Press inclinado en Smith|empuje_h|smi+ban|pecho|hombros,triceps|c|1|p|Banco a 30°; la barra baja a la parte alta del pecho.
+press_inclinado_maq|Press inclinado en máquina|empuje_h|maq|pecho|hombros,triceps|c|1|p|Agarres a la altura de la parte alta del pecho.
+press_declinado_maq|Press declinado en máquina|empuje_h|maq|pecho|triceps|c|1|p|Empuja hacia abajo y adelante; codos a 45°.
+press_convergente|Press de pecho convergente (de discos)|empuje_h|maq|pecho|triceps,hombros|c|1|p|Las manos se juntan al empujar: aprieta el pecho al final.
+press_pecho_polea|Press de pecho en polea|empuje_h|pol|pecho|triceps|c|1|p|De pie con un pie adelante; empuja recto al frente.
+banca_inversa|Press de banca agarre inverso|empuje_h|bar+ban|pecho|triceps|c|2|p|Palmas hacia ti; usa un compañero o los seguros.
+cruce_bajo_alto|Cruce de poleas de abajo arriba|apertura|pol|pecho|hombros|a|1|p|Poleas abajo; sube las manos hasta la altura de los ojos.
+cruce_alto_bajo|Cruce de poleas de arriba abajo|apertura|pol|pecho||a|1|p|Poleas arriba; junta las manos a la altura del ombligo.
+aperturas_polea_banco|Aperturas en polea, sentado o en banco|apertura|pol+ban|pecho||a|1|p|Codos semiflexionados y tensión constante.
+aperturas_inclinadas|Aperturas inclinadas con mancuernas|apertura|man+ban|pecho|hombros|a|1|p|Banco a 30°; abre hasta notar el estiramiento.
+super_fly|Aperturas en máquina de discos (super fly)|apertura|maq|pecho||a|1|p|Brazos casi rectos; junta las manos sin chocar.
+fondos_maquina_asistidos|Fondos asistidos en máquina|empuje_h|maq|pecho|triceps,hombros|c|1|r|Rodillas en la plataforma; baja hasta los 90°.
+press_svend|Press Svend (disco apretado)|apertura|bar|pecho|hombros|a|1|p|Aprieta un disco entre las palmas y empújalo al frente.
+flexiones_anillas|Flexiones con anillas|empuje_h|trx|pecho|triceps,abdomen|c|2|r|Anillas bajas; estabiliza para que no se abran.
+fondos_anillas|Fondos en anillas|empuje_h|trx|pecho|triceps,hombros|c|3|r|Brazos pegados al cuerpo y anillas giradas hacia fuera arriba.
+laterales_maq|Elevaciones laterales en máquina|elevacion|maq|hombros||a|1|p|Codos en las almohadillas; sube hasta la altura de los hombros.
+deltoide_post_maq|Deltoide posterior en máquina (mariposa inversa)|elevacion|maq|hombros|trapecio|a|1|p|Pecho en el respaldo; abre los brazos hacia atrás.
+pajaros_polea|Pájaros en polea (cruzados)|elevacion|pol|hombros|trapecio|a|1|p|Cables cruzados; abre los brazos a la altura de los hombros.
+frontal_polea|Elevación frontal en polea|elevacion|pol|hombros||a|1|p|Polea baja; sube al frente hasta la altura de los ojos.
+frontal_disco|Elevación frontal con disco|elevacion|bar|hombros||a|1|p|Sujeta el disco por los lados como un volante.
+menton_polea|Remo al mentón en polea|elevacion|pol|hombros|trapecio|c|2|p|Agarre amplio y codos no más altos que los hombros.
+lateral_tumbado|Elevación lateral tumbado de lado|elevacion|man+ban|hombros||a|2|p|De lado en un banco inclinado; tensión desde abajo.
+y_inclinado|Elevación en Y en banco inclinado|elevacion|man+ban|hombros|trapecio|a|1|p|Boca abajo, brazos en Y con pulgares arriba; poco peso.
+smith_hombro|Press de hombros en Smith|empuje_v|smi+ban|hombros|triceps|c|1|p|Banco vertical; la barra baja delante de la cara.
+press_hombro_discos|Press de hombros con discos (iso-lateral)|empuje_v|maq|hombros|triceps|c|1|p|Cada brazo empuja por separado; espalda apoyada.
+press_landmine|Press landmine a una mano|empuje_v|lmn|hombros|pecho,triceps|c|1|p|Empuja el extremo de la barra hacia arriba y adelante.
+push_press|Push press|empuje_v|bar|hombros|triceps,cuadriceps|c|2|p|Pequeña flexión de rodillas e impulsa la barra con las piernas.
+press_z|Press Z (sentado en el suelo)|empuje_v|bar|hombros|triceps,abdomen|c|3|p|Sentado con piernas estiradas: sin respaldo, el core trabaja más.
+press_cubano|Press cubano|elevacion|man|hombros|trapecio|a|2|p|Remo al mentón, rota hacia arriba y empuja; muy poco peso.
+rot_externa_polea|Rotación externa en polea|elevacion|pol|hombros||a|1|p|Codo pegado al cuerpo a 90°; gira el antebrazo hacia fuera.
+rot_interna_polea|Rotación interna en polea|elevacion|pol|hombros||a|1|p|Codo pegado al cuerpo; gira el antebrazo hacia dentro.
+rot_externa_man|Rotación externa tumbado con mancuerna|elevacion|man|hombros||a|1|p|De lado, codo sobre la cadera; sube la mancuerna girando.
+kb_halo|Halo con kettlebell|movilidad|kb|hombros|abdomen|a|1|r|Rodea la cabeza con la kettlebell, cerca y despacio.
+curl_z|Curl con barra Z|curl|ez|biceps|antebrazos|a|1|p|El agarre angulado es más cómodo para las muñecas.
+curl_predicador_z|Curl predicador con barra Z|curl|ez+maq|biceps||a|1|p|Axilas sobre el atril; no despegues los codos.
+curl_predicador_man|Curl predicador con mancuerna|curl|man+maq|biceps||a|1|p|Un brazo cada vez; baja hasta casi estirar.
+curl_maquina|Curl de bíceps en máquina|curl|maq|biceps||a|1|p|Codo alineado con el eje de la máquina.
+curl_cuerda|Curl con cuerda en polea|curl|pol|biceps|antebrazos|a|1|p|Palmas enfrentadas; separa la cuerda arriba.
+martillo_polea|Curl martillo en polea con cuerda|curl|pol|biceps|antebrazos|a|1|p|Codos quietos a los lados; sube los puños.
+curl_bayesiano|Curl bayesiano en polea|curl|pol|biceps||a|2|p|De espaldas a la polea, brazo detrás del cuerpo: máximo estiramiento.
+curl_polea_alta|Curl en polea alta (doble bíceps)|curl|pol|biceps||a|2|p|Brazos en cruz; lleva las manos hacia las orejas.
+curl_arana|Curl araña|curl|man+ban|biceps||a|1|p|Boca abajo en un banco inclinado, brazos colgando.
+curl_arrastre|Curl arrastre (drag curl)|curl|bar|biceps||a|2|p|La barra sube pegada al cuerpo con los codos hacia atrás.
+curl_zottman|Curl Zottman|curl|man|biceps|antebrazos|a|2|p|Sube con palmas arriba, gira arriba y baja con palmas abajo.
+curl_inverso_z|Curl inverso con barra Z|curl|ez|antebrazos|biceps|a|1|p|Palmas hacia abajo; trabaja el braquiorradial.
+martillo_cruzado|Curl martillo cruzado|curl|man|biceps|antebrazos|a|1|p|Lleva la mancuerna hacia el hombro contrario.
+ext_cuerda|Extensión en polea con cuerda|extension|pol|triceps||a|1|p|Abre la cuerda abajo y aprieta el tríceps.
+ext_polea_inversa|Extensión en polea a una mano, agarre inverso|extension|pol|triceps||a|1|p|Palma hacia arriba; codo pegado al costado.
+ext_polea_cabeza|Extensión sobre la cabeza en polea|extension|pol|triceps||a|1|p|De espaldas a la polea; estira los brazos por encima de la cabeza.
+ext_cruzada_polea|Extensión cruzada en polea|extension|pol|triceps||a|2|p|Cables cruzados; extiende los brazos hacia los lados.
+patada_polea|Patada de tríceps en polea|extension|pol|triceps||a|1|p|Torso inclinado, brazo pegado; extiende hacia atrás.
+ext_triceps_maq|Extensión de tríceps en máquina|extension|maq|triceps||a|1|p|Codos en la almohadilla; extiende sin mover los hombros.
+fondos_sentado_maq|Fondos sentado en máquina|empuje_h|maq|triceps|pecho|c|1|p|Espalda apoyada; empuja hacia abajo hasta estirar.
+press_frances_z|Press francés con barra Z|extension|ez+ban|triceps||a|1|p|Baja la barra hacia la frente con los codos quietos.
+press_frances_man|Press francés con mancuernas|extension|man+ban|triceps||a|1|p|Palmas enfrentadas; baja a los lados de la cabeza.
+press_tate|Press Tate|extension|man+ban|triceps||a|2|p|Codos hacia fuera; baja las mancuernas al pecho.
+press_jm|Press JM|extension|bar+ban|triceps|pecho|c|3|p|Mezcla de press cerrado y press francés; peso moderado.
+curl_muneca_barra|Curl de muñeca con barra|curl|bar+ban|antebrazos||a|1|p|Antebrazos sobre el banco; solo se mueven las muñecas.
+ext_muneca|Extensión de muñeca|curl|man|antebrazos||a|1|p|Palma hacia abajo; sube el dorso de la mano.
+rodillo_muneca|Rodillo de muñeca|curl|bar|antebrazos||a|1|r|Enrolla la cuerda hasta arriba y desenróllala despacio.
+pinza_discos|Pinza de discos|cargar|bar|antebrazos||a|1|t|Sujeta dos discos lisos con los dedos y aguanta.
+gripper_maq|Máquina de agarre (gripper)|curl|maq|antebrazos||a|1|p|Cierra la mano por completo y abre despacio.
+granjero_hex|Paseo del granjero con barra hexagonal|cargar|hex|antebrazos|trapecio,abdomen|c|1|t|Camina erguido y con pasos cortos.
+crunch_maq|Crunch en máquina|core|maq|abdomen||a|1|p|Enrolla el tronco; no tires con los brazos.
+rot_torso_maq|Rotación de torso en máquina|core|maq|oblicuos||a|1|p|Gira desde el tronco, sin impulso.
+silla_rodillas|Elevación de rodillas en silla romana|core|par|abdomen||a|1|r|Espalda en el respaldo; sube las rodillas al pecho.
+silla_piernas|Elevación de piernas en silla romana|core|par|abdomen|oblicuos|a|2|r|Piernas rectas hasta la cadera; baja controlado.
+crunch_declinado|Abdominales en banco declinado|core|ban|abdomen||a|1|r|Pies sujetos; sube enrollando la espalda.
+crunch_fitball|Crunch con fitball|core|fit|abdomen||a|1|r|Zona lumbar sobre la pelota; más recorrido que en el suelo.
+lenador_bajo|Leñador de abajo arriba en polea|core|pol|oblicuos|hombros|a|1|p|Polea baja; gira el tronco llevando las manos arriba en diagonal.
+rot_landmine|Rotación landmine|core|lmn|oblicuos|hombros|a|2|r|Brazos estirados; lleva la barra de un lado a otro con la cadera.
+inclinacion_lateral|Inclinación lateral con mancuerna|core|man|oblicuos||a|1|p|Una sola mancuerna; inclínate y vuelve sin girar.
+paseo_maleta|Paseo de maleta|cargar|man|oblicuos|antebrazos|c|1|t|Una pesa en una mano; camina sin inclinarte.
+plancha_peso|Plancha con peso|core|est|abdomen||a|2|t|Disco en la espalda alta; cuerpo recto.
+rollout_barra|Rueda con barra (rollout)|core|bar|abdomen|dorsales|a|3|r|Rueda la barra con discos hacia delante sin hundir la cadera.
+limpiaparabrisas|Limpiaparabrisas colgado|core|dom|oblicuos|abdomen|a|3|r|Colgado, piernas arriba y llévalas de lado a lado.
+bandera_dragon|Bandera del dragón|core|ban|abdomen||a|3|r|Agarra el banco tras la cabeza y baja el cuerpo recto.
+balon_suelo|Lanzamiento de balón al suelo|cardio|bal|abdomen|hombros,cardio|c|1|r|Balón arriba y lánzalo con fuerza al suelo.
+balon_lateral|Lanzamiento lateral de balón a la pared|core|bal|oblicuos|hombros|c|1|r|De lado a la pared, gira la cadera y lanza.
+wall_ball|Wall ball|sentadilla|bal|cuadriceps|hombros,cardio|c|1|r|Sentadilla y lanza el balón a un blanco alto en la pared.
+escaladora|Escaladora|cardio|esc|cardio|gluteos,cuadriceps|c|1|t|Erguido y sin apoyar el peso en los brazos.
+stepper|Stepper|cardio|esc|cardio|gemelos,cuadriceps|c|1|t|Pasos completos y ritmo constante.
+skierg|SkiErg|cardio|ski|cardio|dorsales,triceps|c|1|t|Tira hacia abajo con brazos y cadera, como al esquiar.
+air_bike|Bicicleta de aire|cardio|aib|cardio|cuadriceps,hombros|c|1|t|Brazos y piernas a la vez: cuanto más fuerte, más resistencia.
+bici_reclinada|Bicicleta reclinada|cardio|bic|cardio|cuadriceps|c|1|t|Respaldo cómodo: ideal si te molesta la espalda.
+spinning|Bicicleta de spinning|cardio|bic|cardio|cuadriceps,gemelos|c|1|t|Ajusta el sillín a la altura de la cadera.
+cinta_inclinada|Caminata inclinada en cinta|cardio|cin|cardio|gluteos,gemelos|c|1|t|Inclinación del 8–12 % sin agarrarte a la barra.
+cinta_curva|Cinta curva (sin motor)|cardio|cin|cardio|isquios,gluteos|c|2|t|Tú pones la velocidad: pisa en la parte delantera.
+arc_trainer|Arc trainer|cardio|eli|cardio|gluteos|c|1|t|Movimiento en arco, muy suave para las rodillas.
+versaclimber|VersaClimber|cardio|esc|cardio|hombros,cuadriceps|c|2|t|Brazo y pierna contrarios a la vez, como trepando.
+ergometro_brazos|Ergómetro de brazos|cardio|maq|cardio|hombros|c|1|t|Gira las manivelas a ritmo constante.
+cuerdas_ondas|Cuerdas de batalla: ondas|cardio|cdb|cardio|hombros,abdomen|c|1|t|Rodillas flexionadas; ondas rápidas alternando brazos.
+cuerdas_golpes|Cuerdas de batalla: golpes|cardio|cdb|cardio|abdomen,hombros|c|1|t|Sube las dos cuerdas y golpea el suelo con fuerza.
+cuello_maq|Cuello en máquina de 4 direcciones|elevacion|maq|trapecio||a|2|p|Muy poco peso y movimiento lento en cada dirección.
 `;
 
 /* Progresiones de calistenia: cuando dominas uno, PandarIA sugiere el siguiente */
 const PROGRESSIONS = [
+  ['dominadas_maquina','dominadas_negativas','dominadas','muscle_up'],['fondos_maquina_asistidos','fondos_pecho','fondos_anillas'],
+  ['smith_sentadilla','sentadilla','sentadilla_frontal'],['smith_banca','press_banca'],['smith_hombro','press_militar','push_press'],
+  ['smith_rumano','peso_muerto_rumano'],['pm_hexagonal','peso_muerto'],['silla_rodillas','silla_piernas','elev_piernas_colgado','limpiaparabrisas'],
+  ['curl_femoral_fitball','nordico_maquina','curl_nordico'],['flexiones','flexiones_anillas'],['rueda_abdominal','rollout_barra'],
   ['flexiones_pared','flexiones_inclinadas','flexiones_rodillas','flexiones','flexiones_declinadas','flexiones_archer'],
   ['dominadas_asistidas','dominadas_negativas','dominadas','dominadas_supinas'],
   ['sentarse_levantarse','sentadilla_peso','zancadas_pc','sentadilla_salto','sentadilla_pistol'],
@@ -736,7 +919,8 @@ const userLevel = () => LEVELS[S.settings.level]||1;
 const isLower = ex => ex.prim.some(m=>LOWER_MUSCLES.includes(m)) || ['sentadilla','bisagra','zancada','gluteo'].includes(ex.pat);
 function incFor(ex){
   const e = ex.eq;
-  if (e.includes('bar')) return (S.settings.minPlate||1.25)*2;
+  if (e.includes('bar')||e.includes('smi')||e.includes('hex')||e.includes('ez')) return (S.settings.minPlate||1.25)*2;
+  if (e.includes('lmn')) return 2.5; // un solo extremo cargado
   if (e.includes('kb')) return 4;
   if (e.includes('man')) return 2;
   if (e.includes('maq')) return 5;
@@ -806,8 +990,8 @@ function buildItem(exId, goal, level, opts){
 }
 
 /* ---------- Estimación de peso inicial ---------- */
-const EQ_FACTOR = {bar:1, maq:1, pol:0.7, man:0.4, kb:0.35};
-function eqFactor(ex){ for (const q of ['bar','maq','pol','man','kb']) if (ex.eq.includes(q)) return EQ_FACTOR[q]; return 1; }
+const EQ_FACTOR = {hex:1.05, bar:1, smi:0.9, ez:0.95, maq:1, lmn:0.5, pol:0.7, man:0.4, kb:0.35};
+function eqFactor(ex){ for (const q of ['hex','bar','smi','ez','maq','lmn','pol','man','kb']) if (ex.eq.includes(q)) return EQ_FACTOR[q]; return 1; }
 const BW_RATIO = { /* 1RM relativo al peso corporal con barra/máquina, por nivel */
   sentadilla:[0.8,1.1,1.5], bisagra:[1.0,1.3,1.8], zancada:[0.5,0.7,0.9], empuje_h:[0.6,0.85,1.1], empuje_v:[0.4,0.55,0.7],
   tiron_h:[0.55,0.75,1.0], tiron_v:[0.6,0.8,1.0], curl:[0.25,0.35,0.45], extension:[0.2,0.3,0.4], elevacion:[0.25,0.35,0.45],
@@ -925,6 +1109,10 @@ function alternatives(exId, exclude){
     if (o.kind===ex.kind) sc+=1;
     if (o.lvl>L) sc-=2;
     if (o.mode===ex.mode) sc+=1;
+    // si molesta, primero la versión guiada (máquina, Smith o polea) del mismo movimiento
+    const guided=o.eq.some(q=>['maq','smi','pol'].includes(q));
+    if ((S.settings.avoid||{})[exId]==='molesta' && guided) sc+=2;
+    else if (o.eq.some(q=>ex.eq.includes(q))) sc+=0.5;
     out.push([sc,id]);
   }
   return out.sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
@@ -961,6 +1149,8 @@ function itemMinutes(it){
 }
 function routineMinutes(r){ return Math.round(r.items.reduce((a,i)=>a+itemMinutes(i),0)); }
 const STAPLES=new Set(['press_banca','sentadilla','peso_muerto','dominadas','remo_barra','press_militar','hip_thrust','peso_muerto_rumano','jalon_pecho','press_banca_man','press_inclinado_man','sentadilla_goblet','flexiones','zancadas','remo_man','press_hombro_man','elev_laterales','curl_man','ext_triceps_polea','prensa','plancha','remo_polea','curl_femoral','puente_gluteo','sentadilla_peso','face_pull']);
+const FREE_LOAD=['bar','man','maq','pol','kb','smi','ez','hex','lmn'];
+const BEGIN_MACH=new Set(['prensa','smith_sentadilla','press_pecho_maq','jalon_pecho','remo_maq','ext_cuadriceps','curl_femoral_sentado','hip_thrust_maq','pec_deck','press_hombro_maq','laterales_maq','abduccion_maq','aduccion_maq','crunch_maq','curl_maquina','ext_triceps_maq']);
 function pickExercise(slot, ctx){
   const L=ctx.level, cands=[];
   const flexGoal = ctx.goal==='flexibilidad';
@@ -975,7 +1165,12 @@ function pickExercise(slot, ctx){
     if (slot.p) sc += (slot.p.length - slot.p.indexOf(o.pat));
     if (ctx.idx<3 && o.kind==='c') sc+=3; else if (o.kind==='c') sc+=1;
     if (o.lvl===L) sc+=2; else if (o.lvl===L-1) sc+=1;
-    if (o.mode==='p' && ctx.equip.some(q=>['bar','man','maq','pol','kb'].includes(q))) sc+=1.5;
+    if (o.mode==='p' && ctx.equip.some(q=>FREE_LOAD.includes(q))) sc+=1.5;
+    // principiantes: máquinas y Smith guían la técnica; avanzados: más peso libre
+    const guided=o.eq.some(q=>['maq','smi'].includes(q)), free=o.eq.some(q=>['bar','man','kb','hex','ez','lmn'].includes(q));
+    if (L===1 && guided) sc+=1.5; else if (L===1 && o.eq.includes('pol')) sc+=0.7;
+    if (L===3 && free && o.kind==='c') sc+=0.8;
+    if (BEGIN_MACH.has(id) && L===1) sc+=1;
     if (o.mode==='t' && !['core','cardio'].includes(o.pat) && !flexGoal) sc-=2;
     if (ctx.progUsed.has(id)) sc-=2;
     if (ctx.dayPat && ctx.dayPat.has(o.pat+'|'+o.prim[0])){ if (ctx.strict||slot.strict) continue; sc-=2.5; }
@@ -998,7 +1193,7 @@ const LEGS=['cuadriceps','isquios','gluteos','aductores','abductores'];
 const PLYO=['box_jump','sentadilla_salto','skater','flexiones_pliometricas','kb_snatch','kb_clean']; // potencia: con el cuerpo fresco
 function exGroup(ex){ const m=ex.prim[0]; if (LEGS.includes(m)) return 'piernas'; if (['abdomen','oblicuos','lumbar'].includes(m)) return 'core'; return m; }
 const GROUP_RANK={piernas:1,dorsales:2,pecho:2,hombros:3,trapecio:4,triceps:5,biceps:5,antebrazos:6,gemelos:6.5,core:7,cardio:8,movilidad:9};
-const EQ_ORDER=q=>q.includes('bar')?0:q.includes('dom')||q.includes('par')?0.5:q.includes('kb')||q.includes('man')?1:q.includes('maq')?2:q.includes('pol')?3:q.includes('bnd')||q.includes('trx')?4:2.5;
+const EQ_ORDER=q=>q.includes('hex')||q.includes('bar')?0:q.includes('ez')?0.3:q.includes('lmn')?1.2:q.includes('smi')?1.5:q.includes('dom')||q.includes('par')?0.5:q.includes('kb')||q.includes('man')?1:q.includes('maq')?2:q.includes('pol')?3:q.includes('bnd')||q.includes('trx')?4:2.5;
 const PAT_ORDER={sentadilla:0,bisagra:1,gluteo:2,zancada:3,empuje_h:0,tiron_v:0,tiron_h:1,empuje_v:0,apertura:4,ext_pierna:5,curl_pierna:5,abduccion:6,elevacion:3,curl:3,extension:3,gemelo:7,core:5,cardio:5};
 function orderItems(items){
   const warm=items.filter(i=>i.warm), cool=items.filter(i=>i.cool), main=items.filter(i=>!i.warm&&!i.cool);
@@ -1168,6 +1363,11 @@ function reviewExercise(r, it){
     const lastReps=Math.min(...h[0].sets.map(x=>+x.reps||0));
     const nx=nextProgression(it.exId);
     if (lastReps>=range[1]+3 && nx && !avoided(nx)) return {kind:'cambiar',uid:it.uid,exId:it.exId,title:`Sube de nivel: ${getEx(nx).n}`,text:`Haces ${lastReps} repeticiones limpias de ${name}. Es momento de pasar a ${getEx(nx).n}.`,why:'En calistenia se progresa con variantes más difíciles cuando superas el rango objetivo.',data:{to:nx}};
+  }
+  // de la versión guiada (Smith o máquina) a la libre, cuando ya progresa con estabilidad
+  if (ex.mode==='p' && ex.eq.some(q=>['smi','maq'].includes(q)) && userLevel()>=2 && h.length>=6 && last>=first*1.05 && avgInt<=8){
+    const nx=nextProgression(it.exId);
+    if (nx && !avoided(nx) && hasEquip(getEx(nx)) && getEx(nx).eq.some(q=>['bar','man','hex'].includes(q))) return {kind:'cambiar',uid:it.uid,exId:it.exId,title:`Pasa a peso libre: ${getEx(nx).n}`,text:`Llevas ${h.length} sesiones progresando en ${name}. Ya puedes probar ${getEx(nx).n}; empieza con algo menos de peso.`,why:'Las máquinas y la Smith guían el recorrido y son ideales para aprender. El peso libre exige más estabilidad y suma músculos estabilizadores.',data:{to:nx}};
   }
   const kgUp = ex.mode==='p' && maxKg(h[0])>maxKg(h[h.length-1]);
   if (last>=first*1.02 || kgUp){
@@ -1638,7 +1838,8 @@ const EXANIM = {
  est_flexor_cadera:'st_hipflex',est_gluteo:'st_glute',est_gemelos:'st_calf',est_dorsal:'st_lat',yoga_saludo:'y_sun',yoga_perro:'y_dog',yoga_nino:'y_child',yoga_cobra:'y_cobra',
  yoga_guerrero1:'y_w1',yoga_guerrero2:'y_w2',yoga_triangulo:'y_tri',yoga_arbol:'y_tree',yoga_silla:'y_chair',yoga_puente:'bridge',yoga_paloma:'y_pigeon',yoga_pinza:'y_fold',
  yoga_torsion:'y_twist',yoga_barco:'y_boat',yoga_cuervo:'y_crow',pil_hundred:'p_hundred',pil_roll_up:'p_rollup',pil_circulos:'p_circles',pil_tijeras:'p_scissors',
- pil_puente:'bridge',pil_natacion:'p_swim',pil_sierra:'p_saw',pil_una_pierna:'p_legstretch',pil_patada_lateral:'side_leg',pil_teaser:'p_teaser',pil_rodar:'p_roll'
+ pil_puente:'bridge',pil_natacion:'p_swim',pil_sierra:'p_saw',pil_una_pierna:'p_legstretch',pil_patada_lateral:'side_leg',pil_teaser:'p_teaser',pil_rodar:'p_roll',
+ smith_sentadilla:'squat_back',smith_frontal:'squat_front',sentadilla_pendulo:'hack',v_squat:'hack',hack_inversa:'hack',belt_squat:'squat_bw',prensa_vertical:'leg_press',prensa_sentada:'leg_press',prensa_unilateral:'leg_press',ext_cuad_unilateral:'leg_ext',ext_cuad_polea:'leg_ext',sentadilla_landmine:'squat_goblet',sentadilla_zercher:'squat_front',box_squat:'squat_back',sentadilla_sissy:'squat_bw',nordico_inverso:'nordic',smith_zancada:'lunge',smith_bulgara:'bulgarian',zancada_caminando_barra:'lunge',zancada_caminando_man:'lunge',zancada_inversa_barra:'lunge',step_up_man:'step_up',pm_hexagonal:'deadlift',trineo_empuje:'sprint',trineo_arrastre:'walk_load',curl_femoral_pie:'leg_curl',curl_femoral_rodillas:'leg_curl',curl_femoral_unilateral:'leg_curl',curl_femoral_polea:'leg_curl',curl_femoral_fitball:'slide_curl',nordico_maquina:'nordic',glute_ham:'nordic',smith_rumano:'rdl',pm_piernas_rigidas:'rdl',hip_thrust_maq:'hip_thrust',smith_hip_thrust:'hip_thrust',hip_thrust_unilateral:'hip_thrust',patada_gluteo_maq:'kick_quad',multicadera_ext:'kick_cable',pull_through:'rdl',hiper_gluteo:'hyperext',hiper_inversa:'superman',abduccion_polea:'kick_cable',abduccion_multicadera:'kick_cable',fire_hydrant:'kick_quad',frog_pumps:'bridge',rack_pull:'deadlift',aduccion_polea:'kick_cable',aduccion_multicadera:'kick_cable',copenhague:'side_plank',sentadilla_cosaca:'lunge_side',gemelos_prensa:'calf',gemelos_smith:'calf',gemelo_burro:'calf',gemelos_barra:'calf',gemelo_unilateral_man:'calf',gemelo_excentrico:'calf',tibial:'calf',jalon_maquina:'pulldown',jalon_unilateral_maq:'pulldown',jalon_supino:'pulldown',jalon_neutro:'pulldown',jalon_una_mano:'pulldown',dominadas_maquina:'pullup',dominadas_neutras:'pullup',muscle_up:'pullup',remo_alto_maq:'row_mach',remo_bajo_maq:'row_mach',remo_t_apoyado:'row_mach',remo_apoyado_man:'row_db',remo_seal:'row_bb',remo_pendlay:'row_bb',remo_kroc:'row_db',remo_polea_unilateral:'row_cable',smith_remo:'row_bb',remo_meadows:'row_db',pullover_maq:'pullover_cable',ext_lumbar_maq:'hyperext',encog_maq:'shrug',encog_smith:'shrug',encog_polea:'shrug',smith_banca:'bench',smith_inclinado:'incline',press_inclinado_maq:'chest_mach',press_declinado_maq:'chest_mach',press_convergente:'chest_mach',press_pecho_polea:'cable_cross',banca_inversa:'bench',cruce_bajo_alto:'cable_cross',cruce_alto_bajo:'cable_cross',aperturas_polea_banco:'fly',aperturas_inclinadas:'fly',super_fly:'pec_deck',fondos_maquina_asistidos:'dips',press_svend:'front_raise',flexiones_anillas:'pushup',fondos_anillas:'dips',laterales_maq:'lat_raise',deltoide_post_maq:'rear_delt',pajaros_polea:'rear_delt',frontal_polea:'front_raise',frontal_disco:'front_raise',menton_polea:'upright',lateral_tumbado:'lat_raise',y_inclinado:'ytw',smith_hombro:'ohp',press_hombro_discos:'shoulder_mach',press_landmine:'ohp_one',push_press:'ohp',press_z:'ohp',press_cubano:'upright',rot_externa_polea:'pull_apart',rot_interna_polea:'pull_apart',rot_externa_man:'pull_apart',kb_halo:'arm_circles',curl_z:'curl',curl_predicador_z:'curl_preacher',curl_predicador_man:'curl_preacher',curl_maquina:'curl_preacher',curl_cuerda:'curl_cable',martillo_polea:'curl_cable',curl_bayesiano:'curl_cable',curl_polea_alta:'curl_cable',curl_arana:'curl_preacher',curl_arrastre:'curl',curl_zottman:'curl',curl_inverso_z:'curl',martillo_cruzado:'curl',ext_cuerda:'pushdown',ext_polea_inversa:'pushdown',ext_polea_cabeza:'oh_ext',ext_cruzada_polea:'pushdown',patada_polea:'kickback',ext_triceps_maq:'pushdown',fondos_sentado_maq:'dips',press_frances_z:'skull',press_frances_man:'skull',press_tate:'skull',press_jm:'bench',curl_muneca_barra:'wrist',ext_muneca:'wrist',rodillo_muneca:'wrist',pinza_discos:'farmer',gripper_maq:'wrist',granjero_hex:'farmer',crunch_maq:'crunch',rot_torso_maq:'twist',silla_rodillas:'hang_knee',silla_piernas:'hang_leg',crunch_declinado:'crunch',crunch_fitball:'crunch',lenador_bajo:'woodchop',rot_landmine:'woodchop',inclinacion_lateral:'farmer',paseo_maleta:'farmer',plancha_peso:'plank',rollout_barra:'ab_wheel',limpiaparabrisas:'hang_leg',bandera_dragon:'leg_raise',balon_suelo:'thruster',balon_lateral:'woodchop',wall_ball:'thruster',escaladora:'step_up',stepper:'march',skierg:'pullover_cable',air_bike:'bike',bici_reclinada:'bike',spinning:'bike',cinta_inclinada:'treadmill',cinta_curva:'treadmill',arc_trainer:'elliptical',versaclimber:'march',ergometro_brazos:'arm_circles',cuerdas_ondas:'boxing',cuerdas_golpes:'boxing',cuello_maq:'shrug'
 };
 const TPL_BY_PAT = {sentadilla:'squat_bw',bisagra:'rdl',zancada:'lunge',empuje_h:'pushup',empuje_v:'ohp',apertura:'fly',tiron_h:'row_bb',tiron_v:'pullup',curl:'curl',extension:'oh_ext',
   elevacion:'lat_raise',ext_pierna:'leg_ext',curl_pierna:'leg_curl',gluteo:'bridge',abduccion:'abduct',gemelo:'calf',core:'plank',cardio:'run',cargar:'farmer',movilidad:'mobility',
@@ -1681,7 +1882,13 @@ function drawEquip(ex, t, P){
   if (t.cab2 && eq.includes('pol')) { s+=LN(hN,t.cab2[0],1.6,.8)+LN(hF,t.cab2[1],1.6,.8); }
   if ((t.bnd) && (eq.includes('bnd')||ex.id==='curl_toalla'||ex.id==='remo_toalla')){ s+=LN(hN,anchorOf(t.bnd),1.8,.85); }
   if (t.trx){ s+=LN(hN,t.trx,1.8,.85); }
-  if (eq.includes('bar') && !['pbar'].some(k=>(t.p||[]).some(p=>p[0]===k))){
+  if (eq.includes('smi')) s+=LN([hN[0]-2,-6],[hN[0]-2,92],1.6,.32)+LN([hN[0]+2,-6],[hN[0]+2,92],1.6,.32);
+  if (eq.includes('lmn')){ const fx=hN[0]<50?hN[0]+44:hN[0]-44; s+=LN(hN,[fx,91],2.6,.85)+`<circle cx="${f1(fx)}" cy="90" r="2.6" fill="#fff" opacity=".6" stroke="none"/>`+`<circle cx="${f1(hN[0]+(fx>hN[0]?-4:4))}" cy="${f1(hN[1]+3)}" r="6.5" fill="#fff" fill-opacity=".22" stroke-width="2"/>`; }
+  if (eq.includes('trn')){ const sx=hN[0]+3; s+=`<rect x="${f1(sx)}" y="72" width="24" height="18" rx="2" fill="#fff" opacity=".3" stroke="none"/>`+LN([sx+4,72],hN,2.4,.7)+LN([sx-2,91],[sx+30,91],2.5,.55); }
+  if (eq.includes('bal')) s+=`<circle cx="${f1(hN[0])}" cy="${f1(hN[1]-3)}" r="6.5" fill="#fff" fill-opacity=".35" stroke-width="2"/>`;
+  if (eq.includes('fit')){ const c=ex.pat==='core'?[P.hip[0],P.hip[1]+11]:P.ankleN; s+=`<circle cx="${f1(c[0])}" cy="${f1(c[1]+(ex.pat==='core'?0:4))}" r="${ex.pat==='core'?12:8}" fill="#fff" fill-opacity=".18" stroke-width="2"/>`; }
+  if (eq.includes('cdb')){ const x0=hN[0], y0=hN[1]; s+=`<path d="M${f1(x0)} ${f1(y0)} Q${f1(x0+10)} ${f1(y0-10)} ${f1(x0+20)} ${f1(y0+8)} T${f1(x0+40)} 88" fill="none" stroke-width="2" opacity=".8"/>`; }
+  if (['bar','smi','ez','hex'].some(q=>eq.includes(q)) && !eq.includes('lmn') && !['pbar'].some(k=>(t.p||[]).some(p=>p[0]===k))){
     if (front){ s+=LN([hF[0]-8,hF[1]],[hN[0]+8,hN[1]],2.4)+`<rect x="${f1(hN[0]+6)}" y="${f1(hN[1]-6)}" width="3.5" height="12" rx="1" fill="#fff" stroke="none"/><rect x="${f1(hF[0]-9.5)}" y="${f1(hF[1]-6)}" width="3.5" height="12" rx="1" fill="#fff" stroke="none"/>`; }
     else s+=`<circle cx="${f1(hN[0])}" cy="${f1(hN[1])}" r="8" fill="#fff" fill-opacity=".22" stroke-width="2.4"/><circle cx="${f1(hN[0])}" cy="${f1(hN[1])}" r="1.8" fill="#fff" stroke="none"/>`;
   } else if (eq.includes('man')){
@@ -2095,7 +2302,10 @@ A.openLib=()=>openLayer('picker',{mode:'browse',q:'',m:'',mine:false});
 
 /* ---------- Inicio ---------- */
 function boot(){
-  load(); applyTheme(); applyA11y(); if (typeof applyLang==='function') applyLang();
+  load();
+  // v0.5: quien ya tenía equipo de gimnasio recibe los accesorios habituales nuevos
+  if (!S.settings.eqV5){ const q=S.settings.equip||[]; if (q.includes('maq')&&q.includes('pol')&&q.includes('bar')) ['smi','ez','hex','lmn','fit','bal','esc'].forEach(k=>{ if(!q.includes(k)) q.push(k); }); S.settings.eqV5=true; save(); }
+  applyTheme(); applyA11y(); if (typeof applyLang==='function') applyLang();
   document.getElementById('app').innerHTML=`<div id="view"></div><nav id="nav"></nav><div id="mini" class="minibar hide" data-a="resumeWorkout"></div><div id="layers"></div><div id="modals"></div>`;
   render();
   setInterval(tick,250);
@@ -2245,12 +2455,28 @@ A.saveEditor=()=>{
 };
 
 /* ---------- Buscador de ejercicios ---------- */
+const EQ_TYPES=[['','Todo'],['maq','Máquinas'],['pol','Poleas'],['smi','Smith'],['libre','Peso libre'],['pc','Peso corporal'],['cardio','Cardio']];
+const EQ_TEST={maq:e=>e.eq.includes('maq'), pol:e=>e.eq.includes('pol'), smi:e=>e.eq.includes('smi'),
+  libre:e=>e.eq.some(q=>['bar','man','kb','ez','hex','lmn'].includes(q)),
+  pc:e=>e.pat!=='cardio'&&e.eq.every(q=>['pc','est','dom','par','trx','caj','ban','fit','rue','bnd'].includes(q)),
+  cardio:e=>e.pat==='cardio'};
+// apodos con que se conocen las máquinas en el gimnasio
+const EX_ALIAS={pec_deck:'mariposa pec deck peck deck aperturas maquina',deltoide_post_maq:'mariposa inversa pec deck inverso',super_fly:'mariposa aperturas',
+  prensa:'leg press prensa 45',sentadilla_hack:'hack',jalon_pecho:'polea al pecho lat pulldown',remo_polea:'remo gironda remo sentado',
+  ext_cuadriceps:'sillon de cuadriceps silla extensiones',curl_femoral:'femoral tumbado camilla',curl_femoral_sentado:'femoral sentado',
+  abduccion_maq:'abductores maquina apertura piernas',aduccion_maq:'aductores maquina cierre piernas',smith_sentadilla:'multipower',
+  smith_banca:'multipower',smith_inclinado:'multipower',smith_hombro:'multipower',smith_hip_thrust:'multipower',smith_zancada:'multipower',
+  smith_bulgara:'multipower',smith_rumano:'multipower',smith_remo:'multipower',smith_frontal:'multipower',gemelos_smith:'multipower',encog_smith:'multipower',
+  cruce_poleas:'crossover',ext_triceps_polea:'pushdown polea triceps',crunch_polea:'crunch cuerda polea',dominadas_maquina:'gravitron',fondos_maquina_asistidos:'gravitron',
+  pm_hexagonal:'trap bar',escaladora:'stairmaster escaleras',air_bike:'assault bike',belt_squat:'cinturon'};
+const PK_ORDER=MUSCLE_GROUPS.map(x=>x[0]).concat(['movilidad']);
 function pkList(p){
   const q=(p.q||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   let list=Object.values(EX).filter(e=>{
     if (p.m && !e.prim.includes(p.m) && !(p.m==='cardio'&&e.pat==='cardio')) return false;
     if (p.mine && !hasEquip(e)) return false;
-    if (q){ const hay=(e.n+' '+e.prim.map(m=>MUSCLES[m]).join(' ')+' '+e.eq.map(x=>EQUIP[x]).join(' ')).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); if(!q.split(/\s+/).filter(Boolean).every(w=>hay.includes(w))) return false; }
+    if (p.et && EQ_TEST[p.et] && !EQ_TEST[p.et](e)) return false;
+    if (q){ const hay=(e.n+' '+(EX_ALIAS[e.id]||'')+' '+e.prim.map(m=>MUSCLES[m]).join(' ')+' '+e.eq.map(x=>EQUIP[x]).join(' ')).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); if(!q.split(/\s+/).filter(Boolean).every(w=>hay.includes(w))) return false; }
     return true;
   }).sort((a,b)=>a.n.localeCompare(b.n,'es'));
   let h='';
@@ -2259,7 +2485,12 @@ function pkList(p){
     if (alts.length){ h+=`<div class="sec">Recomendados por PandarIA</div>`; alts.forEach(id=>h+=pkRow(getEx(id),p)); h+=`<div class="sec">Todos</div>`; }
   }
   if (!list.length) h+=`<div class="empty">No hay ejercicios con esos filtros.<br><button class="link" data-a="pkCreate" style="margin-top:10px">Crear ejercicio propio</button></div>`;
-  list.forEach(e=>h+=pkRow(e,p));
+  if (!q && !p.m && list.length>12){
+    // clasificado por músculo para buscar más fácil
+    const by={}; list.forEach(e=>{ const m=e.pat==='cardio'?'cardio':['yoga','estiramiento','movilidad','pilates'].includes(e.pat)?'movilidad':e.prim[0]; (by[m]=by[m]||[]).push(e); });
+    PK_ORDER.forEach(m=>{ if(!by[m]) return; h+=`<div class="sec">${esc(m==='movilidad'?'Movilidad y estiramientos':(MUSCLE_GROUPS.find(x=>x[0]===m)||[0,MUSCLES[m]])[1])} <span class="mut" style="font-weight:500">· ${by[m].length}</span></div>`; by[m].forEach(e=>h+=pkRow(e,p)); delete by[m]; });
+    Object.values(by).forEach(arr=>arr.forEach(e=>h+=pkRow(e,p)));
+  } else list.forEach(e=>h+=pkRow(e,p));
   return h;
 }
 function pkRow(e,p){
@@ -2274,6 +2505,7 @@ SCREENS.picker = p => {
   return lhdr(title,`<button class="btn sm" data-a="pkCreate">${I('plus',16)} Crear</button>`)+
   `<div class="lbody" style="padding-top:12px"><div class="search">${I('search',20)}<input class="inp" placeholder="Buscar por nombre o músculo" value="${esc(p.q)}" data-in="pkQ"></div>
    <div class="chips scroll" style="margin-top:12px"><button class="chip ${!p.m?'on':''}" data-a="pkM" data-v="">Todos</button>${MUSCLE_GROUPS.map(([k,n])=>`<button class="chip ${p.m===k?'on':''}" data-a="pkM" data-v="${k}">${n}</button>`).join('')}</div>
+   <div class="chips scroll" style="margin-top:8px">${EQ_TYPES.map(([k,n])=>`<button class="chip ${(p.et||'')===k?'on':''}" data-a="pkEt" data-v="${k}">${n}</button>`).join('')}</div>
    <button class="row" style="margin:12px 0 4px;width:100%" data-a="pkMine"><span class="toggle ${p.mine?'on':''}" style="transform:scale(.85)"></span><span class="sm">Solo con mi equipo</span><span class="grow"></span><span class="xs mut">${Object.keys(EX).length} ejercicios</span></button>
    <div id="pklist">${pkList(p)}</div></div>
    ${p.mode==='add'||p.mode==='wadd'?`<div class="lfoot"><button class="btn pri big" data-a="pkDone" ${n?'':'disabled style="opacity:.5"'}>Añadir ${n?plural(n,'ejercicio','ejercicios'):''}</button></div>`:''}`;
@@ -2281,6 +2513,7 @@ SCREENS.picker = p => {
 const pkP = () => LAYERS[LAYERS.length-1].p;
 IN.pkQ=el=>{ const p=pkP(); p.q=el.value; $('#pklist').innerHTML=pkList(p); };
 A.pkM=v=>{ pkP().m=v; refreshTop(); };
+A.pkEt=v=>{ pkP().et=v; refreshTop(); };
 A.pkMine=()=>{ const p=pkP(); p.mine=!p.mine; refreshTop(); };
 A.pkTap=id=>{
   const p=pkP();
@@ -2699,7 +2932,7 @@ A.wkMenu=u=>{
     it.superset?{icon:'link',label:'Quitar de la superserie',fn:()=>{ const g=it.superset; it.superset=null; const left=S.active.items.filter(x=>x.superset===g); if(left.length<2) left.forEach(x=>x.superset=null); save(); refreshTop(); }}
       :{icon:'link',label:'Crear superserie con el siguiente',fn:()=>{ const n=S.active.items[idx+1]; if(!n){toast('Añade otro ejercicio debajo');return;} const g=n.superset||uid(); it.superset=g; n.superset=g; save(); refreshTop(); }},
   ];
-  if (ex.eq.includes('bar')) opts.push({icon:'calc',label:'Calculadora de discos',fn:()=>{ const w=it.sets.find(s=>s.t!=='c'&&!s.done)||it.sets[0]; plateCalc(w.kg??w.sk); }});
+  if (['bar','smi','hex'].some(q=>ex.eq.includes(q))) opts.push({icon:'calc',label:'Calculadora de discos',fn:()=>{ const w=it.sets.find(s=>s.t!=='c'&&!s.done)||it.sets[0]; plateCalc(w.kg??w.sk); }});
   opts.push({icon:'settings',label:'Preferencias del ejercicio',fn:()=>sheet(ex.n,[
     {icon:'eyeoff',label:'No me gusta este ejercicio',fn:()=>{ S.settings.avoid[ex.id]='no'; save(); toast('PandarIA lo evitará en nuevas rutinas'); }},
     {icon:'alert',label:'Me molesta (dolor o incomodidad)',fn:()=>{ S.settings.avoid[ex.id]='molesta'; save(); toast('PandarIA te propondrá un cambio al terminar'); }},
@@ -3226,14 +3459,14 @@ A.tplAdd=()=>{
 
 /* ============ PandarIA 3.0: perfil, plan, metas, informes y consejos ============ */
 const INJURIES = {
-  rodilla:{n:'Rodilla',ex:['sentadilla_pistol','sentadilla_salto','box_jump','skater','burpees','zancadas_pc','zancadas','sentadilla_bulgara','curl_nordico','sprint','saltar_comba','ext_cuadriceps','sentadilla_frontal']},
-  lumbar:{n:'Espalda baja',ex:['peso_muerto','buenos_dias','remo_barra','remo_t','peso_muerto_sumo','sentadilla','kb_swing','kb_snatch','v_ups','pil_teaser','rueda_abdominal','hiperextensiones','crunch','sentadilla_frontal','thrusters']},
-  hombro:{n:'Hombro',ex:['press_militar','handstand_pushup','fondos_pecho','fondos_triceps','pike_pushup','remo_menton','kb_snatch','flexiones_pliometricas','press_frances','pullover_man','pullover_polea','fondos_banco','yoga_cuervo','kb_turkish']},
-  muneca:{n:'Muñeca',ex:['flexiones','flexiones_diamante','flexiones_archer','flexiones_pliometricas','flexiones_declinadas','burpees','plancha_toques','mountain_climbers','bear_crawl','yoga_cuervo','handstand_pushup','pike_pushup','curl_muneca','l_sit']},
-  tobillo:{n:'Tobillo',ex:['sentadilla_salto','box_jump','skater','burpees','jumping_jacks','sprint','saltar_comba','skipping','correr_cinta']},
-  cuello:{n:'Cuello',ex:['handstand_pushup','crunch','v_ups','encogimientos','encogimientos_barra','pil_roll_up','pil_hundred']}
+  rodilla:{n:'Rodilla',ex:['sentadilla_pistol','sentadilla_salto','box_jump','skater','burpees','zancadas_pc','zancadas','sentadilla_bulgara','curl_nordico','sprint','saltar_comba','ext_cuadriceps','sentadilla_frontal','sentadilla_sissy','nordico_inverso','zancada_caminando_barra','zancada_caminando_man','smith_zancada','smith_bulgara','sentadilla_zercher','wall_ball','ext_cuad_unilateral','ext_cuad_polea','sentadilla_cosaca','cinta_curva']},
+  lumbar:{n:'Espalda baja',ex:['peso_muerto','buenos_dias','remo_barra','remo_t','peso_muerto_sumo','sentadilla','kb_swing','kb_snatch','v_ups','pil_teaser','rueda_abdominal','hiperextensiones','crunch','sentadilla_frontal','thrusters','rack_pull','remo_pendlay','pm_piernas_rigidas','sentadilla_zercher','box_squat','rollout_barra','remo_kroc','push_press','press_z','hiper_inversa','hiper_gluteo','balon_suelo','bandera_dragon','limpiaparabrisas','crunch_declinado']},
+  hombro:{n:'Hombro',ex:['press_militar','handstand_pushup','fondos_pecho','fondos_triceps','pike_pushup','remo_menton','kb_snatch','flexiones_pliometricas','press_frances','pullover_man','pullover_polea','fondos_banco','yoga_cuervo','kb_turkish','muscle_up','fondos_anillas','fondos_maquina_asistidos','push_press','press_z','menton_polea','press_jm','pullover_maq','smith_hombro','press_cubano']},
+  muneca:{n:'Muñeca',ex:['flexiones','flexiones_diamante','flexiones_archer','flexiones_pliometricas','flexiones_declinadas','burpees','plancha_toques','mountain_climbers','bear_crawl','yoga_cuervo','handstand_pushup','pike_pushup','curl_muneca','l_sit','flexiones_anillas','curl_muneca_barra','ext_muneca','rodillo_muneca','press_jm','rollout_barra','fondos_anillas']},
+  tobillo:{n:'Tobillo',ex:['sentadilla_salto','box_jump','skater','burpees','jumping_jacks','sprint','saltar_comba','skipping','correr_cinta','trineo_empuje','cinta_curva','wall_ball']},
+  cuello:{n:'Cuello',ex:['handstand_pushup','crunch','v_ups','encogimientos','encogimientos_barra','pil_roll_up','pil_hundred','cuello_maq','encog_maq','encog_smith','encog_polea','crunch_declinado']}
 };
-const HIGH_IMPACT=['burpees','box_jump','sentadilla_salto','skater','sprint','saltar_comba','jumping_jacks','flexiones_pliometricas','skipping','sentadilla_pistol'];
+const HIGH_IMPACT=['burpees','box_jump','sentadilla_salto','skater','sprint','saltar_comba','jumping_jacks','flexiones_pliometricas','skipping','sentadilla_pistol','wall_ball','cinta_curva','cuerdas_golpes','balon_suelo','muscle_up'];
 function bmi(){ const p=S.profile||{}; const w=bodyWeight(), h=+p.height; return h? w/((h/100)*(h/100)) : null; }
 function profileBlocks(id){
   const p=S.profile||{};
@@ -3838,6 +4071,31 @@ A.importCode=()=>promptBox({title:'Importar con código',text:'Pega el código q
   try{ const d=decodeRoutine(v); const r=newRoutine({name:'Rutina compartida',items:d.items,pandaria:true,goal:d.goal,source:'codigo'});
     openEditor(r,true); toast('Rutina importada: revísala y guarda'); }catch(e){ toast('El código no es válido. Revisa que esté completo.'); } }});
 
+
+/* ---------- Créditos e historial de cambios ---------- */
+const APP_VERSION='0.5';
+const CHANGELOG=[
+ {v:'0.5',t:'Biblioteca de gimnasio',items:['176 ejercicios nuevos: 386 en total, casi todos de máquinas, Smith, poleas y accesorios de gimnasio','12 equipos nuevos en Mis equipos: Smith, landmine, barra hexagonal, barra Z, banco GHD, trineo, balón medicinal, fitball, cuerdas de batalla, escaladora, SkiErg y air bike','Biblioteca clasificada por músculo, con filtro por tipo de equipo y búsqueda por apodos (mariposa, multipower, gravitron…)','PandarIA: prioriza máquinas y Smith para principiantes y más peso libre para avanzados','PandarIA: sugiere pasar de la versión guiada al peso libre cuando ya progresas','PandarIA: si un ejercicio te molesta, ofrece primero la versión en máquina','PandarIA: incrementos y peso inicial según el tipo de equipo, y lesiones del perfil actualizadas con los ejercicios nuevos','Nueva sección de Explorar: Solo máquinas, con 5 rutinas','Créditos e historial de cambios en Ajustes']},
+ {v:'0.4',t:'Sonidos y detalles',items:['Sonidos en series, récords, logros, agua y ayuno','Animaciones: confeti, transiciones de pestaña y anillos animados','Ayuno: elegir la hora de inicio si empezaste antes','Rutinas de PandarIA con orden lógico de ejercicios','Arreglo: las notas y la importación con código no se guardaban']},
+ {v:'0.3',t:'Progreso, nutrición y comunidad',items:['Bienvenida en 4 pasos con perfil: edad, sexo, nivel y lesiones','Plan semanal con "Hoy toca" y check-in antes de entrenar','Metas con fecha, informe semanal y gráfica de series por músculo','Pestaña Nutrición: calorías, proteína, agua y ayuno intermitente supervisado','Compartir entrenos como imagen y rutinas con código corto','Fotos de progreso lado a lado y exportación a CSV','Nuevas secciones de Explorar: running, boxeo, deportes, oficina y embarazo','Inglés, texto grande y alto contraste']},
+ {v:'0.2',t:'Entreno más cómodo',items:['Figuras animadas que muestran cada ejercicio','Botones +/− para peso y repeticiones','Pantalla de descanso grande','Cuenta regresiva en ejercicios de tiempo','Esfuerzo percibido (RIR) por serie','Modo intervalos: Tabata, HIIT, EMOM y AMRAP','PandarIA: periodización por bloques y semanas de descarga']},
+ {v:'0.1',t:'Primera versión',items:['Pestañas Mis rutinas, Explorar, Mi historial y Ajustes, en tema oscuro','Biblioteca de ejercicios con ficha, buscador y ejercicios propios','Crear, editar y archivar rutinas','Pantalla de entrenamiento y ventana de Terminar rutina con intensidad','Historial: calendario, récords, gráficas, medidas, logros y mapa muscular','PandarIA: progresión en vivo, rutinas por grupo muscular, Confía en PandarIA, sugerencias cada 3 entrenos y renovación cada 15','Copia de seguridad de tus datos']}
+];
+SCREENS.changelog = () => lhdr('Historial de cambios')+`<div class="lbody">${CHANGELOG.map((c,i)=>`<div class="card" style="margin-bottom:12px">
+  <div class="row" style="margin-bottom:8px"><span class="tag" style="background:${i===0?'var(--ac)':'var(--card2)'};color:${i===0?'#1a0702':'var(--tx)'};font-weight:800">v${c.v}</span><b class="grow">${esc(c.t)}</b>${i===0?'<span class="xs mut">Actual</span>':''}</div>
+  ${c.items.map(x=>`<div class="row" style="align-items:flex-start;padding:3px 0"><span style="color:var(--ac);margin-top:1px">•</span><span class="sm" style="line-height:1.45">${esc(x)}</span></div>`).join('')}</div>`).join('')}
+  <p class="xs mut" style="text-align:center;margin:14px 0">PandarIA Fit · creada por Eddy · LunaDog</p></div>`;
+A.openChangelog=()=>openLayer('changelog',{});
+function creditsCard(){
+  return `<div class="card" style="text-align:center;padding:20px 16px">
+    <div style="width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('dumbbell',30)}</div>
+    <div style="font-size:20px;font-weight:900;margin-top:10px">PandarIA <span style="color:var(--ac)">Fit</span></div>
+    <div class="xs mut" style="margin-top:2px">Versión ${APP_VERSION}</div>
+    <div class="sm" style="margin-top:12px;line-height:1.5">Idea, diseño y desarrollo: <b>Eddy</b><br>Una app de <b style="color:var(--ac)">LunaDog</b></div>
+    <div class="xs mut" style="margin-top:8px">© ${new Date().getFullYear()} LunaDog. Todos los derechos reservados.</div>
+    <button class="btn wide" style="margin-top:14px" data-a="openChangelog">${I('history',18)} Historial de cambios</button></div>`;
+}
+
 /* ---------- Bienvenida en 4 pasos ---------- */
 SCREENS.onboard = p => {
   const st=p.step||0, n=4; p.pf=p.pf||{injuries:[]};
@@ -3847,7 +4105,7 @@ SCREENS.onboard = p => {
     b=`<div style="text-align:center;padding-top:10px"><div style="width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('dumbbell',44)}</div>
       <div style="font-size:30px;font-weight:900;margin-top:18px">PandarIA <span style="color:var(--ac)">Fit</span></div><p class="mut" style="line-height:1.5;margin:10px 6px 22px">Tu compañero de entrenamiento con un algoritmo que aprende de cada serie.</p></div>
       ${[['dumbbell','Rutinas a tu medida','Crea las tuyas, elige de Explorar o deja que PandarIA diseñe tu plan.'],['spark','Te ayuda a progresar','Sugiere pesos, detecta estancamientos y renueva tus rutinas.'],['leaf','Nutrición y ayuno','Calorías, proteína, agua y ayuno supervisado.'],['chart','Todo tu progreso','Récords, gráficas, metas, informes semanales y fotos.']].map(([ic,t,d])=>`<div class="row" style="align-items:flex-start;gap:14px;padding:10px 4px"><span class="si" style="width:42px;height:42px;border-radius:12px;background:var(--acs);color:var(--ac);display:grid;place-items:center;flex:0 0 auto">${I(ic,22)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4">${d}</div></div></div>`).join('')}`;
-    foot=`<button class="btn pri big" data-a="obNext">Empezar</button>`;
+    foot=`<button class="btn pri big" data-a="obNext">Empezar</button><div class="xs mut" style="text-align:center;margin-top:10px">Una app de <b style="color:var(--ac)">LunaDog</b> · v${APP_VERSION}</div>`;
   } else if (st===1){
     b=`<div style="font-size:24px;font-weight:800">Cuéntanos de ti</div><p class="mut sm" style="line-height:1.45">PandarIA lo usa para elegir ejercicios seguros y estimar tus pesos y tu nutrición. Puedes saltarlo, pero las sugerencias serán menos precisas.</p>${profileForm(p.pf,'ob')}`;
     foot=`<div class="row" style="gap:8px"><button class="btn grow" data-a="obSkip">Saltar</button><button class="btn pri grow" style="flex:2" data-a="obNext">Siguiente</button></div>`;
@@ -3879,6 +4137,12 @@ function applyA11y(){ document.body.style.zoom = S.settings.bigText?'1.12':''; d
 
 /* ---------- Explorar: secciones nuevas ---------- */
 EXPLORE.push(
+ {id:'maquinas',n:'Solo máquinas',d:'Guiadas, seguras y fáciles de aprender',r:[
+  {n:'Circuito de máquinas para principiantes',l:1,g:'musculo',ex:['prensa','press_pecho_maq','jalon_pecho','curl_femoral_sentado','press_hombro_maq','remo_maq','crunch_maq']},
+  {n:'Pierna en máquinas',l:1,g:'musculo',ex:['sentadilla_pendulo','prensa','ext_cuadriceps','curl_femoral','hip_thrust_maq','aduccion_maq','gemelos_prensa']},
+  {n:'Torso en máquinas',l:1,g:'musculo',ex:['press_convergente','jalon_maquina','press_inclinado_maq','remo_bajo_maq','laterales_maq','deltoide_post_maq','curl_maquina','ext_triceps_maq']},
+  {n:'Glúteo en máquinas',l:2,g:'musculo',ex:['hip_thrust_maq','hack_inversa','patada_gluteo_maq','abduccion_maq','hiper_gluteo','pull_through']},
+  {n:'Full body en Smith',l:1,g:'musculo',ex:['smith_sentadilla','smith_banca','smith_remo','smith_rumano','smith_hombro','smith_hip_thrust','gemelos_smith']}]},
  {id:'running',n:'Running y preparación física',d:'Corre más y mejor',r:[
   {n:'Preparación para correr',l:1,g:'resistencia',ex:['skipping','zancadas_pc','elev_gemelos','puente_gluteo','plancha','est_gemelos']},
   {n:'Fuerza para corredores',l:2,g:'fuerza',ex:['sentadilla_bulgara','peso_muerto_unilateral','step_up','elev_gemelos_man','plancha_lateral','hip_thrust_man']},
@@ -3961,7 +4225,8 @@ function viewAjustes(){
     <button class="srow" data-a="wipeData"><span class="si" style="color:var(--bad)">${I('trash',20)}</span><span class="grow b" style="color:var(--bad)">Borrar todos los datos</span></button>
   </div>
   <div class="sec">Acerca de</div><div class="card sm mut" style="line-height:1.5">PandarIA basa sus recomendaciones en guías del American College of Sports Medicine (ACSM) y la National Strength and Conditioning Association (NSCA) para fuerza, la Organización Mundial de la Salud (OMS) para actividad física y la International Society of Sports Nutrition (ISSN) para nutrición. No reemplaza a un profesional de la salud.</div>
-  <div class="mut xs" style="text-align:center;margin:20px 0 8px">PandarIA <b style="color:var(--ac)">Fit</b> · versión 2.0<br>Tus datos se guardan solo en este dispositivo.</div>
+  <div class="sec">Créditos</div>${creditsCard()}
+  <div class="mut xs" style="text-align:center;margin:16px 0 8px">Tus datos se guardan solo en este dispositivo.</div>
   <input type="file" id="impfile" accept="application/json,.json" class="hide" data-ch="importFile">`;
 }
 A.setLang=v=>{ S.settings.lang=v; save(); applyLang(); render.keep=true; render(); };
@@ -4098,7 +4363,6 @@ press_pecho_maq|Machine chest press
 press_cerrado|Close-grip bench press
 aperturas_man|Dumbbell flyes
 cruce_poleas|Cable crossover
-pec_deck|Pec deck
 pullover_man|Dumbbell pullover
 fondos_pecho|Chest dips
 flexiones_pared|Wall push-ups
@@ -4297,7 +4561,184 @@ pil_sierra|Saw
 pil_una_pierna|Single-leg stretch
 pil_patada_lateral|Side kick
 pil_teaser|Teaser
-pil_rodar|Rolling like a ball`;
+pil_rodar|Rolling like a ball
+smith_sentadilla|Smith machine squat
+smith_frontal|Smith machine front squat
+sentadilla_pendulo|Pendulum squat
+v_squat|V-squat machine
+hack_inversa|Reverse hack squat
+belt_squat|Belt squat
+prensa_vertical|Vertical leg press
+prensa_sentada|Seated leg press
+prensa_unilateral|Single-leg press
+ext_cuad_unilateral|Single-leg extension
+ext_cuad_polea|Standing cable leg extension
+sentadilla_landmine|Landmine squat
+sentadilla_zercher|Zercher squat
+box_squat|Box squat
+sentadilla_sissy|Sissy squat
+nordico_inverso|Reverse Nordic
+smith_zancada|Smith machine lunge
+smith_bulgara|Smith Bulgarian split squat
+zancada_caminando_barra|Barbell walking lunge
+zancada_caminando_man|Dumbbell walking lunge
+zancada_inversa_barra|Barbell reverse lunge
+step_up_man|Dumbbell step-up
+pm_hexagonal|Trap bar deadlift
+trineo_empuje|Sled push
+trineo_arrastre|Backward sled drag
+curl_femoral_pie|Standing leg curl
+curl_femoral_rodillas|Kneeling leg curl
+curl_femoral_unilateral|Single-leg lying leg curl
+curl_femoral_polea|Standing cable leg curl
+curl_femoral_fitball|Stability ball leg curl
+nordico_maquina|Assisted Nordic curl machine
+glute_ham|Glute-ham raise
+smith_rumano|Smith machine Romanian deadlift
+pm_piernas_rigidas|Stiff-leg deadlift
+hip_thrust_maq|Hip thrust machine
+smith_hip_thrust|Smith machine hip thrust
+hip_thrust_unilateral|Single-leg hip thrust
+patada_gluteo_maq|Glute kickback machine
+multicadera_ext|Multi-hip extension
+pull_through|Cable pull-through
+hiper_gluteo|45° glute hyperextension
+hiper_inversa|Reverse hyperextension
+abduccion_polea|Cable hip abduction
+abduccion_multicadera|Standing multi-hip abduction
+fire_hydrant|Fire hydrant
+frog_pumps|Frog pumps
+rack_pull|Rack pull
+aduccion_polea|Cable hip adduction
+aduccion_multicadera|Multi-hip adduction
+copenhague|Copenhagen plank
+sentadilla_cosaca|Cossack squat
+gemelos_prensa|Leg press calf raise
+gemelos_smith|Smith machine calf raise
+gemelo_burro|Donkey calf raise
+gemelos_barra|Barbell standing calf raise
+gemelo_unilateral_man|Single-leg dumbbell calf raise
+gemelo_excentrico|Eccentric heel drop
+tibial|Tibialis raise
+jalon_maquina|Machine lat pulldown
+jalon_unilateral_maq|Iso-lateral pulldown
+jalon_supino|Supinated lat pulldown
+jalon_neutro|Neutral-grip lat pulldown
+jalon_una_mano|Single-arm cable pulldown
+dominadas_maquina|Assisted pull-up machine
+dominadas_neutras|Neutral-grip pull-up
+muscle_up|Muscle-up
+remo_alto_maq|High row machine
+remo_bajo_maq|Low row machine
+remo_t_apoyado|Chest-supported T-bar row
+remo_apoyado_man|Chest-supported dumbbell row
+remo_seal|Seal row
+remo_pendlay|Pendlay row
+remo_kroc|Kroc row
+remo_polea_unilateral|Single-arm cable row
+smith_remo|Smith machine row
+remo_meadows|Meadows row
+pullover_maq|Pullover machine
+ext_lumbar_maq|Back extension machine
+encog_maq|Machine shrug
+encog_smith|Smith machine shrug
+encog_polea|Cable shrug
+smith_banca|Smith machine bench press
+smith_inclinado|Smith machine incline press
+press_inclinado_maq|Incline chest press machine
+press_declinado_maq|Decline chest press machine
+press_convergente|Iso-lateral chest press
+press_pecho_polea|Cable chest press
+banca_inversa|Reverse-grip bench press
+cruce_bajo_alto|Low-to-high cable fly
+cruce_alto_bajo|High-to-low cable fly
+aperturas_polea_banco|Bench cable fly
+aperturas_inclinadas|Incline dumbbell fly
+super_fly|Plate-loaded chest fly
+fondos_maquina_asistidos|Assisted dip machine
+press_svend|Svend press
+flexiones_anillas|Ring push-up
+fondos_anillas|Ring dips
+laterales_maq|Machine lateral raise
+deltoide_post_maq|Reverse pec deck
+pajaros_polea|Cable reverse fly
+frontal_polea|Cable front raise
+frontal_disco|Plate front raise
+menton_polea|Cable upright row
+lateral_tumbado|Lying lateral raise
+y_inclinado|Incline Y-raise
+smith_hombro|Smith machine shoulder press
+press_hombro_discos|Iso-lateral shoulder press
+press_landmine|Single-arm landmine press
+push_press|Push press
+press_z|Z press
+press_cubano|Cuban press
+rot_externa_polea|Cable external rotation
+rot_interna_polea|Cable internal rotation
+rot_externa_man|Side-lying external rotation
+kb_halo|Kettlebell halo
+curl_z|EZ-bar curl
+curl_predicador_z|EZ-bar preacher curl
+curl_predicador_man|Dumbbell preacher curl
+curl_maquina|Machine biceps curl
+curl_cuerda|Cable rope curl
+martillo_polea|Cable rope hammer curl
+curl_bayesiano|Bayesian cable curl
+curl_polea_alta|High cable curl
+curl_arana|Spider curl
+curl_arrastre|Drag curl
+curl_zottman|Zottman curl
+curl_inverso_z|Reverse EZ-bar curl
+martillo_cruzado|Cross-body hammer curl
+ext_cuerda|Rope pushdown
+ext_polea_inversa|Reverse-grip single-arm pushdown
+ext_polea_cabeza|Overhead cable extension
+ext_cruzada_polea|Cross-body cable extension
+patada_polea|Cable triceps kickback
+ext_triceps_maq|Triceps extension machine
+fondos_sentado_maq|Seated dip machine
+press_frances_z|EZ-bar skull crusher
+press_frances_man|Dumbbell skull crusher
+press_tate|Tate press
+press_jm|JM press
+curl_muneca_barra|Barbell wrist curl
+ext_muneca|Wrist extension
+rodillo_muneca|Wrist roller
+pinza_discos|Plate pinch
+gripper_maq|Gripper machine
+granjero_hex|Trap bar farmer carry
+crunch_maq|Ab crunch machine
+rot_torso_maq|Rotary torso machine
+silla_rodillas|Captain's chair knee raise
+silla_piernas|Captain's chair leg raise
+crunch_declinado|Decline sit-up
+crunch_fitball|Stability ball crunch
+lenador_bajo|Low-to-high cable woodchop
+rot_landmine|Landmine rotation
+inclinacion_lateral|Dumbbell side bend
+paseo_maleta|Suitcase carry
+plancha_peso|Weighted plank
+rollout_barra|Barbell rollout
+limpiaparabrisas|Hanging windshield wiper
+bandera_dragon|Dragon flag
+balon_suelo|Medicine ball slam
+balon_lateral|Medicine ball side throw
+wall_ball|Wall ball
+escaladora|Stair climber
+stepper|Stepper
+skierg|SkiErg
+air_bike|Air bike
+bici_reclinada|Recumbent bike
+spinning|Spin bike
+cinta_inclinada|Incline treadmill walk
+cinta_curva|Curved treadmill
+arc_trainer|Arc trainer
+versaclimber|VersaClimber
+ergometro_brazos|Arm ergometer
+cuerdas_ondas|Battle rope waves
+cuerdas_golpes|Battle rope slams
+cuello_maq|4-way neck machine
+pec_deck|Pec deck (butterfly)`;
 const EN_UI = `Mis rutinas|My routines
 Explorar|Explore
 Nutrición|Nutrition
@@ -4651,6 +5092,34 @@ Cinta de correr|Treadmill
 Bicicleta estática|Stationary bike
 Elíptica|Elliptical
 Remo ergómetro|Rowing machine
+Máquina Smith|Smith machine
+Máquinas|Machines
+Smith|Smith
+Peso libre|Free weights
+Todo|All
+Movilidad y estiramientos|Mobility and stretching
+Solo máquinas|Machines only
+Guiadas, seguras y fáciles de aprender|Guided, safe and easy to learn
+Circuito de máquinas para principiantes|Beginner machine circuit
+Pierna en máquinas|Machine leg day
+Torso en máquinas|Machine upper body
+Glúteo en máquinas|Machine glutes
+Full body en Smith|Smith machine full body
+Créditos|Credits
+Historial de cambios|Changelog
+Actual|Current
+Todos los derechos reservados.|All rights reserved.
+Landmine|Landmine
+Barra hexagonal|Trap bar
+Barra Z|EZ bar
+Banco GHD / glúteo-isquio|GHD / glute-ham bench
+Trineo|Sled
+Balón medicinal|Medicine ball
+Fitball|Stability ball
+Cuerdas de batalla|Battle ropes
+Escaladora / stepper|Stair climber / stepper
+SkiErg|SkiErg
+Bicicleta de aire|Air bike
 Media|Medium
 Difícil|Hard
 Dificultad|Difficulty`;
@@ -4717,5 +5186,5 @@ function applyLang(){
 }
 
 </script>
-
-</body></html>
+</body>
+</html>
