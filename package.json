@@ -1,0 +1,13 @@
+{
+  "name": "pandaria-fit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PandarIA Fit para Android",
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0"
+  }
+}

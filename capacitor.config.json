@@ -1,0 +1,9 @@
+{
+  "appId": "com.pandaria.fit",
+  "appName": "PandarIA Fit",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#12151a",
+    "allowMixedContent": false
+  }
+}
