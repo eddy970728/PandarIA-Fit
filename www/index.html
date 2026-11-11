@@ -3114,24 +3114,24 @@ function checkAch(){
 
 /* ============ Modo intervalos ============ */
 const INT_FMT = {
-  tabata:{n:'Tabata',d:'20 s de trabajo y 10 s de descanso, 8 rondas por tanda.'},
+  tabata:{n:'Tabata',d:'Clásico: 20 s de trabajo y 10 s de descanso, 8 rondas por tanda. Puedes ajustar los tiempos.'},
   hiit:{n:'HIIT',d:'Tú eliges trabajo, descanso, rondas y tandas.'},
   emom:{n:'EMOM',d:'Cada minuto empiezas una serie; descansas lo que sobre del minuto.'},
   amrap:{n:'AMRAP',d:'Tantas rondas como puedas en el tiempo elegido.'}
 };
-function intDefaults(){ return {fmt:'tabata',work:20,rest:10,rounds:8,sets:1,setRest:60,emomMin:10,emomReps:10,amrapMin:12,prep:10,ex:['burpees','sentadilla_salto','mountain_climbers','flexiones']}; }
+function intDefaults(){ return {fmt:'tabata',work:20,rest:10,rounds:8,sets:1,setRest:60,tWork:20,tRest:10,emomMin:10,emomReps:10,amrapMin:12,prep:10,ex:['burpees','sentadilla_salto','mountain_climbers','flexiones']}; }
 function intPhases(c){
   const ph=[{type:'prep',dur:c.prep,label:'Prepárate'}];
   const exs=c.ex.length?c.ex:[null];
   let k=0;
   if (c.fmt==='tabata'||c.fmt==='hiit'){
-    const work=c.fmt==='tabata'?20:c.work, rest=c.fmt==='tabata'?10:c.rest, rounds=c.fmt==='tabata'?8:c.rounds;
+    const work=c.fmt==='tabata'?(c.tWork??20):c.work, rest=c.fmt==='tabata'?(c.tRest??10):c.rest, rounds=c.fmt==='tabata'?8:c.rounds;
     for (let s=1;s<=c.sets;s++){
       for (let r=1;r<=rounds;r++){
         ph.push({type:'work',dur:work,ex:exs[k++%exs.length],round:r,rounds,set:s,sets:c.sets});
-        if (r<rounds && rest>0) ph.push({type:'rest',dur:rest,round:r,rounds,set:s,sets:c.sets});
+        if (r<rounds && rest>0) ph.push({type:'rest',dur:rest,kind:'serie',round:r,rounds,set:s,sets:c.sets});
       }
-      if (s<c.sets) ph.push({type:'rest',dur:c.setRest,label:'Descanso entre tandas',round:rounds,rounds,set:s,sets:c.sets});
+      if (s<c.sets) ph.push({type:'rest',dur:c.setRest,kind:'tanda',label:'Descanso entre tandas',round:rounds,rounds,set:s,sets:c.sets});
     }
   } else if (c.fmt==='emom'){
     for (let m=1;m<=c.emomMin;m++) ph.push({type:'work',dur:60,ex:exs[k++%exs.length],round:m,rounds:c.emomMin,emom:true});
@@ -3147,8 +3147,8 @@ SCREENS.intervals = p => {
   const num=(k,l,min,max,step,suf)=>`<div class="row" style="padding:8px 0"><span class="grow">${l}</span><button class="stb" style="flex:0 0 40px" data-a="intNum" data-v="${k}|-${step}|${min}|${max}">−</button><b style="min-width:70px;text-align:center">${k.endsWith('Min')?c[k]+' min':suf==='s'?fmtTime(c[k]):c[k]}</b><button class="stb" style="flex:0 0 40px" data-a="intNum" data-v="${k}|${step}|${min}|${max}">+</button></div>`;
   let b=`<div class="seg" style="margin-bottom:10px">${Object.entries(INT_FMT).map(([k,f])=>`<button class="${c.fmt===k?'on':''}" data-a="intFmt" data-v="${k}">${f.n}</button>`).join('')}</div>
   <p class="sm mut" style="margin:4px 2px 14px">${INT_FMT[c.fmt].d}</p><div class="card">`;
-  if (c.fmt==='tabata') b+=num('sets','Tandas',1,6,1)+(c.sets>1?num('setRest','Descanso entre tandas',15,300,15,'s'):'');
-  if (c.fmt==='hiit') b+=num('work','Trabajo',5,300,5,'s')+num('rest','Descanso',0,300,5,'s')+num('rounds','Rondas',1,30,1)+num('sets','Tandas',1,6,1)+(c.sets>1?num('setRest','Descanso entre tandas',15,300,15,'s'):'');
+  if (c.fmt==='tabata') b+=num('tWork','Trabajo',5,120,5,'s')+num('tRest','Descanso entre series',5,120,5,'s')+((c.tWork??20)!==20||(c.tRest??10)!==10?`<div class="xs mut" style="margin:-2px 0 6px">Tabata clásico: 20 s / 10 s. <button class="link xs" data-a="intTabReset">Restablecer</button></div>`:'')+num('sets','Tandas',1,6,1)+(c.sets>1?num('setRest','Descanso entre tandas',15,300,15,'s'):'');
+  if (c.fmt==='hiit') b+=num('work','Trabajo',5,300,5,'s')+num('rest','Descanso entre series',0,300,5,'s')+num('rounds','Rondas',1,30,1)+num('sets','Tandas',1,6,1)+(c.sets>1?num('setRest','Descanso entre tandas',15,300,15,'s'):'');
   if (c.fmt==='emom') b+=num('emomMin','Duración',2,60,1)+num('emomReps','Repeticiones por minuto',1,50,1);
   if (c.fmt==='amrap') b+=num('amrapMin','Duración',3,60,1);
   b+=num('prep','Cuenta previa',0,30,5,'s')+`</div>`;
@@ -3161,6 +3161,7 @@ SCREENS.intervals = p => {
 A.openIntervals=()=>openLayer('intervals',{cfg:Object.assign(intDefaults(),clone(S.intCfg||{}))});
 A.intFmt=v=>{ const c=pkP().cfg; c.fmt=v; refreshTop(); };
 A.intNum=v=>{ const [k,d,mn,mx]=v.split('|'); const c=pkP().cfg; c[k]=Math.max(+mn,Math.min(+mx,(+c[k])+(+d))); refreshTop(); };
+A.intTabReset=()=>{ const c=pkP().cfg; c.tWork=20; c.tRest=10; refreshTop(); };
 A.intDelEx=i=>{ pkP().cfg.ex.splice(+i,1); refreshTop(); };
 A.intAddEx=()=>{ const c=pkP().cfg; openLayer('picker',{mode:'wadd',q:'',m:'',mine:true,sel:[],onAdd:ids=>{ c.ex.push(...ids); }}); };
 A.intStart=()=>{
@@ -3191,13 +3192,26 @@ SCREENS.intRun = () => {
     <div style="text-align:center"><div class="b" style="font-size:22px;letter-spacing:3px">${label}</div><div class="sm" style="opacity:.85;margin-top:4px">${sub}</div></div>
     <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"/><circle id="iarc" cx="60" cy="60" r="52" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="326.7" transform="rotate(-90 60 60)"/></svg><div class="rt" id="it">${fmtTime(Math.ceil(intLeft()))}</div></div>
     ${ex?`<div class="ovnext">${exAnim(ex,'ovanim')}<div class="grow" style="min-width:0"><div class="xs" style="opacity:.7;letter-spacing:1px;text-transform:uppercase">${p.type==='work'?'Ahora':'Siguiente'}</div><div class="b" style="font-size:18px;line-height:1.25">${esc(ex.n)}</div></div></div>`:''}
-    <div class="row" style="gap:12px;justify-content:center">
+    <div class="row" style="gap:${p.type==='rest'?8:12}px;justify-content:center">
       ${p.amrap?`<button class="btn ovb pri" style="min-width:150px;height:58px;font-size:18px" data-a="intRound">+1 ronda</button>`:''}
-      <button class="btn ovb" data-a="intPause">${INT.paused?I('play',20)+' Seguir':'❚❚ Pausa'}</button><button class="btn ovb" data-a="intSkip">Saltar ⏭</button></div>
+      ${p.type==='rest'?`<button class="btn ovb" style="min-width:0;padding:0 12px;white-space:nowrap" data-a="intAdj" data-v="-10">−10 s</button>`:''}
+      <button class="btn ovb" data-a="intPause">${INT.paused?I('play',20)+' Seguir':'❚❚ Pausa'}</button><button class="btn ovb" data-a="intSkip">Saltar ⏭</button>${p.type==='rest'?`<button class="btn ovb" style="min-width:0;padding:0 12px;white-space:nowrap" data-a="intAdj" data-v="10">+10 s</button>`:''}</div>
+    ${p.type==='rest'?`<div class="xs" style="text-align:center;opacity:.75;margin-top:-8px">El cambio se aplica también a los siguientes descansos ${p.kind==='tanda'?'entre tandas':'entre series'}</div>`:''}
   </div>`;
 };
 A.intPause=()=>{ if(!INT) return; if (INT.paused){ INT.t0+=Date.now()-INT.paused; INT.paused=null; } else INT.paused=Date.now(); refreshTop(); };
 A.intSkip=()=>{ intNext(true); };
+A.intAdj=v=>{
+  const p=intCur(); if(!INT||!p||p.type!=='rest') return;
+  const el=((INT.paused||Date.now())-INT.t0)/1000;
+  const nd=Math.max(5,Math.min(600,p.dur+(+v)));
+  p.dur=Math.max(Math.ceil(el)+1,nd);
+  // los descansos siguientes del mismo tipo toman la nueva duración
+  INT.ph.slice(INT.i+1).forEach(x=>{ if(x.type==='rest'&&x.kind===p.kind) x.dur=nd; });
+  const c=INT.cfg; if (p.kind==='tanda') c.setRest=nd; else if (c.fmt==='tabata') c.tRest=nd; else c.rest=nd;
+  S.intCfg=clone(c); save(); vibrate(20); sfx&&sfx('tap'); INT.lastSec=null; refreshTop();
+  toast(`${p.kind==='tanda'?'Descanso entre tandas':'Descanso entre series'}: ${fmtTime(nd)}`);
+};
 A.intRound=()=>{ INT.rounds++; vibrate(40); refreshTop(); };
 function intNext(skipped){
   const p=intCur();
@@ -4073,8 +4087,9 @@ A.importCode=()=>promptBox({title:'Importar con código',text:'Pega el código q
 
 
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='0.5';
+const APP_VERSION='0.5.1';
 const CHANGELOG=[
+ {v:'0.5.1',t:'Mejoras de testers',items:['Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata','Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez']},
  {v:'0.5',t:'Biblioteca de gimnasio',items:['176 ejercicios nuevos: 386 en total, casi todos de máquinas, Smith, poleas y accesorios de gimnasio','12 equipos nuevos en Mis equipos: Smith, landmine, barra hexagonal, barra Z, banco GHD, trineo, balón medicinal, fitball, cuerdas de batalla, escaladora, SkiErg y air bike','Biblioteca clasificada por músculo, con filtro por tipo de equipo y búsqueda por apodos (mariposa, multipower, gravitron…)','PandarIA: prioriza máquinas y Smith para principiantes y más peso libre para avanzados','PandarIA: sugiere pasar de la versión guiada al peso libre cuando ya progresas','PandarIA: si un ejercicio te molesta, ofrece primero la versión en máquina','PandarIA: incrementos y peso inicial según el tipo de equipo, y lesiones del perfil actualizadas con los ejercicios nuevos','Nueva sección de Explorar: Solo máquinas, con 5 rutinas','Créditos e historial de cambios en Ajustes']},
  {v:'0.4',t:'Sonidos y detalles',items:['Sonidos en series, récords, logros, agua y ayuno','Animaciones: confeti, transiciones de pestaña y anillos animados','Ayuno: elegir la hora de inicio si empezaste antes','Rutinas de PandarIA con orden lógico de ejercicios','Arreglo: las notas y la importación con código no se guardaban']},
  {v:'0.3',t:'Progreso, nutrición y comunidad',items:['Bienvenida en 4 pasos con perfil: edad, sexo, nivel y lesiones','Plan semanal con "Hoy toca" y check-in antes de entrenar','Metas con fecha, informe semanal y gráfica de series por músculo','Pestaña Nutrición: calorías, proteína, agua y ayuno intermitente supervisado','Compartir entrenos como imagen y rutinas con código corto','Fotos de progreso lado a lado y exportación a CSV','Nuevas secciones de Explorar: running, boxeo, deportes, oficina y embarazo','Inglés, texto grande y alto contraste']},
@@ -5093,6 +5108,9 @@ Bicicleta estática|Stationary bike
 Elíptica|Elliptical
 Remo ergómetro|Rowing machine
 Máquina Smith|Smith machine
+Descanso entre series|Rest between sets
+Restablecer|Reset
+Mejoras de testers|Tester improvements
 Máquinas|Machines
 Smith|Smith
 Peso libre|Free weights
