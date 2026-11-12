@@ -52,6 +52,7 @@ const AYUDAS = () => `
 window.HOMBRE = ${JSON.stringify(HOMBRE)}; window.MUJER = ${JSON.stringify(MUJER)};
 window.__NOW = ${NOW};
 window.__clean = o => JSON.parse(JSON.stringify(o, (k, v) => ['uid','id','sid','routineId','superset','created','itemUid'].includes(k) ? undefined : (typeof v === 'number' ? Math.round(v * 1000) / 1000 : v)));
+window.__dia = (items) => { const n = nd(), k = dayKey(); n.diario[k] = items.map(([id, gr, m, t], i) => { const f = alimGet(id); return Object.assign(alimMac(f, gr), { id: 'd' + i, fid: id, n: f.n, gr, m, t: t ?? ${NOW} - 3600000 }); }); return k; };
 window.__reset = (profile, settings) => {
   NUT_DAY = null;
   __seed(7); __setNow(${NOW});
@@ -193,6 +194,19 @@ caso('dia_con_poco_descanso', () => { __reset(HOMBRE, { level: 'intermedio' }); 
 caso('estado_de_recuperacion', () => { __reset(HOMBRE); const r = __routine([buildItem('press_banca', 'musculo', 2), buildItem('remo_barra', 'musculo', 2)]); const out = { nada: recoveryState(r) };
   __hist(r, { n: 1, fin: 0.5, intensidad: 10 }); out.reciente = recoveryState(r); S.sessions.forEach(x => x.checkin = { sleep: 0, energy: 0, sore: 1 }); __hist(r, { n: 2, fin: 0.3 }); S.sessions.forEach(x => x.checkin = { sleep: 0, energy: 1, sore: 1 }); out.mal = recoveryState(r); return out; });
 caso('alternativas_sin_barra_marcada', () => { __reset(HOMBRE); S.settings.equip = ['pc', 'est']; return ['press_banca', 'sentadilla', 'curl_barra', 'peso_muerto'].map(id => alternatives(id).slice(0, 3)); });
+
+// 65-71 · Etapa 5: suplementos, calidad de la dieta, menús, agua, ayuno y modo viaje
+caso('agua_bebidas_y_cafeina', () => { __reset(HOMBRE); const k = __dia([['14209', 237, 'desayuno'], ['01077', 244, 'desayuno'], ['14148', 355, 'almuerzo'], ['14003', 356, 'cena'], ['20045', 200, 'almuerzo'], ['14210', 30, 'merienda']]); nut().water[k] = 500;
+  return { bebidas: diaryDrinks(k), total: waterToday(k), adulto: cafLimit(), embarazo: (nutSalud().embarazo = true, cafLimit()), menor: (S.profile.age = 16, cafLimit()) }; });
+caso('agua_entreno_largo', () => { const out = {}; [0, 45, 60, 90, 120, 200].forEach(min => { __reset(HOMBRE); if (min) S.sessions.push({ id: 's', routineId: 'r', start: __NOW - min * 60000 - 60000, end: __NOW - 60000, items: [] }); out[min] = waterGoal(); }); return out; });
+caso('calidad_de_la_dieta', () => { __reset(HOMBRE); const k = __dia([['20038', 45, 'desayuno'], ['01077', 244, 'desayuno'], ['05064', 172, 'almuerzo'], ['20045', 200, 'almuerzo'], ['07029', 120, 'cena'], ['18069', 100, 'cena'], ['16070', 198, 'cena']]); return dietQuality(k); });
+caso('menu_de_ejemplo', () => { const out = {}; for (const [d, e] of [['todo', []], ['vegetariano', []], ['vegano', []], ['todo', ['L', 'G']], ['todo', ['P', 'C', 'H']]]) { __reset(HOMBRE); nd().prefs = { dieta: d, evitar: e }; const c = calcNutrition(); const m = buildMenu(c, 20261112);
+  const ids = m.meals.flatMap(M => M.items.map(it => it.id)); out[d + ':' + e.join('')] = { kcal: Math.round(m.T.k), objetivo: c.kcal, prot: Math.round(m.T.p), conflictos: ids.filter(id => alimConflicts(ALIM[id]).length), comidas: m.meals.map(M => M.m + ':' + M.items.map(it => it.id + '/' + it.gr).join(',')) }; } return out; });
+caso('modo_viaje', () => { __reset(HOMBRE, { level: 'intermedio', equip: EQUIP_GYM.slice() }); const ids = ['press_banca', 'remo_barra', 'peso_muerto', 'press_militar', 'curl_barra', 'jalon_pecho', 'flexiones'].filter(id => EX[id]);
+  const out = {}; for (const eq of ['pc', 'bnd', 'hotel']) { const used = []; out[eq] = ids.map(id => { const it = buildItem(id, 'musculo', 2); const x = travelItem(it, VIAJE_EQ[eq], used); return [id, x.exId, x.sets.map(s => [s.kg, s.reps, s.time])[0]]; }); } return out; });
+caso('ayuno_desde_el_diario', () => { __reset(HOMBRE); __dia([['20038', 45, 'desayuno', __NOW - 10 * 3600000], ['14209', 237, 'desayuno', __NOW - 2 * 3600000], ['05064', 172, 'almuerzo', __NOW - 5 * 3600000]]); return { ultima: (__NOW - lastMealTs()) / 3600000, ventana: fastWindowHtml().replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }; });
+caso('suplementos_pantalla', () => { __reset(HOMBRE); const txt = () => SCREENS.suplementos({}).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '); const sano = txt(); Object.assign(nutSalud(), { embarazo: true, presion: true, rinon: true }); const avisos = txt(); S.profile.age = 16; const menor = txt();
+  return { dosis: (sano.match(/\d[\d,–]* (?:a \d+ )?(?:g|mg)[^.]*?(?:día|kg|ti\))/g) || []).slice(0, 8), avisos: (avisos.match(/(En embarazo|Con la presión|Con una enfermedad del riñón)[^.]*\./g) || []), menor: /no da dosis/.test(menor) && !/3 a 5 g/.test(menor) }; });
 
 /* ---------- Ejecución ---------- */
 const resultados = {}, fallos = [];

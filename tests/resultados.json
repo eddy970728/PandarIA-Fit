@@ -6963,5 +6963,327 @@
    "buenos_dias",
    "pm_piernas_rigidas"
   ]
- ]
+ ],
+ "agua_bebidas_y_cafeina": {
+  "bebidas": {
+   "ml": 800,
+   "caf": 186,
+   "n": 4
+  },
+  "total": 1300,
+  "adulto": {
+   "mg": 400,
+   "why": "en adultos sanos"
+  },
+  "embarazo": {
+   "mg": 200,
+   "why": "en embarazo y lactancia"
+  },
+  "menor": {
+   "mg": 240,
+   "why": "en menores, 3 mg por kg al día"
+  }
+ },
+ "agua_entreno_largo": {
+  "0": 2650,
+  "45": 3150,
+  "60": 3150,
+  "90": 3400,
+  "120": 3650,
+  "200": 3650
+ },
+ "calidad_de_la_dieta": {
+  "fib": 25.5,
+  "fibUnk": false,
+  "fibMeta": 25,
+  "na": 2100.7,
+  "naUnk": false,
+  "naMax": 2000,
+  "per": 20,
+  "meals": 3,
+  "okMeals": 2
+ },
+ "menu_de_ejemplo": {
+  "todo:": {
+   "kcal": 2289,
+   "objetivo": 2430,
+   "prot": 122,
+   "conflictos": [],
+   "comidas": [
+    "desayuno:20038/65,01132/183,09176/165",
+    "almuerzo:15262/140,20029/300,11210/150,11136/100,04053/13.5",
+    "merienda:01116/310,09040/118",
+    "cena:01129/150,11367/300,11959/60,11091/100,04053/13.5"
+   ]
+  },
+  "vegetariano:": {
+   "kcal": 2438,
+   "objetivo": 2430,
+   "prot": 118,
+   "conflictos": [],
+   "comidas": [
+    "desayuno:20038/65,01132/183,09176/165",
+    "almuerzo:16070/320,20029/240,11210/150,11136/100,04053/13.5",
+    "merienda:01116/310,09040/118",
+    "cena:16057/320,11367/75,11959/60,11091/100,04053/5"
+   ]
+  },
+  "vegano:": {
+   "kcal": 2447,
+   "objetivo": 2430,
+   "prot": 111,
+   "conflictos": [],
+   "comidas": [
+    "desayuno:20038/80,16139/486,09176/165",
+    "almuerzo:16070/320,20029/240,11210/150,11136/100,04053/13.5",
+    "merienda:09003/250,12061/30",
+    "cena:16015/320,11367/150,11959/60,11091/100,04053/10"
+   ]
+  },
+  "todo:LG": {
+   "kcal": 2268,
+   "objetivo": 2430,
+   "prot": 116,
+   "conflictos": [],
+   "comidas": [
+    "desayuno:36415/140,01123/150,09176/165",
+    "almuerzo:15262/170,11508/300,11210/150,11136/100,04053/13.5",
+    "merienda:09003/250,12061/30",
+    "cena:01129/150,11367/300,11959/60,11091/100,04053/13.5"
+   ]
+  },
+  "todo:PCH": {
+   "kcal": 2216,
+   "objetivo": 2430,
+   "prot": 129,
+   "conflictos": [],
+   "comidas": [
+    "desayuno:20038/110,01015/28,09176/165",
+    "almuerzo:05711/120,20029/300,11210/150,11136/100,04053/13.5",
+    "merienda:01116/310,09040/118",
+    "cena:16114/180,11367/190,11959/60,11091/100,04053/13.5"
+   ]
+  }
+ },
+ "modo_viaje": {
+  "pc": [
+   [
+    "press_banca",
+    "flexiones_archer",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "remo_barra",
+    "remo_mesa",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "peso_muerto",
+    "curl_femoral_toalla",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "press_militar",
+    "pike_pushup",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "curl_barra",
+    "curl_toalla",
+    [
+     null,
+     null,
+     30
+    ]
+   ],
+   [
+    "jalon_pecho",
+    "remo_toalla",
+    [
+     null,
+     null,
+     30
+    ]
+   ],
+   [
+    "flexiones",
+    "flexiones",
+    [
+     null,
+     8,
+     null
+    ]
+   ]
+  ],
+  "bnd": [
+   [
+    "press_banca",
+    "flexiones_archer",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "remo_barra",
+    "remo_banda",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "peso_muerto",
+    "curl_femoral_toalla",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "press_militar",
+    "pike_pushup",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "curl_barra",
+    "curl_banda",
+    [
+     null,
+     10,
+     null
+    ]
+   ],
+   [
+    "jalon_pecho",
+    "jalon_banda",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "flexiones",
+    "flexiones",
+    [
+     null,
+     8,
+     null
+    ]
+   ]
+  ],
+  "hotel": [
+   [
+    "press_banca",
+    "flexiones_declinadas",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "remo_barra",
+    "remo_kroc",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "peso_muerto",
+    "peso_muerto_unilateral",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "press_militar",
+    "press_arnold",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "curl_barra",
+    "curl_inclinado",
+    [
+     null,
+     10,
+     null
+    ]
+   ],
+   [
+    "jalon_pecho",
+    "jalon_banda",
+    [
+     null,
+     8,
+     null
+    ]
+   ],
+   [
+    "flexiones",
+    "flexiones",
+    [
+     null,
+     8,
+     null
+    ]
+   ]
+  ]
+ },
+ "ayuno_desde_el_diario": {
+  "ultima": 5,
+  "ventana": "Según tu diario, hoy comiste entre las 02:00 y las 07:00 (5 h 00 min). Cómo funciona"
+ },
+ "suplementos_pantalla": {
+  "dosis": [
+   "3 a 5 g al día",
+   "24 g al día",
+   "3 a 6 mg por kg",
+   "240–400 mg para ti)",
+   "400 mg al día",
+   "4 a 6 g al día",
+   "128 g al día"
+  ],
+  "avisos": [
+   "En embarazo y lactancia no hay datos suficientes de seguridad: no la tomes sin consultarlo.",
+   "Con una enfermedad del riñón, consulta a tu médico antes de tomarla.",
+   "Con la presión alta, la cafeína puede subirla un rato: habla con tu médico antes de usarla para entrenar.",
+   "En embarazo y lactancia no uses cafeína para entrenar; no pases de 200 mg al día en total.",
+   "En embarazo y lactancia no hay datos de seguridad: no la tomes.",
+   "Con una enfermedad del riñón, pregunta a tu médico cuánta proteína al día te conviene."
+  ],
+  "menor": true
+ }
 }
