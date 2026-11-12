@@ -118,11 +118,11 @@
   }
   function ttsHelp(){
     if (ttsWarned) return; ttsWarned = true;
-    confirmBox({title:'Falta la voz en español', text:'Tu teléfono no tiene instalada una voz en español para leer los avisos. Instálala en los ajustes de <b>Texto a voz</b> (motor de Google o de Samsung) y vuelve a activar los avisos por voz.',
-      okText:'Instalar voz', ok:() => safe(() => TTS.openInstall()), noText:'Ahora no'});
+    confirmBox(Object.assign(EN_LANG() ? {title:'English voice missing', text:'Your phone does not have an English voice installed to read the cues. Install one in the <b>Text-to-speech</b> settings (Google or Samsung engine) and turn voice cues back on.'} : {title:'Falta la voz en español', text:'Tu teléfono no tiene instalada una voz en español para leer los avisos. Instálala en los ajustes de <b>Texto a voz</b> (motor de Google o de Samsung) y vuelve a activar los avisos por voz.'}, {
+      okText:'Instalar voz', ok:() => safe(() => TTS.openInstall()), noText:'Ahora no'}));
   }
   speak = function(text){
-    if (!S.settings.voice || !TTS || !text) return;
+    if (!S.settings.voice || !TTS || !text) return; text = typeof spkTr === 'function' ? spkTr(text) : text;
     (async () => {
       const k = EN_LANG() ? 'en' : 'es';
       if (!ttsLang || ttsLang.k !== k) ttsLang = {k, l: await pickLang()};
@@ -244,15 +244,17 @@
   let notifOk = false, exactOk = false, nT = null;
 
   // Fases del ayuno (aproximadas; varían según la persona)
-  const FAST_PHASES = [
-    {h:0,  n:'Ayuno iniciado',     t:'Tu cuerpo usa la energía de tu última comida.'},
-    {h:4,  n:'Azúcar estable',     t:'El azúcar en sangre se estabiliza. Bebe agua.'},
-    {h:8,  n:'Reservas en uso',    t:'Tu cuerpo empieza a tirar de sus reservas de glucógeno.'},
-    {h:12, n:'Estado de ayuno',    t:'La insulina baja y el cuerpo usa más grasa como energía.'},
-    {h:16, n:'Más quema de grasa', t:'Estás en la zona del 16:8. ¡Buen trabajo!'},
-    {h:18, n:'Cetosis leve',       t:'Puede empezar una cetosis leve. Escucha a tu cuerpo.'},
-    {h:24, n:'Ayuno largo',        t:'No hay beneficios extra en alargarlo. Considera romperlo con proteína y verduras.'}
+  const FAST_PHASES0 = [
+    {h:0,  n:'Ayuno iniciado',     t:'Tu cuerpo usa la energía de tu última comida.', en:['Fast started','Your body is using the energy from your last meal.']},
+    {h:4,  n:'Azúcar estable',     t:'El azúcar en sangre se estabiliza. Bebe agua.', en:['Stable blood sugar','Your blood sugar is levelling out. Drink some water.']},
+    {h:8,  n:'Reservas en uso',    t:'Tu cuerpo empieza a tirar de sus reservas de glucógeno.', en:['Using reserves','Your body starts drawing on its glycogen stores.']},
+    {h:12, n:'Estado de ayuno',    t:'La insulina baja y el cuerpo usa más grasa como energía.', en:['Fasted state','Insulin drops and your body uses more fat for energy.']},
+    {h:16, n:'Más quema de grasa', t:'Estás en la zona del 16:8. ¡Buen trabajo!', en:['More fat burning','You are in the 16:8 zone. Great job!']},
+    {h:18, n:'Cetosis leve',       t:'Puede empezar una cetosis leve. Escucha a tu cuerpo.', en:['Mild ketosis','Mild ketosis may begin. Listen to your body.']},
+    {h:24, n:'Ayuno largo',        t:'No hay beneficios extra en alargarlo. Considera romperlo con proteína y verduras.', en:['Long fast','There is no extra benefit in going longer. Consider breaking it with protein and vegetables.']}
   ];
+  // los textos de las fases salen en el idioma elegido (también en los avisos, que no pasan por la pantalla)
+  const FAST_PHASES = new Proxy(FAST_PHASES0, {get:(a, k) => { const v = a[k]; return v && typeof v === 'object' && v.en && EN_LANG() ? Object.assign({}, v, {n: v.en[0], t: v.en[1]}) : v; }});
   window.fastPhaseAt = hrs => { let p = FAST_PHASES[0]; for (const x of FAST_PHASES) if (hrs >= x.h) p = x; return p; };
   window.fastNextPhase = hrs => FAST_PHASES.find(x => x.h > hrs) || null;
 
@@ -273,6 +275,7 @@
   }
   const userName = () => { const nm = (S.profile && S.profile.name || '').trim().split(/\s+/)[0]; return nm ? nm + ', ' : ''; };
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const trN = s => { if (!s || !EN_LANG() || typeof trText !== 'function') return s; try{ buildEN(); const r = trText(String(s)); return r == null ? s : r; }catch(e){ return s; } };
   function mk(id, title, body, when, channel, extra, actionTypeId){
     const n = {id, title, body, largeBody: body, channelId: CHN[channel] || CHN.recordatorios, schedule: {at: when, allowWhileIdle: true}, extra: extra || {},
       smallIcon: 'ic_stat_pandaria', iconColor: '#ff7a1a', isExactNotification: exactOk};
@@ -280,23 +283,24 @@
     return n;
   }
   const fmtEvery = m => m < 60 ? `${m} min` : m % 60 ? `${Math.floor(m/60)} h ${m%60} min` : `${m/60} h`;
-  const litros = ml => (ml/1000).toLocaleString('es', {maximumFractionDigits: 2});
-  const WATER_MSG = ['¡Hora de hidratarse! 💧', 'Tu cuerpo te pide un vaso de agua', 'Un sorbo más cerca de tu meta', 'Pausa de agua: tus músculos lo agradecen', '¿Un vasito? El panda también tiene sed 🐼', 'Hidratarte mejora tu energía y tu rendimiento'];
+  const litros = ml => (ml/1000).toLocaleString(window.LOC?LOC():'es', {maximumFractionDigits: 2});
+  const WATER_MSG_ES = ['¡Hora de hidratarse! 💧', 'Tu cuerpo te pide un vaso de agua', 'Un sorbo más cerca de tu meta', 'Pausa de agua: tus músculos lo agradecen', '¿Un vasito? El panda también tiene sed 🐼', 'Hidratarte mejora tu energía y tu rendimiento'];
+  const WATER_MSG_EN = ['Time to hydrate! 💧', 'Your body is asking for a glass of water', 'One sip closer to your goal', 'Water break: your muscles will thank you', 'A quick glass? The panda is thirsty too 🐼', 'Staying hydrated boosts your energy and performance'];
 
   async function setupNotif(){
     if (!LN) return;
     try{
       for (const old of ['entreno','recordatorios','ayuno','agua','pandaria']) { try{ await LN.deleteChannel({id: old}); }catch(e){} }
-      await LN.createChannel({id:CHN.entreno, name:'Entreno en curso', description:'Fin del descanso y de las series', importance:5, vibration:true, visibility:1});
-      await LN.createChannel({id:CHN.recordatorios, name:'Recordatorios de entreno', description:'Cuándo toca entrenar y racha', importance:4, vibration:true, visibility:1});
-      await LN.createChannel({id:CHN.ayuno, name:'Ayuno', description:'Fases, meta y ventana de comida', importance:4, vibration:true, visibility:1});
-      await LN.createChannel({id:CHN.agua, name:'Agua', description:'Recordatorios para beber agua', importance:4, vibration:true, visibility:1});
-      await LN.createChannel({id:CHN.pandaria, name:'PandarIA, informes y copias', description:'Sugerencias, informe semanal y copias de seguridad', importance:3, visibility:1});
+      await LN.createChannel({id:CHN.entreno, name:tx('Entreno en curso','Workout in progress'), description:tx('Fin del descanso y de las series','End of rests and timed sets'), importance:5, vibration:true, visibility:1});
+      await LN.createChannel({id:CHN.recordatorios, name:tx('Recordatorios de entreno','Workout reminders'), description:tx('Cuándo toca entrenar y racha','When to train and your streak'), importance:4, vibration:true, visibility:1});
+      await LN.createChannel({id:CHN.ayuno, name:tx('Ayuno','Fasting'), description:tx('Fases, meta y ventana de comida','Phases, goal and eating window'), importance:4, vibration:true, visibility:1});
+      await LN.createChannel({id:CHN.agua, name:tx('Agua','Water'), description:tx('Recordatorios para beber agua','Reminders to drink water'), importance:4, vibration:true, visibility:1});
+      await LN.createChannel({id:CHN.pandaria, name:tx('PandarIA, informes y copias','PandarIA, reports and backups'), description:tx('Sugerencias, informe semanal y copias de seguridad','Suggestions, weekly report and backups'), importance:3, visibility:1});
       await LN.registerActionTypes({types:[
-        {id:'EMPEZAR', actions:[{id:'start', title:'Empezar'}]},
+        {id:'EMPEZAR', actions:[{id:'start', title:tx('Empezar','Start')}]},
         {id:'AGUA', actions:[{id:'w250', title:'+250 ml'}, {id:'w500', title:'+500 ml'}]},
-        {id:'AYUNO', actions:[{id:'faststart', title:'Empezar ayuno'}]},
-        {id:'AYUNO_FIN', actions:[{id:'fastend', title:'Terminar ayuno'}]}
+        {id:'AYUNO', actions:[{id:'faststart', title:tx('Empezar ayuno','Start fast')}]},
+        {id:'AYUNO_FIN', actions:[{id:'fastend', title:tx('Terminar ayuno','End fast')}]}
       ]});
       LN.addListener('localNotificationActionPerformed', onNotifAction);
     }catch(e){}
@@ -341,8 +345,8 @@
         const t = atTime(now + d * DAYMS, rem.time); t.setMinutes(t.getMinutes() - (+n.trainLead || 0));
         if (!rem.days.includes(atTime(now + d * DAYMS, rem.time).getDay())) continue;
         if (d === 0 && trainedToday().length) continue;
-        const title = r ? `${userName() ? userName() + '¡hoy toca ' : '¡Hoy toca '}${r.name}!` : `${userName() ? userName() + '¡hoy toca entrenar!' : '¡Hoy toca entrenar!'}`;
-        push(mk(ID.train + k++, title, r ? `${routineMinutes(r)} min. Tu rutina te espera: toca Empezar y a darle.` : 'Elige una rutina y dale. Unos minutos ya cuentan.', t, 'recordatorios', {go:'train', rid: r && r.id}, r ? 'EMPEZAR' : null), 'none');
+        const title = EN_LANG() ? (r ? `${userName()}${userName() ? 'time' : 'Time'} for ${r.name}!` : `${userName()}${userName() ? 'time' : 'Time'} to train!`) : r ? `${userName() ? userName() + '¡hoy toca ' : '¡Hoy toca '}${r.name}!` : `${userName() ? userName() + '¡hoy toca entrenar!' : '¡Hoy toca entrenar!'}`;
+        push(mk(ID.train + k++, title, r ? tx(`${routineMinutes(r)} min. Tu rutina te espera: toca Empezar y a darle.`, `${routineMinutes(r)} min. Your routine is waiting: tap Start and go for it.`) : tx('Elige una rutina y dale. Unos minutos ya cuentan.', 'Pick a routine and go. A few minutes still count.'), t, 'recordatorios', {go:'train', rid: r && r.id}, r ? 'EMPEZAR' : null), 'none');
       }
     }
     // Agua: repartida en tu horario; tras la meta, menos frecuente; no avisa si bebiste hace poco
@@ -360,12 +364,12 @@
           if (t <= now + 60000) continue;
           if (n.waterSmart && d === 0 && last && t - last < 60 * 60000) continue;
           let title, body;
-          if (done){ title = '¿Un extra? 💧'; body = `Ya cumpliste tu meta de hoy (${litros(drank)} L). Un vaso más si tienes sed.`; }
-          else if (i === 0 && !(d === 0 && drank > 0)){ title = `${userName() ? cap(userName()) + '¡buenos días!' : '¡Buenos días!'} 💧`; body = 'Empieza el día con un vaso de agua.'; }
+          if (done){ title = tx('¿Un extra? 💧', 'One more? 💧'); body = tx(`Ya cumpliste tu meta de hoy (${litros(drank)} L). Un vaso más si tienes sed.`, `You already reached today's goal (${litros(drank)} L). Have another glass if you're thirsty.`); }
+          else if (i === 0 && !(d === 0 && drank > 0)){ title = EN_LANG() ? `${userName() ? 'Good morning, ' + userName().replace(/, $/, '') + '!' : 'Good morning!'} 💧` : `${userName() ? cap(userName()) + '¡buenos días!' : '¡Buenos días!'} 💧`; body = tx('Empieza el día con un vaso de agua.', 'Start the day with a glass of water.'); }
           else {
-            title = WATER_MSG[(i + d) % WATER_MSG.length];
+            { const WM = EN_LANG() ? WATER_MSG_EN : WATER_MSG_ES; title = WM[(i + d) % WM.length]; }
             const expected = goal * Math.min(1, (t - st) / Math.max(1, en - st));
-            body = d === 0 ? (drank < expected - 250 ? `Vas un poco atrasado: llevas ${litros(drank)} de ${litros(goal)} L.` : `Vas bien: llevas ${litros(drank)} de ${litros(goal)} L.`) : `Tu meta de hoy: ${litros(goal)} L.`;
+            body = d === 0 ? (drank < expected - 250 ? tx(`Vas un poco atrasado: llevas ${litros(drank)} de ${litros(goal)} L.`, `You're a little behind: ${litros(drank)} of ${litros(goal)} L so far.`) : tx(`Vas bien: llevas ${litros(drank)} de ${litros(goal)} L.`, `You're on track: ${litros(drank)} of ${litros(goal)} L so far.`)) : tx(`Tu meta de hoy: ${litros(goal)} L.`, `Today's goal: ${litros(goal)} L.`);
           }
           push(mk(ID.water + k++, title, body, new Date(t), 'agua', {go:'water'}, 'AGUA'), 'skip');
         }
@@ -379,19 +383,19 @@
         FAST_PHASES.forEach((p, i) => {
           if (!p.h || !n.fastPhases[p.h] || (g && p.h === g)) return;
           const reached = g && p.h > g;
-          push(mk(ID.fastPhase + i, `${p.h} h · ${p.n}${reached ? ' 🔥' : ''}`, (reached ? 'Ya pasaste tu meta: sigue si te sientes bien. ' : '') + p.t, new Date(s0 + p.h * 3600000), 'ayuno', {go:'fast'}, reached || p.h >= 24 ? 'AYUNO_FIN' : null), 'skip');
+          push(mk(ID.fastPhase + i, `${p.h} h · ${p.n}${reached ? ' 🔥' : ''}`, (reached ? tx('Ya pasaste tu meta: sigue si te sientes bien. ', 'You passed your goal: keep going if you feel well. ') : '') + p.t, new Date(s0 + p.h * 3600000), 'ayuno', {go:'fast'}, reached || p.h >= 24 ? 'AYUNO_FIN' : null), 'skip');
         });
-        if (g && n.fastHalf && g / 2 !== 4 && g / 2 !== 8 && g / 2 !== 12) push(mk(ID.fastHalf, 'Vas por la mitad del ayuno 💪', `Llevas ${g/2} h. Agua, café o té sin azúcar te ayudan.`, new Date(s0 + g * 1800000), 'ayuno', {go:'fast'}), 'skip');
-        if (g && n.fastGoal) push(mk(ID.fastGoal, `¡${g} h de ayuno cumplidas! 🎉`, 'Rompe el ayuno con proteína y verduras, o sigue si quieres un esfuerzo extra.', new Date(s0 + g * 3600000), 'ayuno', {go:'fast'}, 'AYUNO_FIN'), 'move');
+        if (g && n.fastHalf && g / 2 !== 4 && g / 2 !== 8 && g / 2 !== 12) push(mk(ID.fastHalf, tx('Vas por la mitad del ayuno 💪', 'Halfway through your fast 💪'), tx(`Llevas ${g/2} h. Agua, café o té sin azúcar te ayudan.`, `${g/2} h done. Water, coffee or unsweetened tea help.`), new Date(s0 + g * 1800000), 'ayuno', {go:'fast'}), 'skip');
+        if (g && n.fastGoal) push(mk(ID.fastGoal, tx(`¡${g} h de ayuno cumplidas! 🎉`, `${g} h fast complete! 🎉`), tx('Rompe el ayuno con proteína y verduras, o sigue si quieres un esfuerzo extra.', 'Break your fast with protein and vegetables, or keep going if you want an extra push.'), new Date(s0 + g * 3600000), 'ayuno', {go:'fast'}, 'AYUNO_FIN'), 'move');
       } else {
         const plan = FAST_PLANS[f.plan], last = f.history[f.history.length - 1];
         if (plan && plan.h && last && n.fastWin){
           const close = last.end + (24 - plan.h) * 3600000, lead = (+n.fastWinLead || 60) * 60000;
-          push(mk(ID.fastWin, `Tu ventana de comida cierra en ${fmtEvery(lead / 60000)}`, 'Buen momento para tu última comida, con proteína.', new Date(close - lead), 'ayuno', {go:'fast'}), 'move');
-          push(mk(ID.fastStart, 'Hora de empezar tu ayuno ⏱️', `Plan ${plan.n}. Toca para empezarlo.`, new Date(close), 'ayuno', {go:'fast'}, 'AYUNO'), 'move');
+          push(mk(ID.fastWin, tx(`Tu ventana de comida cierra en ${fmtEvery(lead / 60000)}`, `Your eating window closes in ${fmtEvery(lead / 60000)}`), tx('Buen momento para tu última comida, con proteína.', 'Good time for your last meal, with protein.'), new Date(close - lead), 'ayuno', {go:'fast'}), 'move');
+          push(mk(ID.fastStart, tx('Hora de empezar tu ayuno ⏱️', 'Time to start your fast ⏱️'), tx(`Plan ${plan.n}. Toca para empezarlo.`, `${plan.n} plan. Tap to start it.`), new Date(close), 'ayuno', {go:'fast'}, 'AYUNO'), 'move');
         }
         if (n.fastDaily) for (let d = 0; d < 2; d++)
-          push(mk(ID.fastDaily + d, 'Hora de empezar tu ayuno ⏱️', `Plan ${(plan && plan.n) || 'libre'}. Toca Empezar ayuno.`, atTime(now + d * DAYMS, n.fastDailyTime), 'ayuno', {go:'fast'}, 'AYUNO'), 'none');
+          push(mk(ID.fastDaily + d, tx('Hora de empezar tu ayuno ⏱️', 'Time to start your fast ⏱️'), tx(`Plan ${(plan && plan.n) || 'libre'}. Toca Empezar ayuno.`, `${(plan && plan.n) || 'Free'} plan. Tap Start fast.`), atTime(now + d * DAYMS, n.fastDailyTime), 'ayuno', {go:'fast'}, 'AYUNO'), 'none');
       }
     }
     // Racha en riesgo
@@ -400,15 +404,16 @@
       const wk = weekKey(now), days = new Set(S.sessions.filter(s => weekKey(s.end) === wk).map(s => new Date(s.end).toDateString())).size;
       const target = S.plan && S.plan.days.length ? S.plan.days.length : 1, st = streakWeeks(), falt = target - days;
       if (falt > 0 && weekKey(t.getTime()) === wk)
-        push(mk(ID.streak, days === 0 && st > 0 ? `🔥 Tu racha de ${plural(st,'semana','semanas')} está en riesgo` : 'Se acaba la semana',
-          days === 0 ? 'Entrena hoy para mantener la racha. Unos minutos ya cuentan.' : `Te ${falt === 1 ? 'falta 1 entreno' : 'faltan ' + falt + ' entrenos'} para tu objetivo semanal.`, t, 'recordatorios', {go:'train'}), 'move');
+        push(mk(ID.streak, days === 0 && st > 0 ? tx(`🔥 Tu racha de ${plural(st,'semana','semanas')} está en riesgo`, `🔥 Your ${plural(st,'week','weeks')} streak is at risk`) : tx('Se acaba la semana', 'The week is ending'),
+          days === 0 ? tx('Entrena hoy para mantener la racha. Unos minutos ya cuentan.', 'Train today to keep your streak. A few minutes still count.') : tx(`Te ${falt === 1 ? 'falta 1 entreno' : 'faltan ' + falt + ' entrenos'} para tu objetivo semanal.`, `${plural(falt,'workout','workouts')} to go for your weekly goal.`), t, 'recordatorios', {go:'train'}), 'move');
     }
     // Informe semanal (Premium)
     if (n.report && premium() && S.settings.report !== false){
       const t = atTime(now, n.reportTime); let add = (+n.reportDay - t.getDay() + 7) % 7; if (add === 0 && t.getTime() <= now) add = 7; t.setDate(t.getDate() + add);
       const r = weekReport(weekKey(now));
-      const body = r.n ? `Semana: ${plural(r.n,'entreno','entrenos')}${r.pvol ? `, ${r.vol >= r.pvol ? '+' : ''}${Math.round((r.vol - r.pvol) / r.pvol * 100)} % de volumen` : ''}${r.prs ? `, ${plural(r.prs,'récord','récords')}` : ''}. Toca para verlo.` : 'Nueva semana, nuevo comienzo. Toca para ver tu informe.';
-      push(mk(ID.report, 'Tu informe semanal está listo 📊', body, t, 'pandaria', {go:'report'}), 'move');
+      const body = EN_LANG() ? (r.n ? `Week: ${plural(r.n,'workout','workouts')}${r.pvol ? `, ${r.vol >= r.pvol ? '+' : ''}${Math.round((r.vol - r.pvol) / r.pvol * 100)}% volume` : ''}${r.prs ? `, ${plural(r.prs,'record','records')}` : ''}. Tap to see it.` : 'New week, fresh start. Tap to see your report.')
+        : r.n ? `Semana: ${plural(r.n,'entreno','entrenos')}${r.pvol ? `, ${r.vol >= r.pvol ? '+' : ''}${Math.round((r.vol - r.pvol) / r.pvol * 100)} % de volumen` : ''}${r.prs ? `, ${plural(r.prs,'récord','récords')}` : ''}. Toca para verlo.` : 'Nueva semana, nuevo comienzo. Toca para ver tu informe.';
+      push(mk(ID.report, tx('Tu informe semanal está listo 📊', 'Your weekly report is ready 📊'), body, t, 'pandaria', {go:'report'}), 'move');
     }
     // Sugerencias de PandarIA (Premium)
     if (n.pandaria && premium()){
@@ -416,13 +421,13 @@
       if (rs.length){
         const t = atTime(now, n.pandariaTime); if (t.getTime() < now + 2 * 3600000) t.setDate(t.getDate() + 1);
         const tot = rs.reduce((a, r) => a + r.sugg.length, 0);
-        push(mk(ID.pandaria, `PandarIA tiene ${plural(tot,'sugerencia','sugerencias')} para ti`, `${rs[0].name}: ${rs[0].sugg[0].title}`, t, 'pandaria', {go:'routine', rid: rs[0].id}), 'move');
+        push(mk(ID.pandaria, tx(`PandarIA tiene ${plural(tot,'sugerencia','sugerencias')} para ti`, `PandarIA has ${plural(tot,'suggestion','suggestions')} for you`), `${rs[0].name}: ${trN(rs[0].sugg[0].title)}`, t, 'pandaria', {go:'routine', rid: rs[0].id}), 'move');
       }
     }
     // Copia de seguridad mensual: día 1 a las 10:00
     if (n.backup){
       const t = new Date(); t.setMonth(t.getMonth() + 1, 1); t.setHours(10, 0, 0, 0);
-      push(mk(ID.backup, 'Guarda tu copia de seguridad 💾', 'Un toque y tus rutinas y tu historial quedan a salvo en Drive.', t, 'pandaria', {go:'backup'}), 'move');
+      push(mk(ID.backup, tx('Guarda tu copia de seguridad 💾', 'Save your backup 💾'), tx('Un toque y tus rutinas y tu historial quedan a salvo en Drive.', 'One tap and your routines and history are safe in Drive.'), t, 'pandaria', {go:'backup'}), 'move');
     }
     return list;
   }
@@ -446,14 +451,14 @@
     if (!LN || !notifOk || !n.on || !n.rest || !S.active) return;
     const a = S.active, list = [], now = Date.now();
     if (a.rest && a.rest.end > now + 1500){
-      const np = nextPending(); let body = 'A por la siguiente serie';
+      const np = nextPending(); let body = tx('A por la siguiente serie', 'On to the next set');
       if (np){ const ex = getEx(np.it.exId), wn = np.it.sets.slice(0, np.i + 1).filter(x => x.t !== 'c').length;
-        body = np.it.sets[np.i].t === 'c' ? `Calentamiento de ${ex.n}` : `¡A por la serie ${wn} de ${ex.n}!`; }
-      list.push(mk(ID.rest, '⏱️ Descanso terminado', body, new Date(a.rest.end), 'entreno', {go:'workout'}));
+        body = np.it.sets[np.i].t === 'c' ? tx(`Calentamiento de ${ex.n}`, `${trN(ex.n)} warm-up`) : tx(`¡A por la serie ${wn} de ${ex.n}!`, `On to set ${wn} of ${trN(ex.n)}!`); }
+      list.push(mk(ID.rest, tx('⏱️ Descanso terminado', '⏱️ Rest over'), body, new Date(a.rest.end), 'entreno', {go:'workout'}));
     }
     if (a.timer && a.timer.end > now + 1500){
       const it = wkItem(a.timer.uid);
-      list.push(mk(ID.timer, '✅ Tiempo cumplido', it ? `${getEx(it.exId).n}: serie completada` : 'Serie completada', new Date(a.timer.end), 'entreno', {go:'workout'}));
+      list.push(mk(ID.timer, tx('✅ Tiempo cumplido', '✅ Time is up'), it ? tx(`${getEx(it.exId).n}: serie completada`, `${trN(getEx(it.exId).n)}: set complete`) : tx('Serie completada', 'Set complete'), new Date(a.timer.end), 'entreno', {go:'workout'}));
     }
     if (list.length) safe(() => LN.schedule({notifications: list}));
   }
@@ -561,15 +566,21 @@
     let pend = []; try{ pend = (await LN.getPending()).notifications || []; }catch(e){}
     openLayer('nfNext', {list: pend.map(x => ({at: new Date(x.schedule && x.schedule.at || 0).getTime(), title: x.title, body: x.body}))});
   };
-  const TESTS = {
+  const TESTS_ES = {
     train: ['¡Hoy toca entrenar! 💪', 'Así se verá tu recordatorio de entreno.', 'recordatorios', 'EMPEZAR'],
     water: ['¡Hora de hidratarse! 💧', 'Así se verá el aviso de agua. Prueba el botón +250 ml.', 'agua', 'AGUA'],
     fast:  ['12 h · Estado de ayuno', 'Así se verán las fases de tu ayuno.', 'ayuno', null],
     all:   ['PandarIA Fit 🐼', '¡Las notificaciones funcionan! Bloquea el teléfono y espera…', 'entreno', null]
   };
+  const TESTS_EN = {
+    train: ['Time to train! 💪', 'This is how your workout reminder will look.', 'recordatorios', 'EMPEZAR'],
+    water: ['Time to hydrate! 💧', 'This is how the water reminder will look. Try the +250 ml button.', 'agua', 'AGUA'],
+    fast:  ['12 h · Fasted state', 'This is how your fasting phases will look.', 'ayuno', null],
+    all:   ['PandarIA Fit 🐼', 'Notifications are working! Lock your phone and wait…', 'entreno', null]
+  };
   A.nfTest = async kind => {
     if (!notifOk){ enableNotifs(); return; }
-    const t = TESTS[kind] || TESTS.all;
+    const TESTS = EN_LANG() ? TESTS_EN : TESTS_ES, t = TESTS[kind] || TESTS.all;
     try{ await LN.schedule({notifications: [mk(9999, t[0], t[1], new Date(Date.now() + 5000), t[2], {go: kind === 'water' ? 'water' : kind === 'fast' ? 'fast' : 'train'}, t[3])]}); toast('Llegará en 5 segundos. Puedes bloquear el teléfono.'); }catch(e){ toast('No se pudo programar'); }
   };
   A.nfBattery = () => openModal(`<div class="sheet"><div class="grab"></div><h3>Que los avisos lleguen siempre</h3>
@@ -599,9 +610,10 @@
   const nativeTiming = () => svcOn && (!!S.active || intRunning());
   function intPhaseInfo(p, c){
     const ex = p.ex ? getEx(p.ex).n : '';
-    const label = p.type === 'work' ? (p.amrap ? 'AMRAP' : p.emom ? 'EMOM' : 'TRABAJO') + (ex ? ' · ' + ex : '') : p.type === 'rest' ? (p.label || 'Descanso') : 'Prepárate';
-    const sub = p.round ? (p.emom ? `Minuto ${p.round} de ${p.rounds}` : `Ronda ${p.round} de ${p.rounds}`) + (p.sets > 1 ? ` · Tanda ${p.set} de ${p.sets}` : '') : INT_FMT[c.fmt].n;
-    const say = p.type === 'work' ? (p.amrap ? '¡Adelante! Máximo de rondas' : (p.emom ? `Minuto ${p.round}. ` : 'Trabajo. ') + ex) : p.type === 'rest' ? (p.label || 'Descanso') : 'Prepárate';
+    const en = EN_LANG(), exN = en ? trN(ex) : ex, lb = p.label ? (en ? trN(p.label) : p.label) : tx('Descanso', 'Rest');
+    const label = p.type === 'work' ? (p.amrap ? 'AMRAP' : p.emom ? 'EMOM' : tx('TRABAJO', 'WORK')) + (ex ? ' · ' + exN : '') : p.type === 'rest' ? lb : tx('Prepárate', 'Get ready');
+    const sub = p.round ? (p.emom ? tx(`Minuto ${p.round} de ${p.rounds}`, `Minute ${p.round} of ${p.rounds}`) : tx(`Ronda ${p.round} de ${p.rounds}`, `Round ${p.round} of ${p.rounds}`)) + (p.sets > 1 ? tx(` · Tanda ${p.set} de ${p.sets}`, ` · Block ${p.set} of ${p.sets}`) : '') : trN(INT_FMT[c.fmt].n);
+    const say = p.type === 'work' ? (p.amrap ? tx('¡Adelante! Máximo de rondas', 'Go! As many rounds as you can') : (p.emom ? tx(`Minuto ${p.round}. `, `Minute ${p.round}. `) : tx('Trabajo. ', 'Work. ')) + exN) : p.type === 'rest' ? lb : tx('Prepárate', 'Get ready');
     return {label, sub, dur: p.dur, say};
   }
   function svcState(){
@@ -614,13 +626,13 @@
     const a = S.active;
     Object.assign(base, {mode:'workout', title: a.name, startedAt: a.start});
     if (a.timer){
-      const it = wkItem(a.timer.uid), n = it ? getEx(it.exId).n : 'Serie';
-      base.rest = {kind:'set', end: a.timer.end, total: a.timer.total, title: `Serie por tiempo · ${n}`, text: a.name, doneTitle: '✅ Tiempo cumplido', doneText: n, say: 'Tiempo'};
+      const it = wkItem(a.timer.uid), n = it ? trN(getEx(it.exId).n) : tx('Serie', 'Set');
+      base.rest = {kind:'set', end: a.timer.end, total: a.timer.total, title: tx(`Serie por tiempo · ${n}`, `Timed set · ${n}`), text: a.name, doneTitle: tx('✅ Tiempo cumplido', '✅ Time is up'), doneText: n, say: tx('Tiempo', 'Time')};
     } else if (a.rest){
-      const np = nextPending(); let next = 'la siguiente serie', say = 'Descanso terminado';
-      if (np){ const ex = getEx(np.it.exId), wn = np.it.sets.slice(0, np.i + 1).filter(x => x.t !== 'c').length;
-        next = np.it.sets[np.i].t === 'c' ? `calentamiento de ${ex.n}` : `serie ${wn} de ${ex.n}`; say = `Descanso terminado. Siguiente: ${ex.n}`; }
-      base.rest = {kind:'rest', end: a.rest.end, total: a.rest.total, title: `Descanso · ${cap(next)}`, text: a.name, doneTitle: '⏱️ Descanso terminado', doneText: `¡A por la ${next}!`, say};
+      const en = EN_LANG(); const np = nextPending(); let next = tx('la siguiente serie', 'the next set'), say = tx('Descanso terminado', 'Rest over');
+      if (np){ const ex = getEx(np.it.exId), wn = np.it.sets.slice(0, np.i + 1).filter(x => x.t !== 'c').length, xn = en ? trN(ex.n) : ex.n;
+        next = np.it.sets[np.i].t === 'c' ? tx(`calentamiento de ${xn}`, `${xn} warm-up`) : tx(`serie ${wn} de ${xn}`, `set ${wn} of ${xn}`); say = tx(`Descanso terminado. Siguiente: ${xn}`, `Rest over. Next: ${xn}`); }
+      base.rest = {kind:'rest', end: a.rest.end, total: a.rest.total, title: tx(`Descanso · ${cap(next)}`, `Rest · ${cap(next)}`), text: a.name, doneTitle: tx('⏱️ Descanso terminado', '⏱️ Rest over'), doneText: tx(`¡A por la ${next}!`, `On to ${next}!`), say};
     }
     return base;
   }
@@ -683,13 +695,13 @@
     const anyR = S.routines.find(x => !x.archived);
     let today;
     if (!prem) today = {locked: true};
-    else if (done) today = {label:'HOY', title:'¡Hecho por hoy! 💪', sub: r ? 'Próxima: ' + r.name : 'Descansa y recupera', rid:''};
-    else if (r && (!S.plan || S.plan.days.includes(dow))) today = {label:'HOY TOCA', title: r.name, sub: `~${routineMinutes(r)} min · ${plural(r.items.filter(i => !i.warm && !i.cool).length,'ejercicio','ejercicios')}`, rid: r.id};
-    else if (r) today = {label:'HOY', title:'Día de descanso', sub:'Próxima: ' + r.name, rid:''};
-    else if (anyR) today = {label:'TUS RUTINAS', title: anyR.name, sub:'Toca para empezar', rid: anyR.id};
-    else today = {label:'HOY TOCA', title:'Crea tu primera rutina', sub:'Toca para abrir la app', rid:''};
+    else if (done) today = {label:tx('HOY','TODAY'), title:tx('¡Hecho por hoy! 💪','Done for today! 💪'), sub: r ? tx('Próxima: ','Next: ') + r.name : tx('Descansa y recupera','Rest and recover'), rid:''};
+    else if (r && (!S.plan || S.plan.days.includes(dow))) today = {label:tx('HOY TOCA','UP TODAY'), title: r.name, sub: `~${routineMinutes(r)} min · ${plural(r.items.filter(i => !i.warm && !i.cool).length,tx('ejercicio','exercise'),tx('ejercicios','exercises'))}`, rid: r.id};
+    else if (r) today = {label:tx('HOY','TODAY'), title:tx('Día de descanso','Rest day'), sub:tx('Próxima: ','Next: ') + r.name, rid:''};
+    else if (anyR) today = {label:tx('TUS RUTINAS','YOUR ROUTINES'), title: anyR.name, sub:tx('Toca para empezar','Tap to start'), rid: anyR.id};
+    else today = {label:tx('HOY TOCA','UP TODAY'), title:tx('Crea tu primera rutina','Create your first routine'), sub:tx('Toca para abrir la app','Tap to open the app'), rid:''};
     const f = S.nutri && S.nutri.fast;
-    const planN = f ? ((FAST_PLANS[f.plan] || {}).n || '') : '';
+    const planN = f ? trN((FAST_PLANS[f.plan] || {}).n || '') : '';
     const fast = f && f.active ? {active: true, start: f.active.start, goalH: f.active.goalH || 0, plan: planN} : {active: false, plan: planN};
     const water = {ml: (S.nutri && S.nutri.water && S.nutri.water[dayKey()]) || 0, goal: waterGoal(), day: dayKey()};
     const wk = weekKey(Date.now());
@@ -845,7 +857,7 @@
     if (c && s.on && s.useInPandaria && isPrem() && HD.steps7){
       const f = HD.steps7 >= 12000 ? 1.08 : HD.steps7 >= 9000 ? 1.04 : HD.steps7 < 4000 ? 0.96 : 1;
       if (f !== 1){ c.tdee = Math.round(c.tdee * f); c.kcal = Math.round(c.kcal * f / 10) * 10; c.carbs = Math.max(0, Math.round((c.kcal - c.prot * 4 - c.fat * 9) / 4)); }
-      c.notes.push(`Ajustado con tus pasos de Health Connect (media de ${HD.steps7.toLocaleString('es')} al día).`);
+      c.notes.push(`Ajustado con tus pasos de Health Connect (media de ${HD.steps7.toLocaleString(window.LOC?LOC():'es')} al día).`);
     }
     return c;
   };
@@ -855,7 +867,7 @@
     let b = `<p class="sm mut" style="margin-top:0;line-height:1.5">Conecta PandarIA Fit con Health Connect para leer pasos, peso y pulso de Samsung Health u otras apps, y guardar allí tus entrenos, tu peso, tus comidas y tu agua.</p>`;
     if (!s.on) b += `<div class="card" style="text-align:center"><div style="font-size:38px">❤️</div><div class="b" style="margin:6px 0 4px">Health Connect no está conectado</div><div class="xs mut" style="margin-bottom:14px">Tú eliges qué datos compartir. Puedes desconectarlo cuando quieras.</div><button class="btn pri wide" data-a="hcConnect">Conectar Health Connect</button></div>`;
     else {
-      const fmtN = n => n == null ? '—' : n.toLocaleString('es');
+      const fmtN = n => n == null ? '—' : n.toLocaleString(window.LOC?LOC():'es');
       b += `<div class="stats"><div class="stat"><div class="v">${fmtN(HD.steps)}</div><div class="l">Pasos hoy</div></div><div class="stat"><div class="v">${fmtN(HD.steps7)}</div><div class="l">Media 7 días</div></div></div>
         <div class="stats"><div class="stat"><div class="v">${HD.weight ? fmtNum(HD.weight) + ' kg' : '—'}</div><div class="l">Peso${HD.weightAt ? ' · ' + fmtDate(HD.weightAt) : ''}</div></div><div class="stat"><div class="v">${HD.hr ? HD.hr + ' lpm' : '—'}</div><div class="l">Pulso${HD.hrKind ? ' ' + HD.hrKind : ''}</div></div></div>
         <button class="btn wide" data-a="hcSyncNow">${I('refresh',18)} Actualizar ahora</button>
@@ -885,7 +897,7 @@
     const t = S.settings.theme;
     h = h.replace(/<button class="srow" data-a="toggleSet" data-v="theme">[\s\S]*?<\/button>/, `<div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('moon',20)}</span><span class="b grow">Tema</span></div><div class="seg">${[['system','Sistema'],['light','Claro'],['dark','Oscuro']].map(([k, n]) => `<button class="${t === k ? 'on' : ''}" data-a="setThemeMode" data-v="${k}">${n}</button>`).join('')}</div></div>`);
     const s = HCS();
-    const row = `<div class="sec">Salud</div><div class="card" style="padding:0 12px"><button class="srow" data-a="hcMenu"><span class="si">${I('flame',20)}</span><span class="grow"><div class="b">Health Connect</div><div class="xs mut">${s.on ? 'Conectado' + (HD.steps != null ? ` · ${HD.steps.toLocaleString('es')} pasos hoy` : '') : 'Pasos, peso y pulso de Samsung Health'}</div></span>${I('right',18)}</button></div>`;
+    const row = `<div class="sec">Salud</div><div class="card" style="padding:0 12px"><button class="srow" data-a="hcMenu"><span class="si">${I('flame',20)}</span><span class="grow"><div class="b">Health Connect</div><div class="xs mut">${s.on ? 'Conectado' + (HD.steps != null ? ` · ${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy` : '') : 'Pasos, peso y pulso de Samsung Health'}</div></span>${I('right',18)}</button></div>`;
     h = h.replace('<div class="sec">Notificaciones</div>', row + '<div class="sec">Notificaciones</div>');
     if (APPV) h = h.replace(/versión 2\.0[^<]*/, `versión ${APPV}`);
     h = h.replace(/<div class="sec">Recordatorios<\/div><div class="card">[\s\S]*?<\/div>\s*(?=<div class="sec">Tus datos<\/div>)/, '');
@@ -896,7 +908,7 @@
   viewHistorial = function(){
     let h = _vhN.apply(this, arguments);
     if (HSEG === 'resumen' && HCS().on && HD.steps != null){
-      const card = `<div class="card row" data-a="hcMenu" style="gap:12px;cursor:pointer"><span style="color:var(--bad)">${I('flame',22)}</span><div class="grow"><div class="b">${HD.steps.toLocaleString('es')} pasos hoy</div><div class="xs mut">Media 7 días: ${(HD.steps7 || 0).toLocaleString('es')}${HD.hr ? ` · Pulso ${HD.hrKind}: ${HD.hr} lpm` : ''}</div></div>${I('right',18)}</div>`;
+      const card = `<div class="card row" data-a="hcMenu" style="gap:12px;cursor:pointer"><span style="color:var(--bad)">${I('flame',22)}</span><div class="grow"><div class="b">${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy</div><div class="xs mut">Media 7 días: ${(HD.steps7 || 0).toLocaleString(window.LOC?LOC():'es')}${HD.hr ? ` · Pulso ${HD.hrKind}: ${HD.hr} lpm` : ''}</div></div>${I('right',18)}</div>`;
       h = h.replace('<div class="stats">', card + '<div class="stats">');
     }
     return h;

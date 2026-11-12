@@ -16,7 +16,9 @@
   --ac:#ff7a1a; --ac2:#ff9a4d; --acs:rgba(255,122,26,.14);
   --ok:#2fd27a; --oks:rgba(47,210,122,.16); --bad:#ff4d5a; --bads:rgba(255,77,90,.14);
   --blue:#4aa8ff; --blues:rgba(74,168,255,.14); --gold:#ffc83d;
-  --r:16px; --nav:64px; --safe-b:env(safe-area-inset-bottom,0px);
+  --r:16px; --nav:64px;
+  /* Android 15+ (pantalla de borde a borde): Capacitor inyecta --safe-area-inset-*; en el resto vale env() o 0 */
+  --safe-t:var(--safe-area-inset-top,env(safe-area-inset-top,0px)); --safe-b:var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px));
   color-scheme:dark;
 }
 :root[data-theme="light"]{
@@ -31,7 +33,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 input,select,textarea{font:inherit;color:var(--tx)}
 svg{display:block}
 .hide{display:none!important}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto;padding-top:var(--safe-t);background:var(--bg)}
 #view{flex:1;overflow-y:auto;padding:0 16px calc(var(--nav) + 24px + var(--safe-b));-webkit-overflow-scrolling:touch}
 /* Nav */
 #nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--bg2);border-top:1px solid var(--line);display:flex;max-width:560px;margin:0 auto;z-index:20}
@@ -104,8 +106,8 @@ svg{display:block}
 .exi.lg{width:96px;height:96px;border-radius:24px}
 .exi .ini{font-weight:800;font-size:16px}
 /* Layers */
-.layer{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;max-width:560px;margin:0 auto;animation:slin .22s ease}
-.layer .lhdr{display:flex;align-items:center;gap:6px;padding:10px 8px;min-height:62px;border-bottom:1px solid var(--line);background:var(--bg2)}
+.layer{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;flex-direction:column;max-width:560px;margin:0 auto;animation:slin .22s ease;padding-top:var(--safe-t)}
+.layer .lhdr{display:flex;align-items:center;gap:6px;padding:10px 8px;min-height:62px;border-bottom:1px solid var(--line);background:var(--bg2);margin-top:calc(-1 * var(--safe-t));padding-top:calc(10px + var(--safe-t));min-height:calc(62px + var(--safe-t))}
 .layer .lhdr h2{flex:1;margin:0;font-size:18px;font-weight:700;padding-left:4px}
 .layer .lbody{flex:1;overflow-y:auto;padding:16px 16px 40px}
 .layer .lfoot{padding:12px 16px calc(12px + var(--safe-b));border-top:1px solid var(--line);background:var(--bg2)}
@@ -188,7 +190,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .suptag{font-size:11px;color:var(--ac);font-weight:800;letter-spacing:.8px;margin-bottom:6px}
 .minibar{position:fixed;left:12px;right:12px;bottom:calc(var(--nav) + 10px + var(--safe-b));z-index:25;max-width:536px;margin:0 auto;background:var(--ac);color:#1a0d02;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .toast{position:fixed;left:50%;bottom:calc(var(--nav) + 22px + var(--safe-b));transform:translateX(-50%);z-index:80;background:var(--card2);color:var(--tx);padding:12px 18px;border-radius:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:up .2s;max-width:90vw;text-align:center;border:1px solid var(--line)}
-.in-layer .toast{bottom:auto;top:74px}
+.in-layer .toast{bottom:auto;top:calc(74px + var(--safe-t))}
 .toast.pr{background:var(--gold);color:#2a1d00}
 /* Edit routine */
 .eitem{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:10px}
@@ -272,8 +274,8 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .rirrow{display:flex;align-items:center;gap:6px;justify-content:flex-end;padding:2px 0 6px}
 .rirb{min-width:34px;height:28px;border-radius:8px;background:var(--card2);font-weight:700;font-size:13px}
 .rirb.on{background:var(--ok);color:#03200f}
-#restov{position:fixed;inset:0;z-index:60;background:linear-gradient(170deg,#1e5fbf,#123a7a);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px 20px calc(24px + var(--safe-b));animation:fd .2s}
-#restov .ovtop,.intrun .ovtop{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:20px;right:12px;display:flex;align-items:center;justify-content:space-between}
+#restov{position:fixed;inset:0;z-index:60;background:linear-gradient(170deg,#1e5fbf,#123a7a);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:calc(24px + var(--safe-t)) 20px calc(24px + var(--safe-b));animation:fd .2s}
+#restov .ovtop,.intrun .ovtop{position:absolute;top:calc(14px + var(--safe-t));left:20px;right:12px;display:flex;align-items:center;justify-content:space-between}
 #restov .ring,.intrun .ring{position:relative;width:min(70vw,280px);aspect-ratio:1}
 #restov .ring svg,.intrun .ring svg{width:100%;height:100%}
 #restov .rt,.intrun .rt{position:absolute;inset:0;display:grid;place-items:center;font-size:min(17vw,68px);font-weight:900;font-variant-numeric:tabular-nums}
@@ -282,7 +284,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 #restov .ovnext,.intrun .ovnext{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.12);border-radius:18px;padding:12px;width:100%;max-width:420px}
 #restov .ovanim,.intrun .ovanim{width:84px;max-width:84px;border-radius:14px;flex:0 0 auto;padding:4px}
 
-.intrun{position:absolute;inset:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:60px 20px calc(24px + var(--safe-b));transition:background .4s}
+.intrun{position:absolute;inset:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:calc(60px + var(--safe-t)) 20px calc(24px + var(--safe-b));transition:background .4s}
 .intrun .ovb.pri{color:#c2410c}
 
 #nav button{font-size:10.5px}
@@ -5206,13 +5208,16 @@ const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>
 const clone = o => JSON.parse(JSON.stringify(o));
 const toUnit = kg => kg==null||kg==='' ? '' : (S.settings.unit==='lb' ? Math.round(kg*2.20462*2)/2 : Math.round(kg*100)/100);
 const fromUnit = v => v===''||v==null||isNaN(v) ? null : (S.settings.unit==='lb' ? +v/2.20462 : +v);
-const fmtNum = n => (Math.round(n*100)/100).toLocaleString('es',{maximumFractionDigits:2});
+const fmtNum = n => (Math.round(n*100)/100).toLocaleString(LOC(),{maximumFractionDigits:2});
 const fmtKg = kg => kg==null||kg==='' ? '—' : `${fmtNum(toUnit(kg))} ${S.settings.unit}`;
 const fmtTime = s => { s=Math.max(0,Math.round(+s||0)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; };
 const fmtDur = ms => { const m=Math.round(ms/60000); return m>=60?`${Math.floor(m/60)} h ${m%60} min`:`${m} min`; };
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MESES_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const mesN=i=>EN_LANG()?MESES_EN[i]:MESES[i];
 const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const EN_LANG=()=>S&&S.settings&&S.settings.lang==='en';
+const LOC=()=>EN_LANG()?'en':'es'; window.LOC=LOC;
 const fmtDate = ts => { const d=new Date(ts); return EN_LANG()?d.toLocaleDateString('en-US',{month:'long',day:'numeric'}):`${d.getDate()} de ${MESES[d.getMonth()]}`; };
 const fmtDateL = ts => { const d=new Date(ts); return EN_LANG()?d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}):`${DIAS[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`; };
 function ago(ts){
@@ -5240,8 +5245,10 @@ function beep(){
   }catch(e){}
 }
 function vibrate(p){ if (S.settings.vibrate && navigator.vibrate) try{ navigator.vibrate(p||[200,100,200]); }catch(e){} }
+// lo que dice la voz también sale en inglés si la app está en inglés
+function spkTr(text){ text=String(text==null?'':text); if (!EN_LANG()) return text; try{ buildEN(); const r=trText(text); return r==null?text:r; }catch(e){ return text; } }
 function speak(text){
-  if (!S.settings.voice || !window.speechSynthesis) return;
+  if (!S.settings.voice || !window.speechSynthesis) return; text=spkTr(text);
   try{ const u=new SpeechSynthesisUtterance(text); u.lang=EN_LANG()?'en-US':'es-ES'; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
 }
 function applyTheme(){ document.documentElement.dataset.theme=S.settings.theme; const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=S.settings.theme==='light'?'#ffffff':'#181c23'; }
@@ -6613,7 +6620,7 @@ function histResumen(){
   for(let i=0;i<start;i++) cal+='<div></div>';
   for(let d=1;d<=days;d++){ const dt=new Date(HM.y,HM.m,d); const on=trained.has(dt.toDateString()); const td=dt.toDateString()===now.toDateString();
     cal+=`<div class="d ${on?'on':''} ${td?'today':''}" ${on?`data-a="calDay" data-v="${dt.getTime()}"`:''}>${d}</div>`; }
-  h+=`<div class="card"><div class="row" style="margin-bottom:10px"><button class="ibtn" data-a="calNav" data-v="-1">${I('back',20)}</button><div class="grow b" style="text-align:center;text-transform:capitalize">${MESES[HM.m]} ${HM.y}</div><button class="ibtn" data-a="calNav" data-v="1">${I('right',20)}</button></div><div class="cal">${cal}</div></div>`;
+  h+=`<div class="card"><div class="row" style="margin-bottom:10px"><button class="ibtn" data-a="calNav" data-v="-1">${I('back',20)}</button><div class="grow b" style="text-align:center;text-transform:capitalize">${mesN(HM.m)} ${HM.y}</div><button class="ibtn" data-a="calNav" data-v="1">${I('right',20)}</button></div><div class="cal">${cal}</div></div>`;
   // mapa muscular semanal
   const ms=muscleSets(7); const mx=Math.max(10,...Object.values(ms));
   const lv={}; Object.entries(ms).forEach(([k,v])=>lv[k]=v/mx);
@@ -6624,7 +6631,7 @@ function histResumen(){
   if (!S.sessions.length) return h+`<div class="empty"><div class="big">📅</div>Aún no hay entrenamientos.<br>Completa una rutina y aparecerá aquí.</div>`;
   let lastM='';
   [...S.sessions].reverse().slice(0,60).forEach(s=>{
-    const d=new Date(s.end); const mk=`${MESES[d.getMonth()]} ${d.getFullYear()}`;
+    const d=new Date(s.end); const mk=`${mesN(d.getMonth())} ${d.getFullYear()}`;
     if (mk!==lastM){ h+=`<div class="xs mut b" style="margin:14px 2px 8px;text-transform:uppercase;letter-spacing:.8px">${mk}</div>`; lastM=mk; }
     h+=sessionCard(s);
   });
@@ -6969,6 +6976,7 @@ function goalSeries(g){
   return S.measures.filter(m=>m[g.type]).map(m=>({x:m.date,y:+m[g.type]}));
 }
 function goalStatus(g){
+  if (!g.deadline && g.date) g.deadline=g.date; if (g.startVal==null && g.start!=null) g.startVal=g.start; // metas guardadas con nombres antiguos
   const pts=goalSeries(g).filter(p=>p.x>=g.created-30*DAY);
   const cur = pts.length?pts[pts.length-1].y:g.startVal;
   const dir = g.target>=g.startVal?1:-1;
@@ -7262,7 +7270,7 @@ function viewNutricion(){
   h+=`<div class="sec">Tu objetivo diario</div><div class="seg" style="margin-bottom:12px">${Object.entries(NGOALS).map(([k,v])=>`<button class="${n.goal===k?'on':''}" data-a="nGoal" data-v="${k}">${v}</button>`).join('')}</div>`;
   if (!c) h+=`<div class="card row" data-a="openProfile" style="cursor:pointer"><span style="color:var(--ac)">${I('user',24)}</span><div class="grow"><div class="b">Completa tu perfil</div><div class="sm mut">Necesito edad, sexo, altura y peso para calcular tus calorías y proteína.</div></div>${I('right',18)}</div>`;
   else {
-    h+=`<div class="card"><div class="row" style="align-items:flex-end"><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CALORÍAS</div><div style="font-size:34px;font-weight:900;line-height:1.1">${c.kcal.toLocaleString('es')} <span class="sm mut" style="font-weight:600">kcal</span></div></div><div class="xs mut" style="text-align:right">${c.adapt&&c.adapt.ok?`Mantenimiento ajustado ${c.adapt.tdee.toLocaleString('es')}`:`Mantenimiento ${c.tdee.toLocaleString('es')}`}<br>Basal ${c.bmr.toLocaleString('es')}</div></div>
+    h+=`<div class="card"><div class="row" style="align-items:flex-end"><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CALORÍAS</div><div style="font-size:34px;font-weight:900;line-height:1.1">${c.kcal.toLocaleString(LOC())} <span class="sm mut" style="font-weight:600">kcal</span></div></div><div class="xs mut" style="text-align:right">${c.adapt&&c.adapt.ok?`Mantenimiento ajustado ${c.adapt.tdee.toLocaleString(LOC())}`:`Mantenimiento ${c.tdee.toLocaleString(LOC())}`}<br>Basal ${c.bmr.toLocaleString(LOC())}</div></div>
     <div class="macros">${[['Proteína',c.prot,'#ff7a1a',c.prot*4],['Carbohidratos',c.carbs,'#3f9cff',c.carbs*4],['Grasas',c.fat,'#f5b82e',c.fat*9]].map(([l,g,col,k])=>`<div class="mac"><div class="mbar"><div style="width:${Math.round(k/c.kcal*100)}%;background:${col}"></div></div><div class="row"><span class="b grow">${l}</span><span class="b">${g} g</span></div></div>`).join('')}</div>
     ${c.goal!=='mantener'?`<div class="xs mut b" style="letter-spacing:1px;margin-top:14px">RITMO ${c.goal==='bajar'?'PARA BAJAR':'PARA GANAR'}</div><div class="seg" style="margin-top:6px">${[['lento','Lento'],['normal','Normal'],['rapido','Rápido']].map(([k,l])=>`<button class="${c.ritmo===k?'on':''}" data-a="nRitmo" data-v="${k}">${l}</button>`).join('')}</div>
       <div class="xs mut" style="margin-top:6px;line-height:1.4">${c.goal==='bajar'?`Alrededor de ${fmtNum(c.semana)} kg por semana (${fmtNum(Math.round(c.semana/c.w*1000)/10)} % de tu peso).${c.limite?' PandarIA aplicó su límite de seguridad: no quita más del 25 % de tu gasto ni baja de tu metabolismo en reposo.':''}`:`${Math.round((kb('nut.superavit')[c.ritmo]-1)*100)} % más de calorías que tu mantenimiento.`}${kbLink(c.goal==='bajar'?'nut.deficit':'nut.superavit','Por qué')}</div>`:''}
@@ -7277,12 +7285,12 @@ function viewNutricion(){
   const days=[...Array(7).keys()].reverse().map(i=>waterToday(dayKey(Date.now()-i*DAY)));
   const tt=trainedToday(), ttMin=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0), KA=kb('agua');
   const extraTxt=!tt.length?'':ttMin>KA.largo+29?tx(`, + agua extra por tu entreno de ${Math.round(ttMin)} min`,`, + extra water for your ${Math.round(ttMin)}-min workout`):tx(', + 500 ml porque hoy entrenaste',', + 500 ml because you trained today');
-  h+=`<div class="sec">Agua</div><div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString('es',{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString('es',{maximumFractionDigits:1})} L</span></div></div>
+  h+=`<div class="sec">Agua</div><div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString(LOC(),{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString(LOC(),{maximumFractionDigits:1})} L</span></div></div>
     <div class="grow col" style="gap:8px"><button class="btn sm" data-a="water" data-v="250">${I('drop',16)} + Vaso 250 ml</button><button class="btn sm" data-a="water" data-v="500">${I('drop',16)} + Botella 500 ml</button><div class="row" style="gap:6px"><button class="btn sm grow" data-a="wOther">${I('plus',16)} ${tx('Otra bebida','Other drink')}</button><button class="btn sm ghost" data-a="water" data-v="-250" aria-label="−250 ml">− 250</button></div></div></div>
     ${dd.n?`<div class="xs" style="margin-top:10px;color:var(--blue);line-height:1.4">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}
     ${cafLine(dd.caf)}
     <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
-    <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString('es'):''})}</div></div>`;
+    <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div></div>`;
   h+=supCardsHtml();
   h+=fastCard();
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
@@ -7978,8 +7986,8 @@ function alimSearch(q, opts){
 }
 function alimRecent(){ const n=nd(), seen=new Set(), out=[]; const days=Object.keys(n.diario).sort().reverse();
   for (const d of days){ for (const e of n.diario[d].slice().reverse()){ if (!seen.has(e.fid)){ seen.add(e.fid); const f=alimGet(e.fid); if (f) out.push(f); if (out.length>=30) return out; } } } return out; }
-const fmtG = g => (Math.round(g*10)/10).toLocaleString('es')+' g';
-const fmtK = k => Math.round(k).toLocaleString('es')+' kcal';
+const fmtG = g => (Math.round(g*10)/10).toLocaleString(LOC())+' g';
+const fmtK = k => Math.round(k).toLocaleString(LOC())+' kcal';
 const porTxt = e => !e.por ? fmtG(e.gr) : (!e.q||e.q===1) ? `${e.por} · ${fmtG(e.gr)}` : `${fmtNum(e.q)} × ${/^1 /.test(e.por)?e.por.slice(2):e.por} · ${fmtG(e.gr)}`;
 
 /* ---------- Tarjeta del diario en Nutrición ---------- */
@@ -7991,7 +7999,7 @@ function diarioCard(){
     <div class="row" style="justify-content:space-between;margin-bottom:10px"><button class="ibtn" data-a="dDay" data-v="-1" aria-label="Día anterior">${I('back',20)}</button><b>${esc(lbl.charAt(0).toUpperCase()+lbl.slice(1))}</b><button class="ibtn" data-a="dDay" data-v="1" ${isToday?'disabled style="opacity:.3"':''} aria-label="Día siguiente"><span style="display:inline-flex;transform:scaleX(-1)">${I('back',20)}</span></button></div>`;
   if (hab) h+=habitosResumen(k);
   else {
-    h+=`<div class="row" style="align-items:flex-end;gap:10px"><div class="grow"><div style="font-size:28px;font-weight:900;line-height:1.1">${T.k.toLocaleString('es')} <span class="sm mut" style="font-weight:600">kcal</span></div></div>
+    h+=`<div class="row" style="align-items:flex-end;gap:10px"><div class="grow"><div style="font-size:28px;font-weight:900;line-height:1.1">${T.k.toLocaleString(LOC())} <span class="sm mut" style="font-weight:600">kcal</span></div></div>
       <div class="xs" style="text-align:right;line-height:1.5"><span style="color:#ff7a1a">P ${fmtNum(T.p)} g</span> · <span style="color:#3f9cff">C ${fmtNum(T.c)} g</span> · <span style="color:#f5b82e">G ${fmtNum(T.g)} g</span></div></div>`;
     const c=calcNutrition();
     if (prem()){
@@ -8010,7 +8018,7 @@ function diarioCard(){
   });
   h+=`<div class="row" style="gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn sm grow" data-a="dCopy">${I('copy',16)} Copiar ${isToday?'ayer':'el día anterior'}</button><button class="btn sm grow" data-a="dSaveMeal">${I('pin',16)} Guardar comida</button></div>`;
   if (!hab && prem() && calcNutrition()){ const days=[...Array(7).keys()].reverse().map(i=>dayKey(new Date(k+'T12:00').getTime()-i*DAY));
-    h+=`<div class="xs mut b" style="letter-spacing:1px;margin:16px 0 4px">ÚLTIMOS 7 DÍAS (KCAL)</div>${barChart(days.map(x=>dayTotals(x).k),days.map(x=>DAYS_SHORT[new Date(x+'T12:00').getDay()]),{fmt:v=>v?Math.round(v).toLocaleString('es'):''})}`; }
+    h+=`<div class="xs mut b" style="letter-spacing:1px;margin:16px 0 4px">ÚLTIMOS 7 DÍAS (KCAL)</div>${barChart(days.map(x=>dayTotals(x).k),days.map(x=>DAYS_SHORT[new Date(x+'T12:00').getDay()]),{fmt:v=>v?Math.round(v).toLocaleString(LOC()):''})}`; }
   h+=`<div class="xs mut" style="margin-top:12px;line-height:1.4">Datos de alimentos: USDA, base de datos de nutrientes de referencia (dominio público). Revisa siempre la etiqueta de los productos envasados.</div></div>`;
   return h;
 }
@@ -8238,7 +8246,7 @@ function fastCard(){
     const reached=goal && el>=goal;
     h+=`<div class="card" style="text-align:center"><div class="xs mut b" style="letter-spacing:1px">${reached?'META ALCANZADA':'AYUNANDO'}</div>
       <div class="fring" style="--p:${pct.toFixed(1)};--c:${reached?'var(--ok)':'var(--ac)'}"><div><div class="tick-fast" data-long="1" style="font-size:30px;font-weight:900;font-variant-numeric:tabular-nums">${fmtHMl(el)}</div><div class="xs mut">${goal?`de ${goal} h · ${plan.n}`:'ayuno libre'}</div></div></div>
-      <div class="sm mut">Empezaste ${new Date(a.start).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})} ${new Date(a.start).toDateString()!==new Date().toDateString()?'de ayer':''}${goal?` · terminas ${new Date(a.start+goal*3600000).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}`:''}</div>
+      <div class="sm mut">Empezaste ${new Date(a.start).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})} ${new Date(a.start).toDateString()!==new Date().toDateString()?'de ayer':''}${goal?` · terminas ${new Date(a.start+goal*3600000).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})}`:''}</div>
       <div class="row" style="gap:8px;margin-top:14px"><button class="btn ${reached?'ok':'pri'} grow" data-a="fastEnd">Terminar ayuno</button><button class="btn" data-a="fastAdjust">${I('edit',16)} Hora de inicio</button></div>
       <button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="fastUnwell">Me siento mal</button></div>`;
   } else {
@@ -8248,7 +8256,7 @@ function fastCard(){
   return h+fastAdvice()+fastHistory();
 }
 // Ayuno conectado con el diario: hora de la última comida registrada (hoy o anoche)
-const hhmm = ts => new Date(ts).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+const hhmm = ts => new Date(ts).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'});
 function diaryTimes(k){ return ((S.nutri&&S.nutri.diario&&S.nutri.diario[k])||[]).filter(e=>{ const f=alimGet(e.fid); return e.t && f && f.k*(+e.gr||0)/100>=15; }).map(e=>e.t).filter(t=>t<=Date.now()).sort((a,b)=>a-b); }
 function lastMealTs(){ const t=diaryTimes(dayKey()).concat(diaryTimes(dayKey(Date.now()-DAY))).filter(x=>Date.now()-x<kb('ayuno.diario').maxH*3600000); return t.length?Math.max(...t):null; }
 function fastWindowHtml(){ const t=diaryTimes(dayKey()); if (t.length<2) return '';
@@ -8294,7 +8302,7 @@ function fastTimePicker(adjust){
   const cur = adjust&&f.active ? f.active.start : now-2*3600000;
   const y=new Date(now-DAY); const ystr=d=>{ const x=new Date(y); x.setHours(d,0,0,0); return x.getTime(); };
   const quick=[['Hace 1 h',now-3600000],['Hace 2 h',now-2*3600000],['Hace 4 h',now-4*3600000],['Ayer 20:00',ystr(20)],['Ayer 21:00',ystr(21)],['Ayer 22:00',ystr(22)]].filter(q=>now-q[1]<48*3600000);
-  const set=ts=>{ ts=Math.min(Date.now(),ts); if (f.active) f.active.start=ts; else f.active={start:ts,goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast(`Ayuno desde las ${new Date(ts).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}`); };
+  const set=ts=>{ ts=Math.min(Date.now(),ts); if (f.active) f.active.start=ts; else f.active={start:ts,goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast(`Ayuno desde las ${new Date(ts).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})}`); };
   A.ftQuick=v=>{ const el=document.getElementById('ftdt'); if(el) el.value=toLocalInput(+v); document.querySelectorAll('[data-a=ftQuick]').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); };
   const okK=cb(()=>{ const v=MV.ftdt; const ts=v?new Date(v).getTime():NaN; if (isNaN(ts)){ toast('Elige una fecha y hora válidas'); return; } if (ts>Date.now()){ toast('La hora de inicio no puede ser futura'); return; } set(ts); });
   openModal(`<div class="sheet"><div class="grab"></div><h3>${adjust?'Cambiar hora de inicio':'¿Cuándo empezaste a ayunar?'}</h3>
@@ -8633,7 +8641,7 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='0.9';
 const CHANGELOG=[
- {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y más alimentos (en desarrollo)',items:['Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
+ {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y más alimentos (en desarrollo)',items:['Etapa 3 · Inglés completo: toda la app en inglés, también los 386 consejos de ejercicio, la técnica paso a paso, Explorar, el historial de cambios, los logros y los avisos del teléfono','La voz de los entrenos, los avisos del teléfono, la notificación del entreno en curso y los widgets hablan en el idioma que elijas','En inglés los números y las fechas van al estilo inglés (1,910 kcal · 80.6 kg · November 12)','Nueva prueba automática: en inglés, si queda algún texto en español en las pantallas, la versión no sale','Arreglo: más espacio arriba para la cámara y la barra de estado (notch) en todas las pantallas','Arreglo: al tocar «Buscar actualizaciones» se abre directamente la versión nueva, aunque antes hubieras elegido «Más tarde» o «Saltar esta versión»; el aviso también aparece en Ajustes','Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
  {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
@@ -8665,7 +8673,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["0.9 · Etapa 2 de 5: tu cuenta de Google", "Bienvenida nueva, con «Continuar con Google» o «Usar sin cuenta»", "Copia automática en tu Google Drive (opcional y privada)", "En un teléfono nuevo recuperas entrenos, rutinas, diario, fotos y Premium", "Nunca se pisan datos sin preguntarte", "Premium con tu cuenta: funciona en cualquier teléfono", "Ajustes › Tus datos: guardar, recuperar, cerrar sesión y borrar la copia"];
+const NOTAS_VERSION=["0.9 · Etapa 3 de 5: inglés completo", "Toda la app en inglés, también consejos de ejercicio, técnica, Explorar y logros", "La voz, los avisos del teléfono y los widgets en tu idioma", "Números y fechas al estilo inglés", "Más espacio arriba para el notch en todas las pantallas", "«Buscar actualizaciones» abre directamente la versión nueva"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
@@ -8677,15 +8685,20 @@ async function updCheck(force){
   if (!updOn()) return; S.upd=S.upd||{}; const now=Date.now(); if (!force && S.upd.last && now-S.upd.last<UPD_EVERY) return;
   try{ const r=await fetch(`https://api.github.com/repos/${UPD_REPO}/releases?per_page=20`,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'}); if(!r.ok) throw 0;
     const list=(await r.json()).filter(x=>!x.draft).map(updParse).filter(Boolean).filter(updNewer).sort((a,b)=>b.maj-a.maj||b.min-a.min||b.n-a.n);
-    S.upd.last=now; S.upd.list=list.slice(0,20); save(); if (force) toast(list.length?`Hay una versión nueva: ${list[0].maj}.${list[0].min}.${list[0].n}`:'Tienes la última versión'); if (TAB==='rutinas'&&!LAYERS.length) render();
+    S.upd.last=now; S.upd.list=list.slice(0,20);
+    // al buscar a mano se ignora «Más tarde» y «Saltar esta versión» y se abre directamente la versión nueva
+    if (force && list.length){ S.upd.later=0; if (S.upd.skip===list[0].tag) S.upd.skip=null; }
+    save(); if (force){ if (list.length) openLayer('updNew',{}); else toast('Tienes la última versión'); } else if (!LAYERS.length){ render.keep=true; render(); }
   }catch(e){ if (force) toast('No se pudo comprobar. Revisa tu conexión.'); }
 }
 function updPending(){ if (!updOn()||!S.upd||!(S.upd.list||[]).length) return null; const v=S.upd.list[0]; if (S.upd.skip===v.tag) return null; if (S.upd.later&&Date.now()<S.upd.later) return null; return v; }
 function updCard(){
   if (!AVISOS_DEV) return '';
   const nw=updBuild()!=null&&S.upd&&S.upd.seen!=null&&S.upd.seen<updBuild();
+  const v0=updPending(); if (v0) return updCardNew(v0); // una versión aún más nueva va primero
   if (nw) return `<div class="card tap" data-a="updWhatsNew" style="border:1px solid var(--ac);margin-bottom:12px"><div class="row" style="gap:12px"><span style="color:var(--ac)">${I('spark',22)}</span><div class="grow"><div class="b">Ya tienes la versión ${updVer(updBuild())}</div><div class="xs mut" style="margin-top:2px">Toca para ver qué hay de nuevo</div></div><span class="mut" style="font-size:22px;line-height:1">›</span></div></div>`;
-  const v=updPending(); if (!v) return '';
+  return ''; }
+function updCardNew(v){
   return `<div class="card tap" data-a="updOpen" style="border:1px solid var(--ac);margin-bottom:12px"><div class="row" style="gap:12px"><span style="color:var(--ac)">${I('download',22)}</span><div class="grow"><div class="b">Versión nueva disponible: ${v.maj}.${v.min}.${v.n}</div><div class="xs mut" style="margin-top:2px">Tienes la ${updVer(updBuild())} · toca para ver los cambios</div></div><span class="mut" style="font-size:22px;line-height:1">›</span></div></div>`;
 }
 const updNotesHtml=(title,date,notes)=>`<div class="card" style="margin-bottom:10px"><div class="row" style="margin-bottom:6px"><b class="grow">${esc(title)}</b>${date?`<span class="xs mut">${esc(fmtDateL(new Date(date).getTime()))}</span>`:''}</div>${(notes&&notes.length?notes:['Sin notas para esta versión']).map(x=>`<div class="row" style="align-items:flex-start;padding:3px 0"><span style="color:var(--ac);margin-top:1px">•</span><span class="sm" style="line-height:1.45">${esc(x)}</span></div>`).join('')}</div>`;
@@ -9025,7 +9038,7 @@ function viewAjustes(){
   const nav=(act,ic,lbl,val,v)=>`<button class="srow" data-a="${act}" ${v?`data-v="${v}"`:''}><span class="si">${I(ic,20)}</span><span class="grow b">${lbl}</span><span class="mut sm">${val||''}</span>${I('right',18)}</button>`;
   const arch=S.routines.filter(r=>r.archived).length, nAv=Object.keys(st.avoid||{}).length;
   const prof=[pr.age?pr.age+' años':'',pr.weight?pr.weight+' kg':''].filter(Boolean).join(' · ')||'Completar';
-  return `<div class="hdr"><h1>Ajustes</h1></div>
+  return `<div class="hdr"><h1>Ajustes</h1></div>${(()=>{ try{ const v=updPending(); return v?updCardNew(v):''; }catch(e){ return ''; } })()}
   <div class="card row" data-a="openProfile" style="cursor:pointer;gap:14px"><span style="width:52px;height:52px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;font-size:20px;flex:0 0 auto">${pr.name?esc(pr.name[0].toUpperCase()):I('user',24)}</span><div class="grow"><div class="b">${esc(pr.name||'Mi perfil')}</div><div class="sm mut">${prof}${(pr.injuries||[]).length?` · ${plural(pr.injuries.length,'zona sensible','zonas sensibles')}`:''}</div></div>${I('right',18)}</div>
   <div class="sec">Entrenamiento</div><div class="card" style="padding:0 12px">
     ${nav('openEquip','dumbbell','Mis equipos',`${st.equip.filter(q=>!['pc','est'].includes(q)).length} elegidos`)}
@@ -9153,7 +9166,7 @@ function countUp(root){
   root.querySelectorAll('.stat .v').forEach(el=>{
     const txt=el.textContent.trim(); if (!/^\d[\d.]*$/.test(txt)) return;
     const end=+txt.replace(/\./g,''); if (!end) return; const t0=performance.now(), d=900;
-    (function f(t){ const k=Math.min(1,(t-t0)/d), e=1-Math.pow(1-k,3); el.textContent=Math.round(end*e).toLocaleString('es'); if(k<1) requestAnimationFrame(f); else el.textContent=txt; })(t0);
+    (function f(t){ const k=Math.min(1,(t-t0)/d), e=1-Math.pow(1-k,3); el.textContent=Math.round(end*e).toLocaleString(LOC()); if(k<1) requestAnimationFrame(f); else el.textContent=txt; })(t0);
   });
 }
 function applyAnim(){ document.documentElement.dataset.fx=ANIM_ON()?'on':'off'; }
@@ -10902,13 +10915,13 @@ const KB_LOG_EN={'1.0':'First version: the numbers PandarIA already used, checke
  '1.1':'Rules that change results: 2 minutes of rest on weighted compound lifts for muscle; weight-loss pace of 0.5 to 1 % of body weight per week instead of a fixed 15 %; a calorie target that adjusts with your diary and weight; a lighter load if you arrive poorly rested; water goal recalibrated with the EFSA reference; alternatives of similar difficulty.',
  '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
 const EN_08_RX=[
-  [/^Te quedan ([\d.]+) kcal de ([\d.]+) kcal$/,'$1 kcal left of $2 kcal'],[/^([\d.]+) kcal por encima de tu objetivo de ([\d.]+) kcal$/,'$1 kcal over your goal of $2 kcal'],
-  [/^Alrededor de ([\d,]+) kg por semana \(([\d,]+) % de tu peso\)\.(.*)$/,(m,a,b,c)=>`About ${a.replace(',','.')} kg per week (${b.replace(',','.')} % of your weight).${c?' PandarIA applied its safety limit: it never removes more than 25 % of your expenditure or goes below your resting metabolism.':''}`],
+  [/^Te quedan ([\d.,]+) kcal de ([\d.,]+) kcal$/,'$1 kcal left of $2 kcal'],[/^([\d.,]+) kcal por encima de tu objetivo de ([\d.,]+) kcal$/,'$1 kcal over your goal of $2 kcal'],
+  [/^Alrededor de ([\d.,]+) kg por semana \(([\d.,]+) % de tu peso\)\.(.*)$/,(m,a,b,c)=>`About ${a} kg per week (${b} % of your weight).${c?' PandarIA applied its safety limit: it never removes more than 25 % of your expenditure or goes below your resting metabolism.':''}`],
   [/^(\d+) % más de calorías que tu mantenimiento\.$/,'$1 % more calories than your maintenance.'],
   [/^Objetivo que se ajusta solo: Faltan días de diario: (\d+) de (\d+)\.$/,'Self-adjusting target: diary days missing: $1 of $2.'],
   [/^Objetivo que se ajusta solo: Faltan pesajes: necesito al menos dos separados 10 días\.$/,'Self-adjusting target: missing weigh-ins: I need at least two, 10 days apart.'],
   [/^Objetivo que se ajusta solo: (.*)$/,'Self-adjusting target: the data does not match the formula (missing meals in the diary?), so it is not used.'],
-  [/^con tu perfil y tus entrenos de la semana\. Proteína: ([\d,]+) g por kg \(la ISSN recomienda 1,4–2,0 g\/kg si entrenas, y algo más en déficit\)\.$/,(m,a)=>`with your profile and this week’s workouts. Protein: ${a.replace(',','.')} g per kg (ISSN recommends 1.4–2.0 g/kg if you train, and a bit more in a deficit).`],
+  [/^con tu perfil y tus entrenos de la semana\. Proteína: ([\d.,]+) g por kg \(la ISSN recomienda 1,4–2,0 g\/kg si entrenas, y algo más en déficit\)\.$/,(m,a)=>`with your profile and this week’s workouts. Protein: ${a} g per kg (ISSN recommends 1.4–2.0 g/kg if you train, and a bit more in a deficit).`],
   [/^Plan ([\d:]+): ayunas (\d+) h y comes en (\d+) h\.$/,'Plan $1: fast $2 h and eat within $3 h.'],
   [/^Añadir a (desayuno|almuerzo|merienda|cena|snack)$/,(m,a)=>'Add to '+({desayuno:'breakfast',almuerzo:'lunch',merienda:'afternoon snack',cena:'dinner',snack:'snacks'})[a]],
   [/^También: /,'Also: '],
@@ -10940,6 +10953,8 @@ function buildEN(){
   [['Schoenfeld, Ogborn y Krieger','Schoenfeld, Ogborn and Krieger'],['Helms, Aragon y Fitschen','Helms, Aragon and Fitschen'],['Mifflin, St Jeor y col.','Mifflin, St Jeor et al.']].forEach(([a,b])=>EN_MAP.set(a,b));
   (EN_UI+'\n'+EN_EXTRA).split('\n').forEach(l=>{ const [a,b]=l.split('|'); if(a&&b) EN_MAP.set(a.trim(),b.trim()); });
   EN_EX.split('\n').forEach(l=>{ const [id,n]=l.split('|'); if (EX[id]) EN_MAP.set(EX[id].n,n); });
+  EN_TIP.split('\n').forEach(l=>{ const i=l.indexOf('|'); const id=l.slice(0,i); if (EX[id]&&EX[id].tip) EN_MAP.set(EX[id].tip,l.slice(i+1)); });
+  [EN_PAT,EN_09].forEach(b=>b.split('\n').forEach(l=>{ const i=l.indexOf('|'); if(i>0){ const a=l.slice(0,i).trim(); if(!EN_MAP.has(a)) EN_MAP.set(a,l.slice(i+1).trim()); } }));
   EXPLORE.forEach(s=>{ EN_MAP.has(s.n)||0; });
   const names=[]; EN_EX.split('\n').forEach(l=>{ const [id,n]=l.split('|'); if(EX[id]) names.push([EX[id].n,n]); });
   Object.entries(GOALS).forEach(([k,g])=>{ const t=EN_MAP.get(g.n); if(t) names.push([g.n,t]); });
@@ -10949,6 +10964,1275 @@ function buildEN(){
   EN_PHR_RX = new RegExp(names.map(([a])=>a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g');
 }
 let EN_PHR=[], EN_PHR_RX=null;
+/* 0.9.2 · Inglés completo: consejos de cada ejercicio (id|consejo) y técnica por patrón (español|inglés) */
+const EN_TIP = `press_banca|Shoulder blades together and feet planted; lower the bar to mid-chest.
+press_inclinado_barra|Bench at 30°; lower the bar towards your upper chest.
+press_declinado|Lower under control towards your lower chest.
+press_banca_man|Lower until you feel a chest stretch, elbows at about 45°.
+press_inclinado_man|Bench at 30°; bring the dumbbells together at the top without clashing them.
+press_suelo_man|Elbows touch the floor softly before you press.
+press_pecho_maq|Set the seat so the handles line up with your chest.
+press_cerrado|Hands shoulder-width apart, elbows close to your body.
+aperturas_man|Elbows slightly bent the whole way, as if hugging a tree.
+cruce_poleas|Bring your hands together in front of your chest and squeeze for a second.
+pec_deck|Back against the pad, slow movement.
+pullover_man|Arms almost straight; lower behind your head without arching your back.
+fondos_pecho|Lean your torso forward to load the chest more.
+flexiones_pared|Body straight as a plank; step your feet back to make it harder.
+flexiones_inclinadas|Hands on a sturdy bench or table.
+flexiones_rodillas|Keep a straight line from knees to hips to shoulders.
+flexiones|Core tight; your chest almost touches the floor.
+flexiones_declinadas|Feet raised; works the upper chest more.
+flexiones_diamante|Index fingers and thumbs form a diamond under your chest.
+flexiones_archer|Lower towards one side with the other arm almost straight.
+flexiones_pliometricas|Push explosively until your hands leave the floor.
+press_bandas|Anchor the band behind you at chest height.
+press_militar|Glutes and core tight; the bar travels in a straight line.
+press_hombro_man|Seated or standing, don't arch your lower back.
+press_arnold|Rotate your palms as you press up.
+press_hombro_maq|Handles at ear height to start.
+kb_press|Straight wrist, the kettlebell resting on your forearm.
+pike_pushup|Hips high, forming an upside-down V.
+handstand_pushup|Against the wall; lower your head under control.
+elev_laterales|Raise to shoulder height, elbows slightly bent.
+elev_laterales_polea|Constant tension, no swinging.
+elev_laterales_banda|Stand on the band and raise slowly.
+elev_frontales|Raise to eye level without momentum.
+pajaros|Torso bent forward; open your arms like wings.
+face_pull|Pull the rope towards your face, spreading your hands.
+face_pull_banda|Elbows high; squeeze your shoulder blades.
+pull_apart|Arms straight in front; pull apart until the band touches your chest.
+remo_menton|Wide grip, elbows above your hands.
+encogimientos|Lift your shoulders towards your ears and hold for a second.
+encogimientos_barra|Don't roll your shoulders, just up and down.
+dominadas|Chest towards the bar; lower until your arms are straight.
+dominadas_supinas|Palms facing you, chin over the bar.
+dominadas_asistidas|The band under your knees or feet helps you up.
+dominadas_negativas|Jump to the top and lower as slowly as you can (3-5 s).
+jalon_pecho|Pull the bar to your upper chest without swinging.
+jalon_cerrado|Elbows tucked; squeeze your back at the bottom.
+jalon_banda|High anchor; pull towards your chest.
+pullover_polea|Arms almost straight; bring the bar down to your thighs.
+remo_barra|Torso at 45°, neutral back, bar to your belly button.
+remo_man|Hand and knee on the bench, elbow towards your hip.
+remo_polea|Chest up; squeeze your shoulder blades at the end.
+remo_maq|Chest on the pad; pull with your elbows.
+remo_t|Neutral back and knees bent.
+remo_invertido|Bar in a rack; body straight, chest to the bar.
+remo_trx|The more you lean back, the harder it gets.
+remo_banda|Seated, band around your feet; pull towards your belly button.
+kb_remo|Straight back, elbow travels back.
+hiperextensiones|Rise until your body is in line, no further.
+superman|Face down; lift your arms and legs at the same time.
+remo_mesa|Very sturdy table; body straight, bring your chest to the edge.
+remo_toalla|Stand on a towel, pull up hard and hold.
+ytw|Face down; draw a Y, a T and a W with your arms.
+curl_toalla|Stand on the towel and pull with your elbows at 90°.
+puente_isquios|Heels far from your hips to load the hamstrings.
+curl_femoral_toalla|On a smooth floor, slide your heels towards your glutes with your hips up.
+elev_lateral_pierna|Lying on your side, raise your straight leg without rotating your hips.
+encog_escapular|Hanging, pull your shoulders down and back without bending your elbows.
+colgarse|Firm grip, active shoulders.
+curl_barra|Elbows fixed at your sides, no swinging.
+curl_man|Turn your palm up as you lift.
+curl_martillo|Palms facing each other throughout.
+curl_concentrado|Elbow braced on your thigh; lift slowly.
+curl_polea|Constant tension; lower under control.
+curl_predicador|Don't fully straighten at the bottom to protect your elbow.
+curl_inclinado|Bench at 45°, arms hanging.
+curl_banda|Stand on the band, elbows still.
+curl_muneca|Forearms supported; move only your wrist.
+ext_triceps_polea|Elbows tucked; extend all the way down.
+press_frances|Lower the bar towards your forehead, bending only your elbows.
+ext_triceps_man|Elbows pointing at the ceiling.
+patada_triceps|Upper arm parallel to the floor; extend backwards.
+ext_triceps_banda|High anchor, elbows fixed.
+fondos_banco|Back close to the bench; lower to 90°.
+fondos_triceps|Upright torso to load the triceps.
+paseo_granjero|Walk tall with a weight in each hand.
+sentadilla|Knees in line with your toes; go down to at least parallel.
+sentadilla_frontal|Elbows high, torso as upright as possible.
+sentadilla_goblet|Hold a dumbbell against your chest.
+kb_goblet|Kettlebell against your chest, elbows between your knees.
+sentadilla_peso|Hips back as if sitting down.
+sentarse_levantarse|Without using your hands if you can.
+sentadilla_sumo|Feet very wide and toes pointing out.
+sentadilla_salto|Land softly and go straight into the next one.
+sentadilla_pistol|On one leg; use a support at first.
+sentadilla_pared|Back against the wall, knees at 90°.
+sentadilla_hack|Back against the pad.
+sentadilla_banda|Stand on the band and hold it on your shoulders.
+prensa|Don't let your hips lift off the seat at the bottom.
+thrusters|Squat, and as you rise press the weights overhead.
+ext_cuadriceps|Squeeze at the top for a second.
+zancadas|Back knee almost touches the floor.
+zancadas_pc|Long step, upright torso.
+zancada_inversa|Step backwards; easier on the knee.
+zancada_lateral|Hips back towards the side of the bent leg.
+sentadilla_bulgara|Back foot on the bench; lower straight down.
+step_up|Push through the heel of the top leg.
+peso_muerto|Bar close to your legs, neutral back, push the floor away.
+peso_muerto_rumano|Knees slightly bent; hips back until you feel your hamstrings.
+peso_muerto_rumano_man|The weights travel down close to your legs.
+peso_muerto_sumo|Feet wide, hands inside your legs.
+peso_muerto_unilateral|Hips level, back leg in line with your torso.
+kb_pm|Kettlebell between your feet, neutral back.
+buenos_dias|Bar on your back; hinge at the hips.
+kb_swing|The drive comes from your hips, not your arms.
+kb_clean|The kettlebell rolls over your forearm without banging.
+kb_snatch|From the swing, take the kettlebell overhead in one move.
+kb_turkish|Keep your eyes on the kettlebell, one step at a time.
+curl_femoral|Hips pressed into the bench.
+curl_femoral_sentado|Squeeze at the bottom for a second.
+curl_nordico|Feet anchored; lower slowly with your body straight.
+puente_gluteo|Push through your heels and squeeze at the top.
+puente_gluteo_unilateral|Keep your hips level as you rise.
+hip_thrust|Upper back on the bench, chin to chest, squeeze at the top.
+hip_thrust_man|Dumbbell resting on your hips.
+patada_gluteo|Lift your leg without arching your back.
+patada_gluteo_polea|Ankle strap on the low pulley; kick backwards.
+abduccion_maq|Open and return slowly.
+abduccion_banda|On your side, open your knee without moving your hips.
+monster_walk|Half squat; short steps without bringing your feet together.
+aduccion_maq|Close your legs under control.
+elev_gemelos|Rise onto your toes as high as you can.
+elev_gemelos_man|Pause at the top for a second.
+elev_gemelos_maq|Full range; stretch at the bottom.
+gemelos_sentado|Works the soleus more.
+plancha|Body straight; squeeze your glutes and core.
+plancha_lateral|Hips high, body in line.
+plancha_toques|Don't let your hips sway.
+crunch|Lift only your shoulders, without pulling on your neck.
+crunch_bici|Elbow towards the opposite knee.
+elev_piernas|Lower back pressed into the floor.
+elev_rodillas_colgado|No swinging, knees to chest.
+elev_piernas_colgado|Straight legs up to 90° or more.
+russian_twist|Feet off the floor for extra difficulty.
+dead_bug|Opposite arm and leg, lower back pressed into the floor.
+bird_dog|On all fours, extend the opposite arm and leg.
+hollow_hold|Banana shape, lower back pressed down.
+v_ups|Hands and feet meet at the top.
+rueda_abdominal|Roll out only as far as you can control your back.
+pallof|Resist the rotation, arms straight in front.
+pallof_banda|Side-on to the anchor; press forward without rotating.
+crunch_polea|Kneeling, curl your torso down.
+lenador|Rotate from your torso, arms firm.
+l_sit|Legs straight and parallel to the floor.
+equilibrio_pierna|Near a wall for safety.
+mountain_climbers|Knees to chest fast, hips low.
+burpees|Plank, chest to the floor, jump up.
+jumping_jacks|Steady pace.
+skipping|Knees up to hip height.
+saltar_comba|Small jumps on the balls of your feet.
+sprint|Warm up well first.
+skater|Land steadily on one leg.
+box_jump|Step down, don't jump down.
+bear_crawl|Knees a hand's width off the floor.
+sombra_boxeo|Guard up, fast punches.
+marcha_sitio|Swing your arms with each step.
+caminata|A pace where you can talk with some effort.
+correr_cinta|A 1% incline simulates running outdoors.
+bici_estatica|Saddle at hip height.
+eliptica|Push with your arms too.
+remo_ergometro|Legs, then hips, then arms.
+mov_articular|Circles with your neck, shoulders, hips, knees and ankles.
+circulos_brazos|Small to big, in both directions.
+gato_vaca|Alternate arching and rounding your back with your breath.
+rot_toracica|On all fours, open your arm towards the ceiling.
+cadera_9090|Rotate your legs from side to side without using your hands.
+est_isquios|Straight back; hinge at the hips.
+est_cuadriceps|Heel to glute, knees together.
+est_pecho|Forearm on the wall; turn your body away.
+est_hombro|Arm across your chest, without lifting the shoulder.
+est_triceps|Hand behind your back; push the elbow gently.
+est_flexor_cadera|Back knee on the floor; push your hips forward.
+est_gluteo|Ankle over the opposite knee.
+est_gemelos|Back heel flat on the floor.
+est_dorsal|Hold on to something and push your hips back.
+yoga_saludo|Link the poses with your breath.
+yoga_perro|Hips up, heels towards the floor.
+yoga_nino|Glutes to heels, arms stretched forward.
+yoga_cobra|Elbows close to your body, shoulders away from your ears.
+yoga_guerrero1|Front knee over the ankle.
+yoga_guerrero2|Arms open, gaze forward.
+yoga_triangulo|Straight legs; open your chest to the side.
+yoga_arbol|Foot on your calf or thigh, never on the knee.
+yoga_silla|Like sitting on an imaginary chair.
+yoga_puente|Shoulders on the floor, hips up.
+yoga_paloma|Hips square to the front.
+yoga_pinza|Lengthen your back before folding forward.
+yoga_torsion|Shoulders on the floor, knees to one side.
+yoga_barco|Straight back, legs raised.
+yoga_cuervo|Knees on your triceps, gaze forward.
+pil_hundred|Pump your arms, breathing in for 5 counts and out for 5.
+pil_roll_up|Roll up one vertebra at a time.
+pil_circulos|Pelvis still, small circles.
+pil_tijeras|Alternate straight legs, stable lower back.
+pil_puente|Rise one vertebra at a time.
+pil_natacion|Face down; alternate arms and legs.
+pil_sierra|Rotate and reach your hand to the opposite foot.
+pil_una_pierna|Head lifted; switch legs.
+pil_patada_lateral|Body aligned, leg at hip height.
+pil_rodar|Keep the ball shape.
+pil_teaser|Balance on your sit bones forming a V.
+smith_sentadilla|Feet slightly in front of the bar; lower under control to parallel.
+smith_frontal|Elbows high and torso upright; the bar rests on your shoulders.
+sentadilla_pendulo|Back against the pad; go deep without lifting your heels.
+v_squat|Shoulders under the pads; push through your whole foot.
+hack_inversa|Chest against the pad; push your hips back as you lower.
+belt_squat|The load sits on your hips: ideal if your back bothers you.
+prensa_vertical|Lower back always supported; don't lock your knees at the top.
+prensa_sentada|Set the seat so your knees reach 90°.
+prensa_unilateral|Foot in the middle of the platform; knee in line with your toes.
+ext_cuad_unilateral|Up in 1 second, squeeze at the top and down in 3.
+ext_cuad_polea|Ankle strap on the low pulley; extend the knee without moving your thigh.
+sentadilla_landmine|Hold the end of the bar against your chest and lower straight down.
+sentadilla_zercher|Bar in the crook of your elbows; core very tight.
+box_squat|Sit back until you touch the box without relaxing, then stand.
+sentadilla_sissy|Heels up and hips forward; lower by leaning your body back.
+nordico_inverso|Kneeling, lean back in one piece and return with your quads.
+smith_zancada|Long step; the back knee travels down to the floor.
+smith_bulgara|Back foot on the bench; lower straight down guided by the bar.
+zancada_caminando_barra|Firm steps and upright torso; you need clear space.
+zancada_caminando_man|Take long steps and alternate legs without stopping.
+zancada_inversa_barra|Step back: it is easier on the knees.
+step_up_man|Push with the top foot, without bouncing off the bottom one.
+pm_hexagonal|Stand in the centre of the bar and push the floor away with your legs.
+trineo_empuje|Arms firm, body leaning and short, powerful steps.
+trineo_arrastre|Walk backwards with short steps; very gentle on the knees.
+curl_femoral_pie|Hips still; bring your heel towards your glute.
+curl_femoral_rodillas|Support your knee well and don't arch your back.
+curl_femoral_unilateral|Work each leg separately to even them out.
+curl_femoral_polea|Ankle strap on the low pulley; thigh still.
+curl_femoral_fitball|Hips up and pull the ball towards you with your heels.
+nordico_maquina|Lower as slowly as you can; the machine helps you back up.
+glute_ham|Body straight from knees to head; rise with your hamstrings.
+smith_rumano|Hips back with the bar close to your legs.
+pm_piernas_rigidas|Knees almost straight; lower until you feel the stretch.
+hip_thrust_maq|Chin to chest and rise until knees, hips and shoulders line up.
+smith_hip_thrust|Upper back on the bench; pause at the top for a second.
+hip_thrust_unilateral|Hips level, no twisting as you rise.
+patada_gluteo_maq|Push the platform back without arching your lower back.
+multicadera_ext|Torso still; take your leg back with your glute.
+pull_through|Facing away from the pulley; drive your hips back and forward hard.
+hiper_gluteo|Back slightly rounded; squeeze your glutes as you rise.
+hiper_inversa|Torso supported; raise your legs in line with your body.
+abduccion_polea|Ankle strap on the low pulley; move your leg out without leaning.
+abduccion_multicadera|Hold on firmly and open your leg to the side.
+fire_hydrant|Knee bent; lift it to the side without twisting your torso.
+frog_pumps|Soles of your feet together and knees open; rise fast.
+rack_pull|The bar starts from the safeties at knee height.
+aduccion_polea|Bring your leg towards the standing one, crossing in front.
+aduccion_multicadera|Slow movement; don't swing your body.
+copenhague|Top leg on the bench; hips high like a side plank.
+sentadilla_cosaca|Lower to one side with the other leg straight and heel down.
+gemelos_prensa|Only the balls of your feet on the platform; full range.
+gemelos_smith|Put a plate under your toes for more range.
+gemelo_burro|Hips bent; stretch well at the bottom.
+gemelos_barra|Bar on your back; rise onto your toes without bending your knees.
+gemelo_unilateral_man|Hold on to something and work one leg at a time.
+gemelo_excentrico|Up on two feet and down very slowly on one: protects the tendon.
+tibial|Back against the wall, feet forward; lift your toes.
+jalon_maquina|Chest up; bring your elbows towards your ribs.
+jalon_unilateral_maq|One arm at a time; stretch fully at the top.
+jalon_supino|Palms facing you, shoulder-width; pull to your chest.
+jalon_neutro|Palms facing each other; elbows tucked as you pull.
+jalon_una_mano|Lean slightly towards the working arm.
+dominadas_maquina|More assistance weight = easier. Lower it over time.
+dominadas_neutras|Palms facing each other; usually kinder to the shoulders.
+muscle_up|Explosive pull to your hips, then get your elbows over the bar.
+remo_alto_maq|Pull from high to low and back, squeezing your shoulder blades.
+remo_bajo_maq|Chest on the pad; drive your elbows back.
+remo_t_apoyado|Chest on the pad; don't lift off as you pull.
+remo_apoyado_man|Face down on an incline bench; pull towards your hips.
+remo_seal|Lying on a high bench; no momentum, just back.
+remo_pendlay|Torso parallel to the floor; every rep starts from the floor.
+remo_kroc|Lots of reps with a heavy dumbbell; some momentum is allowed.
+remo_polea_unilateral|Rotate your torso slightly as you reach and pull.
+smith_remo|Hip hinge, bar to your lower belly.
+remo_meadows|Side-on to the landmine; grab the end and pull with your elbow high.
+pullover_maq|Elbows on the pads; bring your arms down in an arc.
+ext_lumbar_maq|Slow movement without jerking; moderate weight.
+encog_maq|Lift your shoulders to your ears and hold for 1 second.
+encog_smith|Arms straight; only your shoulders move.
+encog_polea|Constant cable tension up and down.
+smith_banca|Set the bench so the bar comes down to mid-chest.
+smith_inclinado|Bench at 30°; the bar comes down to your upper chest.
+press_inclinado_maq|Handles at upper-chest height.
+press_declinado_maq|Press down and forward; elbows at 45°.
+press_convergente|Your hands come together as you press: squeeze your chest at the end.
+press_pecho_polea|Standing with one foot forward; press straight ahead.
+banca_inversa|Palms facing you; use a spotter or the safeties.
+cruce_bajo_alto|Pulleys low; raise your hands up to eye level.
+cruce_alto_bajo|Pulleys high; bring your hands together at belly-button height.
+aperturas_polea_banco|Elbows slightly bent and constant tension.
+aperturas_inclinadas|Bench at 30°; open until you feel the stretch.
+super_fly|Arms almost straight; bring your hands together without clashing.
+fondos_maquina_asistidos|Knees on the platform; lower to 90°.
+press_svend|Squeeze a plate between your palms and press it forward.
+flexiones_anillas|Low rings; stabilise so they don't drift apart.
+fondos_anillas|Arms close to your body; turn the rings out at the top.
+laterales_maq|Elbows on the pads; raise to shoulder height.
+deltoide_post_maq|Chest on the pad; open your arms backwards.
+pajaros_polea|Cables crossed; open your arms at shoulder height.
+frontal_polea|Low pulley; raise forward to eye level.
+frontal_disco|Hold the plate by the sides like a steering wheel.
+menton_polea|Wide grip and elbows no higher than your shoulders.
+lateral_tumbado|On your side on an incline bench; tension from the bottom.
+y_inclinado|Face down, arms in a Y with thumbs up; light weight.
+smith_hombro|Upright bench; the bar comes down in front of your face.
+press_hombro_discos|Each arm presses separately; back supported.
+press_landmine|Press the end of the bar up and forward.
+push_press|Small knee dip, then drive the bar up with your legs.
+press_z|Seated with legs straight: no back support, so your core works harder.
+press_cubano|Upright row, rotate up and press; very light weight.
+rot_externa_polea|Elbow against your body at 90°; rotate your forearm outwards.
+rot_interna_polea|Elbow against your body; rotate your forearm inwards.
+rot_externa_man|On your side, elbow on your hip; rotate the dumbbell up.
+kb_halo|Circle the kettlebell around your head, close and slow.
+curl_z|The angled grip is easier on the wrists.
+curl_predicador_z|Armpits over the pad; keep your elbows down.
+curl_predicador_man|One arm at a time; lower until almost straight.
+curl_maquina|Elbow in line with the machine's pivot.
+curl_cuerda|Palms facing each other; spread the rope at the top.
+martillo_polea|Elbows still at your sides; raise your fists.
+curl_bayesiano|Facing away from the pulley, arm behind your body: maximum stretch.
+curl_polea_alta|Arms out to the sides; bring your hands towards your ears.
+curl_arana|Face down on an incline bench, arms hanging.
+curl_arrastre|The bar travels up close to your body with elbows going back.
+curl_zottman|Up with palms up, rotate at the top and lower with palms down.
+curl_inverso_z|Palms down; works the brachioradialis.
+martillo_cruzado|Bring the dumbbell towards the opposite shoulder.
+ext_cuerda|Spread the rope at the bottom and squeeze your triceps.
+ext_polea_inversa|Palm up; elbow tucked at your side.
+ext_polea_cabeza|Facing away from the pulley; straighten your arms overhead.
+ext_cruzada_polea|Cables crossed; extend your arms out to the sides.
+patada_polea|Torso leaning, arm tucked; extend backwards.
+ext_triceps_maq|Elbows on the pad; extend without moving your shoulders.
+fondos_sentado_maq|Back supported; press down until your arms are straight.
+press_frances_z|Lower the bar towards your forehead with your elbows still.
+press_frances_man|Palms facing each other; lower to the sides of your head.
+press_tate|Elbows out; lower the dumbbells to your chest.
+press_jm|A mix of close-grip press and skull crusher; moderate weight.
+curl_muneca_barra|Forearms on the bench; only your wrists move.
+ext_muneca|Palm down; lift the back of your hand.
+rodillo_muneca|Roll the cord all the way up and unroll it slowly.
+pinza_discos|Pinch two smooth plates with your fingers and hold.
+gripper_maq|Close your hand completely and open slowly.
+granjero_hex|Walk tall with short steps.
+crunch_maq|Curl your torso; don't pull with your arms.
+rot_torso_maq|Rotate from your torso, no momentum.
+silla_rodillas|Back on the pad; bring your knees to your chest.
+silla_piernas|Straight legs up to hip height; lower under control.
+crunch_declinado|Feet anchored; curl up through your back.
+crunch_fitball|Lower back on the ball; more range than on the floor.
+lenador_bajo|Low pulley; rotate your torso, taking your hands up diagonally.
+rot_landmine|Arms straight; move the bar from side to side with your hips.
+inclinacion_lateral|A single dumbbell; lean over and return without twisting.
+paseo_maleta|A weight in one hand; walk without leaning.
+plancha_peso|Plate on your upper back; body straight.
+rollout_barra|Roll the loaded bar forward without letting your hips sag.
+limpiaparabrisas|Hanging, legs up, and move them from side to side.
+bandera_dragon|Grab the bench behind your head and lower your body straight.
+balon_suelo|Ball overhead, then slam it hard into the floor.
+balon_lateral|Side-on to the wall; rotate your hips and throw.
+wall_ball|Squat and throw the ball to a high target on the wall.
+escaladora|Upright, without leaning your weight on your arms.
+stepper|Full steps and a steady pace.
+skierg|Pull down with your arms and hips, like skiing.
+air_bike|Arms and legs together: the harder you go, the more resistance.
+bici_reclinada|Comfortable backrest: ideal if your back bothers you.
+spinning|Set the saddle at hip height.
+cinta_inclinada|8–12% incline without holding the rail.
+cinta_curva|You set the speed: step on the front part.
+arc_trainer|Arc-shaped movement, very gentle on the knees.
+versaclimber|Opposite arm and leg together, like climbing.
+ergometro_brazos|Turn the handles at a steady pace.
+cuerdas_ondas|Knees bent; fast waves alternating arms.
+cuerdas_golpes|Lift both ropes and slam the floor hard.
+cuello_maq|Very light weight and slow movement in each direction.`;
+const EN_PAT = `Sentadilla|Squat
+Bisagra de cadera|Hip hinge
+Zancada|Lunge
+Empuje horizontal|Horizontal push
+Empuje vertical|Vertical push
+Aperturas|Flyes
+Remo|Row
+Tirón vertical|Vertical pull
+Curl|Curl
+Extensión de tríceps|Triceps extension
+Elevaciones|Raises
+Extensión de piernas|Leg extension
+Curl de piernas|Leg curl
+Glúteo|Glutes
+Abducción / aducción|Abduction / adduction
+Gemelos|Calves
+Core|Core
+Cardio|Cardio
+Carga|Carry
+Movilidad|Mobility
+Estiramiento|Stretching
+Yoga|Yoga
+Pilates|Pilates
+Pies al ancho de hombros, puntas un poco hacia fuera.|Feet shoulder-width apart, toes turned slightly out.
+Lleva la cadera atrás y abajo manteniendo el pecho alto.|Push your hips back and down, keeping your chest up.
+Baja hasta que los muslos queden paralelos o algo más.|Go down until your thighs are parallel or a bit lower.
+Sube empujando el suelo con todo el pie.|Stand up by pushing the floor away with your whole foot.
+Rodillas que se van hacia dentro.|Knees caving inwards.
+Levantar los talones.|Lifting your heels.
+Redondear la espalda abajo.|Rounding your back at the bottom.
+Pies al ancho de cadera, rodillas suaves.|Feet hip-width apart, soft knees.
+Inclínate llevando la cadera atrás con la espalda neutra.|Lean forward by pushing your hips back with a neutral spine.
+Mantén la carga pegada al cuerpo.|Keep the load close to your body.
+Vuelve arriba apretando los glúteos.|Come back up squeezing your glutes.
+Redondear la zona lumbar.|Rounding your lower back.
+Hacer una sentadilla en lugar de llevar la cadera atrás.|Squatting instead of pushing your hips back.
+Hiperextender la espalda arriba.|Overarching your back at the top.
+Da un paso largo y estable.|Take a long, stable step.
+Baja la rodilla trasera hacia el suelo.|Lower your back knee towards the floor.
+La rodilla delantera sigue la línea del pie.|Your front knee tracks over your foot.
+Empuja con el talón delantero para volver.|Push through your front heel to come back.
+Paso demasiado corto.|Step too short.
+Rodilla delantera hacia dentro.|Front knee caving in.
+Inclinar el torso en exceso.|Leaning your torso too far.
+Junta las escápulas y aprieta el abdomen.|Pull your shoulder blades together and brace your core.
+Baja controlado hasta estirar el pecho.|Lower under control until your chest stretches.
+Codos a unos 45° del cuerpo.|Elbows at about 45° from your body.
+Empuja fuerte hasta extender los brazos.|Press hard until your arms are straight.
+Codos abiertos a 90°.|Elbows flared out to 90°.
+Rebotar abajo.|Bouncing at the bottom.
+Despegar la cadera o hundirla.|Lifting or sagging your hips.
+Abdomen y glúteos firmes.|Core and glutes tight.
+Empuja por encima de la cabeza en línea recta.|Press overhead in a straight line.
+Termina con los brazos junto a las orejas.|Finish with your arms by your ears.
+Baja controlado a la altura de la barbilla.|Lower under control to chin height.
+Arquear la zona lumbar.|Arching your lower back.
+Empujar hacia delante y no arriba.|Pressing forward instead of up.
+Recorrido incompleto.|Incomplete range of motion.
+Codos ligeramente flexionados y fijos.|Elbows slightly bent and locked in place.
+Abre los brazos en arco hasta estirar el pecho.|Open your arms in an arc until your chest stretches.
+Cierra como abrazando un árbol.|Close as if hugging a tree.
+Aprieta el pecho al final.|Squeeze your chest at the end.
+Doblar y estirar los codos (se convierte en press).|Bending and straightening your elbows (it turns into a press).
+Bajar demasiado y forzar el hombro.|Going too low and straining the shoulder.
+Usar impulso.|Using momentum.
+Espalda neutra y pecho alto.|Neutral back and chest up.
+Tira llevando los codos hacia atrás.|Pull by driving your elbows back.
+Junta las escápulas al final.|Squeeze your shoulder blades at the end.
+Vuelve estirando los brazos sin perder la postura.|Return by straightening your arms without losing your posture.
+Tirar con los brazos y no con la espalda.|Pulling with your arms instead of your back.
+Encoger los hombros.|Shrugging your shoulders.
+Balancear el torso.|Swinging your torso.
+Agarre firme, hombros abajo y atrás.|Firm grip, shoulders down and back.
+Tira llevando los codos hacia las costillas.|Pull by bringing your elbows towards your ribs.
+Lleva el pecho hacia la barra.|Bring your chest towards the bar.
+Baja controlado hasta estirar los brazos.|Lower under control until your arms are straight.
+Medio recorrido.|Half reps.
+Balancearse.|Swinging.
+Encoger los hombros hacia las orejas.|Shrugging your shoulders up to your ears.
+Codos pegados a los costados.|Elbows tucked at your sides.
+Flexiona sin mover los hombros.|Curl without moving your shoulders.
+Aprieta arriba un segundo.|Squeeze at the top for a second.
+Baja lento hasta estirar.|Lower slowly until your arm is straight.
+Balancear el cuerpo.|Swinging your body.
+Adelantar los codos.|Letting your elbows drift forward.
+Bajar sin control.|Lowering without control.
+Codos fijos apuntando en una dirección.|Elbows fixed, pointing in one direction.
+Extiende completamente el brazo.|Fully straighten your arm.
+Aprieta el tríceps al final.|Squeeze your triceps at the end.
+Vuelve lento sin mover los codos.|Return slowly without moving your elbows.
+Abrir los codos.|Flaring your elbows.
+Usar el hombro para mover el peso.|Using your shoulder to move the weight.
+Recorrido corto.|Short range of motion.
+Postura erguida y abdomen firme.|Upright posture and core tight.
+Eleva sin impulso.|Raise without momentum.
+Pausa breve arriba.|Brief pause at the top.
+Baja controlado.|Lower under control.
+Subir los hombros hacia las orejas.|Lifting your shoulders towards your ears.
+Usar demasiado peso.|Using too much weight.
+Ajusta la máquina a tu rodilla.|Line the machine up with your knee.
+Extiende hasta estirar las piernas.|Extend until your legs are straight.
+Aprieta arriba.|Squeeze at the top.
+Baja lento.|Lower slowly.
+Dar golpes arriba.|Slamming at the top.
+Despegar la cadera.|Lifting your hips.
+Cadera fija.|Hips locked in place.
+Flexiona las rodillas llevando los talones al glúteo.|Bend your knees, bringing your heels to your glutes.
+Aprieta un segundo.|Squeeze for a second.
+Vuelve lento.|Return slowly.
+Levantar la cadera.|Lifting your hips.
+Pies firmes y abdomen activo.|Feet planted and core engaged.
+Empuja con los talones.|Push through your heels.
+Aprieta fuerte los glúteos arriba.|Squeeze your glutes hard at the top.
+Arquear la zona lumbar en lugar de usar el glúteo.|Arching your lower back instead of using your glutes.
+Empujar con las puntas.|Pushing through your toes.
+No llegar a la extensión completa.|Not reaching full extension.
+Postura estable.|Stable posture.
+Mueve solo las piernas.|Move only your legs.
+Pausa al final.|Pause at the end.
+Mover la cadera o el torso.|Moving your hips or torso.
+Ir demasiado rápido.|Going too fast.
+Apoya la parte delantera del pie.|Stand on the balls of your feet.
+Sube en puntas lo máximo.|Rise onto your toes as high as you can.
+Pausa arriba.|Pause at the top.
+Baja hasta estirar.|Lower until you feel the stretch.
+Rebotar.|Bouncing.
+Doblar las rodillas.|Bending your knees.
+Activa el abdomen como si fueras a recibir un golpe.|Brace your core as if you were about to take a punch.
+Mantén la respiración controlada.|Keep your breathing controlled.
+Cuida la posición de la zona lumbar.|Watch the position of your lower back.
+Prioriza la técnica sobre la cantidad.|Put technique before quantity.
+Hundir la cadera.|Letting your hips sag.
+Tirar del cuello.|Pulling on your neck.
+Contener la respiración.|Holding your breath.
+Calienta 3 a 5 minutos.|Warm up for 3 to 5 minutes.
+Mantén un ritmo que puedas sostener.|Keep a pace you can sustain.
+Respira de forma constante.|Breathe steadily.
+Termina bajando el ritmo poco a poco.|Finish by slowing down gradually.
+Empezar demasiado fuerte.|Starting too hard.
+Aterrizar duro.|Landing hard.
+No hidratarse.|Not drinking enough water.
+Levanta la carga con buena técnica.|Pick up the load with good technique.
+Camina erguido.|Walk tall.
+Hombros abajo y abdomen firme.|Shoulders down and core tight.
+Pasos cortos y controlados.|Short, controlled steps.
+Inclinarse hacia un lado.|Leaning to one side.
+Mirar al suelo.|Looking at the floor.
+Movimientos suaves y controlados.|Smooth, controlled movements.
+Aumenta el rango poco a poco.|Increase the range little by little.
+Respira tranquilo.|Breathe calmly.
+Nunca fuerces el dolor.|Never push into pain.
+Ir con prisa.|Rushing.
+Forzar articulaciones.|Forcing your joints.
+Llega a una tensión suave.|Reach a gentle tension.
+Mantén 20 a 40 segundos.|Hold for 20 to 40 seconds.
+Respira profundo para relajarte.|Breathe deeply to relax.
+Repite en ambos lados.|Repeat on both sides.
+Llegar al dolor.|Stretching into pain.
+Entra en la postura despacio.|Move into the pose slowly.
+Alinea la columna.|Align your spine.
+Respira profundo por la nariz.|Breathe deeply through your nose.
+Sal de la postura con control.|Come out of the pose with control.
+Forzar la flexibilidad.|Forcing your flexibility.
+Comparar tu postura con otros.|Comparing your pose with others.
+Activa el centro (abdomen y suelo pélvico).|Engage your centre (abs and pelvic floor).
+Movimiento lento y preciso.|Slow, precise movement.
+Coordina con la respiración.|Coordinate with your breathing.
+Mantén la pelvis estable.|Keep your pelvis stable.
+Despegar la zona lumbar.|Lifting your lower back off the floor.
+Perder la respiración.|Losing your breathing rhythm.`;
+const EN_09 = `(con lo que falla). Las nuevas en 3D llevan la etiqueta|(and what is wrong). The new 3D ones carry the label
+. Cuando termines una sección, envía tus votos.|. When you finish a section, send your votes.
+. Avisos con sonido y vibración.|. Sound and vibration cues.
+. Avisos con sonido, voz y vibración.|. Sound, voice and vibration cues.
+Abre cada ejercicio, mira la animación y márcala como|Open each exercise, watch the animation and mark it as
+Correcta|Correct
+Incorrecta|Incorrect
+✓ Correcta|✓ Correct
++ Añadir|+ Add
+Duración total:|Total time:
+tus equipos|your equipment
+: solo peso corporal|: bodyweight only
+Usaremos|We will use
+Idea, diseño y desarrollo:|Idea, design and development:
+Una app de|An app by
+PandarIA Fit · creada por Eddy · LunaDog|PandarIA Fit · made by Eddy · LunaDog
+creada por Eddy|made by Eddy
+Revisión:|Review:
+Revisión de animaciones|Animation review
+Sin revisar|Not reviewed
+Con errores|With errors
+EN REVISIÓN|IN REVIEW
+por secciones de equipo|by equipment section
+Enviar mis votos al creador|Send my votes to the creator
+Premium · menos descanso en calentamientos y más si una serie cuesta|Premium · less rest on warm-ups and more when a set is hard
+menos descanso en calentamientos y más si una serie cuesta|less rest on warm-ups and more when a set is hard
+Primer paso|First step
+Completa tu primer entrenamiento|Complete your first workout
+Constante|Consistent
+5 entrenamientos|5 workouts
+Disciplina|Discipline
+25 entrenamientos|25 workouts
+Imparable|Unstoppable
+50 entrenamientos|50 workouts
+Leyenda|Legend
+100 entrenamientos|100 workouts
+Racha de 2|2-week streak
+2 semanas seguidas entrenando|2 weeks in a row training
+Un mes firme|A solid month
+4 semanas seguidas|4 weeks in a row
+Hábito de acero|Iron habit
+12 semanas seguidas|12 weeks in a row
+Récord personal|Personal record
+Tu primer récord|Your first record
+Coleccionista|Collector
+25 récords|25 records
+10 toneladas|10 tonnes
+100 toneladas|100 tonnes
+10.000 kg de volumen total|10,000 kg of total volume
+100.000 kg de volumen total|100,000 kg of total volume
+Madrugador|Early bird
+Entrena antes de las 8:00|Train before 8:00
+Búho|Night owl
+Entrena después de las 22:00|Train after 22:00
+Me conozco|Know thyself
+Registra tus medidas|Log your measurements
+Equipo con PandarIA|Team PandarIA
+Aplica 5 sugerencias|Apply 5 suggestions
+Cada entreno te acerca al siguiente.|Every workout brings you closer to the next one.
+Abdomen y core|Abs and core
+Actualizar pesos de la rutina|Update routine weights
+Ajuste automático desactivado|Automatic adjustment off
+Anota cuántas repeticiones te quedaban|Note how many reps you had left
+Apunta a 500–600 kcal, priorizando proteína y verduras. Evita entrenos intensos hoy.|Aim for 500–600 kcal, prioritising protein and vegetables. Avoid intense workouts today.
+Ayuno libre: inícialo cuando termines tu última comida.|Free fast: start it when you finish your last meal.
+Añadir a snacks|Add to snacks
+Añadir a Snacks|Add to Snacks
+Añadir a Desayuno|Add to Breakfast
+Añadir a Almuerzo|Add to Lunch
+Añadir a Merienda|Add to Afternoon snack
+Añadir a Cena|Add to Dinner
+Barra y paralelas|Bar and parallel bars
+Biblioteca de gimnasio|Gym library
+Borrar esta copia|Delete this copy
+Borrar todos los datos|Delete all data
+Cada minuto empiezas una serie; descansas lo que sobre del minuto.|Every minute you start a set; you rest for whatever is left of the minute.
+Comidas guardadas|Saved meals
+Con aprobación médica|With medical approval
+Consulta con tu médico o matrona antes de empezar.|Check with your doctor or midwife before you start.
+Copia de seguridad de tus datos|Back up your data
+Crear ejercicio|Create exercise
+Créala basándote en lo que tengas planificado o traslada al móvil tu rutina en papel o notas.|Build it from what you have planned, or move your paper or notes routine onto your phone.
+Cómo se registra|How it is logged
+Cómo te llamamos|What should we call you
+Descanso entre tandas|Rest between blocks
+Rest entre tandas|Rest between blocks
+Después del primer trimestre evita estar mucho tiempo boca arriba. Detente si notas dolor, sangrado, mareo, falta de aire o contracciones.|After the first trimester avoid lying on your back for long. Stop if you notice pain, bleeding, dizziness, shortness of breath or contractions.
+Disco más pequeño disponible|Smallest plate available
+Disco más pequeño|Smallest plate
+Durante el ayuno puedes tomar agua, café o té sin azúcar.|While fasting you can have water, coffee or unsweetened tea.
+Días bajos|Low days
+Días en que quieres entrenar. Te avisamos al abrir la app.|Days you want to train. We remind you when you open the app.
+Ej.: Remo con toalla|E.g. Towel row
+Ejercicios (se alternan)|Exercises (they alternate)
+Ejercicios del circuito|Circuit exercises
+Ejercicios evitados|Avoided exercises
+Elige el equipo que tienes o quieres usar. El peso corporal y la esterilla siempre están incluidos.|Choose the equipment you have or want to use. Bodyweight and the mat are always included.
+Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno, PandarIA te propone la siguiente y la cambia si los músculos aún no se recuperaron (48 horas).|Choose which days you train and the order of your routines. On each training day PandarIA suggests the next one and swaps it if those muscles have not recovered yet (48 hours).
+Eliminar ejercicio propio|Delete custom exercise
+Empezar ayuno|Start fast
+Empezar ayuno ahora|Start fast now
+Entreno|Workout
+No hay entreno en curso.|No workout in progress.
+Español|Spanish
+Hoy es día bajo en calorías|Today is a low-calorie day
+La franja verde (10 a 20 series) es lo recomendado para ganar músculo. Las series de músculos secundarios cuentan como media.|The green band (10 to 20 sets) is what is recommended to build muscle. Sets for secondary muscles count as half.
+La sobrecarga progresiva es la base de las ganancias de fuerza y músculo.|Progressive overload is the foundation of strength and muscle gains.
+La técnica primero, el peso después. Una repetición limpia vale más que dos con trampa.|Technique first, weight second. One clean rep is worth more than two cheated ones.
+Las rutinas archivadas no aparecen en Mis rutinas, pero sus entrenos siguen en tu historial. Si eliminas una, su historial desaparece.|Archived routines don't appear in My routines, but their workouts stay in your history. If you delete one, its history disappears.
+Libera espacio. Se borra sola a los 60 días.|Frees up space. It deletes itself after 60 days.
+Los ejercicios que crees aparecen en la biblioteca para usarlos en cualquier rutina.|The exercises you create appear in the library so you can use them in any routine.
+Marca lo que corresponda. Tus respuestas solo se usan para decidir si el ayuno es adecuado y no se comparten.|Tick whatever applies. Your answers are only used to decide whether fasting is suitable and are never shared.
+Mi rutina propia|My own routine
+Máx. repeticiones|Max. reps
+Máximo de repeticiones por sesión|Maximum reps per session
+Músculo principal|Main muscle
+No te gusta|You don't like it
+Para empezar te sugiero 12:12 o 14:10 y subir de a poco cuando te sientas cómodo.|To start I suggest 12:12 or 14:10, and going up little by little once you feel comfortable.
+Para ganar músculo con ventanas cortas, asegúrate de llegar a tus calorías y proteína en la ventana de comida.|To build muscle with short windows, make sure you reach your calories and protein within your eating window.
+Pega el código de una rutina que te compartieron.|Paste the code of a routine someone shared with you.
+Peso y reps|Weight and reps
+Remo en mi máquina|Row on my machine
+Revisar aptitud para el ayuno|Check whether fasting suits you
+Semana sólida. La próxima, intenta una repetición más en tus ejercicios principales.|Solid week. Next week, try one more rep on your main exercises.
+Soy menor de 18 años|I am under 18
+Sueño, energía y agujetas; se puede saltar|Sleep, energy and soreness; you can skip it
+Tabata clásico: 20 s / 10 s.|Classic Tabata: 20 s / 10 s.
+Tabata, HIIT, EMOM o AMRAP con temporizador automático, avisos y registro en tu historial.|Tabata, HIIT, EMOM or AMRAP with an automatic timer, cues and logging in your history.
+Tantas rondas como puedas en el tiempo elegido.|As many rounds as you can in the chosen time.
+Te creamos una rutina inteligente para los músculos que elijas, la cual puedes editar.|We build you a smart routine for the muscles you choose, and you can edit it.
+Tengo diabetes con medicación|I have diabetes and take medication
+Tengo o tuve un trastorno de la conducta alimentaria|I have or have had an eating disorder
+Tengo otra condición médica que requiere control de comidas|I have another medical condition that requires watching my meals
+Todavía no registraste este ejercicio.|You haven't logged this exercise yet.
+Tú eliges trabajo, descanso, rondas y tandas.|You choose work, rest, rounds and blocks.
+Una caída sostenida suele indicar fatiga: revisa sueño, comida y estrés.|A sustained drop usually means fatigue: check your sleep, food and stress.
+Usamos nuestro potente algoritmo para diseñar tu rutina perfecta, te ayudaremos a mejorar y la iremos actualizando cuando sea necesario.|We use our powerful algorithm to design your perfect routine; we'll help you improve and keep it updated when needed.
+Variar el ejercicio ayuda a romper estancamientos.|Changing the exercise helps break plateaus.
+años|years
+de 16 h|of 16 h
+© 2026 LunaDog. Todos los derechos reservados.|© 2026 LunaDog. All rights reserved.
+¿Cuándo empezaste a ayunar?|When did you start fasting?
+¿Qué comida quieres guardar?|Which meal do you want to save?
+¿Qué quieres entrenar hoy?|What do you want to train today?
+Próximo entreno: mañana|Next workout: tomorrow
+Próximo entreno: hoy|Next workout: today
+Elevaciones Y-T-W boca abajo|Prone Y-T-W raises
+Elevación en Y en banco inclinado|Incline Y-raise
+Clásico: 20 s de trabajo y 10 s de descanso, 8 rondas por tanda. Puedes ajustar los tiempos.|Classic: 20 s of work and 10 s of rest, 8 rounds per block. You can adjust the times.
+Arranque sin pesas|No-weights kickoff
+Base sólida|Solid foundation
+Básicos pesados|Heavy basics
+Cardio de máquinas|Machine cardio
+Cardio y potencia|Cardio and power
+Centro de acero|Core of steel
+Centro fuerte y postura|Strong core and posture
+Circuito con pesas|Weights circuit
+Circuitos metabólicos|Metabolic circuits
+Con mancuernas|With dumbbells
+Core básico|Core basics
+Core de acero|Steel core
+Corre más y mejor|Run more and better
+Cuello y espalda en el trabajo|Neck and back at work
+Cuerpo completo con bandas|Full body with bands
+Cuerpo completo sin pesas|Full body without weights
+Full body sin pesas|Full body without weights
+Deportes de equipo|Team sports
+Día de pierna|Leg day
+Embarazo y posparto|Pregnancy and postpartum
+En casa sin pesas|At home without weights
+Entreno más cómodo|A more comfortable workout
+Equilibrio y movilidad|Balance and mobility
+Espalda sana y postura|Healthy back and posture
+Exprés total|Express full body
+Exprés tren inferior|Express lower body
+Exprés tren superior|Express upper body
+Flexibilidad y calma|Flexibility and calm
+Fortalece esos glúteos|Strengthen those glutes
+Fuerza para boxeo|Strength for boxing
+Fuerza para corredores|Strength for runners
+Fuerza para la vida real|Strength for real life
+Fuerza y equilibrio|Strength and balance
+Fuerza y potencia|Strength and power
+Funcional atlético|Athletic functional
+Funcional básico|Functional basics
+Fútbol, básquet y más|Football, basketball and more
+Glúteos en el gym|Glutes at the gym
+Glúteo a fondo|Glutes in depth
+Glúteo fuerte y firme|Strong, firm glutes
+Glúteo y pierna con bandas|Glutes and legs with bands
+Intervalos de carrera|Running intervals
+Kettlebell básico|Kettlebell basics
+Levanta más|Lift more
+Mayores de 60|Over 60
+Muévete mejor|Move better
+Máquinas para empezar|Machines to get started
+Pausa activa de 5 minutos|5-minute active break
+Pausas activas en la oficina|Active breaks at the office
+Piernas para empezar|Legs to get started
+Pilates básico|Pilates basics
+Pilates clásico|Classic Pilates
+Posparto: reconexión del core|Postpartum: reconnecting your core
+Potencia y cambio de dirección|Power and change of direction
+Preparación para correr|Running preparation
+Prevención de lesiones|Injury prevention
+Principiante desde cero|Beginner from scratch
+Quema de grasa|Fat burn
+Reto sin pesas|No-weights challenge
+Running y preparación física|Running and conditioning
+Rutinas de gimnasio|Gym routines
+Rutinas exprés 15 min|15-min express routines
+Semana 1: conoce tu cuerpo|Week 1: get to know your body
+Semana 3: más confianza|Week 3: more confidence
+Sin excusas|No excuses
+Solo tu cuerpo|Just your body
+Tu primer mes|Your first month
+Yoga desafío|Yoga challenge
+Yoga para empezar|Yoga to get started
+5 minutos sin cambiarte|5 minutes, no need to change
+Adiós dolores|Goodbye aches
+Historial de cambios|Change history
+Acerca de|About
+Créditos|Credits
+Tus datos|Your data
+Nutrición|Nutrition
+Mis rutinas|My routines
+Avisos por voz|Voice cues
+Vibración|Vibration
+Sonidos de la app|App sounds
+Hora del aviso|Reminder time
+Descanso por defecto|Default rest
+Apariencia y accesibilidad|Appearance and accessibility
+Durante el entreno|During the workout
+Exportar copia de seguridad|Export backup
+Importar copia de seguridad|Import backup
+Exportar entrenos a Excel (CSV)|Export workouts to Excel (CSV)
+Datos de antes de actualizar|Data from before the update
+Tus datos se guardan solo en este dispositivo.|Your data is stored only on this device.
+Ciencia de PandarIA|PandarIA science
+Consejos del día|Tips of the day
+Día anterior|Previous day
+Día siguiente|Next day
+Girar la vista|Rotate view
+Cámara lenta|Slow motion
+Pantalla de descanso grande|Large rest screen
+Fin del descanso y siguiente ejercicio|End of rest and next exercise
+Toques, series, récords y logros|Taps, sets, records and achievements
+Sonidos y detalles|Sounds and details
+Confeti, transiciones y efectos|Confetti, transitions and effects
+Esfuerzo por serie (RIR)|Effort per set (RIR)
+Check-in antes de entrenar|Check-in before training
+Aviso cada lunes con el resumen de tu semana|A reminder every Monday with your week summary
+Cuenta regresiva en ejercicios de tiempo|Countdown on timed exercises
+Periodización por bloques|Block periodisation
+Ciclos de volumen, intensidad y descarga|Volume, intensity and deload cycles
+En Mis rutinas|In My routines
+Versión 0.9|Version 0.9
+Primera versión|First version
+Pulido: cero errores, copia en Google Drive, inglés completo y más alimentos (en desarrollo)|Polish: zero errors, Google Drive backup, full English and more foods (in development)
+Nutrición completa y PandarIA con evidencia|Complete nutrition and evidence-based PandarIA
+Animaciones en 3D: todos los ejercicios|3D animations: every exercise
+Animaciones nuevas y descanso por serie|New animations and rest per set
+Progreso, nutrición y comunidad|Progress, nutrition and community
+Figuras animadas que muestran cada ejercicio|Animated figures showing every exercise
+12 equipos nuevos en Mis equipos: Smith, landmine, barra hexagonal, barra Z, banco GHD, trineo, balón medicinal, fitball, cuerdas de batalla, escaladora, SkiErg y air bike|12 new items in My equipment: Smith, landmine, hex bar, EZ bar, GHD bench, sled, medicine ball, stability ball, battle ropes, stair climber, SkiErg and air bike
+176 ejercicios nuevos: 386 en total, casi todos de máquinas, Smith, poleas y accesorios de gimnasio|176 new exercises: 386 in total, almost all machines, Smith, cables and gym accessories
+52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)|52 machines approved in review and 12 fixed: rollers and pads in place (leg curl, leg extension, T-bar row, presses, glute hyperextension)
+95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)|95 animations approved in review and 23 fixed (woodchops, pull-throughs, close-grip pulldowns, triceps extensions, benches that no longer pass through the body, a Smith bar that stays put and no jumps on the way up)
+Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora|Water: drinks in your diary (coffee, tea, milk, juice, soft drinks) count towards your goal, an «Other drink» button, today's caffeine against the EFSA limit, and more water on workouts longer than 1 hour
+Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia|Settings › Your data: Save now, Restore, Sign out and Delete my copy
+Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre|Animations redone one by one: a character with a real body, bigger and better framed
+Animaciones: confeti, transiciones de pestaña y anillos animados|Animations: confetti, tab transitions and animated rings
+Arreglo: las notas y la importación con código no se guardaban|Fix: notes and code imports were not being saved
+Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas|Shortcuts: less rest on warm-ups, more rest before the last sets, and make them all equal
+Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo|Fasting linked to the diary: start from your last logged meal, see today's eating window and, if you log food while fasting, PandarIA offers to end the fast
+Ayuno: elegir la hora de inicio si empezaste antes|Fasting: choose the start time if you began earlier
+Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %|Lose fat at your pace: slow, normal or fast (0.5 to 1% of body weight per week), with a safety limit; to build muscle, +5, +10 or +15%
+Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale|Safe foundation: automatic tests check every version before the APK is built; if a PandarIA calculation changes by accident, the version is not released
+Biblioteca clasificada por músculo, con filtro por tipo de equipo y búsqueda por apodos (mariposa, multipower, gravitron…)|Library sorted by muscle, with an equipment filter and search by nicknames (butterfly, multipower, gravitron…)
+Biblioteca de ejercicios con ficha, buscador y ejercicios propios|Exercise library with details, search and your own exercises
+Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)|Evidence library 1.2: 16 new rules with their sources (ISSN, EFSA, WHO and ACSM)
+Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia|Evidence library: the numbers PandarIA uses (sets, rests, loads, calories, protein, water, safety) live in one place, each with its source and level of evidence
+Bienvenida en 4 pasos con perfil: edad, sexo, nivel y lesiones|4-step welcome with profile: age, sex, level and injuries
+Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales|New welcome: short screens with a progress bar, «Continue with Google» or «Use without an account», your name, details about you with «Not now», where you train and the optional permissions
+Botones +/− para peso y repeticiones|+/− buttons for weight and reps
+Botón «Fijar» para guardar el descanso que ajustaste con +15/−15|«Save» button to keep the rest you adjusted with +15/−15
+Botón ⟲ en la ficha para girar la vista|⟲ button on the exercise page to rotate the view
+Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves|Diet quality in the diary (Premium): fibre against the EFSA's 25 g, sodium against the WHO's 2 g and meals with enough protein, with gentle tips
+Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D|3D cardio: 31 exercises with their machines (regular, incline and curved treadmills, stationary, spin, recumbent and air bikes, elliptical, arc trainer, rower, SkiErg, stair climber, stepper, VersaClimber, sled and battle ropes) plus the bodyweight ones (burpees, jumps, jump rope, boxing, mountain climbers, bear crawl…). No 2D animations are left
+Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave|Check-in that matters: if you slept badly or have low energy, the suggested load drops 10%; «Up today» flags your recovery and offers an easy start
+Compartir entrenos como imagen y rutinas con código corto|Share workouts as an image and routines with a short code
+Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo|Automatic pose checks: knees and elbows never bend backwards and nothing goes through the floor
+Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos|Backup in your Google Drive (optional): it saves itself after each workout and once a day, in a hidden folder of your own Drive that nobody else sees; the app cannot see your other files
+Corregidas también las aperturas con mancuernas y los cruces de poleas|Dumbbell flyes and cable crossovers fixed too
+Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)|Protein text fixed: the ISSN recommends 1.4–2.0 g/kg if you train (it used to say 1.6–2.2)
+Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)|Fixed: when you plateau, PandarIA no longer suggests a much easier exercise (for example wall push-ups instead of bench press)
+Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más|Odd movements fixed (back extensions, superman, side-lying leg raise, dead hang, dips, farmer's walk…) and new dedicated movements for diamond, archer, Arnold, T-bar row, sissy, reverse Nordic and many more
+Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)|Create your foods from the label and your recipes by servings (10 free, unlimited with Premium)
+Crear, editar y archivar rutinas|Create, edit and archive routines
+Créditos e historial de cambios en Ajustes|Credits and change history in Settings
+Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías|Impossible values blocked: age 12 to 100, height 100 to 230 cm, weight 30 to 300 kg and measurements with their limits; a typo no longer sends your calories through the roof
+Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»|Different rest for each set: tap it and choose «This set only» or «All sets»
+Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España|Food diary in Nutrition: breakfast, lunch, afternoon snack, dinner and snacks, with 597 foods that work offline (USDA data, public domain) and names from Uruguay, Argentina, Cuba, Mexico and Spain
+Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez|During intervals, −10 s and +10 s buttons on every rest; the change applies to the following rests and is remembered for next time
+Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro|Sample menus (Premium): a day of meals with your calories, your protein, your diet and your allergies; add it to the diary with one tap or ask for another
+Ejercicios propios: puedes elegir una animación parecida|Custom exercises: you can pick a similar animation
+El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos|History stores the actual rest of every set and routine codes include the rests
+En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días|In Settings › Your data you can go back to your data from before the update or delete that copy; it deletes itself after 60 days
+En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos|On the exercise page: pause, slow motion, movement phase (down, up, push…) and a «Hold» ring on static exercises
+En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium|On a new phone, when you sign in, PandarIA finds your copy and restores it: workouts, routines, diary, measurements, photos and Premium
+Esfuerzo percibido (RIR) por serie|Perceived effort (RIR) per set
+Fotos de progreso lado a lado y exportación a CSV|Side-by-side progress photos and CSV export
+Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35|Progress photos: up to 40. Past 40 the oldest is deleted, but the first one is always kept for comparison; warning from photo 35
+Health Connect: guarda también las calorías de tus comidas y el agua (Premium)|Health Connect: also saves the calories of your meals and your water (Premium)
+Historial: calendario, récords, gráficas, medidas, logros y mapa muscular|History: calendar, records, charts, measurements, achievements and muscle map
+Informe semanal con tus minutos de actividad frente a la meta de la OMS|Weekly report with your activity minutes against the WHO goal
+Inglés, texto grande y alto contraste|English, large text and high contrast
+Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas|All 64 machines rebuilt from real machines: seat, backrest, levers with their pivot, rollers, weight stack, rails and platforms
+Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones|Fixed animations show up as pending again in Animation review
+Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento|Hands and feet stay on the handles, rollers and platforms throughout the movement
+Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas|Held positions (planks, stretches, yoga) breathe gently instead of freezing
+Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)|Water goal recalibrated with the EFSA reference (it no longer shoots up for larger people)
+Metas con fecha, informe semanal y gráfica de series por músculo|Dated goals, weekly report and sets-per-muscle chart
+Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario|Habits mode: log without seeing calories or numbers; it turns on by itself if you ticked an eating disorder in the fasting check
+Modo intervalos: Tabata, HIIT, EMOM y AMRAP|Interval mode: Tabata, HIIT, EMOM and AMRAP
+Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata|Interval mode: you can now change the rest between sets in every format, Tabata included
+Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia|Travel mode: from «Up today» or Change, do your routine without equipment (bodyweight only, with bands, with TRX or in a hotel gym); PandarIA swaps each exercise for one that works the same muscle and your routine stays as it is
+Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca|New PandarIA science screen in Settings › About, with the 37 rules, their sources and the Library history
+Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale|New automatic test: before each version is built, about 780 buttons across all tabs are tapped in Spanish and in English; if one fails, the version is not released
+Nueva sección de Explorar: Solo máquinas, con 5 rutinas|New Explore section: Machines only, with 5 routines
+Nuevas secciones de Explorar: running, boxeo, deportes, oficina y embarazo|New Explore sections: running, boxing, sports, office and pregnancy
+Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica|New 3D animation engine: the body has real depth and each exercise is shown from the angle that explains it best
+Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías|Self-adjusting target (Premium): with 10 days of diary and two weigh-ins, PandarIA estimates your real expenditure and corrects your calories
+Pantalla de entrenamiento y ventana de Terminar rutina con intensidad|Workout screen and Finish routine window with intensity
+Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates|3D bodyweight: 128 new exercises with their equipment (pull-up bar, parallel bars, rings and TRX, bands, bench, box, chair, wall and mat): push-ups and dips, pull-ups, core, legs and glutes, mobility, stretches, yoga (with a flowing sun salutation) and Pilates
+Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado|3D free weights: 109 exercises with barbell, dumbbells, kettlebell, EZ bar, hex bar, landmine, medicine ball and stability ball, side-lying ones included
+Pestaña Nutrición: calorías, proteína, agua y ayuno intermitente supervisado|Nutrition tab: calories, protein, water and supervised intermittent fasting
+Pestañas Mis rutinas, Explorar, Mi historial y Ajustes, en tema oscuro|My routines, Explore, My history and Settings tabs, in a dark theme
+Plan semanal con "Hoy toca" y check-in antes de entrenar|Weekly plan with "Up today" and a check-in before training
+Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja|3D cables and Smith: 54 exercises with their cable tower, cable, rope or bar, and the guided bar that only goes up and down
+Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas|Household portions (cup, unit, slice, tablespoon…) or grams, recent, favourites, copy the previous day and saved meals
+Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja|Preferences: vegetarian or vegan and allergies (milk, egg, gluten, peanut, tree nuts, soy, fish, shellfish, sesame); PandarIA warns you when something doesn't fit
+Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual|Premium with your account: account unlock codes (PA-) work on any phone where you sign in; phone codes (PF-) work as before
+Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó|Premium: PandarIA shortens warm-up rests and adds 30 s when a set was hard
+Premium: músculos que trabajan resaltados en la animación|Premium: working muscles highlighted in the animation
+Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes|People who already had the app see a short card once to connect Google; if they say «Not now», it stays in Settings
+Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana|Logging is free; with Premium you compare the day with your calorie and macro target and see your week
+Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo|Rules that change results (Library 1.1): 2 minutes of rest on weighted compound lifts when the goal is building muscle
+Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo|Review 3: 160 animations approved and 67 fixed. Benches and mats no longer pass through the body; on deadlifts the bar rises in front of the legs; the EZ bar has its real shape; on wrist curls only the wrist moves; Arnold press, Cuban press, clean, halo and Turkish get-up with the real movement and no jumps; walking lunges alternating legs; inverted row with the heels fixed; ab wheel rollout without leaving the floor
+Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla|Review 4: 218 animations approved. Deadlifts redone with real biomechanics: the feet don't move, the knees straighten first and then the hips, and the bar rises in a straight line sliding close to the legs without passing through them or jerking. Kettlebell halo: the forearms pass over the head without touching it
+Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza|Review 5: 322 approved and 33 fixed. Mats, benches and pads no longer pass through the body; truly straight arms on hundred, saw, roll up, teaser and jumps; correct elbows on face pulls and Y-T-W; knees no longer twist on leg raises or the dead bug; sun salutation with a lunge step back and chaturanga; dragon flag, muscle-up, sissy, Copenhagen and joint mobility (now with 8 movements) redone; halo without touching the head
+Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje|Animation review 6: smoother mountain climbers and burpees at a human pace; the jump rope goes over the head and under the feet; sprint without cuts; skater jumps with smooth transitions; box jump with drive, flight, landing and stepping down one leg at a time; shadow boxing without crossed legs; elliptical moving forwards; ball with drop, bounce and pick-up; stair climber with visible steps; ropes whose wave travels to the anchor
+Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos|Animation review in Explore, by equipment section: mark each one as correct or incorrect and send your votes
+Rutinas de PandarIA con orden lógico de ejercicios|PandarIA routines with a logical exercise order
+Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio|Every exercise shows its equipment: weights, benches, machines, cables with their wire, bands, bars and cardio machines
+Sello «En revisión» en las animaciones que todavía no están aprobadas|«In review» stamp on animations that are not approved yet
+Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord|Sets: negative numbers are not accepted and, if you enter a weight, reps or a time far above your history (for example 1000 kg instead of 100), PandarIA asks before saving it as a record
+Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges|If two phones have different data, nothing is ever overwritten: the app shows you both copies and you choose
+Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual|If storage fills up, the app frees space (first the pre-update copy, then the oldest photos) and your workouts are still saved
+Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo|If a weigh-in changes a lot from the previous one, the app asks whether it is right before saving it
+Sonidos en series, récords, logros, agua y ayuno|Sounds for sets, records, achievements, water and fasting
+Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)|Evidence-based supplements in Nutrition: creatine, caffeine, beta-alanine and protein powder, with the dose for your weight, the level of evidence and warnings if you are pregnant, have high blood pressure, kidney or heart problems, or take medication (no doses for minors)
+Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones|Temporary during development: new-version notice in My routines with the changes and a button to download it; in Settings, the exact version number and Check for updates
+Texto más claro para quien tiene más rutinas que el límite gratis|Clearer text for people with more routines than the free limit
+Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale|Tap the reason for a suggestion, or «See source» on a tip or in Nutrition, to see where it comes from
+Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno|Everything new in 0.8 in English: the diary and the names of all 597 foods, PandarIA science with its 53 rules, supplements, menus, Health Connect and fasting
+Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban|Your data carries a version number and, before updating it, the app saves an exact copy of how it was
+Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador|Test version: «Is it clear?» button on each animation to send your votes to the creator
+Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas|Free version: up to 3 routines at a time including archived ones (to create another you have to delete one); unlimited with Premium
+Etapa 1|Stage 1
+Etapa 2|Stage 2
+Etapa 3|Stage 3
+Etapa 4|Stage 4
+Etapa 5|Stage 5
+¡Entreno completado! Buen trabajo.|Workout complete! Great job.
+¡Ya!|Go!
+Descanso terminado|Rest over
+¡Adelante! Máximo de rondas|Go! As many rounds as you can
+Prepárate|Get ready
+Último minuto|Last minute
+¡Terminaste! Gran trabajo.|You finished! Great work.
+¡Meta cumplida! Crea una nueva para seguir avanzando.|Goal reached! Create a new one to keep progressing.
+Necesito al menos 2 registros para proyectar tu ritmo.|I need at least 2 entries to project your pace.
+Versión nueva|New version
+Tienes|You have
+Nueva|New
+Cambios y correcciones|Changes and fixes
+Descargar e instalar|Download and install
+Más tarde|Later
+Saltar esta versión|Skip this version
+Tienes la última versión.|You have the latest version.
+Tienes la última versión|You have the latest version
+Qué hay de nuevo|What's new
+Entendido|Got it
+Toca para ver qué hay de nuevo|Tap to see what's new
+Sin notas para esta versión|No notes for this version
+No te avisaré de esta versión|I won't tell you about this version
+Avisos de versión activados|Version notices on
+Avisos de versión desactivados|Version notices off
+Buscando…|Checking…
+No se pudo comprobar. Revisa tu conexión.|Couldn't check. Check your connection.
+Solo funciona en la app instalada|Only works in the installed app
+Buscar actualizaciones|Check for updates
+Se descarga el archivo PandarIA-Fit.apk. Ábrelo e instálalo encima: tus rutinas y tu historial se conservan. La primera vez Android puede pedirte permitir "Instalar apps desconocidas" para tu navegador.|The PandarIA-Fit.apk file is downloaded. Open it and install it over the current app: your routines and history are kept. The first time, Android may ask you to allow "Install unknown apps" for your browser.
+↓ Baja|↓ Down
+↑ Sube|↑ Up
+Baja|Down
+Sube|Up
+Abre|Open
+Adelante|Forward
+Aprieta|Squeeze
+Arquea|Arch
+Atrás|Back
+Baja lento|Lower slowly
+Cierra|Close
+Contrae|Contract
+Empuja|Push
+Estira|Stretch
+Extiende|Extend
+Flexiona|Bend
+Gato|Cat
+Gira|Turn
+Gira y empuja|Turn and press
+Golpea|Strike
+Guardia|Guard
+Impulsa|Drive
+Junta|Bring together
+Lanza|Throw
+Levántate|Stand up
+Recoge|Pick up
+Redondea|Round
+Siéntate|Sit
+Sube rápido|Up fast
+Sube y empuja|Up and press
+Sube y lanza|Up and throw
+Suelta|Release
+Tira|Pull
+Vaca|Cow
+Vuelve|Return
+A una hora fija, si no estás ayunando|At a set time, if you are not fasting
+Activar Premium|Activate Premium
+Agua inteligente|Smart water
+Agua y fases del ayuno no suenan; el resto se mueve al final. El fin del descanso siempre avisa.|Water and fasting phases stay silent; the rest moves to the end. The end of a rest always alerts you.
+Al llegar a las horas de tu plan|When you reach your plan's hours
+Alimentos y recetas sin límite|Unlimited foods and recipes
+Antes de que cierre y cuando toca volver a ayunar|Before it closes and when it's time to fast again
+Aprobadas|Approved
+Apto|Suitable
+Avisar antes del cierre|Remind me before it closes
+Avisar|Remind me
+Avisos más espaciados por si quieres beber de más|More spaced reminders in case you want to drink extra
+Avisos por voz activados|Voice cues on
+Buscar: palta, frijoles, pan…|Search: avocado, beans, bread…
+Calidad de la dieta y menús|Diet quality and menus
+Calistenia avanzada|Advanced calisthenics
+Calistenia base|Calisthenics basics
+Calistenia intermedia|Intermediate calisthenics
+Calorías y macros|Calories and macros
+Claro|Light
+Oscuro|Dark
+Sistema|System
+Tema|Theme
+Clave:|Key:
+Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.|Comparing your diary with your calorie and macro target, and seeing your week, is part of Premium.
+Compartir|Share
+Comprar|Buy
+Crear alimento|Create food
+Crear receta|Create recipe
+Cuando hay mejoras para tus rutinas|When there are improvements for your routines
+CÓDIGO DE DESBLOQUEO|UNLOCK CODE
+TU CÓDIGO DE TELÉFONO|YOUR PHONE CODE
+Desbloquea PandarIA completo y más|Unlock the full PandarIA and more
+Disponible con PandarIA Fit Premium.|Available with PandarIA Fit Premium.
+Día del aviso|Reminder day
+Días|Days
+Ejercicios propios ilimitados|Unlimited custom exercises
+El día 1 de cada mes|On the 1st of every month
+Elige los días abajo|Choose the days below
+Elige uno o varios.|Choose one or more.
+En casa|At home
+En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.|In the free version you can have up to 3 routines, counting archived ones. To create another, delete one (in My routines or Settings › Archived) or go Premium.
+En la versión gratis, hasta 10. Registrar comidas es gratis.|In the free version, up to 10. Logging meals is free.
+En la versión gratis, hasta 3 (contando las archivadas).|In the free version, up to 3 (counting archived ones).
+En la versión gratis, hasta 5.|In the free version, up to 5.
+Entrena donde sea|Train anywhere
+Entreno, agua, ayuno y más|Workouts, water, fasting and more
+Enviar correo al creador|Email the creator
+Espalda sana|Healthy back
+Esta rutina es parte de Premium.|This routine is part of Premium.
+Este modo de intervalos es parte de Premium.|This interval mode is part of Premium.
+Estoy embarazada o en lactancia|I am pregnant or breastfeeding
+Fases (siguen después de tu meta)|Phases (they continue after your goal)
+Fibra, sodio y proteína por comida en tu diario, y ejemplos de menú con tus calorías, tu alimentación y tus alergias.|Fibre, sodium and protein per meal in your diary, and sample menus with your calories, your diet and your allergies.
+Fin del descanso|End of rest
+Frecuencia|Frequency
+Fuente|Source
+Fuerza pura|Pure strength
+Full body en casa|Full body at home
+Glutes en casa|Glutes at home
+Glúteos en casa|Glutes at home
+Legs en casa|Legs at home
+Piernas en casa|Legs at home
+Upper body en casa|Upper body at home
+Tren superior en casa|Upper body at home
+Torso en casa|Upper body at home
+Funcional|Functional
+Gráficas de progreso|Progress charts
+Gráficas, series por músculo, informes semanales, desequilibrios y metas con fecha.|Charts, sets per muscle, weekly reports, imbalances and dated goals.
+Guarda fotos y compáralas lado a lado.|Save photos and compare them side by side.
+HIIT 15 minutos|15-minute HIIT
+HIIT, EMOM y AMRAP personalizados.|Custom HIIT, EMOM and AMRAP.
+Hora|Time
+Horas de silencio|Quiet hours
+Informe semanal 🔒|Weekly report 🔒
+Informes semanales|Weekly reports
+Informes 🔒|Reports 🔒
+Interruptor general de todos los avisos|Master switch for all reminders
+Intervalos intensos|Intense intervals
+Intervalos sin límite|Unlimited intervals
+Kettlebell maestro|Kettlebell master
+Kettlebell potencia|Kettlebell power
+Las calorías y macros son parte de Premium.|Calories and macros are part of Premium.
+Las rutinas diseñadas por PandarIA son parte de Premium.|Routines designed by PandarIA are part of Premium.
+Los ejemplos de menú hechos con tus calorías y tus preferencias son parte de Premium.|Sample menus built with your calories and your preferences are part of Premium.
+Mejor tiempo|Best time
+Meta cumplida|Goal reached
+Metas con fecha|Dated goals
+Metas 🔒|Goals 🔒
+Mira en rojo qué músculos trabajan en cada ejercicio, y descansos ajustados por PandarIA en cada serie.|See in red which muscles work in each exercise, and rests adjusted by PandarIA on every set.
+Músculos en las animaciones|Muscles in the animations
+No avisa si bebiste en la última hora y te dice si vas atrasado|Skips the reminder if you drank in the last hour and tells you if you are behind
+Notificaciones|Notifications
+PROBAR|TRY
+Pago una sola vez con las mejoras futuras incluidas, o una suscripción mensual.|Pay once with future improvements included, or a monthly subscription.
+Pago único|One-time payment
+Pasos, peso y pulso de Samsung Health|Steps, weight and heart rate from Samsung Health
+Pega aquí el código que te enviaron (empieza por PFU-)|Paste the code you were sent here (it starts with PFU-)
+Pega primero el código de desbloqueo|Paste the unlock code first
+Pilates avanzado|Advanced Pilates
+Postura perfecta|Perfect posture
+Progreso a fondo|In-depth progress
+Progreso 🔒|Progress 🔒
+Prueba|Test
+Próximamente.|Coming soon.
+Próximos avisos|Upcoming reminders
+Pura calistenia|Pure calisthenics
+Quema suave|Gentle burn
+Qué incluye|What's included
+Racha en riesgo|Streak at risk
+Recordatorio de copia de seguridad|Backup reminder
+Recordatorio de entreno|Workout reminder
+Recordatorio diario para empezar|Daily reminder to start
+Registra algo primero|Log something first
+Repartidos en tu horario|Spread across your schedule
+Resumen de tu semana|Your week summary
+Rutina por grupo muscular y plan semanal completo «Confía en PandarIA».|Routine by muscle group and the full «Trust PandarIA» weekly plan.
+Rutinas de nivel Medio y Difícil, y Fuerza pura, Kettlebell, Running y Boxeo.|Medium and Hard routines, plus Pure strength, Kettlebell, Running and Boxing.
+Rutinas ilimitadas|Unlimited routines
+Seguir tras la meta|Keep going after the goal
+Si sales de la app durante un descanso o una serie por tiempo|If you leave the app during a rest or a timed set
+Si te falta entrenar al acabar la semana|If you still have training left when the week ends
+Silenciar por la noche|Mute at night
+Sin anuncios, nunca. Entrenar, la biblioteca de ejercicios, el agua y el ayuno son gratis para siempre.|No ads, ever. Training, the exercise library, water and fasting are free forever.
+Sube pesos y repeticiones por ti, detecta estancamientos, renueva tus rutinas y planifica bloques y descargas.|Raises weights and reps for you, spots plateaus, refreshes your routines and plans blocks and deloads.
+Sugerencia aplicada|Suggestion applied
+Sugerencias de PandarIA 🔒|PandarIA suggestions 🔒
+Suscripción|Subscription
+Tiempo disponible:|Time available:
+Todas|All
+Todo Explorar|All of Explore
+Tu objetivo diario de calorías y macros, y tu diario de comidas comparado con él, día a día y semana a semana.|Your daily calorie and macro target, and your food diary compared with it, day by day and week by week.
+Tus datos siempre son tuyos: exportar, copias de seguridad, accesibilidad y seguridad nunca se bloquean.|Your data is always yours: export, backups, accessibility and safety are never locked.
+Ventana de comida|Eating window
+Volver a esos datos|Go back to that data
+Yoga fluido|Flowing yoga
+hazte Premium|go Premium
+sólida|strong
+✗ Incorrecta|✗ Incorrect
+× Incorrecta|× Incorrect
+🔒 Músculos que trabajan|🔒 Working muscles
+Músculos que trabajan|Working muscles
+Boxeo|Boxing
+Cardio boxeo|Cardio boxing
+Embarazo: fuerza suave|Pregnancy: gentle strength
+Estiramiento total|Full stretch
+Fuerza suave|Gentle strength
+Fuerza 5×5 A|Strength 5×5 A
+Fuerza 5×5 B|Strength 5×5 B
+HIIT extremo|Extreme HIIT
+Desde|From
+Hasta|Until
+En punto|On the hour
+Equipo|Equipment
+Ayuno|Fasting
+Semana de descarga|Deload week
+Tu recuperación necesita atención|Your recovery needs attention
+En varios check-in marcaste poco sueño o poca energía. Prioriza dormir 7 a 9 horas y, si sigue así, haz una semana más liviana.|In several check-ins you reported little sleep or low energy. Prioritise 7 to 9 hours of sleep and, if it continues, make the week lighter.
+Llevas varias semanas apretando. Una semana con menos peso ayuda a recuperarte y volver más fuerte.|You've been pushing hard for several weeks. A week with less weight helps you recover and come back stronger.
+Principal:|Main:
+Secundarios:|Secondary:
+¿No puedes pagarlo? Pídeselo al creador|Can't afford it? Ask the creator
+Descanso solo de esta serie|Rest for this set only
+Sin descanso|No rest
+sin descanso|no rest
+Ahora|Now
+Lo de la última vez|Same as last time
+Mancuernas, banco y bandas|Dumbbells, bench and bands
+Mancuernas, kettlebell, bandas, barra de dominadas|Dumbbells, kettlebell, bands, pull-up bar
+Solo tu cuerpo y una esterilla|Just your body and a mat
+Todo el equipo de un gimnasio|All the equipment of a gym
+No marcaste ninguna serie como completada. Toca ✓ en cada serie que hagas para guardarla.|You didn't mark any set as completed. Tap ✓ on each set you do to save it.
+No se guarda nada.|Nothing is saved.
+No se guardará nada de esta sesión.|Nothing from this session will be saved.
+¿Descartar entreno?|Discard workout?
+Ajustes › Tus datos: guardar, recuperar, cerrar sesión y borrar la copia|Settings › Your data: save, restore, sign out and delete the copy
+Bienvenida nueva, con «Continuar con Google» o «Usar sin cuenta»|New welcome, with «Continue with Google» or «Use without an account»
+Copia automática en tu Google Drive (opcional y privada)|Automatic backup in your Google Drive (optional and private)
+En un teléfono nuevo recuperas entrenos, rutinas, diario, fotos y Premium|On a new phone you get back your workouts, routines, diary, photos and Premium
+Nunca se pisan datos sin preguntarte|Data is never overwritten without asking you
+Premium con tu cuenta: funciona en cualquier teléfono|Premium with your account: works on any phone
+tu cuenta de Google|your Google account
+Etapa 3 · Inglés completo: toda la app en inglés, también los 386 consejos de ejercicio, la técnica paso a paso, Explorar, el historial de cambios, los logros y los avisos del teléfono|Stage 3 · Full English: the whole app in English, including the 386 exercise tips, the step-by-step technique, Explore, the change history, achievements and phone notifications
+La voz de los entrenos, los avisos del teléfono, la notificación del entreno en curso y los widgets hablan en el idioma que elijas|Workout voice cues, phone notifications, the ongoing-workout notification and the widgets speak the language you choose
+En inglés los números y las fechas van al estilo inglés (1,910 kcal · 80.6 kg · November 12)|In English, numbers and dates use English style (1,910 kcal · 80.6 kg · November 12)
+Nueva prueba automática: en inglés, si queda algún texto en español en las pantallas, la versión no sale|New automatic test: in English, if any Spanish text is left on the screens, the version is not released
+Arreglo: más espacio arriba para la cámara y la barra de estado (notch) en todas las pantallas|Fix: more room at the top for the camera and the status bar (notch) on every screen
+Arreglo: al tocar «Buscar actualizaciones» se abre directamente la versión nueva, aunque antes hubieras elegido «Más tarde» o «Saltar esta versión»; el aviso también aparece en Ajustes|Fix: tapping «Check for updates» opens the new version directly, even if you had chosen «Later» or «Skip this version» before; the notice also appears in Settings
+Toda la app en inglés, también consejos de ejercicio, técnica, Explorar y logros|The whole app in English, including exercise tips, technique, Explore and achievements
+La voz, los avisos del teléfono y los widgets en tu idioma|Voice, phone notifications and widgets in your language
+Números y fechas al estilo inglés|English-style numbers and dates
+Más espacio arriba para el notch en todas las pantallas|More room at the top for the notch on every screen
+«Buscar actualizaciones» abre directamente la versión nueva|«Check for updates» opens the new version directly
+inglés completo|full English
+PandarIA: progresión en vivo, rutinas por grupo muscular, Confía en PandarIA, sugerencias cada 3 entrenos y renovación cada 15|PandarIA: live progression, routines by muscle group, Trust PandarIA, suggestions every 3 workouts and a refresh every 15
+PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Solo funcionará en este teléfono; si borras la app tendrás que pedirlo de nuevo. Si inicias sesión con Google en Ajustes › Tus datos, funcionará en cualquier teléfono con tu cuenta.|PandarIA Fit is a personal project. If you can't pay, write to me and I'll give it to you. It will only work on this phone; if you delete the app you'll have to ask again. If you sign in with Google in Settings › Your data, it will work on any phone with your account.
+PandarIA basa sus recomendaciones en guías del American College of Sports Medicine (ACSM) y la National Strength and Conditioning Association (NSCA) para fuerza, la Organización Mundial de la Salud (OMS) para actividad física y la International Society of Sports Nutrition (ISSN) para nutrición. No reemplaza a un profesional de la salud.|PandarIA bases its recommendations on guidelines from the American College of Sports Medicine (ACSM) and the National Strength and Conditioning Association (NSCA) for strength, the World Health Organization (WHO) for physical activity and the International Society of Sports Nutrition (ISSN) for nutrition. It does not replace a health professional.
+PandarIA e informes|PandarIA and reports
+PandarIA evitará este ejercicio al crear rutinas.|PandarIA will avoid this exercise when building routines.
+PandarIA evitará los ejercicios que cargan esas zonas. Si tienes dolor, consulta a un profesional de la salud.|PandarIA will avoid exercises that load those areas. If you are in pain, see a health professional.
+PandarIA no usará estos ejercicios al crear rutinas. Márcalos desde la ficha de cada ejercicio.|PandarIA won't use these exercises when building routines. Mark them from each exercise's page.
+PandarIA sugiere en gris|PandarIA suggests in grey
+PandarIA usa estos datos para elegir ejercicios, estimar pesos iniciales, ajustar descansos y calcular tu nutrición. Todo es opcional y se queda en tu teléfono.|PandarIA uses this data to choose exercises, estimate starting weights, adjust rests and calculate your nutrition. Everything is optional and stays on your phone.
+PandarIA: incrementos y peso inicial según el tipo de equipo, y lesiones del perfil actualizadas con los ejercicios nuevos|PandarIA: increments and starting weight by equipment type, and profile injuries updated with the new exercises
+PandarIA: periodización por bloques y semanas de descarga|PandarIA: block periodisation and deload weeks
+PandarIA: prioriza máquinas y Smith para principiantes y más peso libre para avanzados|PandarIA: favours machines and Smith for beginners and more free weights for advanced lifters
+PandarIA: si un ejercicio te molesta, ofrece primero la versión en máquina|PandarIA: if an exercise bothers you, it offers the machine version first
+PandarIA: sugiere pasar de la versión guiada al peso libre cuando ya progresas|PandarIA: suggests moving from the guided version to free weights once you progress`;
+const enN=x=>{ x=String(x).trim(); const r=EN_MAP.get(x); if(r) return r; const t=trText(x); return t==null?x:t.trim(); };
+const enList=x=>x.split(/, | y /).map(enN).join(', ');
+const EN_MED={Peso:'Weight',Cintura:'Waist',Cadera:'Hips',Pecho:'Chest',Brazo:'Arm',Muslo:'Thigh',Cuello:'Neck',Hombros:'Shoulders',Pantorrilla:'Calf',Grasa:'Body fat',Glúteo:'Glutes',Antebrazo:'Forearm'};
+const EN_09_RX = [
+  [/^Ya tienes la versión (.+)$/,'You now have version $1'],
+  [/^Versión nueva disponible: (.+)$/,'New version available: $1'],
+  [/^Tienes la (\S+) · toca para ver los cambios$/,'You have $1 · tap to see the changes'],
+  [/^Te saltaste (\d+) versiones; abajo están todos los cambios\.$/,'You skipped $1 versions; all the changes are below.'],
+  [/^Última: hace (\d+) días$/,'Last: $1 days ago'],[/^Última: hace (\d+) sem\.$/,'Last: $1 wk ago'],[/^Última: hace (\d+) h$/,'Last: $1 h ago'],
+  [/^Hace (\d+) h$/,'$1 h ago'],[/^Hace (\d+) min$/,'$1 min ago'],[/^· Hace (\d+) (días|sem\.)$/,(m,n,u)=>'· '+n+(u==='días'?' days':' wk')+' ago'],
+  [/^· (.+)$/,(m,a)=>'· '+enN(a)],
+  [/^(Principal|Secundarios): (.*)$/,(m,a,b)=>(a==='Principal'?'Main: ':'Secondary: ')+b.split(', ').map(enN).join(', ')],
+  [/^(.+): estancado$/,(m,a)=>enN(a)+': plateaued'],[/^(.+): una serie más$/,(m,a)=>enN(a)+': one more set'],
+  [/^Pasa a peso libre: (.+)$/,(m,a)=>'Move to free weights: '+enN(a)],[/^Sube de nivel: (.+)$/,(m,a)=>'Level up: '+enN(a)],
+  [/^Haces (\d+) repeticiones limpias de (.+)\. Es momento de pasar a (.+)\.$/,(m,n,a,b)=>`You do ${n} clean reps of ${enN(a)}. Time to move on to ${enN(b)}.`],
+  [/^Llevas (\d+) sesiones progresando en (.+)\. Ya puedes probar (.+); empieza con algo menos de peso\.$/,(m,n,a,b)=>`You've progressed on ${enN(a)} for ${n} sessions. You can now try ${enN(b)}; start with a bit less weight.`],
+  [/^Te resulta cómodo \(intensidad media ([\d.,]+)\/10\) pero no avanzas\. Agrego una serie para dar más estímulo\.$/,'It feels comfortable (average intensity $1/10) but you are not progressing. I am adding a set for more stimulus.'],
+  [/^(\d+) elegidos$/,'$1 selected'],
+  [/^(.+) Logro: (.+)$/,(m,a,b)=>a+' Achievement: '+enN(b)],
+  [/^Empezaste (.+?)(?: de ayer)?$/,(m,a)=>'Started '+a+(/ de ayer$/.test(m)?' yesterday':'')],[/^terminas (.+)$/,'ends $1'],
+  [/^meta (\d+) h$/,'goal $1 h'],[/^✓ meta$/,'✓ goal'],
+  [/^Mantenimiento ([\d.,]+)$/,'Maintenance $1'],[/^Basal ([\d.,]+)$/,'BMR $1'],
+  [/^Pago único · (.+)$/,'One-time payment · $1'],[/^Suscripción · (.+) al mes$/,'Subscription · $1 a month'],[/^(.+) USD al mes$/,'$1 USD a month'],
+  [/^Dificultad: (.+)$/,(m,a)=>'Difficulty: '+enN(a)],
+  [/^Versión gratis: tienes (\d+) rutinas \((\d+) archivadas?\) y el límite es (\d+)\. Puedes seguir usándolas todas; para crear otra, elimina (\d+) o$/,(m,a,b,c,d)=>`Free version: you have ${a} routines (${b} archived) and the limit is ${c}. You can keep using them all; to create another, delete ${d} or`],
+  [/^Versión gratis: tienes (\d+) rutinas y el límite es (\d+)\. Puedes seguir usándolas todas; para crear otra, elimina (\d+) o$/,'Free version: you have $1 routines and the limit is $2. You can keep using them all; to create another, delete $3 or'],
+  [/^Progresaste en (\d+) ejercicios?\. Actualizo la rutina con tus nuevos números: (.+?)(\.?)$/,(m,n,l,dot)=>`You progressed on ${n} exercise${n==='1'?'':'s'}. I'm updating the routine with your new numbers: ${l.split(' · ').map(x=>{ const k=x.match(/^(.+?) (\d[\d:.,]*(?: \S+)?)$/); return k?enN(k[1])+' '+k[2]:enN(x); }).join(' · ')}${dot}`],
+  [/^Descanso de todas las series(.*)$/,(m,a)=>'Rest for all sets'+a.replace('sin descanso','no rest')],
+  [/^Descanso de esta serie: (.+)$/,(m,a)=>'Rest for this set: '+a.replace('sin descanso','no rest')],
+  [/^Descanso después de la serie (\d+)(.*)$/,'Rest after set $1$2'],[/^Descanso después de la serie de calentamiento(.*)$/,'Rest after the warm-up set$1'],
+  [/^Igual que el ejercicio \((.+)\)(.*)$/,(m,a,b)=>'Same as the exercise ('+a.replace('sin descanso','no rest')+')'+b],
+  [/^(\d+) de (\d+) series$/,'$1 of $2 sets'],
+  [/^([\d.]+) · Etapa (\d) de (\d): (.+)$/,(m,v,a,b,c)=>`${v} · Stage ${a} of ${b}: ${enN(c)}`],[/^Etapa (\d) de (\d): (.+)$/,(m,a,b,c)=>`Stage ${a} of ${b}: ${enN(c)}`],
+  [/^Como: (.+)$/,(m,a)=>'e.g. '+enN(a)],
+  [/^Cambié (\d+) ejercicios? por alternativas que puedes hacer con tu equipo o preferencias\.$/,(m,n)=>`I swapped ${n} exercise${n==='1'?'':'s'} for alternatives you can do with your equipment or preferences.`],
+  [/^Semana del (.+)$/,'Week of $1'],
+  [/^([A-Z][a-z]+ \d+(?:, \d+)?) al ([A-Z][a-z]+ \d+(?:, \d+)?)$/,'$1 to $2'],
+  [/^Actividad: (\d+) de (\d+) min recomendados por la OMS$/,'Activity: $1 of the $2 min recommended by the WHO'],
+  [/^Más trabajados: (.+)$/,(m,a)=>'Most worked: '+a.split(', ').map(x=>{ const k=x.match(/^(.*) \((\d+)\)$/); return k?enN(k[1])+' ('+k[2]+')':enN(x); }).join(', ')],
+  [/^Progresaste en (\d+) ejercicios?\. Actualizo la rutina con tus nuevos números: (.+)\.$/,(m,n,l)=>`You progressed on ${n} exercise${n==='1'?'':'s'}. I'm updating the routine with your new numbers: ${l.split(' · ').map(x=>{ const k=x.match(/^(.+?) (\d[\d:.,]*(?: \S+)?)$/); return k?enN(k[1])+' '+k[2]:enN(x); }).join(' · ')}.`],
+  [/^(.+): bajemos un poco$/,(m,a)=>enN(a)+': let’s ease off a little'],
+  [/^Tu rendimiento bajó un (\d+) % en los últimos entrenos\. Bajo la carga un (\d+) % para recuperar la técnica y la confianza\.$/,'Your performance dropped $1% over your last workouts. I’m lowering the load $2% so you can regain technique and confidence.'],
+  [/^Sin mejoras en (\d+) entrenos\. Propongo (.+) para dar un estímulo nuevo al mismo músculo\.$/,(m,n,a)=>`No progress in ${n} workouts. I suggest ${enN(a)} to give the same muscle a new stimulus.`],
+  [/^Ayer (\d+:\d+(?: [AP]M)?)$/,'Yesterday $1'],
+  [/^A tu ritmo llegarías el (.+), después de la fecha\. Necesitas ([\d.,]+) (\S+) por semana\.$/,'At your pace you would get there on $1, after the date. You need $2 $3 per week.'],
+  [/^Vas bien: a este ritmo llegas hacia el (.+)\.$/,'On track: at this pace you get there around $1.'],
+  [/^Sin avance en la dirección de la meta todavía\. Necesitas ([\d.,]+) por semana\.$/,'No progress towards the goal yet. You need $1 per week.'],
+  [/^(Peso|Cintura|Cadera|Pecho|Brazo|Muslo|Cuello|Hombros|Pantorrilla|Grasa|Glúteo|Antebrazo) ([\d.,]+ ?(?:kg|cm|lb|in|%)?)$/,(m,a,b)=>EN_MED[a]+' '+b],
+  [/^Peso corporal: ([\d.,]+ \S+)$/,'Body weight: $1'],
+  [/^(\d+) años$/,'$1 years'],[/^(\d+) zonas? sensibles?$/,(m,n)=>`${n} sensitive area${n==='1'?'':'s'}`],
+  [/^Adaptada a tu nivel: (.+)$/,(m,a)=>'Adapted to your level: '+enN(a)],
+  [/^(\d+) entrenos? en el historial$/,(m,n)=>`${n} workout${n==='1'?'':'s'} in your history`],
+  [/^(\d+) de (\d+) aprobadas$/,'$1 of $2 approved'],[/^(\d+) con errores$/,'$1 with errors'],
+  [/^(\d+) de (\d+) logros$/,'$1 of $2 achievements'],
+  [/^(\d+) × ([^·]+)$/,(m,n,a)=>n+' × '+enN(a)],
+  [/^Buscar entre (\d+) ejercicios$/,'Search $1 exercises'],
+  [/^(\d+) entrenos? la semana pasada\. Toca para verlo\.$/,(m,n)=>`${n} workout${n==='1'?'':'s'} last week. Tap to see it.`],
+  [/^(.+)\. Una rutina que los incluya equilibra tu semana\.$/,(m,a)=>enList(a)+'. A routine that includes them balances your week.'],
+  [/^Copia guardada (.+) al actualizar la app\. Reemplaza tus datos actuales\.$/,'Copy saved on $1 when the app was updated. It replaces your current data.'],
+  [/^Antes del (.+)$/,'By $1'],[/^ahora (.+)$/,'now $1'],
+  [/^Versión (\d[\d.]*)$/,'Version $1'],
+  [/^Empezamos (.+)\. Primer ejercicio: (.+)$/,(m,a,b)=>`Let’s start ${a}. First exercise: ${enN(b)}`],
+  [/^Descanso terminado\. Siguiente: (.+)$/,(m,a)=>'Rest over. Next: '+enN(a)],
+  [/^Minuto (\d+)\. (.*)$/,(m,n,a)=>`Minute ${n}. ${a?enN(a):''}`],[/^Trabajo\. (.*)$/,(m,a)=>'Work. '+(a?enN(a):'')]
+];
 const EN_EXTRA = `Solo esta serie|This set only
 Todas las series de este ejercicio|All sets of this exercise
 Cambia únicamente este descanso|Changes only this rest
@@ -10984,17 +12268,19 @@ Elige|Choose
 Buscar|Search`;
 const EN_RX = [
   [/^Hace (\d+) días$/,'$1 days ago'],[/^Hace (\d+) sem\.$/,'$1 wk ago'],[/(\d+) ejercicios?/g,(m,n)=>`${n} exercise${n==='1'?'':'s'}`],
-  [/(\d+) veces/g,'$1 times'],[/(\d+) vez\b/g,'$1 time'],[/(\d+) entrenos?/g,(m,n)=>`${n} workout${n==='1'?'':'s'}`],[/ días/g,' days'],
+  [/(\d+) veces/g,'$1 times'],[/(\d+) vez\b/g,'$1 time'],[/(\d+) entrenos?/g,(m,n)=>`${n} workout${n==='1'?'':'s'}`],[/(\d) días/g,'$1 days'],
   [/^Serie (\d+) de (\d+)/,'Set $1 of $2'],[/Ronda (\d+) de (\d+)/,'Round $1 of $2'],[/Minuto (\d+) de (\d+)/,'Minute $1 of $2'],[/AÑADIR SERIE/,'ADD SET'],
   [/^Descanso /,'Rest '],[/ calent\./,' warm-up'],[/rondas completadas/,'rounds completed'],[/Última: /,'Last: '],[/de trabajo/,'of work'],
   [/^Día (\d+)$/,'Day $1'],[/Cuerpo completo/,'Full body'],[/^Torso/,'Upper body'],[/^Pierna/,'Legs'],[/^Empuje/,'Push'],[/^Tirón/,'Pull'],[/Plan PandarIA/,'PandarIA plan'],
   [/^Rutina de /,'Routine: '],[/^Próxima: /,'Next: '],[/^Última: hoy$/,'Last: today'],[/^· Hoy$/,'· Today'],[/^· Nunca$/,'· Never'],[/^Hoy$/,'Today'],[/(\d+) semanas de racha/,'$1-week streak'],[/ejercicios más/,'more exercises'],[/Buscar entre (\d+) ejercicios/,'Search $1 exercises'],[/Buscar por nombre o músculo/,'Search by name or muscle'],[/(\d+) rutinas$/,'$1 routines']
 ];
-EN_RX.unshift(...EN_08_RX);
+EN_RX.unshift(...EN_08_RX); EN_RX.unshift(...EN_09_RX);
 function trText(t){
   const s=t.trim(); if (!s) return null;
   if (EN_MAP.has(s)) return t.replace(s,EN_MAP.get(s));
   let out=s, ch=false;
+  // «Pecho · Mancuernas + Banco», «Próximo entreno: mañana · Full body A»: se traduce cada parte por separado
+  const seg=s.split(/ (·|\+) /); if (seg.length>2 && seg.length<40){ let any=false; const o=seg.map((p,k)=>{ if(k%2) return p; const r=p&&trText(p); if(r!=null){ any=true; return r; } return p; }); if(any) return t.replace(s,o.join(' ')); }
   for (const [rx,rp] of EN_RX){ const n=out.replace(rx,rp); if(n!==out){ out=n; ch=true; } }
   if (EN_PHR_RX && s.length<400){ const m=new Map(EN_PHR); const n=out.replace(EN_PHR_RX,x=>m.get(x)||x); if(n!==out){ out=n; ch=true; } }
   return ch? t.replace(s,out) : null;
