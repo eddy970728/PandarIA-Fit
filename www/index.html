@@ -5048,7 +5048,7 @@ function exAnim(ex, cls){
   const ctl = big&&t ? `<div class="exctl"><span class="exph" data-ph="1"></span><span class="grow"></span>
       ${A3&&A3.cams&&A3.cams.length>1?`<button class="exb" data-a="animCam" aria-label="Girar la vista">⟲</button>`:''}<button class="exb ${ANIM_UI.slow?'on':''}" data-a="animSlow" aria-label="Cámara lenta">½×</button><button class="exb" data-a="animPause" aria-label="Pausa">${ANIM_UI.paused?'▶':'❚❚'}</button></div>
       ${t.hold||t.k.length<2?`<div class="exhold"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="3.5"/><circle class="hring" cx="20" cy="20" r="16" fill="none" stroke="#ff7a1a" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="100.5" transform="rotate(-90 20 20)"/></svg><span>AGUANTA</span></div>`:''}` : '';
-  const rev = big && typeof animReviewed==='function' && !animReviewed(ex) ? `<div class="exrev">EN REVISIÓN</div>` : '';
+  const rev = big && ANIM_FEEDBACK && typeof animReviewed==='function' && !animReviewed(ex) ? `<div class="exrev">EN REVISIÓN</div>` : '';
   return `<div class="exanim ${big?'big':cls}" data-anim="${ex.id}" style="--exc:${c}"><div class="exsvg" data-a="${big?'animPause':''}">${exFigureStatic(ex,'stage')}</div>${ctl}${rev}</div>`;
 }
 /* fase del movimiento según cómo cambia la pose: Baja/Sube, Empuja/Vuelve, Tira/Suelta */
@@ -5737,7 +5737,7 @@ A.ceSave=()=>{
 
 /* ---------- Ficha de ejercicio ---------- */
 // Botón ¿Se entiende? solo en las versiones de prueba (poner en false para la versión final)
-const ANIM_FEEDBACK=true;
+const ANIM_FEEDBACK=false; // 0.9.3: revisión de animaciones apagada (se puede volver a encender; los votos guardados no se pierden)
 function exAnimTools(ex){
   const prem=typeof isPremium!=='function'||isPremium(); const on=animMusOn();
   let b=`<div class="row" style="justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap">`;
@@ -7929,6 +7929,60 @@ ALIM_RAW.trim().split('\n').forEach(l=>{ if(!l) return; const [id,n,syn,cat,k,p,
   ALIM[id]={id,n,syn:syn?syn.split(','):[],cat,k:+k,p:+p,c:+c,g:+g,f:num(f),a:num(a),na:num(na),fl:fl||'',usda:true,
     por:por?por.split(';').map(x=>{ const i=x.lastIndexOf(':'); return [x.slice(0,i),+x.slice(i+1)]; }).filter(x=>x[1]>0):[]};
   ALIM[id].key=anorm(n+' '+ALIM[id].syn.join(' ')); });
+const MAC_ALL=['k','p','c','g','f','a','na'];
+/* Recetas típicas (0.9.3): platos de Uruguay, Argentina, Cuba, México y España calculados por PandarIA
+   con ingredientes de la base del USDA (dominio público). Formato: id|nombre|sinónimos|categoría|porciones|id:gramos,…|porción */
+const ALIM_REC_RAW=`
+R01|Milanesa de carne frita|milanesa,milanesa de nalga,escalope,bistec empanizado|preparado|4|23592:300,01123:50,18079:80,04060:40,02047:3|1 unidad:118
+R02|Milanesa de pollo frita|milanesa de pechuga,pollo empanizado,suprema|preparado|4|05064:300,01123:50,18079:80,04060:40,02047:3|1 unidad:118
+R03|Milanesa al horno|milanesa horneada|preparado|4|23592:300,01123:50,18079:80,04053:10,02047:3|1 unidad:111
+R04|Milanesa napolitana|milanesa a la napolitana|preparado|4|23592:300,01123:50,18079:80,04060:40,07029:60,01026:100,06931:80,02047:3|1 unidad:178
+R05|Chivito uruguayo|chivito,chivito al pan|preparado|1|18350:90,23600:120,07029:30,01026:30,01128:50,11253:15,11529:30,04025:15|1 chivito:380
+R06|Choripán|chori,choripan|preparado|1|18029:80,07019:100,04053:10,11297:3,11215:2|1 choripán:195
+R07|Chimichurri|salsa chimichurri|condimento|12|04053:100,02053:30,11297:30,11215:10,02027:3,02009:2,02047:4|1 cucharada:15
+R08|Salsa criolla|criolla|condimento|6|11529:150,11282:100,11821:60,04053:30,02053:20,02047:3|1 cucharada:20
+R09|Tortilla de papas|tortilla española,tortilla de patatas|preparado|6|11367:450,01123:300,11282:100,04053:50,02047:5|1 porción:151
+R10|Pastel de papa|pastel de carne y papa,pastel de patata|preparado|6|23575:400,11282:150,11821:60,11934:600,09195:30,01032:30,04060:15,02047:5|1 porción:215
+R11|Lentejas guisadas con chorizo|guiso de lentejas con chorizo,lentejas con chorizo,potaje de lentejas|preparado|6|16070:600,07019:80,11367:200,11125:100,11282:100,11821:60,11531:150,04053:15,02047:6,06008:400|1 plato:285
+R12|Ñoquis con tuco|ñoquis,gnocchi con salsa,ñoquis caseros|preparado|5|11367:500,20081:150,01123:50,02047:5,06931:300,01032:30|1 plato:207
+R13|Tarta de jamón y queso|tarta de jamón y queso,quiche de jamón|preparado|6|18334:200,07029:150,01022:150,01123:150,01053:100,02047:2|1 porción:125
+R14|Tarta de verdura|pascualina,torta pascualina,tarta de acelga|preparado|8|18334:300,11148:500,01123:150,11282:100,01032:40,04053:15,02047:4|1 porción:139
+R15|Empanada de jamón y queso|empanada de jyq|preparado|10|18334:300,07029:150,01026:150|1 unidad:60
+R16|Empanada de pollo|empanada de ave|preparado|12|18334:300,05083:250,11282:120,11821:50,04053:15,02047:3|1 unidad:62
+R17|Alfajor de maicena|alfajor,alfajores de maicena|dulce|15|20027:150,20081:100,01001:100,19335:80,01125:60,01225:200,12108:20|1 unidad:47
+R18|Torta frita|tortas fritas,sopaipilla frita|dulce|10|20081:300,04002:30,04060:50,02047:5,14411:160|1 unidad:54
+R19|Polenta con tuco|polenta,polenta con salsa|preparado|5|20022:200,14411:800,06931:300,01032:30,02047:5|1 plato:267
+R20|Provoleta|provolone a la parrilla,provoleta a la parrilla|preparado|2|01035:200,02027:2,04053:10,02009:1|1 porción:106
+R21|Ensalada mixta|ensalada de lechuga y tomate,ensalada criolla|preparado|2|11253:100,11529:150,11282:40,04053:15,02053:10,02047:2|1 plato:158
+R22|Ropa vieja|carne desmechada,carne mechada|preparado|5|23654:400,11531:200,11282:120,11333:80,11821:60,11215:10,04053:25,02014:2,02047:5|1 plato:180
+R23|Picadillo a la habanera|picadillo,picadillo cubano|preparado|5|23575:400,11531:200,11282:100,11333:80,09195:40,09298:30,11215:8,04053:15,02047:4|1 plato:175
+R24|Fricasé de pollo|fricasé,pollo en fricasé|preparado|5|05009:400,11367:200,11531:150,11282:100,11333:60,09195:30,09298:20,04053:15,02047:4|1 plato:196
+R25|Sándwich cubano|cubano,sandwich cubano,medianoche|preparado|1|18029:100,10061:70,07029:50,01022:40,11937:15,02046:8,01001:8|1 sándwich:291
+R26|Croquetas de jamón|croquetas,croquetas caseras|preparado|18|20081:60,01001:60,01077:500,07029:150,01123:50,18079:80,04060:60,02047:3|1 unidad:54
+R27|Chilaquiles rojos|chilaquiles|preparado|2|19056:120,06164:200,01056:30,01228:30,11282:15|1 plato:198
+R28|Guacamole|guacamol,salsa de palta|condimento|6|09037:300,11529:80,11282:40,11165:8,09159:20,11979:5,02047:3|1/4 taza:60
+R29|Tacos al pastor|tacos de cerdo,taco al pastor|preparado|4|18363:120,10061:160,09266:40,11282:20,11165:5,06631:15|1 taco:90
+R30|Huevos rancheros|huevos a la ranchera|preparado|1|01128:100,18363:50,06164:100,16103:80,01228:20|1 plato:350
+R31|Tinga de pollo|tinga,pollo en tinga|preparado|5|05083:400,11531:200,11282:150,11979:10,04053:15,02047:4|1 porción:156
+R32|Paella mixta|paella,paella de pollo y mariscos|preparado|6|20045:700,05064:200,15271:200,11305:80,11821:80,11531:100,04053:40,02047:6,02043:2|1 plato:235
+R33|Gazpacho|gazpacho andaluz,sopa fría de tomate|preparado|4|11529:600,11205:100,11333:60,11282:40,11215:5,18069:40,04053:40,02053:20,02047:5|1 vaso:228
+R34|Fabada|fabada asturiana,porotos con chorizo y morcilla|preparado|5|16050:500,07019:100,07005:80,06008:300,02028:3,02047:3|1 plato:197
+R35|Pisto|pisto manchego,ratatouille|preparado|5|11477:250,11210:200,11821:100,11333:80,11282:120,11531:250,04053:40,02047:4|1 plato:209
+R36|Patatas bravas|papas bravas|preparado|3|11403:400,11531:80,02028:3,06631:10,04053:10,04025:30|1 porción:178
+R37|Churros|churro,churros fritos|dulce|10|20081:200,14411:250,04060:60,19335:30,02047:2|1 unidad:54
+R38|Puré de papas con manteca|puré casero,puré de patatas casero|preparado|4|11367:600,01077:120,01001:30,02047:4|1 porción:188
+R39|Arroz blanco con huevo frito|arroz a la cubana,arroz con huevo|preparado|1|20045:200,01128:50,06931:60|1 plato:310
+R40|Bife a la plancha con ensalada|bife con ensalada,carne con ensalada|preparado|1|23610:200,11253:60,11529:100,04053:10,02047:2|1 plato:372
+`;
+ALIM_REC_RAW.trim().split('\n').forEach(l=>{ if(!l) return; const [id,n,syn,cat,rac,ing,por]=l.split('|');
+  const items=ing.split(',').map(x=>{ const [i,g]=x.split(':'); return [i,+g]; }).filter(([i])=>ALIM[i]);
+  const tot=items.reduce((a,[,g])=>a+g,0), v={}; MAC_ALL.forEach(m=>v[m]=0); const fl=new Set();
+  items.forEach(([i,g])=>{ const f=ALIM[i]; MAC_ALL.forEach(m=>v[m]+=(f[m]||0)*g); [...f.fl].forEach(x=>fl.add(x)); });
+  if (fl.has('A')) fl.delete('V');
+  const r1=x=>Math.round(x/tot*10)/10, i=por.lastIndexOf(':');
+  ALIM[id]={id,n,syn:syn?syn.split(','):[],cat,k:Math.round(v.k/tot),p:r1(v.p),c:r1(v.c),g:r1(v.g),f:r1(v.f),a:r1(v.a),na:Math.round(v.na/tot),fl:'LHGMNSPCZAV'.split('').filter(x=>fl.has(x)).join(''),
+    usda:false,rec:true,rac:+rac,ing:items,por:[[por.slice(0,i),+por.slice(i+1)]]};
+  ALIM[id].key=anorm(n+' '+ALIM[id].syn.join(' ')); });
 // Alimentos básicos que suben un poco en la búsqueda (lo que más se come)
 const ALIM_POP=new Set(['20045','18069','01123','01077','09040','09003','05064','23562','11367','16015','20038','04053','01228','01116','11529','11253','14209','09200','16070','16057','01026','15121','20121','05062','01129']);
 const ALIM_CAT_RANK={propio:0,receta:0,fruta:1,verdura:1,legumbre:1,cereal:2,lacteo:2,huevo:2,carne:2,ave:2,pescado:2,semilla:3,grasa:3,bebida:3,condimento:4,suplemento:4,dulce:4,snack:5,preparado:5};
@@ -8153,9 +8207,11 @@ function amountModal(f, o){
     <div class="chips" style="margin-bottom:12px">${MEALS.map(([m,l])=>`<button class="chip ${AQ.m===m?'on':''}" data-a="aqMeal" data-v="${m}">${l}</button>`).join('')}</div>
     <button class="btn pri big" data-a="cbm" data-v="${ok}">${o.edit?'Guardar cambios':'Añadir'}</button>
     ${del?`<button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="cbm" data-v="${del}">Quitar del diario</button>`:''}
-    ${f.usda?`<div class="xs mut" style="margin:10px 4px 0">Fuente: USDA, base de datos de nutrientes de referencia.</div>`:''}</div>`);
+    ${f.usda?`<div class="xs mut" style="margin:10px 4px 0">Fuente: USDA, base de datos de nutrientes de referencia.</div>`:''}${f.rec?recIngHtml(f):''}</div>`);
 }
 
+// Receta típica: qué lleva y de dónde salen los números
+function recIngHtml(f){ return `<div class="xs mut" style="margin:10px 4px 0;line-height:1.45">${tx(`Receta típica calculada por PandarIA con ingredientes del USDA (dominio público), para ${f.rac} porciones:`,`Typical recipe calculated by PandarIA from USDA ingredients (public domain), for ${f.rac} servings:`)} ${f.ing.map(([i,g])=>`${Math.round(g)} g ${tx('de','of')} ${esc(EN_LANG()&&ALIM_EN[i]?ALIM_EN[i]:ALIM[i].n)}`).join(', ')}. ${tx('Cada casa la hace distinto: si la tuya lleva otras cantidades, créala en Mis recetas.','Every home makes it differently: if yours uses other amounts, create it in My recipes.')}</div>`; }
 /* ---------- Alimentos propios ---------- */
 const alimRoom = () => prem() || nd().alim.length+nd().recetas.length < ALIM_FREE;
 A.alNew=()=>{ if (!alimRoom()) return payFor('alimProp'); openLayer('alimNuevo',{d:{n:'',porl:'1 porción',porg:100,k:'',p:'',c:'',g:'',f:'',a:'',na:'',fl:'',animal:false}}); };
@@ -8641,7 +8697,7 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='0.9';
 const CHANGELOG=[
- {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y más alimentos (en desarrollo)',items:['Etapa 3 · Inglés completo: toda la app en inglés, también los 386 consejos de ejercicio, la técnica paso a paso, Explorar, el historial de cambios, los logros y los avisos del teléfono','La voz de los entrenos, los avisos del teléfono, la notificación del entreno en curso y los widgets hablan en el idioma que elijas','En inglés los números y las fechas van al estilo inglés (1,910 kcal · 80.6 kg · November 12)','Nueva prueba automática: en inglés, si queda algún texto en español en las pantallas, la versión no sale','Arreglo: más espacio arriba para la cámara y la barra de estado (notch) en todas las pantallas','Arreglo: al tocar «Buscar actualizaciones» se abre directamente la versión nueva, aunque antes hubieras elegido «Más tarde» o «Saltar esta versión»; el aviso también aparece en Ajustes','Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
+ {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y recetas típicas',items:['Etapa 4 · Ajustes ordenados: la pantalla principal queda corta, con tu perfil, Premium y 8 grupos (Tu cuenta y tus datos, Entrenamiento, PandarIA, Nutrición y ayuno, Avisos y sonido, Pantalla e idioma, Salud y Acerca de) que abren su propia pantalla','«Borrar todos los datos» queda aparte, al final de Tu cuenta y tus datos','La política de privacidad se puede abrir desde Ajustes › Acerca de','40 recetas típicas de Uruguay, Argentina, Cuba, México y España en el diario (milanesas, chivito, choripán, tortilla de papas, pascualina, ropa vieja, picadillo, chilaquiles, tacos al pastor, paella, gazpacho, fabada y más), calculadas con ingredientes del USDA y con sus alérgenos; la ficha muestra qué lleva cada una','Nuevo nombre del estudio: LunaDoggyBru Studios','La revisión de animaciones se apaga para la versión final (los votos ya enviados se guardan)','Arreglo: algunas metas guardadas con un formato antiguo mostraban «Invalid Date» y la barra de progreso vacía','Etapa 3 · Inglés completo: toda la app en inglés, también los 386 consejos de ejercicio, la técnica paso a paso, Explorar, el historial de cambios, los logros y los avisos del teléfono','La voz de los entrenos, los avisos del teléfono, la notificación del entreno en curso y los widgets hablan en el idioma que elijas','En inglés los números y las fechas van al estilo inglés (1,910 kcal · 80.6 kg · November 12)','Nueva prueba automática: en inglés, si queda algún texto en español en las pantallas, la versión no sale','Arreglo: más espacio arriba para la cámara y la barra de estado (notch) en todas las pantallas','Arreglo: al tocar «Buscar actualizaciones» se abre directamente la versión nueva, aunque antes hubieras elegido «Más tarde» o «Saltar esta versión»; el aviso también aparece en Ajustes','Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
  {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
@@ -8655,15 +8711,15 @@ const CHANGELOG=[
 SCREENS.changelog = () => lhdr('Historial de cambios')+`<div class="lbody">${CHANGELOG.map((c,i)=>`<div class="card" style="margin-bottom:12px">
   <div class="row" style="margin-bottom:8px"><span class="tag" style="background:${i===0?'var(--ac)':'var(--card2)'};color:${i===0?'#1a0702':'var(--tx)'};font-weight:800">v${c.v}</span><b class="grow">${esc(c.t)}</b>${i===0?'<span class="xs mut">Actual</span>':''}</div>
   ${c.items.map(x=>`<div class="row" style="align-items:flex-start;padding:3px 0"><span style="color:var(--ac);margin-top:1px">•</span><span class="sm" style="line-height:1.45">${esc(x)}</span></div>`).join('')}</div>`).join('')}
-  <p class="xs mut" style="text-align:center;margin:14px 0">PandarIA Fit · creada por Eddy · LunaDog</p></div>`;
+  <p class="xs mut" style="text-align:center;margin:14px 0">PandarIA Fit · creada por Eddy · LunaDoggyBru Studios</p></div>`;
 A.openChangelog=()=>openLayer('changelog',{});
 function creditsCard(){
   return `<div class="card" style="text-align:center;padding:20px 16px">
     <div style="width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('dumbbell',30)}</div>
     <div style="font-size:20px;font-weight:900;margin-top:10px">PandarIA <span style="color:var(--ac)">Fit</span></div>
     <div class="xs mut" style="margin-top:2px">Versión ${updBuild()!=null?updVer(updBuild()):APP_VERSION}</div>
-    <div class="sm" style="margin-top:12px;line-height:1.5">Idea, diseño y desarrollo: <b>Eddy</b><br>Una app de <b style="color:var(--ac)">LunaDog</b></div>
-    <div class="xs mut" style="margin-top:8px">© ${new Date().getFullYear()} LunaDog. Todos los derechos reservados.</div>
+    <div class="sm" style="margin-top:12px;line-height:1.5">Idea, diseño y desarrollo: <b>Eddy</b><br>Una app de <b style="color:var(--ac)">LunaDoggyBru Studios</b></div>
+    <div class="xs mut" style="margin-top:8px">© ${new Date().getFullYear()} LunaDoggyBru Studios. Todos los derechos reservados.</div>
     <button class="btn wide" style="margin-top:14px" data-a="openChangelog">${I('history',18)} Historial de cambios</button>
     ${AVISOS_DEV&&updBuild()!=null?`<button class="btn wide" style="margin-top:8px" data-a="updCheckNow">${I('refresh',18)} Buscar actualizaciones</button><button class="btn wide sm" style="margin-top:8px" data-a="updToggle">Avisar de versiones nuevas: <b>${S.settings.updAvisos===false?'No':'Sí'}</b></button>`:''}</div>`;
 }
@@ -8673,7 +8729,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["0.9 · Etapa 3 de 5: inglés completo", "Toda la app en inglés, también consejos de ejercicio, técnica, Explorar y logros", "La voz, los avisos del teléfono y los widgets en tu idioma", "Números y fechas al estilo inglés", "Más espacio arriba para el notch en todas las pantallas", "«Buscar actualizaciones» abre directamente la versión nueva"];
+const NOTAS_VERSION=["0.9 · Versión completa: 0.9 cerrada", "Ajustes ordenados en 8 grupos", "40 recetas típicas de Uruguay, Argentina, Cuba, México y España", "Nuevo nombre: LunaDoggyBru Studios", "Política de privacidad en Ajustes › Acerca de", "Revisión de animaciones apagada para la versión final"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
@@ -8746,7 +8802,7 @@ function cloudErrTxt(e){ const m=String(e&&e.message||e||'');
   if (/drive-scope/.test(m)) return tx('Sin el permiso de Drive no se puede guardar la copia. Vuelve a intentarlo y marca la casilla de Google Drive.','Without the Drive permission the backup cannot be saved. Try again and tick the Google Drive box.');
   if (/No credentials|no account|NoCredential/i.test(m)) return tx('No hay ninguna cuenta de Google en este teléfono. Añádela en los Ajustes de Android › Cuentas.','There is no Google account on this phone. Add one in Android Settings › Accounts.');
   if (/offline|network|Failed to fetch|NetworkError/i.test(m)) return tx('Sin conexión a internet. Lo intentaremos más tarde.','No internet connection. We will try again later.');
-  if (/auth/.test(m)) return tx('Tu sesión de Google caducó. Vuelve a iniciar sesión en Ajustes › Tus datos.','Your Google session expired. Sign in again in Settings › Your data.');
+  if (/auth/.test(m)) return tx('Tu sesión de Google caducó. Vuelve a iniciar sesión en Ajustes › Tu cuenta y tus datos.','Your Google session expired. Sign in again in Settings › Your account and data.');
   if (/drive 403/.test(m)) return tx('Google Drive no dejó guardar la copia (¿espacio lleno?).','Google Drive did not allow saving the backup (storage full?).');
   return tx('No se pudo conectar con Google Drive. Inténtalo de nuevo.','Could not connect to Google Drive. Try again.'); }
 
@@ -8797,7 +8853,7 @@ async function cloudBackup(o){
     // Otra instalación guardó después de nuestra última copia: no se pisa sin preguntar
     if (info && info.dev && info.dev!==cloudDev() && info.at>(c.at||0) && !o.force){
       c.conflict={at:info.at, modelo:info.modelo, r:info.r, id:info.id}; save(true); CLOUD_BUSY=false;
-      if (o.manual) cloudConflictAsk(); else toast(tx('Hay una copia más nueva de otro teléfono en tu Drive. Revisa Ajustes › Tus datos.','There is a newer backup from another phone in your Drive. Check Settings › Your data.'));
+      if (o.manual) cloudConflictAsk(); else toast(tx('Hay una copia más nueva de otro teléfono en tu Drive. Revisa Ajustes › Tu cuenta y tus datos.','There is a newer backup from another phone in your Drive. Check Settings › Your account and data.'));
       return false; }
     const env=cloudEnvelope(), r=env.resumen;
     const props={at:String(env.at), dev:env.dev, modelo:String(env.modelo||'').slice(0,60), ver:APP_VERSION, entrenos:String(r.entrenos), rutinas:String(r.rutinas), dias:String(r.dias), fotos:String(r.fotos)};
@@ -8909,9 +8965,9 @@ SCREENS.onboard = p => {
     b=`<div style="text-align:center;padding-top:18px"><div style="width:92px;height:92px;border-radius:26px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702;box-shadow:0 12px 34px rgba(255,122,26,.35)">${I('dumbbell',48)}</div>
       <div style="font-size:32px;font-weight:900;margin-top:20px">PandarIA <span style="color:var(--ac)">Fit</span></div><p class="mut" style="line-height:1.5;margin:10px 10px 26px">${tx('Tu compañero de entrenamiento con un algoritmo que aprende de cada serie.','Your training partner with an algorithm that learns from every set.')}</p></div>
       ${[['dumbbell',tx('Rutinas a tu medida','Routines made for you'),tx('Crea las tuyas, elige de Explorar o deja que PandarIA diseñe tu plan.','Build your own, pick from Explore or let PandarIA design your plan.')],['spark',tx('Te ayuda a progresar','Helps you progress'),tx('Sugiere pesos, detecta estancamientos y renueva tus rutinas.','Suggests weights, spots plateaus and refreshes your routines.')],['leaf',tx('Nutrición y ayuno','Nutrition and fasting'),tx('Diario de comidas, agua y ayuno supervisado.','Food diary, water and supervised fasting.')],['chart',tx('Todo tu progreso','All your progress'),tx('Récords, gráficas, metas, informes y fotos.','Records, charts, goals, reports and photos.')]].map(([ic,t,d])=>`<div class="row" style="align-items:flex-start;gap:14px;padding:9px 4px"><span style="width:42px;height:42px;border-radius:12px;background:var(--acs);color:var(--ac);display:grid;place-items:center;flex:0 0 auto">${I(ic,22)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4">${d}</div></div></div>`).join('')}`;
-    foot=`<button class="btn pri big" data-a="obNext">${tx('Empezar','Get started')}</button><div class="xs mut" style="text-align:center;margin-top:10px">${tx('Una app de','An app by')} <b style="color:var(--ac)">LunaDog</b> · v${APP_VERSION}</div>`;
+    foot=`<button class="btn pri big" data-a="obNext">${tx('Empezar','Get started')}</button><div class="xs mut" style="text-align:center;margin-top:10px">${tx('Una app de','An app by')} <b style="color:var(--ac)">LunaDoggyBru Studios</b> · v${APP_VERSION}</div>`;
   } else if (p.paso==='cuenta'){
-    b=titulo(tx('¿Cómo quieres usar PandarIA?','How do you want to use PandarIA?'),tx('Puedes cambiarlo cuando quieras en Ajustes › Tus datos.','You can change it anytime in Settings › Your data.'))+
+    b=titulo(tx('¿Cómo quieres usar PandarIA?','How do you want to use PandarIA?'),tx('Puedes cambiarlo cuando quieras en Ajustes › Tu cuenta y tus datos.','You can change it anytime in Settings › Your account and data.'))+
       `<button class="opt card" style="margin-bottom:10px;padding:16px;${p.modo==='google'?'border-color:var(--ac)':''}" data-a="obGoogle"><span class="oi" style="color:var(--blue)">${I('user',24)}</span><span class="grow"><div class="b">${tx('Continuar con Google','Continue with Google')} <span class="xs" style="color:var(--ok);font-weight:800;margin-left:4px">${tx('RECOMENDADO','RECOMMENDED')}</span></div><div class="od" style="line-height:1.4">${tx('Copia en tu Google Drive: si cambias de teléfono recuperas todo, también tu Premium.','Backup in your Google Drive: if you change phones you get everything back, Premium included.')}</div></span>${p.modo==='google'?`<span style="color:var(--ac)">${I('check',22)}</span>`:''}</button>
       <button class="opt card" style="padding:16px;${p.modo==='local'?'border-color:var(--ac)':''}" data-a="obLocal"><span class="oi">${I('lock',24)}</span><span class="grow"><div class="b">${tx('Usar sin cuenta','Use without an account')}</div><div class="od" style="line-height:1.4">${tx('Todo se guarda solo en este teléfono. Puedes conectar Google más tarde.','Everything stays on this phone only. You can connect Google later.')}</div></span>${p.modo==='local'?`<span style="color:var(--ac)">${I('check',22)}</span>`:''}</button>
       ${p.u?`<div class="banner" style="margin-top:14px"><span class="ic" style="color:var(--ok)">${I('check',20)}</span><div class="grow sm">${tx('Sesión iniciada como','Signed in as')} <b>${esc(p.u.email||p.u.name)}</b></div></div>`:''}
@@ -8923,7 +8979,7 @@ SCREENS.onboard = p => {
       `<div class="card" style="padding:16px"><div class="row" style="gap:12px"><span style="color:var(--ok)">${I('history',26)}</span><div class="grow"><div class="b">${tx('Copia del','Backup from')} ${fmtDate(k.at)} · ${hhmm(k.at)}</div><div class="sm mut" style="line-height:1.45;margin-top:2px">${resumenTxt(k.r)}${k.modelo?' · '+esc(k.modelo):''}</div></div></div></div>
       <button class="btn pri big" style="margin-top:16px" data-a="obRestore">${I('download',20)} ${tx('Recuperar mis datos','Restore my data')}</button>
       <button class="btn wide" style="margin-top:10px" data-a="obFresh">${tx('Empezar de cero en este teléfono','Start from scratch on this phone')}</button>
-      <p class="xs mut" style="line-height:1.5;margin-top:12px">${tx('Si empiezas de cero, tu copia de Drive no se toca hasta que decidas en Ajustes › Tus datos qué datos usar.','If you start from scratch, your Drive backup is not touched until you choose in Settings › Your data which data to keep.')}</p>`;
+      <p class="xs mut" style="line-height:1.5;margin-top:12px">${tx('Si empiezas de cero, tu copia de Drive no se toca hasta que decidas en Ajustes › Tu cuenta y tus datos qué datos usar.','If you start from scratch, your Drive backup is not touched until you choose in Settings › Your account and data which data to keep.')}</p>`;
     foot=`<div class="row" style="gap:8px">${atras}</div>`;
   } else if (p.paso==='nombre'){
     b=titulo(tx('¿Cómo te llamamos?','What should we call you?'),tx('Así te saludará PandarIA.','This is how PandarIA will greet you.'))+
@@ -8985,7 +9041,7 @@ A.obEnd=v=>{
 SCREENS.cloudIntro = () => `<div class="lbody" style="padding-top:34px"><div style="text-align:center"><div style="width:80px;height:80px;border-radius:24px;background:var(--acs);color:var(--ac);display:grid;place-items:center;margin:0 auto">${I('upload',40)}</div>
   <div style="font-size:24px;font-weight:900;margin-top:18px;line-height:1.2;text-wrap:balance">${tx('Novedad: guarda tus datos en tu Google Drive','New: save your data in your Google Drive')}</div></div>
   ${[[tx('Recupera todo si cambias de teléfono','Get everything back if you change phones'),tx('Entrenos, rutinas, diario, medidas, fotos y Premium.','Workouts, routines, diary, measurements, photos and Premium.')],[tx('Se guarda solo','It saves itself'),tx('Al terminar cada entreno y una vez al día.','After each workout and once a day.')],[tx('Privado','Private'),tx('Va a una carpeta oculta de tu Drive. Nadie más la ve.','It goes to a hidden folder in your Drive. Nobody else sees it.')]].map(([t,d])=>`<div class="row" style="gap:12px;align-items:flex-start;margin-top:16px"><span style="color:var(--ok)">${I('check',22)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4">${d}</div></div></div>`).join('')}
-  </div><div class="lfoot"><button class="btn pri big" data-a="ciGoogle">${I('user',20)} ${tx('Continuar con Google','Continue with Google')}</button><button class="btn wide" style="margin-top:8px" data-a="ciLater">${tx('Ahora no','Not now')}</button><div class="xs mut" style="text-align:center;margin-top:8px">${tx('Siempre disponible en Ajustes › Tus datos.','Always available in Settings › Your data.')}</div></div>`;
+  </div><div class="lfoot"><button class="btn pri big" data-a="ciGoogle">${I('user',20)} ${tx('Continuar con Google','Continue with Google')}</button><button class="btn wide" style="margin-top:8px" data-a="ciLater">${tx('Ahora no','Not now')}</button><div class="xs mut" style="text-align:center;margin-top:8px">${tx('Siempre disponible en Ajustes › Tu cuenta y tus datos.','Always available in Settings › Your account and data.')}</div></div>`;
 A.ciLater=()=>{ S.settings.cloudIntro=true; save(); closeLayer(); };
 A.ciGoogle=async()=>{ S.settings.cloudIntro=true; save(); closeLayer(); await cloudSignIn('intro'); };
 function cloudBoot(){
@@ -9097,6 +9153,81 @@ function viewAjustes(){
   <div class="mut xs" style="text-align:center;margin:16px 0 8px">Tus datos se guardan solo en este dispositivo.</div>
   <input type="file" id="impfile" accept="application/json,.json" class="hide" data-ch="importFile">`;
 }
+/* ========== Ajustes por grupos (0.9.3) ==========
+   La pantalla de Ajustes se arma igual que antes (con lo que añaden native.js y premium.js) y después se reparte:
+   la principal queda corta (perfil, Premium y 8 grupos) y cada grupo abre su propia pantalla con sus ajustes de siempre. */
+const AJ_GRUPOS=[
+  {id:'cuenta',ic:'user',t:'Tu cuenta y tus datos',en:'Your account and data',d:'Copia en Google Drive, exportar e importar',den:'Google Drive backup, export and import',
+   parts:[{sec:'Copia en Google Drive',whole:true},{sec:'Tus datos',keys:['exportData','importData','exportCSV','premigOpen'],rest:['Tus datos']},{keys:['wipeData']}]},
+  {id:'entreno',ic:'dumbbell',t:'Entrenamiento',en:'Training',d:'Equipos, nivel, plan semanal, unidades',den:'Equipment, level, weekly plan, units',
+   parts:[{keys:['openEquip','setLevel','openPlan','setUnit','setPlate','setRestDef','openAvoid','openArchived'],rest:['Entrenamiento']}]},
+  {id:'pandaria',ic:'spark',t:'PandarIA',en:'PandarIA',d:'Descansos, esfuerzo, check-in e informes',den:'Rests, effort, check-in and reports',
+   parts:[{keys:['toggleSet:restSmart','toggleSet:rir','toggleSet:checkin','toggleSet:period','toggleSet:report','toggleSet:tips'],rest:['PandarIA']}]},
+  {id:'nutri',ic:'leaf',t:'Nutrición y ayuno',en:'Nutrition and fasting',d:'Objetivo nutricional y ayuno',den:'Nutrition goal and fasting',
+   parts:[{keys:[],rest:['Nutrición y ayuno']}]},
+  {id:'avisos',ic:'bell',t:'Avisos y sonido',en:'Reminders and sound',d:'Notificaciones, sonido, vibración y voz',den:'Notifications, sound, vibration and voice',
+   parts:[{keys:['nfMenu'],rest:['Notificaciones','Recordatorios'],whole:true},{sec:'Durante el entreno',keys:['toggleSet:sound','toggleSet:vibrate','toggleSet:voice','toggleSet:uiSound']}]},
+  {id:'pantalla',ic:'moon',t:'Pantalla e idioma',en:'Display and language',d:'Idioma, tema, texto grande y animaciones',den:'Language, theme, large text and animations',
+   parts:[{keys:['setLang','setThemeMode','toggleSet:bigText','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
+  {id:'salud',ic:'heart',t:'Salud',en:'Health',d:'Health Connect',den:'Health Connect',parts:[{keys:[],rest:['Salud'],whole:true}]},
+  {id:'acerca',ic:'info',t:'Acerca de',en:'About',d:'Ciencia, historial de cambios, créditos y versión',den:'Science, change history, credits and version',
+   parts:[{sec:'Acerca de',whole:true,noHead:true},{html:()=>typeof A.hcPrivacy==='function'?`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" data-a="hcPrivacy"><span class="si">${I('lock',20)}</span><span class="grow b">${tx('Política de privacidad','Privacy policy')}</span><span class="mut" style="font-size:22px;line-height:1">›</span></button></div>`:''},{sec:'Créditos',whole:true},{otros:true}]}
+];
+const AJ_OUT=new Set(['openRev']); // filas que ya no se muestran
+// Reparte el HTML de Ajustes en piezas: cabecera de arriba, secciones con sus filas y lo que queda al final
+function ajPiezas(html){
+  const tp=document.createElement('template'); tp.innerHTML=html; const top=[], secs=[], tail=[]; let cur=null;
+  [...tp.content.childNodes].forEach(n=>{
+    if (n.nodeType===1 && n.classList.contains('sec')){ cur={name:n.textContent.trim(),nodes:[]}; secs.push(cur); return; }
+    if (n.nodeType===1 && n.classList.contains('hdr')) return;
+    if (!cur){ top.push(n); return; }
+    if (n.nodeType===1 && /^(INPUT)$/.test(n.nodeName)){ tail.push(n); return; }
+    if (n.nodeType===1 && n.classList.contains('mut') && n.classList.contains('xs') && !n.classList.contains('card') && /Tus datos se guardan/.test(n.textContent)) return;
+    cur.nodes.push(n);
+  });
+  // filas sueltas de cada sección, con su clave (acción y valor)
+  secs.forEach(s=>{ s.rows=[]; s.blocks=[];
+    s.nodes.forEach(n=>{ if (n.nodeType!==1) return;
+      const rows=n.classList.contains('card')?[...n.children].filter(c=>c.classList.contains('srow')):[];
+      if (rows.length && rows.length===[...n.children].length){ rows.forEach(r=>{ const a=r.dataset.a?r:r.querySelector('[data-a]'); const act=a?a.dataset.a:''; const v=a&&a.dataset.a==='toggleSet'?a.dataset.v:'';
+        s.rows.push({key:v?act+':'+v:act,html:r.outerHTML}); }); }
+      else s.blocks.push(n.outerHTML); }); });
+  return {top:top.map(n=>n.nodeType===1?n.outerHTML:(n.textContent||'')).join(''),secs,tail:tail.map(n=>n.outerHTML).join('')};
+}
+function ajGrupoHtml(g,P){
+  const used=new Set(), card=rows=>rows.length?`<div class="card" style="padding:0 12px">${rows.join('')}</div>`:'';
+  const find=k=>{ for (const s of P.secs) for (const r of s.rows) if (r.key===k && !used.has(s.name+k)){ used.add(s.name+k); return r.html; } return null; };
+  let h='';
+  g.parts.forEach(pt=>{
+    if (pt.otros){ P.secs.filter(s=>!AJ_SECS.has(s.name)).forEach(s=>{ h+=`<div class="sec">${esc(s.name)}</div>`+s.blocks.join('')+card(s.rows.filter(r=>!AJ_OUT.has(r.key)).map(r=>r.html)); }); return; }
+    const rows=(pt.keys||[]).map(find).filter(Boolean);
+    (pt.rest||[]).forEach(sn=>{ const s=P.secs.find(x=>x.name===sn); if (!s) return; s.rows.forEach(r=>{ if (!AJ_OUT.has(r.key) && !used.has(s.name+r.key) && !AJ_ALL_KEYS.has(r.key)){ used.add(s.name+r.key); rows.push(r.html); } }); if (pt.whole) h+=s.blocks.join(''); });
+    const sec=pt.sec?P.secs.find(x=>x.name===pt.sec):null;
+    if (pt.html){ h+=pt.html(); return; }
+    if (pt.whole && sec && !pt.keys){ h+=(pt.noHead?'':`<div class="sec">${esc(tx(pt.sec,AJ_SEC_EN[pt.sec]||pt.sec))}</div>`)+sec.blocks.join('')+card(sec.rows.filter(r=>!AJ_OUT.has(r.key)).map(r=>r.html)); return; }
+    if (rows.length) h+=(pt.sec&&g.parts.length>1?`<div class="sec">${esc(tx(pt.sec,AJ_SEC_EN[pt.sec]||pt.sec))}</div>`:(h?'<div style="height:14px"></div>':''))+card(rows);
+  });
+  return h||`<p class="mut">${tx('No hay ajustes en este grupo.','There are no settings in this group.')}</p>`;
+}
+const AJ_SEC_EN={'Copia en Google Drive':'Google Drive backup','Tus datos':'Your data','Durante el entreno':'During the workout','Acerca de':'About','Créditos':'Credits'};
+const AJ_SECS=new Set(AJ_GRUPOS.flatMap(g=>g.parts.flatMap(p=>[p.sec,...(p.rest||[])]).filter(Boolean)));
+const AJ_ALL_KEYS=new Set(AJ_GRUPOS.flatMap(g=>g.parts.flatMap(p=>p.keys||[])));
+let AJ_BASE=null;
+function ajInstall(){
+  if (AJ_BASE) return; AJ_BASE=viewAjustes;
+  viewAjustes=function(){
+    const P=ajPiezas(AJ_BASE.apply(this,arguments));
+    const rows=AJ_GRUPOS.map(g=>`<button class="srow" data-a="ajGrupo" data-v="${g.id}"><span class="si">${I(g.ic,20)}</span><span class="grow"><div class="b">${tx(g.t,g.en)}</div><div class="xs mut">${tx(g.d,g.den)}</div></span><span class="mut" style="font-size:22px;line-height:1">›</span></button>`).join('');
+    return `<div class="hdr"><h1>Ajustes</h1></div>${P.top}<div class="card" style="padding:0 12px;margin-top:14px">${rows}</div>
+      <p class="xs mut" style="text-align:center;margin:16px 0 8px">PandarIA Fit ${APP_VERSION} · LunaDoggyBru Studios</p>${P.tail}`;
+  };
+}
+SCREENS.ajGrupo=p=>{ const g=AJ_GRUPOS.find(x=>x.id===p.g)||AJ_GRUPOS[0]; const P=ajPiezas((AJ_BASE||viewAjustes)());
+  return lhdr(tx(g.t,g.en))+`<div class="lbody">${ajGrupoHtml(g,P)}</div>`; };
+A.ajGrupo=v=>openLayer('ajGrupo',{g:v});
+// los ajustes cambian con render(): si el grupo está abierto, también se vuelve a dibujar
+{ const r0=render; render=function(){ const out=r0.apply(this,arguments); if (LAYERS.length && LAYERS[LAYERS.length-1].t==='ajGrupo') refreshTop(); return out; }; }
+document.addEventListener('DOMContentLoaded',()=>{ ajInstall(); if (TAB==='ajustes' && typeof S!=='undefined' && S) render(); });
 A.premigOpen=()=>{ const L=premigList(); if(!L.length) return; const p=L[L.length-1];
   sheet('Datos de antes de actualizar',[
     {icon:'history',label:'Volver a esos datos',desc:`Copia guardada ${p.date?fmtDate(p.date):''} al actualizar la app. Reemplaza tus datos actuales.`,fn:()=>confirmBox({title:'¿Volver a los datos anteriores?',text:'Perderás lo que hayas registrado después de actualizar. Te recomendamos exportar una copia antes.',danger:true,okText:'Volver',ok:()=>{ try{ const d=JSON.parse(localStorage.getItem(premigKey(p.v))); migrateData(d,null); S=Object.assign(DEF(),d); S.settings=Object.assign(DEF().settings,d.settings||{}); loadExercises(S.customEx); applyTheme(); save(true); render(); toast('Datos anteriores recuperados'); }catch(e){ toast('No se pudo leer la copia'); } }})},
@@ -10601,7 +10732,47 @@ const ALIM_EN_RAW=`09003|Apple with skin
 14067|Soy protein powder
 14062|Meal replacement shake
 19177|Collagen powder`;
-const ALIM_EN={}; ALIM_EN_RAW.split('\n').forEach(l=>{ const i=l.indexOf('|'); ALIM_EN[l.slice(0,i)]=l.slice(i+1); });
+const ALIM_REC_EN=`R01|Fried breaded beef cutlet (milanesa)
+R02|Fried breaded chicken cutlet (milanesa)
+R03|Oven-baked breaded beef cutlet
+R04|Milanesa napolitana (with ham, cheese and tomato)
+R05|Uruguayan chivito sandwich
+R06|Choripán (chorizo sandwich)
+R07|Chimichurri
+R08|Salsa criolla (onion and tomato relish)
+R09|Spanish potato omelette (tortilla de patatas)
+R10|Meat and potato pie (pastel de papa)
+R11|Lentil stew with chorizo
+R12|Potato gnocchi with tomato sauce
+R13|Ham and cheese tart
+R14|Chard and egg pie (pascualina)
+R15|Ham and cheese empanada
+R16|Chicken empanada
+R17|Cornstarch alfajor with dulce de leche
+R18|Fried dough bread (torta frita)
+R19|Polenta with tomato sauce
+R20|Grilled provolone (provoleta)
+R21|Mixed salad (lettuce, tomato and onion)
+R22|Cuban ropa vieja (shredded beef)
+R23|Cuban picadillo
+R24|Cuban chicken fricassee
+R25|Cuban sandwich
+R26|Ham croquettes
+R27|Red chilaquiles
+R28|Guacamole
+R29|Tacos al pastor
+R30|Huevos rancheros
+R31|Chicken tinga
+R32|Mixed paella
+R33|Gazpacho
+R34|Fabada (white bean stew)
+R35|Pisto (vegetable stew)
+R36|Patatas bravas
+R37|Churros
+R38|Homemade mashed potatoes
+R39|Rice with fried egg (arroz a la cubana)
+R40|Grilled steak with salad`;
+const ALIM_EN={}; (ALIM_EN_RAW+'\n'+ALIM_REC_EN).split('\n').forEach(l=>{ const i=l.indexOf('|'); ALIM_EN[l.slice(0,i)]=l.slice(i+1); });
 Object.keys(ALIM_EN).forEach(id=>{ if (ALIM[id]) ALIM[id].key+=' '+anorm(ALIM_EN[id]); });
 const EN_08=`Diario de comidas|Food diary
 ÚLTIMOS 7 DÍAS (KCAL)|LAST 7 DAYS (KCAL)
@@ -10940,7 +11111,7 @@ const EN_08_RX=[
   [/^Plan (.+)\. Toca para empezarlo\.$/,'Plan $1. Tap to start it.'],
   [/^de (\d+) h · (.+)$/,'of $1 h · $2'],[/^Siguiente: (.+) a las (\d+) h$/,(m,a,h)=>`Next: ${EN_MAP.get(a)||a} at ${h} h`]
 ];
-const EN_POR={'taza':'cup','unidad':'unit','unidades':'units','porción':'serving','cucharada':'tbsp','cucharadas':'tbsp','cucharadita':'tsp','cucharaditas':'tsp','vaso':'glass','pieza':'piece','piezas':'pieces','lata':'can','rebanada':'slice','rebanadas':'slices','plato':'plate','puñado':'handful','mediano':'medium','mediana':'medium','filete':'fillet','grande':'large','hoja':'leaf','hojas':'leaves','pote':'pot','feta':'slice','barra':'bar','bife':'steak','sobre':'packet','cuadrito':'square','pequeña':'small','pequeño':'small','tallo':'stalk','tajada':'slice','scoop':'scoop','copa':'glass','rodaja':'slice','rodajas':'slices','ramillete':'floret','pizca':'pinch','mitad':'half','medida':'measure','medidas':'measures','botella':'bottle','bola':'scoop','yema':'yolk','uvas':'grapes','trozo':'piece','tiras':'strips','tira':'strip','tapa':'wrapper','tacita':'small cup','ramita':'sprig','racimo':'bunch','penca':'pad','pechuga':'breast','medallón':'patty','mazorca':'ear','lonja':'slice','diente':'clove','cubo':'cube','clara':'white','cerezas':'cherries','bulbo':'bulb','bolsita':'bag','aceituna':'olive','picada':'chopped','picado':'chopped','en':'','rodajas':'slices','cubos':'cubes','trozos':'pieces','puré':'purée','gajos':'segments','mitades':'halves','rallada':'grated','entera':'whole','molida':'ground','desmenuzada':'crumbled','derretida':'melted','compacta':'packed','cocida':'cooked','de':'','empanada':'empanada'};
+const EN_POR={'chivito':'chivito','choripán':'choripán','sándwich':'sandwich','taco':'taco','taza':'cup','unidad':'unit','unidades':'units','porción':'serving','cucharada':'tbsp','cucharadas':'tbsp','cucharadita':'tsp','cucharaditas':'tsp','vaso':'glass','pieza':'piece','piezas':'pieces','lata':'can','rebanada':'slice','rebanadas':'slices','plato':'plate','puñado':'handful','mediano':'medium','mediana':'medium','filete':'fillet','grande':'large','hoja':'leaf','hojas':'leaves','pote':'pot','feta':'slice','barra':'bar','bife':'steak','sobre':'packet','cuadrito':'square','pequeña':'small','pequeño':'small','tallo':'stalk','tajada':'slice','scoop':'scoop','copa':'glass','rodaja':'slice','rodajas':'slices','ramillete':'floret','pizca':'pinch','mitad':'half','medida':'measure','medidas':'measures','botella':'bottle','bola':'scoop','yema':'yolk','uvas':'grapes','trozo':'piece','tiras':'strips','tira':'strip','tapa':'wrapper','tacita':'small cup','ramita':'sprig','racimo':'bunch','penca':'pad','pechuga':'breast','medallón':'patty','mazorca':'ear','lonja':'slice','diente':'clove','cubo':'cube','clara':'white','cerezas':'cherries','bulbo':'bulb','bolsita':'bag','aceituna':'olive','picada':'chopped','picado':'chopped','en':'','rodajas':'slices','cubos':'cubes','trozos':'pieces','puré':'purée','gajos':'segments','mitades':'halves','rallada':'grated','entera':'whole','molida':'ground','desmenuzada':'crumbled','derretida':'melted','compacta':'packed','cocida':'cooked','de':'','empanada':'empanada'};
 function enPor(p){ return p.split(' ').map(w=>EN_POR[w]!=null?EN_POR[w]:w).filter(Boolean).join(' '); }
 EN_08_RX.push([/^(\d+(?:\/\d+)?|\d+ ×) ([a-zñáéíóú ]+)$/,(m,q,p)=>p.split(' ').every(w=>EN_POR[w]!=null)?q+' '+enPor(p):m]);
 
@@ -11536,7 +11707,7 @@ tus equipos|your equipment
 Usaremos|We will use
 Idea, diseño y desarrollo:|Idea, design and development:
 Una app de|An app by
-PandarIA Fit · creada por Eddy · LunaDog|PandarIA Fit · made by Eddy · LunaDog
+PandarIA Fit · creada por Eddy · LunaDoggyBru Studios|PandarIA Fit · made by Eddy · LunaDoggyBru Studios
 creada por Eddy|made by Eddy
 Revisión:|Review:
 Revisión de animaciones|Animation review
@@ -11661,7 +11832,7 @@ Usamos nuestro potente algoritmo para diseñar tu rutina perfecta, te ayudaremos
 Variar el ejercicio ayuda a romper estancamientos.|Changing the exercise helps break plateaus.
 años|years
 de 16 h|of 16 h
-© 2026 LunaDog. Todos los derechos reservados.|© 2026 LunaDog. All rights reserved.
+© 2026 LunaDoggyBru Studios. Todos los derechos reservados.|© 2026 LunaDoggyBru Studios. All rights reserved.
 ¿Cuándo empezaste a ayunar?|When did you start fasting?
 ¿Qué comida quieres guardar?|Which meal do you want to save?
 ¿Qué quieres entrenar hoy?|What do you want to train today?
@@ -12155,7 +12326,7 @@ Más espacio arriba para el notch en todas las pantallas|More room at the top fo
 «Buscar actualizaciones» abre directamente la versión nueva|«Check for updates» opens the new version directly
 inglés completo|full English
 PandarIA: progresión en vivo, rutinas por grupo muscular, Confía en PandarIA, sugerencias cada 3 entrenos y renovación cada 15|PandarIA: live progression, routines by muscle group, Trust PandarIA, suggestions every 3 workouts and a refresh every 15
-PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Solo funcionará en este teléfono; si borras la app tendrás que pedirlo de nuevo. Si inicias sesión con Google en Ajustes › Tus datos, funcionará en cualquier teléfono con tu cuenta.|PandarIA Fit is a personal project. If you can't pay, write to me and I'll give it to you. It will only work on this phone; if you delete the app you'll have to ask again. If you sign in with Google in Settings › Your data, it will work on any phone with your account.
+PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Solo funcionará en este teléfono; si borras la app tendrás que pedirlo de nuevo. Si inicias sesión con Google en Ajustes › Tu cuenta y tus datos, funcionará en cualquier teléfono con tu cuenta.|PandarIA Fit is a personal project. If you can't pay, write to me and I'll give it to you. It will only work on this phone; if you delete the app you'll have to ask again. If you sign in with Google in Settings › Your account and data, it will work on any phone with your account.
 PandarIA basa sus recomendaciones en guías del American College of Sports Medicine (ACSM) y la National Strength and Conditioning Association (NSCA) para fuerza, la Organización Mundial de la Salud (OMS) para actividad física y la International Society of Sports Nutrition (ISSN) para nutrición. No reemplaza a un profesional de la salud.|PandarIA bases its recommendations on guidelines from the American College of Sports Medicine (ACSM) and the National Strength and Conditioning Association (NSCA) for strength, the World Health Organization (WHO) for physical activity and the International Society of Sports Nutrition (ISSN) for nutrition. It does not replace a health professional.
 PandarIA e informes|PandarIA and reports
 PandarIA evitará este ejercicio al crear rutinas.|PandarIA will avoid this exercise when building routines.
@@ -12167,7 +12338,25 @@ PandarIA: incrementos y peso inicial según el tipo de equipo, y lesiones del pe
 PandarIA: periodización por bloques y semanas de descarga|PandarIA: block periodisation and deload weeks
 PandarIA: prioriza máquinas y Smith para principiantes y más peso libre para avanzados|PandarIA: favours machines and Smith for beginners and more free weights for advanced lifters
 PandarIA: si un ejercicio te molesta, ofrece primero la versión en máquina|PandarIA: if an exercise bothers you, it offers the machine version first
-PandarIA: sugiere pasar de la versión guiada al peso libre cuando ya progresas|PandarIA: suggests moving from the guided version to free weights once you progress`;
+PandarIA: sugiere pasar de la versión guiada al peso libre cuando ya progresas|PandarIA: suggests moving from the guided version to free weights once you progress
+Pulido: cero errores, copia en Google Drive, inglés completo y recetas típicas|Polish: zero errors, Google Drive backup, full English and typical recipes
+Etapa 4 · Ajustes ordenados: la pantalla principal queda corta, con tu perfil, Premium y 8 grupos (Tu cuenta y tus datos, Entrenamiento, PandarIA, Nutrición y ayuno, Avisos y sonido, Pantalla e idioma, Salud y Acerca de) que abren su propia pantalla|Stage 4 · Settings tidied up: the main screen is short, with your profile, Premium and 8 groups (Your account and data, Training, PandarIA, Nutrition and fasting, Reminders and sound, Display and language, Health and About) that open their own screen
+«Borrar todos los datos» queda aparte, al final de Tu cuenta y tus datos|«Delete all data» sits apart, at the end of Your account and data
+La política de privacidad se puede abrir desde Ajustes › Acerca de|The privacy policy can be opened from Settings › About
+40 recetas típicas de Uruguay, Argentina, Cuba, México y España en el diario (milanesas, chivito, choripán, tortilla de papas, pascualina, ropa vieja, picadillo, chilaquiles, tacos al pastor, paella, gazpacho, fabada y más), calculadas con ingredientes del USDA y con sus alérgenos; la ficha muestra qué lleva cada una|40 typical recipes from Uruguay, Argentina, Cuba, Mexico and Spain in the diary (milanesas, chivito, choripán, Spanish omelette, pascualina, ropa vieja, picadillo, chilaquiles, tacos al pastor, paella, gazpacho, fabada and more), calculated from USDA ingredients and with their allergens; each one shows what it contains
+Nuevo nombre del estudio: LunaDoggyBru Studios|New studio name: LunaDoggyBru Studios
+La revisión de animaciones se apaga para la versión final (los votos ya enviados se guardan)|Animation review is switched off for the final version (votes already sent are kept)
+Arreglo: algunas metas guardadas con un formato antiguo mostraban «Invalid Date» y la barra de progreso vacía|Fix: some goals saved in an old format showed «Invalid Date» and an empty progress bar
+0.9 · Versión completa: 0.9 cerrada|0.9 · Complete version: 0.9 closed
+Ajustes ordenados en 8 grupos|Settings organised into 8 groups
+40 recetas típicas de Uruguay, Argentina, Cuba, México y España|40 typical recipes from Uruguay, Argentina, Cuba, Mexico and Spain
+Nuevo nombre: LunaDoggyBru Studios|New name: LunaDoggyBru Studios
+Política de privacidad en Ajustes › Acerca de|Privacy policy in Settings › About
+Revisión de animaciones apagada para la versión final|Animation review switched off for the final version
+Tu cuenta y tus datos|Your account and data
+Política de privacidad|Privacy policy
+Etapa 4 · Ajustes ordenados|Stage 4 · Settings tidied up
+Perfil guardado|Profile saved`;
 const enN=x=>{ x=String(x).trim(); const r=EN_MAP.get(x); if(r) return r; const t=trText(x); return t==null?x:t.trim(); };
 const enList=x=>x.split(/, | y /).map(enN).join(', ');
 const EN_MED={Peso:'Weight',Cintura:'Waist',Cadera:'Hips',Pecho:'Chest',Brazo:'Arm',Muslo:'Thigh',Cuello:'Neck',Hombros:'Shoulders',Pantorrilla:'Calf',Grasa:'Body fat',Glúteo:'Glutes',Antebrazo:'Forearm'};
