@@ -313,7 +313,7 @@
       for (let d = 0; d < 2 && k < 40; d++){
         const base = now + d * DAYMS, day = new Date(base);
         if (!n.waterDays.includes(day.getDay())) continue;
-        const drank = d === 0 ? (nut().water[dayKey()] || 0) : 0, done = drank >= goal;
+        const drank = d === 0 ? (typeof waterToday === 'function' ? waterToday() : (nut().water[dayKey()] || 0)) : 0, done = drank >= goal;
         if (done && !n.waterAfterGoal) continue;
         const st = atTime(base, n.waterFrom).getTime(), en = atTime(base, n.waterTo).getTime();
         const step = (done ? n.waterEvery * 2 : n.waterEvery) * 60000;
@@ -726,7 +726,8 @@
 
   /* ---------- 13. Health Connect (Fase 6) ---------- */
   const HC = P('Health');
-  const HCS = () => (S.settings.hc = Object.assign({on:false, steps:true, weight:true, hr:true, writeWeight:true, writeWorkouts:true, useInPandaria:true, lastWeightTs:0}, S.settings.hc || {}));
+  const HCS = () => (S.settings.hc = Object.assign({on:false, steps:true, weight:true, hr:true, writeWeight:true, writeWorkouts:true, writeFood:false, writeWater:false, useInPandaria:true, lastWeightTs:0}, S.settings.hc || {}));
+  const HC_READ = ['steps','weight','heartRate','restingHeartRate'], HC_WRITE = ['weight','calories','dietaryEnergyConsumed','dietaryWater'];
   const HD = {available: null, reason: '', steps: null, steps7: null, weight: null, weightAt: 0, hr: null, hrKind: '', lastSync: 0};
   const isPrem = () => typeof isPremium === 'function' ? isPremium() : true;
   async function hcAvail(){ try{ const r = await HC.isAvailable(); HD.available = !!r.available; HD.reason = r.reason || ''; }catch(e){ HD.available = false; } return HD.available; }
@@ -734,8 +735,8 @@
     if (!HC){ toast('Health Connect no está disponible'); return; }
     if (!(await hcAvail())){ confirmBox({title:'Falta Health Connect', text:'Instala <b>Health Connect</b> de Google desde Play Store (en Android 14 o superior ya viene incluido) y vuelve a intentarlo.', okText:'Entendido', ok:() => {}}); return; }
     try{
-      await HC.requestAuthorization({read: ['steps','weight','heartRate','restingHeartRate'], write: ['weight','calories']});
-      HCS().on = true; save(); await hcSync(true); refreshHc(); toast('Health Connect conectado');
+      await HC.requestAuthorization({read: HC_READ, write: HC_WRITE});
+      const s0 = HCS(); s0.on = true; s0.writeFood = s0.writeWater = true; save(); await hcSync(true); refreshHc(); toast('Health Connect conectado');
     }catch(e){ toast('No se pudo conectar. Revisa los permisos en Health Connect.'); }
   }
   const iso = d => new Date(d).toISOString();
@@ -787,6 +788,17 @@
     if (HC && s.on && s.writeWeight && isPrem() && S.measures.length > n0 && m && m.peso && m.src !== 'hc')
       HC.saveSample({dataType:'weight', value: +m.peso, startDate: iso(m.date)}).catch(() => {});
   };
+  // Comidas del diario (energía consumida) y agua (hidratación) en Health Connect (Premium). Solo lo de hoy.
+  const _da = diarioAdded;
+  diarioAdded = function(k, entries){
+    _da.apply(this, arguments);
+    const s = HCS(); if (!HC || !s.on || !s.writeFood || !isPrem() || k !== dayKey()) return;
+    (entries || []).forEach(e => { const kc = Math.round(+e.k || 0); if (kc <= 0) return; const t0 = Math.min(Date.now(), e.t || Date.now()) - 60000;
+      HC.saveSample({dataType:'dietaryEnergyConsumed', value: kc, startDate: iso(t0), endDate: iso(t0 + 60000), metadata: {source:'PandarIA Fit', food: String(e.n || '').slice(0, 60)}}).catch(() => {}); });
+  };
+  const _wHc = A.water;
+  A.water = v => { _wHc(v); const s = HCS(); if (HC && s.on && s.writeWater && isPrem() && +v > 0){ const t0 = Date.now() - 60000;
+    HC.saveSample({dataType:'dietaryWater', value: (+v) / 1000, startDate: iso(t0), endDate: iso(t0 + 60000), metadata: {source:'PandarIA Fit'}}).catch(() => {}); } };
   // PandarIA ajusta tus calorías con tus pasos (Premium)
   const _cn = calcNutrition;
   calcNutrition = function(){
@@ -801,7 +813,7 @@
   SCREENS.hcMenu = () => {
     const s = HCS(), prem = isPrem();
     const tg = (k, l, d, premOnly) => { const lock = premOnly && !prem; return `<button class="srow" data-a="${lock ? 'pfPay' : 'hcTog'}" data-v="${k}"><span class="grow"><div class="b">${l}${lock ? ' 🔒' : ''}</div>${d ? `<div class="xs mut">${d}</div>` : ''}</span><span class="toggle ${s[k] && !lock ? 'on' : ''}"></span></button>`; };
-    let b = `<p class="sm mut" style="margin-top:0;line-height:1.5">Conecta PandarIA Fit con Health Connect para leer pasos, peso y pulso de Samsung Health u otras apps, y guardar allí tus entrenos y tu peso.</p>`;
+    let b = `<p class="sm mut" style="margin-top:0;line-height:1.5">Conecta PandarIA Fit con Health Connect para leer pasos, peso y pulso de Samsung Health u otras apps, y guardar allí tus entrenos, tu peso, tus comidas y tu agua.</p>`;
     if (!s.on) b += `<div class="card" style="text-align:center"><div style="font-size:38px">❤️</div><div class="b" style="margin:6px 0 4px">Health Connect no está conectado</div><div class="xs mut" style="margin-bottom:14px">Tú eliges qué datos compartir. Puedes desconectarlo cuando quieras.</div><button class="btn pri wide" data-a="hcConnect">Conectar Health Connect</button></div>`;
     else {
       const fmtN = n => n == null ? '—' : n.toLocaleString('es');
@@ -809,7 +821,8 @@
         <div class="stats"><div class="stat"><div class="v">${HD.weight ? fmtNum(HD.weight) + ' kg' : '—'}</div><div class="l">Peso${HD.weightAt ? ' · ' + fmtDate(HD.weightAt) : ''}</div></div><div class="stat"><div class="v">${HD.hr ? HD.hr + ' lpm' : '—'}</div><div class="l">Pulso${HD.hrKind ? ' ' + HD.hrKind : ''}</div></div></div>
         <button class="btn wide" data-a="hcSyncNow">${I('refresh',18)} Actualizar ahora</button>
         <div class="sec">Leer de Health Connect</div><div class="card" style="padding:4px 12px">${tg('steps','Pasos','Hoy y media de 7 días')}${tg('weight','Peso','Se añade solo a Mi historial › Cuerpo')}${tg('hr','Pulso','En reposo o la última medida')}</div>
-        <div class="sec">Guardar en Health Connect</div><div class="card" style="padding:4px 12px">${tg('writeWorkouts','Entrenos','Como calorías activas estimadas por duración e intensidad', true)}${tg('writeWeight','Peso','Cuando registras tu peso en Cuerpo', true)}</div>
+        <div class="sec">Guardar en Health Connect</div><div class="card" style="padding:4px 12px">${tg('writeWorkouts','Entrenos','Como calorías activas estimadas por duración e intensidad', true)}${tg('writeWeight','Peso','Cuando registras tu peso en Cuerpo', true)}${tg('writeFood','Comidas','Las calorías de lo que añades hoy a tu diario', true)}${tg('writeWater','Agua','Cada vaso o botella que sumas', true)}</div>
+        <div class="xs mut" style="margin:-4px 4px 8px;line-height:1.4">Si quitas algo del diario o del agua, bórralo también en Health Connect: PandarIA solo añade.</div>
         <div class="sec">PandarIA</div><div class="card" style="padding:4px 12px">${tg('useInPandaria','Usar mis pasos en las recomendaciones','Ajusta tus calorías diarias según tu actividad', true)}</div>
         <div class="row" style="gap:8px;margin-top:14px"><button class="btn grow sm" data-a="hcSettings">Permisos en Health Connect</button><button class="btn grow sm danger" data-a="hcOff">Desconectar</button></div>`;
     }
@@ -818,7 +831,8 @@
   };
   A.hcMenu = () => { openLayer('hcMenu'); if (HCS().on) hcSync(true).then(refreshHc); };
   A.hcConnect = () => hcConnect();
-  A.hcTog = k => { const s = HCS(); s[k] = !s[k]; save(); refreshTop(); };
+  A.hcTog = async k => { const s = HCS(); s[k] = !s[k]; save(); refreshTop();
+    if (s[k] && (k === 'writeFood' || k === 'writeWater')) try{ await HC.requestAuthorization({read: HC_READ, write: HC_WRITE}); }catch(e){ s[k] = false; save(); refreshTop(); toast('Falta el permiso en Health Connect'); } };
   A.hcSyncNow = async () => { toast('Actualizando…'); await hcSync(true); refreshHc(); };
   A.hcSettings = () => { try{ HC.openHealthConnectSettings(); }catch(e){} };
   A.hcOff = () => confirmBox({title:'¿Desconectar Health Connect?', text:'Dejaremos de leer y guardar datos. Para quitar también los permisos, hazlo en los ajustes de Health Connect.', okText:'Desconectar', danger:true, ok:() => { HCS().on = false; save(); refreshTop(); }});

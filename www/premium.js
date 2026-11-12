@@ -98,6 +98,7 @@
     ['timer','Intervalos sin límite','HIIT, EMOM y AMRAP personalizados.'],
     ['camera','Fotos de progreso','Guarda fotos y compáralas lado a lado.'],
     ['leaf','Calorías y macros','Tu objetivo diario de calorías y macros, y tu diario de comidas comparado con él, día a día y semana a semana.'],
+    ['spark','Calidad de la dieta y menús','Fibra, sodio y proteína por comida en tu diario, y ejemplos de menú con tus calorías, tu alimentación y tus alergias.'],
     ['list','Alimentos y recetas sin límite','En la versión gratis, hasta 10. Registrar comidas es gratis.'],
     ['dumbbell','Rutinas ilimitadas','En la versión gratis, hasta 3 (contando las archivadas).'],
     ['edit','Ejercicios propios ilimitados','En la versión gratis, hasta 5.'],
@@ -105,7 +106,7 @@
   ];
   const REASONS = {
     pandaria:'Las rutinas diseñadas por PandarIA son parte de Premium.', explore:'Esta rutina es parte de Premium.', intervals:'Este modo de intervalos es parte de Premium.',
-    history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.', diario:'Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.', alimProp:'En la versión gratis puedes crear hasta 10 alimentos y recetas propios.',
+    history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.', diario:'Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.', alimProp:'En la versión gratis puedes crear hasta 10 alimentos y recetas propios.', calidad:'La calidad del día (fibra, sodio y proteína por comida) es parte de Premium.', menu:'Los ejemplos de menú hechos con tus calorías y tus preferencias son parte de Premium.',
     customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
   SCREENS.premium = p => {

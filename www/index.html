@@ -905,10 +905,11 @@ const ACHIEVEMENTS = [
      consejo → cualquier otra fuente: solo tomamos el consejo, con nuestras palabras, y la citamos.
      propio  → criterio de PandarIA, cuando no hay una fuente que dé el número exacto.
    Evidencia: solida · moderada · limitada · contradictoria.  'rev' = revisar antes de esa fecha. */
-const KB_VER='1.1';
+const KB_VER='1.2';
 const KB_LOG=[
   {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'},
-  {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'}
+  {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'},
+  {v:'1.2', d:'2026-11-12', app:'0.8.4', t:'Suplementos (creatina, cafeína, beta-alanina y proteína en polvo) con su dosis, su evidencia y para quién no son; calidad de la dieta (fibra, sodio y proteína por comida); ejemplos de menú; bebidas y cafeína en el agua del día; más agua en los entrenos largos; ayuno conectado con el diario y modo viaje sin equipo.'}
 ];
 const KB_LIC={pd:'Dominio público, con crédito', consejo:'Consejo de la fuente, con nuestras palabras', propio:'Criterio propio de PandarIA'};
 const KB_EV={solida:'Evidencia sólida', moderada:'Evidencia moderada', limitada:'Evidencia limitada', contradictoria:'Evidencia contradictoria'};
@@ -926,6 +927,13 @@ const KB_SRC={
   aasm2015:{n:'Recommended amount of sleep for a healthy adult (consenso de la AASM y la SRS)', a:'Watson y col.', y:2015, pub:'Sleep 38(6):843–844', url:'https://www.aasm.org/resources/pdf/adultsleepdurationconsensus.pdf', lic:'consejo'},
   faigenbaum2009:{n:'Youth resistance training: updated position statement paper from the NSCA', a:'Faigenbaum y col.', y:2009, pub:'J Strength Cond Res 23(5 Supl):S60–S79', url:'https://pubmed.ncbi.nlm.nih.gov/19620931/', lic:'consejo'},
   schoenfeld2016:{n:'Longer interset rest periods enhance muscle strength and hypertrophy in resistance-trained men', a:'Schoenfeld y col.', y:2016, pub:'J Strength Cond Res 30(7):1805–1812', url:'https://pubmed.ncbi.nlm.nih.gov/26605807/', lic:'consejo'},
+  issn_creatina2017:{n:'ISSN exercise & sports nutrition review update: research & recommendations (creatina)', a:'Kreider y col.', y:2017, pub:'J Int Soc Sports Nutr 14:18', url:'https://doi.org/10.1186/s12970-017-0173-z', lic:'consejo'},
+  issn_cafeina2021:{n:'ISSN Position Stand: caffeine and exercise performance', a:'Guest y col.', y:2021, pub:'J Int Soc Sports Nutr 18:1', url:'https://doi.org/10.1186/s12970-020-00383-4', lic:'consejo'},
+  issn_ba2015:{n:'ISSN Position Stand: beta-alanine', a:'Trexler y col.', y:2015, pub:'J Int Soc Sports Nutr 12:30', url:'https://doi.org/10.1186/s12970-015-0090-y', lic:'consejo'},
+  efsa_cafeina2015:{n:'Scientific opinion on the safety of caffeine', a:'Autoridad Europea de Seguridad Alimentaria (EFSA)', y:2015, pub:'EFSA Journal 13(5):4102', url:'https://www.efsa.europa.eu/en/topics/topic/caffeine', lic:'consejo'},
+  efsa_fibra2010:{n:'Valores dietéticos de referencia: hidratos de carbono y fibra alimentaria', a:'Autoridad Europea de Seguridad Alimentaria (EFSA)', y:2010, pub:'EFSA Journal 8(3):1462', url:'https://doi.org/10.2903/j.efsa.2010.1462', lic:'consejo'},
+  who_sodio2012:{n:'Guideline: sodium intake for adults and children', a:'Organización Mundial de la Salud', y:2012, pub:'OMS', url:'https://www.who.int/news-room/fact-sheets/detail/salt-reduction', lic:'consejo'},
+  acsm2007:{n:'Exercise and fluid replacement (posicionamiento del ACSM)', a:'Sawka y col.', y:2007, pub:'Med Sci Sports Exerc 39(2):377–390', url:'https://pubmed.ncbi.nlm.nih.gov/17277604/', lic:'consejo'},
   pandaria:{n:'Criterio propio de PandarIA', a:'PandarIA Fit', y:2026, pub:'', url:'', lic:'propio'}
 };
 // v = el valor que usan los algoritmos. t = qué dice, con nuestras palabras. usa = dónde lo usa la app.
@@ -1004,10 +1012,35 @@ const KB_RULES=[
     t:'Un índice de masa corporal por debajo de 18,5 se considera bajo peso. En ese caso PandarIA no propone déficit y muestra tu mantenimiento.', usa:'Calorías para bajar grasa', rev:'2028-11-01', desde:'0.8.1'},
   {id:'nut.menores', area:'seguridad', n:'Menores de edad', v:{edad:18}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Menores de 18',
     t:'En menores de 18 las necesidades cambian con el crecimiento: PandarIA solo muestra el mantenimiento como orientación y recomienda consultar a un profesional.', usa:'Calorías y ayuno', rev:'2027-11-01', desde:'0.8.1'},
-  {id:'agua', area:'nutricion', n:'Agua diaria', v:{mlkg:33, ref:{h:2000, m:1600, x:1800}, min:0.85, max:1.35, entreno:500}, src:['efsa2010','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
-    t:'La EFSA considera adecuados 2,0 L de agua total al día en mujeres y 2,5 L en hombres, contando la que llega con la comida (se suele estimar en un 20 %). PandarIA parte de 33 ml por kg, lo mantiene cerca de esa referencia para que no se dispare en personas grandes ni se quede corto en pequeñas, y suma medio litro los días que entrenas.', usa:'Meta de agua', rev:'2028-11-01', desde:'0.8.1'},
+  {id:'agua', area:'nutricion', n:'Agua diaria', v:{mlkg:33, ref:{h:2000, m:1600, x:1800}, min:0.85, max:1.35, entreno:500, largo:60, extra30:250, extraMax:500}, src:['efsa2010','acsm2007','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'La EFSA considera adecuados 2,0 L de agua total al día en mujeres y 2,5 L en hombres, contando la que llega con la comida (se suele estimar en un 20 %). PandarIA parte de 33 ml por kg, lo mantiene cerca de esa referencia para que no se dispare en personas grandes ni se quede corto en pequeñas, y suma medio litro los días que entrenas. Como el sudor varía mucho (el ACSM habla de 0,4 a 0,8 L por hora), en las sesiones de más de 1 hora suma 250 ml por cada media hora extra, hasta 500 ml más.', usa:'Meta de agua', rev:'2028-11-01', desde:'0.8.1'},
+  {id:'agua.bebidas', area:'nutricion', n:'Bebidas que cuentan como agua', v:{alcohol:['14003','14006','14096','14106','14253','14037'], lacteas:['01077','01079','01085','01082','01102','01106','16139','14091','14639','14171','01289']}, src:['efsa2010','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'La referencia de la EFSA cuenta el agua de todas las bebidas. PandarIA suma a tu meta el agua de las bebidas que registras en el diario (café, té, leche, zumos, refrescos…), estimada como el peso de la bebida menos sus hidratos, proteínas y grasas. Las bebidas con alcohol no cuentan.', usa:'Agua del día', rev:'2027-11-01', desde:'0.8.4'},
+  {id:'sup.cafeina_bebidas', area:'nutricion', n:'Cafeína de las bebidas', v:{mg100:{'14209':45,'14215':45,'14210':133,'14355':23,'14278':23,'14148':11,'14416':11,'14154':32}, sueno:100}, src:['efsa_cafeina2015'], lic:'consejo', ev:'moderada', pob:'Adultos',
+    t:'Cantidades aproximadas de la EFSA: un espresso de 60 ml tiene unos 80 mg, una taza de café de filtro de 200 ml unos 90 mg, una taza de té de 220 ml unos 50 mg, una lata de cola de 355 ml unos 40 mg y una bebida energética de 250 ml unos 80 mg (el café instantáneo se cuenta como el de filtro). Unos 100 mg cerca de la hora de dormir pueden empeorar el sueño de algunas personas.', usa:'Cafeína del día en Agua', rev:'2028-11-01', desde:'0.8.4'},
   {id:'ayuno.prudencia', area:'seguridad', n:'Ayuno con prudencia', v:{inicioMaxH:18, inicioN:3, sedentarioMaxH:20, maxUtilH:24}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
     t:'PandarIA sugiere empezar por ayunos cortos (12 a 14 h), avisa si un plan es muy exigente para tu actividad y recomienda romper el ayuno pasadas 24 horas.', usa:'Consejos del ayuno', rev:'2027-11-01', desde:'0.8.1'},
+  // ---------- Suplementos y calidad de la dieta ----------
+  {id:'sup.creatina', area:'nutricion', n:'Creatina', v:{mant:[3,5], carga:0.3, cargaDias:[5,7]}, src:['issn_creatina2017'], lic:'consejo', ev:'solida', pob:'Adultos sanos que entrenan',
+    t:'La creatina monohidrato es el suplemento con más pruebas para ganar fuerza y músculo con el entrenamiento. Basta con 3 a 5 g al día, todos los días, a cualquier hora. La fase de carga (0,3 g por kg al día durante 5 a 7 días) solo hace que el efecto llegue antes. En personas sanas se considera segura; puede subir 1 o 2 kg el peso por el agua que retiene el músculo.', usa:'Suplementos', rev:'2028-11-01', desde:'0.8.4'},
+  {id:'sup.cafeina', area:'nutricion', n:'Cafeína antes de entrenar', v:{mgkg:[3,6], minAntes:60, maxDia:400, maxToma:200, embarazo:200, jovenesMgkg:3}, src:['issn_cafeina2021','efsa_cafeina2015'], lic:'consejo', ev:'solida', pob:'Adultos sanos',
+    t:'La cafeína mejora el rendimiento en muchos deportes con 3 a 6 mg por kg, unos 60 minutos antes. Dosis más bajas también pueden ayudar y más altas no rinden más y dan más efectos secundarios (nervios, taquicardia, mal sueño). La EFSA considera seguras para adultos sanos tomas de hasta 200 mg y hasta 400 mg al día en total, contando café, té y refrescos; 200 mg al día en embarazo y lactancia, y 3 mg por kg al día en menores.', usa:'Suplementos y cafeína del día', rev:'2028-11-01', desde:'0.8.4'},
+  {id:'sup.betaalanina', area:'nutricion', n:'Beta-alanina', v:{g:[4,6], semanas:[2,4], toma:2}, src:['issn_ba2015'], lic:'consejo', ev:'moderada', pob:'Adultos sanos que entrenan',
+    t:'La beta-alanina ayuda en esfuerzos intensos de 1 a 4 minutos (series largas, intervalos). Se toman 4 a 6 g al día, repartidos en tomas de 2 g o menos, durante al menos 2 a 4 semanas. Puede dar un hormigueo en la piel que no es peligroso; repartirla en tomas pequeñas lo reduce.', usa:'Suplementos', rev:'2028-11-01', desde:'0.8.4'},
+  {id:'sup.proteina', area:'nutricion', n:'Proteína en polvo', v:{}, src:['issn2017','morton2018'], lic:'consejo', ev:'solida', pob:'Adultos que entrenan',
+    t:'La proteína en polvo es un alimento práctico, no algo imprescindible: ayuda solo si con la comida no llegas a tu proteína del día. Da el mismo resultado que la proteína de los alimentos.', usa:'Suplementos', rev:'2028-11-01', desde:'0.8.4'},
+  {id:'sup.prudencia', area:'seguridad', n:'Suplementos con prudencia', v:{edad:18}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'PandarIA solo informa: no vende ni recomienda marcas. Antes de un suplemento consulta a tu médico si eres menor de edad, estás embarazada o en lactancia, tienes presión alta, una enfermedad del riñón o del corazón, o tomas medicación. Elige productos con un sello de análisis independiente y desconfía de los que prometen quemar grasa o subir hormonas.', usa:'Suplementos', rev:'2027-11-01', desde:'0.8.4'},
+  {id:'dieta.fibra', area:'nutricion', n:'Fibra diaria', v:{g:25}, src:['efsa_fibra2010'], lic:'consejo', ev:'solida', pob:'Adultos',
+    t:'La EFSA considera adecuados 25 g de fibra al día para la salud intestinal de los adultos. Llegan con legumbres, cereales integrales, frutas, verduras y frutos secos.', usa:'Calidad del día en el diario (Premium)', rev:'2028-11-01', desde:'0.8.4'},
+  {id:'dieta.sodio', area:'nutricion', n:'Sodio diario', v:{mg:2000}, src:['who_sodio2012'], lic:'consejo', ev:'solida', pob:'Adultos',
+    t:'La OMS recomienda a los adultos menos de 2 g de sodio al día (unos 5 g de sal, una cucharadita). La mayor parte llega con pan, fiambres, quesos, salsas y comidas preparadas.', usa:'Calidad del día en el diario (Premium)', rev:'2028-11-01', desde:'0.8.4'},
+  {id:'menu.ejemplo', area:'nutricion', n:'Ejemplos de menú', v:{reparto:{desayuno:0.25, almuerzo:0.35, merienda:0.12, cena:0.28}, tol:0.08}, src:['issn2017','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
+    t:'Los menús de ejemplo reparten tus calorías en cuatro comidas (25, 35, 12 y 28 %), ponen proteína en cada una, verduras en almuerzo y cena, y respetan tu alimentación y tus alergias. Son una idea para inspirarte, no una dieta.', usa:'Ejemplos de menú (Premium)', rev:'2027-11-01', desde:'0.8.4'},
+  {id:'ayuno.diario', area:'nutricion', n:'Ayuno conectado con el diario', v:{maxH:16}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
+    t:'Si usas el diario, PandarIA toma la hora de tu última comida registrada para empezar el ayuno y te ofrece terminarlo si registras comida mientras ayunas.', usa:'Ayuno intermitente', rev:'2027-11-01', desde:'0.8.4'},
+  {id:'viaje', area:'entreno', n:'Modo viaje', v:{}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'En modo viaje PandarIA cambia cada ejercicio por uno que trabaje el mismo músculo con el equipo que tengas a mano (peso corporal, bandas o TRX), con una dificultad parecida. Tu rutina no cambia: solo la sesión de hoy.', usa:'«Hoy toca» y Empezar rutina', rev:'2027-11-01', desde:'0.8.4'},
   // ---------- Seguridad ----------
   {id:'seguridad.alto_impacto', area:'seguridad', n:'Ejercicios de alto impacto', v:{edad:60, imc:30}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Mayores de 60 o IMC de 30 o más',
     t:'Desde los 60 años o con un IMC de 30 o más, PandarIA evita saltos y ejercicios de alto impacto para cuidar las articulaciones.', usa:'Ejercicios que PandarIA no elige', rev:'2027-11-01', desde:'0.8.1'},
@@ -1030,6 +1063,62 @@ const KB_WHY=[
   [/descarga/i,'descarga'], [/^Serie de calentamiento/,'calentamiento'], [/^Peso inicial estimado/,'peso.inicial'], [/bloque de intensidad/,'bloque']
 ];
 const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sueno.adultos'};
+// Textos de las reglas en inglés (pantalla Ciencia en inglés)
+const KB_EN_T={
+ 'obj.fuerza':'To build strength, train with heavy loads (up to 6 reps) and rest at least 3 minutes between sets of the main lifts.',
+ 'obj.musculo':'To build muscle, sets of 6 to 12 reps are recommended above all, with 1 to 2 minutes of rest.',
+ 'obj.resistencia':'For muscular endurance, use light loads with many reps (15 or more) and short rests.',
+ 'obj.grasa':'To lose fat, PandarIA uses slightly longer sets and short rests that keep your heart rate up. Diet is what counts most for fat loss.',
+ 'obj.salud':'For general health, moderate loads of 8 to 15 reps are enough, training every muscle group 2 or more days a week.',
+ 'obj.flexibilidad':'In mobility routines PandarIA uses few sets and minimal rest: the priority is moving with control.',
+ 'descanso.multi':'On weighted compound lifts (squat, press, row, deadlift), resting 2 minutes or more builds more strength and muscle than resting 1 minute, because it lets you keep your reps up.',
+ 'alternativa.similar':'When PandarIA suggests swapping an exercise, it looks for one that works the same muscles at a similar difficulty: it avoids going from a weighted exercise to a much easier one, and counts the equipment of the exercise you already do as yours.',
+ 'carga.subida':'When you complete every set at the top of the rep range, the load goes up by 2 to 10 %. PandarIA adds 5 % for legs and 2.5 % for everything else, at least one plate.',
+ 'carga.doble':'First add reps with the same weight until you reach the top of the range, and only then add weight.',
+ 'carga.bajada':'If you miss the minimum reps two sessions in a row, PandarIA lowers the weight by 10 % to consolidate technique and build back up.',
+ 'carga.esfuerzo':'If you rated the previous session as very hard (9 or 10 out of 10), PandarIA keeps the weight instead of raising it.',
+ 'regreso.pausa':'After 2 weeks without training an exercise, PandarIA lowers the weight by 10 %; after 4 weeks, by 20 %; after 8, by 30 %. It is a cautious estimate of what is lost when you stop.',
+ 'bloque':'Varying training in phases (periodisation) gives better medium-term results. PandarIA alternates 3 weeks of volume, 2 of intensity and 1 deload.',
+ 'descarga':'A lighter week (in PandarIA, 15 % less weight) every 4 to 8 weeks helps recovery. It is a very common practice with few direct studies.',
+ 'calentamiento':'Warm-up sets build up gradually: 50 %, 70 % and 85 % of the working weight, with fewer reps each time.',
+ 'volumen.hipertrofia':'Doing at least 10 sets a week for each muscle group gives more growth than doing fewer.',
+ 'volumen.minimo':'PandarIA warns you if a large muscle group had fewer than 2 sets in the last 7 days, or fewer than 4 in the report week.',
+ 'equilibrio':'PandarIA compares push with pull, quads with hamstrings and legs with upper body over the last 4 weeks, and warns you when one clearly outweighs the other.',
+ 'fuerza.e1rm':'To compare sets with different weights and reps, PandarIA estimates your max with the widely used Epley formula (weight × (1 + reps ÷ 30)).',
+ 'peso.inicial':'Without history, PandarIA estimates your starting weight from your body weight and level, and deliberately lowers it so the first session is safe. It adjusts it for sex, inactivity and age.',
+ 'sueno.adultos':'Adults should regularly sleep 7 hours or more per night.',
+ 'recuperacion.ajuste':'If at check-in you say you slept badly or have low energy, or choose to start easy, PandarIA lowers the suggested load by 10 % that day. “Up next” warns you if you are coming off a very hard session or your muscles are still recovering.',
+ 'recuperacion.48h':'If a muscle in the routine already had 6 or more sets in the last 48 hours, PandarIA warns you before you start.',
+ 'actividad.oms':'Adults need 150 to 300 minutes of moderate activity a week (or 75 to 150 of vigorous) and strength exercises 2 or more days. From age 65, balance and strength 3 or more days.',
+ 'nut.metabolismo':'Resting calories are calculated with the Mifflin-St Jeor equation: 10 × weight + 6.25 × height − 5 × age, plus 5 for men or minus 161 for women. If you prefer not to state your sex, PandarIA uses the midpoint.',
+ 'nut.actividad':'Resting calories are multiplied by a factor for your activity (1.2 to 1.55), and PandarIA raises it a little based on your workouts in the last week.',
+ 'nut.deficit':'To lose fat without losing muscle, go slowly: 0.5 to 1 % of body weight per week. PandarIA calculates the deficit for that pace (each kilo of fat is about 7,700 kcal, a common estimate), never removes more than 25 % of your expenditure and never goes below your resting metabolism.',
+ 'nut.superavit':'To build muscle PandarIA adds 5, 10 or 15 % calories depending on the pace you choose: enough to grow without gaining too much fat.',
+ 'nut.adaptativo':'Formulas are an estimate. With at least 10 days of diary and two weigh-ins 10 or more days apart in the last 2 weeks, PandarIA compares what you ate with how your weight changed, estimates your real expenditure and blends it half and half with the formula. If the result looks very odd, it is not used.',
+ 'nut.proteina':'If you train, 1.4 to 2.0 g of protein per kg a day covers your needs, and more may be needed in a deficit. The benefit for muscle levels off around 1.6 g/kg.',
+ 'nut.proteina_comida':'It helps to spread protein into servings of about 0.25 g per kg (20 to 40 g) every 3 or 4 hours.',
+ 'nut.grasa':'PandarIA reserves 0.8 g of fat per kg to cover essentials; the rest of the calories go to carbs. It usually falls within 15 to 30 % of calories.',
+ 'nut.imc_bajo':'A body mass index below 18.5 is considered underweight. In that case PandarIA does not suggest a deficit and shows your maintenance.',
+ 'nut.menores':'Under 18, needs change with growth: PandarIA only shows maintenance as a guide and recommends seeing a professional.',
+ 'agua':'EFSA considers 2.0 L of total water a day adequate for women and 2.5 L for men, including the water in food (usually estimated at 20 %). PandarIA starts from 33 ml per kg, keeps it close to that reference so it does not shoot up for large people or fall short for small ones, and adds half a litre on training days. Because sweat varies a lot (ACSM mentions 0.4 to 0.8 L per hour), for sessions over 1 hour it adds 250 ml for each extra half hour, up to 500 ml more.',
+ 'agua.bebidas':'The EFSA reference counts the water from all drinks. PandarIA adds to your goal the water from the drinks you log in the diary (coffee, tea, milk, juices, soft drinks…), estimated as the drink’s weight minus its carbs, protein and fat. Alcoholic drinks do not count.',
+ 'sup.cafeina_bebidas':'Approximate EFSA amounts: a 60 ml espresso has about 80 mg, a 200 ml cup of filter coffee about 90 mg, a 220 ml cup of tea about 50 mg, a 355 ml can of cola about 40 mg and a 250 ml energy drink about 80 mg (instant coffee is counted like filter coffee). About 100 mg close to bedtime can worsen some people’s sleep.',
+ 'ayuno.prudencia':'PandarIA suggests starting with short fasts (12 to 14 h), warns you if a plan is very demanding for your activity level and recommends breaking the fast after 24 hours.',
+ 'sup.creatina':'Creatine monohydrate is the supplement with the most evidence for gaining strength and muscle with training. 3 to 5 g a day, every day, at any time is enough. The loading phase (0.3 g per kg a day for 5 to 7 days) only makes the effect arrive sooner. It is considered safe in healthy people; it can raise body weight by 1 or 2 kg from the water muscle holds.',
+ 'sup.cafeina':'Caffeine improves performance in many sports at 3 to 6 mg per kg, about 60 minutes before. Lower doses can also help, and higher ones do not work better and cause more side effects (jitters, racing heart, poor sleep). EFSA considers single doses of up to 200 mg and up to 400 mg a day in total safe for healthy adults, counting coffee, tea and soft drinks; 200 mg a day in pregnancy and breastfeeding, and 3 mg per kg a day for minors.',
+ 'sup.betaalanina':'Beta-alanine helps with intense efforts of 1 to 4 minutes (long sets, intervals). Take 4 to 6 g a day, split into doses of 2 g or less, for at least 2 to 4 weeks. It can cause a harmless tingling of the skin; splitting it into small doses reduces it.',
+ 'sup.proteina':'Protein powder is a convenient food, not a must: it only helps if your meals do not reach your daily protein. It works the same as protein from food.',
+ 'sup.prudencia':'PandarIA only informs: it does not sell or recommend brands. Before taking a supplement, ask your doctor if you are under 18, pregnant or breastfeeding, have high blood pressure, kidney or heart disease, or take medication. Choose products with an independent testing seal and be wary of those promising to burn fat or boost hormones.',
+ 'dieta.fibra':'EFSA considers 25 g of fibre a day adequate for adults’ bowel health. It comes from legumes, whole grains, fruit, vegetables and nuts.',
+ 'dieta.sodio':'WHO recommends adults have less than 2 g of sodium a day (about 5 g of salt, one teaspoon). Most of it comes from bread, cold cuts, cheese, sauces and ready meals.',
+ 'menu.ejemplo':'Sample menus split your calories into four meals (25, 35, 12 and 28 %), put protein in each one and vegetables at lunch and dinner, and respect your diet and allergies. They are ideas for inspiration, not a diet.',
+ 'ayuno.diario':'If you use the diary, PandarIA takes the time of your last logged meal to start the fast, and offers to end it if you log food while fasting.',
+ 'viaje':'In travel mode PandarIA swaps each exercise for one that works the same muscle with the equipment you have on hand (bodyweight, bands or TRX), at a similar difficulty. Your routine does not change: only today’s session.',
+ 'seguridad.alto_impacto':'From age 60 or with a BMI of 30 or more, PandarIA avoids jumps and high-impact exercises to protect your joints.',
+ 'seguridad.menores':'Strength training is safe for well-supervised young people, starting with moderate loads and more reps. PandarIA does not go below 6 reps for minors.',
+ 'seguridad.mayores':'Rests of 1 to 3 minutes are recommended for older adults. PandarIA adds 15 seconds of rest from age 50.',
+ 'seguridad.sedentario':'If you said you are sedentary, PandarIA removes one set per exercise at first so adapting is more comfortable.'
+};
 function kbWhy(text){ if (!text) return null; for (const [re,id] of KB_WHY) if (re.test(text)) return id; return null; }
 
 /* ============ PandarIA · MOTOR DE ENTRENAMIENTO ============
@@ -1705,6 +1794,7 @@ const ICONS = {
   layers:'<path d="m12 2 10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5"/>',
   book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
   info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  pill:'<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>',
   leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z"/><path d="M2 21c0-3 1.9-5.4 5.1-6"/>',
   drop:'<path d="M12 2.7l5.7 5.6a8 8 0 1 1-11.3 0z"/>',
   weight:'<circle cx="12" cy="5" r="3"/><path d="M6.5 8h11l2.5 13H4z"/>'
@@ -4722,6 +4812,160 @@ def3('cuerdas_golpes',{cams:[CAMP,CAM34],loop:true,tm:[900],ico:.25,
   pose:u=>{ const up=Math.max(0,Math.sin(u*Math.PI*2)); const p={pel:[-6,mix(35,39,up),0],lean:mix(28,10,up),head:-8,fR:[3,D3.ANK,11],fL:[3,D3.ANK,-11],kR:[1,0,.3],kL:[1,0,-.3]}; capPel(p);
     return withHands(p,(B,g)=>{ const a=mix(55,165,up)*RAD; const S=B['sho'+SD(g)]; const dir=vn(V(UP,-Math.cos(a),[1,0,0],Math.sin(a),[0,0,1],g*.1)); return arm2(S,dir,vn(V(dir,1,[1,0,0],.2))); }); },
   kit:(R,u,B,pal)=>G.forEach(g=>ropeK(R,pal,B['hand'+SD(g)],u,0,12))});
+
+/* ===================== Revisión 6: cardio ===================== */
+// Suavizado temporal: promedia la pose con la de un instante antes y uno después. Quita los tirones entre fotogramas clave
+// sin cambiar las posiciones principales (mismo truco que un filtro de movimiento en animación).
+const NORM_KEYS=['eR','eL','kR','kL','ffR','ffL','fuR','fuL'];
+function smoothPose(fn,u,d,loop){ d=d??.035; const w=x=>loop?((x%1)+1)%1:Math.max(0,Math.min(1,x));
+  const p=blendP(blendP(fn(w(u-d)),fn(w(u+d)),.5),fn(u),.5); NORM_KEYS.forEach(k=>{ if (p[k]&&vl(p[k])>1e-6) p[k]=vn(p[k]); }); return p; }
+const sstep=t=>t*t*(3-2*t);
+const segT=(T,u)=>{ let i=0; while(i<T.length-2&&u>T[i+1]) i++; return [i,Math.max(0,Math.min(1,(u-T[i])/(T[i+1]-T[i])))]; };
+
+// --- Escaladores: plancha alta; las rodillas van al pecho alternando de forma continua, a ritmo humano ---
+def3('mountain_climbers',{cams:[CAMP,CAM34],loop:true,tm:[1500],ico:.25,
+  pose:u=>{ const p=lineP(A0,21.5); const S0=shoC(lineP(A0,21.5)); p.pel=[p.pel[0],p.pel[1]+.6*Math.sin(u*Math.PI*4),p.pel[2]]; const B0=body3(p);
+    G.forEach(g=>{ const s=SD(g); const q=(u+(g>0?0:.5))%1; const k=sstep((1-Math.cos(q*Math.PI*2))/2); const hip=B0['hip'+s];
+      if (k>.01){ const th=vn(V([1,0,0],mix(-.95,.6,k),UP,mix(-.35,-.8,k))); const kn=vp(hip,th,19.3); const sh=vn(V([1,0,0],-1,UP,mix(-.2,-.25,k))); const tgt=vp(kn,sh,18.4);
+        const f=vm(p['f'+s],tgt,k); p['f'+s]=[f[0],f[1]+2.5*Math.sin(Math.PI*k),f[2]]; p['k'+s]=vn(V(UP,-1,[1,0,0],.4*k)); p['t'+s]=20*k; } });
+    return withHands(p,(B,g)=>[[S0[0],2.6,g*11],vn(V([1,0,0],-.7,[0,0,1],g*.6,UP,.25))]); },kit:(R,u,B,pal)=>matK(R,pal,-6,80,30)});
+
+// --- Burpees: mismas fases, pero con transiciones que fluyen (sin frenar en cada postura) ---
+const BURP2=(()=>{ const hx=12, AX=hx-58.5;
+  const stand=()=>withHands(standP(),(B,g)=>[vp(B['sho'+SD(g)],UP,-26,B.r,g*2),vn(V(UP,-1,B.f,-.2))]);
+  const squat=()=>{ const p={pel:[-10,24,0],lean:62,head:-14,fR:[2,D3.ANK,8],fL:[2,D3.ANK,-8],kR:[1,0,.3],kL:[1,0,-.3]}; return withHands(p,(B,g)=>[[hx,2.6,g*10],vn(V([1,0,0],-1,[0,0,1],g*.4,UP,.2))]); };
+  const plank=()=>withHands(lineP([AX,7.9,0],20.6),(B,g)=>[[hx,2.6,g*10.5],vn(V([1,0,0],-.8,[0,0,1],g*.4,UP,.3))]);
+  const jump=()=>{ const p={pel:[0,50,0],lean:-2,head:-6,fR:[1,D3.ANK+8,6],fL:[1,D3.ANK+8,-6],kR:[1,0,.05],kL:[1,0,-.05],tR:30,tL:30}; return withHands(p,(B,g)=>{ const dir=vn(V(UP,1,B.r,g*.18)); return arm2(B['sho'+SD(g)],dir,dir); }); };
+  const dip=()=>{ const p={pel:[-6,34,0],lean:24,head:-6,fR:[2,D3.ANK,8],fL:[2,D3.ANK,-8],kR:[1,0,.3],kL:[1,0,-.3]}; return withHands(p,(B,g)=>[vp(B['sho'+SD(g)],UP,-24,B.f,-4,B.r,g*3),vn(V(UP,-1,B.f,-.3))]); };
+  const land=()=>{ const p={pel:[-3,38,0],lean:10,head:-4,fR:[1,D3.ANK,7],fL:[1,D3.ANK,-7],kR:[1,0,.2],kL:[1,0,-.2]}; return withHands(p,(B,g)=>[vp(B['sho'+SD(g)],UP,-25,B.f,2,B.r,g*2),vn(V(UP,-1,B.f,-.1))]); };
+  return {K:[stand(),squat(),plank(),plank(),squat(),dip(),jump(),land(),stand()],T:[0,.13,.27,.33,.47,.58,.7,.84,1],
+    E:[1,0,1,0,1,0,1,1]}; })();
+def3('burpees',{cams:[CAMP,CAM34],loop:true,tm:[3800],ico:.34,
+  pose:u=>smoothPose(v=>{ const K=BURP2.K, T=BURP2.T; const [i,t0]=segT(T,v); const t=BURP2.E[i]?sstep(t0):mix(t0,sstep(t0),.5); const a=K[i], b=K[i+1]; const p=blendP(a,b,t);
+    NORM_KEYS.forEach(k=>{ if (p[k]&&vl(p[k])>1e-6) p[k]=vn(p[k]); });
+    G.forEach(g=>{ const s=SD(g); const dx=Math.abs(a['f'+s][0]-b['f'+s][0]); if (dx>8) p['f'+s]=[p['f'+s][0],p['f'+s][1]+6*Math.sin(Math.PI*t),p['f'+s][2]]; }); return p; },u,.03,true),
+  kit:(R,u,B,pal)=>matK(R,pal,-14,90,30)});
+
+// --- Saltar la comba: la cuerda da la vuelta por fuera del cuerpo (por encima de la cabeza y por debajo de los pies) ---
+// Un salto por vuelta; la cuerda pasa bajo los pies justo en lo más alto del bote. Botes suaves sobre la punta.
+const ROPE={tm:760, rx:23, cy:45, ry:47};
+def3('saltar_comba',{cams:[CAM34,CAMF,CAMP],loop:true,tm:[ROPE.tm],ico:.6,
+  pose:u=>{ const air=(1-Math.cos(u*Math.PI*2))/2; const lift=3.4*air*air; const p={pel:[0,42.2+lift-.8*(1-air),0],lean:1,head:0,fR:[1.5,D3.ANK+1+lift,5],fL:[1.5,D3.ANK+1+lift,-5],kR:[1,0,.05],kL:[1,0,-.05],tR:-24+10*air,tL:-24+10*air};
+    return withHands(p,(B,g)=>{ const S=B['sho'+SD(g)]; const a=(u-.5)*Math.PI*2; return [vp(S,UP,-24,B.f,6-1.8*Math.sin(a),B.r,g*8,UP,1.8*Math.cos(a)),vn(V(UP,-1,B.r,g*.4,B.f,-.6))]; }); },
+  kit:(R,u,B,pal)=>{ const th=(u-.5)*Math.PI*2; // th=0: cuerda abajo (bajo los pies); gira hacia atrás por arriba y baja por delante
+    const M=[B.pel[0]+.5-ROPE.rx*Math.sin(th),ROPE.cy-ROPE.ry*Math.cos(th),0];
+    const pts=[]; for(let i=0;i<=16;i++){ const t=i/16; const w=Math.sin(Math.PI*t); const base=vm(B.handL,B.handR,t); const q=vm(base,M,Math.sqrt(w)); const z=-Math.cos(Math.PI*t)*(Math.abs(B.handL[2])+11*w); pts.push([q[0],Math.max(.6,q[1]),z]); }
+    for(let i=0;i<16;i++) R.cap(pts[i],pts[i+1],.55,.55,'#e2553f'); G.forEach(g=>{ const h=B['hand'+SD(g)]; R.cap(vp(h,UP,-2.5),vp(h,UP,2.5),1.1,1.1,'#20252c'); }); }});
+
+// --- Sprint: trayectoria del pie continua (sin cortes): apoyo corto, talón que sube detrás y rodilla que avanza ---
+function runFoot(q,o){ const a=o.a, duty=o.duty; let x,y,sw=0;
+  if (q<duty){ const s=q/duty; x=a*Math.cos(Math.PI*s); y=0; } else { const s=(q-duty)/(1-duty); sw=s; x=-a*Math.cos(Math.PI*s); y=o.kick*Math.pow(Math.sin(Math.PI*Math.pow(s,.8)),1.2); }
+  return {x,y:D3.ANK+y,sw}; }
+def3('sprint',{cams:[CAMP,CAM34],loop:true,tm:[680],ico:.25,
+  pose:u=>{ const o={a:16,duty:.36,kick:21}; const p={pel:[0,41.5-1.4*Math.cos(u*Math.PI*4),0],lean:12,head:-2}; const F={};
+    G.forEach(g=>{ const s=SD(g); const q=(u+(g>0?0:.5))%1; const f=runFoot(q,o); F[s]=f; p['f'+s]=[f.x,f.y,g*6]; p['k'+s]=[1,0,g*.08]; p['t'+s]=f.sw?mix(-8,28,Math.sin(Math.PI*f.sw)):-8+6*Math.sin(Math.PI*q/o.duty); });
+    capPel(p,38.2);
+    return withHands(p,(B,g)=>{ const q=(u+(g>0?.5:0))%1; const ang=55*Math.cos(q*Math.PI*2); return armSwing(B['sho'+SD(g)],B,g,ang,85); }); },kit:()=>{}});
+
+// --- Saltos de patinador: todo con curvas continuas; aterrizas sobre una pierna, la otra cruza por detrás, y saltas al otro lado ---
+def3('skater',{cams:[CAMF,CAM34],loop:true,tm:[1900],ico:0,
+  pose:u=>{ const c=Math.cos(u*Math.PI*2); const side=c; const air=Math.pow(1-Math.abs(c),1.6);
+    const p={pel:[mix(-6,-2,air),mix(31,36.5,air),side*17],lean:mix(32,18,air),head:-5,side:-side*6};
+    G.forEach(g=>{ const s=SD(g); const sg=g*c; // 1 = esta pierna aterriza y sostiene · -1 = cruza por detrás de la otra
+      const P=[1,D3.ANK,g*21], M=[-4,D3.ANK+6,g*8], Q=[-15,D3.ANK+3,-g*8];
+      const f=sg>=0?vm(M,P,sstep(sg)):vm(M,Q,sstep(-sg)); p['f'+s]=f;
+      p['k'+s]=vn([1,sg<0?.3*sg:0,g*.1]); p['t'+s]=sg<0?-35*sg:0; });
+    capPel(p);
+    const sw=Math.sin(u*Math.PI*2); return withHands(p,(B,g)=>{ const a=mix(35,60,1-air)*RAD; const dir=vn(V(UP,-Math.cos(a),B.f,Math.sin(a)*.4,[0,0,1],-side*.9,B.r2,g*.1)); return arm2(B['sho'+SD(g)],dir,vn(V(dir,1,B.f,.25))); }); },kit:()=>{}});
+
+// --- Salto al cajón: impulso con los brazos, vuelo en arco, aterrizaje suave en el cajón, te pones de pie
+//     y bajas caminando hacia atrás (primero una pierna y luego la otra) ---
+const BOX2={H:24, X:30};
+def3('box_jump',{cams:[CAMP,CAM34],loop:true,tm:[5200],ico:.42,
+  pose:u=>smoothPose(v=>{ const H=BOX2.H, BX=BOX2.X-3;
+    const st=(x,y,o)=>Object.assign({pel:[x-1,43+y,0],lean:2,head:0,fR:[x+1,D3.ANK+y,7],fL:[x+1,D3.ANK+y,-7],kR:[1,0,.1],kL:[1,0,-.1]},o||{});
+    const K={
+      ini:st(0,0), dip:{pel:[-8,32,0],lean:34,head:-10,fR:[1,D3.ANK,8],fL:[1,D3.ANK,-8],kR:[1,0,.3],kL:[1,0,-.3],tR:-5,tL:-5},
+      push:{pel:[1,44,0],lean:8,head:-4,fR:[3,D3.ANK+1.5,7],fL:[3,D3.ANK+1.5,-7],kR:[1,0,.1],kL:[1,0,-.1],tR:40,tL:40},
+      tuck:{pel:[13,H+38,0],lean:22,head:-8,fR:[20,H+D3.ANK+7,7],fL:[20,H+D3.ANK+7,-7],kR:[1,.35,.15],kL:[1,.35,-.15],tR:10,tL:10},
+      land:{pel:[BX-9,H+31,0],lean:30,head:-8,fR:[BX+1,H+D3.ANK,8],fL:[BX+1,H+D3.ANK,-8],kR:[1,0,.3],kL:[1,0,-.3]},
+      top:st(BX,H), top2:st(BX,H),
+      step1:{pel:[BX-11,H+35,0],lean:8,head:-8,fR:[BX+1,H+D3.ANK,7],fL:[4,D3.ANK,-7],kR:[1,0,.15],kL:[1,0,-.1]},
+      step2:{pel:[-1,42,0],lean:4,head:-6,fR:[BX-12,D3.ANK+H*.55,7],fL:[3,D3.ANK,-7],kR:[1,.2,.1],kL:[1,0,-.1]},
+      fin:st(0,0)};
+    const seq=['ini','dip','push','tuck','land','top','top2','step1','step2','fin','ini'], T=[0,.1,.18,.24,.31,.4,.5,.62,.74,.84,1];
+    const [i,t0]=segT(T,v); const a=K[seq[i]], b=K[seq[i+1]];
+    const fly=seq[i]==='push'||seq[i]==='tuck'; const t=fly?t0:sstep(t0); const p=blendP(a,b,t); NORM_KEYS.forEach(k=>{ if (p[k]&&vl(p[k])>1e-6) p[k]=vn(p[k]); });
+    if (fly){ const arc=seq[i]==='push'?Math.sin(Math.PI*t*.5)*4:Math.sin(Math.PI*(.5+t*.5))*4; p.pel=[p.pel[0],p.pel[1]+arc,0]; }
+    if (seq[i]==='step1'){ const lift=Math.sin(Math.PI*t)*3; p.fR=[p.fR[0]-6*Math.sin(Math.PI*t),p.fR[1]+lift,p.fR[2]]; }
+    if (seq[i]==='top2'){ const lift=Math.sin(Math.PI*t)*2.5; p.fL=[p.fL[0]-4*Math.sin(Math.PI*t),p.fL[1]+lift,p.fL[2]]; }
+    // brazos: atrás en el impulso, adelante y arriba al saltar, al frente al aterrizar, abajo de pie
+    const arm={ini:0,dip:-60,push:120,tuck:70,land:45,top:0,top2:0,step1:10,step2:10,fin:0};
+    const ang=mix(arm[seq[i]],arm[seq[i+1]],t)*RAD;
+    return withHands(p,(B,g)=>{ const dir=vn(V(UP,-Math.cos(ang),B.f,Math.sin(ang),B.r,g*.12)); return arm2(B['sho'+SD(g)],dir,vn(V(dir,1,B.f,.15))); }); },u,.025,true),
+  kit:(R,u,B,pal)=>{ R.box([BOX2.X+3,BOX2.H/2,0],[1,0,0],UP,[0,0,1],12,BOX2.H/2,14,pal.pad,pal); R.box([BOX2.X+3,BOX2.H+.2,0],[1,0,0],UP,[0,0,1],12,.3,14,pal.frame,pal); }});
+
+// --- Boxeo de sombra: guardia estable con la izquierda delante; jab, directo y gancho con giro de tronco (no de pies) ---
+def3('sombra_boxeo',{cams:[CAM34,CAMP],loop:true,tm:[2400],ico:.12,
+  pose:u=>{ const env=(a,b)=>u<a||u>b?0:Math.pow(Math.sin((u-a)/(b-a)*Math.PI),1.3); const jab=env(.04,.22), cross=env(.32,.56), hook=env(.66,.9);
+    const p={pel:[0,40.8+.6*Math.cos(u*Math.PI*8),0],lean:5,head:-5,yaw:-20,twist:cross*-20+hook*18+jab*4,fR:[-6,D3.ANK,8.5],fL:[7,D3.ANK,-6.5],kR:[1,0,.2],kL:[1,0,-.12],tR:-15,tL:0}; capPel(p);
+    return withHands(p,(B,g)=>{ const r=vk(B.r2,g); const gE=V(UP,-.8,B.nf,.35,r,.3), gF=V(UP,.95,B.nf,.45,r,-.4); const punch=g<0?jab:cross; const P=vn(V(B.nf,1,r,-.1,UP,.06));
+      let ed=vn(slerp(vn(gE),P,punch)), fd=vn(slerp(vn(gF),P,punch));
+      if (g<0&&hook>0){ ed=vn(slerp(ed,vn(V(r,.85,B.nf,.4,UP,.02)),hook)); fd=vn(slerp(fd,vn(V(B.nf,.65,r,-.75,UP,.02)),hook)); }
+      return arm2(B['sho'+SD(g)],ed,fd); }); },kit:()=>{}});
+
+// --- Elíptica: los pedales giran hacia delante (el pie de arriba avanza) ---
+ellipDef('eliptica',{cx:2,cy:13,ax:10,ay:3,hx:18});
+(old=>{ ANIM3.eliptica.pose=u=>old(1-u); const k=ANIM3.eliptica.kit; ANIM3.eliptica.kit=(R,u,B,pal)=>k(R,1-u,B,pal); })(ANIM3.eliptica.pose);
+
+// --- Lanzamiento de balón al suelo: el balón cae con gravedad, rebota con pérdida de energía y se recoge del suelo ---
+const SLAM={rel:.21, hit:.27, pick:.46, floor:[17,6.5,0], r:6.5};
+def3('balon_suelo',{cams:[CAMP,CAM34],loop:true,tm:[2200],ico:.0,
+  pose:u=>{ const K=[[0,43,2,168],[-6,40,14,150],[-9,34,40,95],[-10,30,48,40],[-12,27,56,28],[-11,28,52,30],[-6,37,24,110],[0,43,2,168]], T=[0,.12,.2,.3,.44,.5,.78,1];
+    const k=crvT(K.map(q=>q.slice(0,3)),T,u); const arm=crvT(K.map(q=>[q[3],0,0]),T,u)[0];
+    const p={pel:[k[0],k[1],0],lean:k[2],head:-k[2]*.25,fR:[2,D3.ANK,9],fL:[2,D3.ANK,-9],kR:[1,0,.3],kL:[1,0,-.3],tR:u<.1||u>.9?-22:0,tL:u<.1||u>.9?-22:0}; capPel(p);
+    return withHands(p,(B,g)=>{ const a=arm*RAD; const dir=vn(V(UP,-Math.cos(a),[1,0,0],Math.sin(a),[0,0,1],g*.2)); const S=B['sho'+SD(g)]; const H=vp(S,dir,26.2); return [vp(H,[0,0,1],-g*2.5),vn(V(UP,-1,[0,0,1],g*.8))]; }); },
+  kit:(R,u,B,pal)=>{ const held=vp(mid2(B),UP,-1); let c=held;
+    const handsAt=t=>{ const P=ANIM3.balon_suelo.pose(t); return vp(mid2(body3(P)),UP,-1); };
+    if (u>=SLAM.rel && u<SLAM.hit){ const t=(u-SLAM.rel)/(SLAM.hit-SLAM.rel); const R0=handsAt(SLAM.rel); c=vm(R0,SLAM.floor,t*t*(.4+.6*t)); }
+    else if (u>=SLAM.hit && u<SLAM.pick-.05){ const t=(u-SLAM.hit)/(SLAM.pick-.05-SLAM.hit); const b1=Math.max(0,Math.sin(Math.PI*Math.min(1,t/.55)))*9, b2=t>.55?Math.max(0,Math.sin(Math.PI*(t-.55)/.3))*2.5:0;
+      c=[SLAM.floor[0]+2*t,SLAM.floor[1]+(t<.55?b1:t<.85?b2:0),0]; }
+    else if (u>=SLAM.pick-.05 && u<SLAM.pick){ const t=(u-(SLAM.pick-.05))/.05; c=vm([SLAM.floor[0]+2,SLAM.floor[1],0],handsAt(SLAM.pick),sstep(t)); }
+    if (u>=SLAM.hit && u<SLAM.hit+.02){ const t=(u-SLAM.hit)/.02; R.dot([c[0],c[1]-1,0],SLAM.r*(1.1+.3*(1-t)),pal.mono?'#fff':'rgba(255,255,255,.12)'); }
+    R.dot(c,SLAM.r,pal.ball); }});
+
+// --- Escaladora: escalera mecánica de escalones que bajan; cada pie pisa el escalón que sube y lo acompaña al bajar ---
+const STM={H:15, D:20, top:24, x0:4, duty:.6};
+function stmStep(k,u){ return [STM.x0+k*STM.D-2*STM.D*u, STM.top-STM.H+k*STM.H-2*STM.H*u]; }
+function stmFoot(q){ // q: fase de este pie (0 = aterriza en el escalón alto)
+  if (q<STM.duty){ const d=q*2; return {x:STM.x0+STM.D*1-STM.D*d*1, y:STM.top-STM.H*d, st:true}; }
+  const s=(q-STM.duty)/(1-STM.duty); const e=sstep(s); const d0=STM.duty*2;
+  return {x:STM.x0+STM.D-STM.D*d0+STM.D*d0*e, y:STM.top-STM.H*d0+STM.H*d0*e+7*Math.sin(Math.PI*s), st:false}; }
+def3('escaladora',{cams:[CAMP,CAM34],loop:true,tm:[1700],ico:.25,
+  pose:u=>{ const p={pel:[-6,STM.top+32,0],lean:9,head:-6}; G.forEach(g=>{ const s=SD(g); const q=(u+(g>0?0:.5))%1; const f=stmFoot(q); p['f'+s]=[f.x+1,f.y+D3.ANK,g*6.5]; p['k'+s]=[1,0,g*.1]; p['t'+s]=f.st?0:12*Math.sin(Math.PI*(q-STM.duty)/(1-STM.duty)); });
+    p.pel=[p.pel[0],p.pel[1]-1.2*Math.cos(u*Math.PI*4),0]; capPel(p,38.3);
+    return withHands(p,(B,g)=>[[12,STM.top+48,g*17],vn(V(UP,-1,[0,0,1],g*.7,[1,0,0],-.2))]); },
+  kit:(R,u,B,pal)=>{ const uu=(u*2)%1; const dark='#3a424d', tread=pal.mono?'#fff':'#58616e';
+    R.under(()=>{ // escalones visibles entre el suelo de la máquina y la parte alta
+      for (let k=-1;k<=4;k++){ const [x,y]=stmStep(k,uu*.5); if (y<2||y>STM.top+STM.H*1.2) continue;
+        R.box([x,y-1.2,0],[1,0,0],UP,[0,0,1],STM.D*.5,1.2,11,tread,pal); R.box([x-STM.D*.5,y-STM.H*.5-1,0],[1,0,0],UP,[0,0,1],.8,STM.H*.5,10.5,dark,pal); }
+      const ang=Math.atan2(STM.H,STM.D)/RAD; R.box([10,17,-12.5],rotAx([1,0,0],[0,0,1],ang),rotAx(UP,[0,0,1],ang),[0,0,1],26,4,1,pal.frame,pal); K3.tube(R,[-20,-8+8,12.5],[36,38,12.5],1.2,pal.frame);
+      K3.base(R,[-26,0],[40,0],pal); R.box([34,40,0],[1,0,0],UP,[0,0,1],4,40,13,pal.frame,pal); });
+    R.box([33,82,0],rotAx([1,0,0],[0,0,1],70),rotAx(UP,[0,0,1],70),[0,0,1],7,1.2,10,'#1a1e24',pal);
+    G.forEach(g=>{ K3.tube(R,[34,STM.top+48,g*17],[4,STM.top+48,g*17],1.3,pal.steel); K3.tube(R,[34,STM.top+30,g*15],[34,STM.top+48,g*17],1.3,pal.steel); }); }});
+
+// --- Cuerdas de batalla, golpes: la cuerda repite con retraso el movimiento de las manos (la onda viaja hasta el anclaje) y golpea el suelo ---
+const ROPE2={lag:.55, n:22, A:[96,4,0]};
+def3('cuerdas_golpes',{cams:[CAMP,CAM34],loop:true,tm:[1000],ico:.25,
+  pose:u=>{ const up=Math.pow(Math.max(0,Math.sin(u*Math.PI*2)),.8), dn=Math.max(0,-Math.sin(u*Math.PI*2)); const p={pel:[-6,mix(35,39,up)-2*dn,0],lean:mix(30,12,up),head:-8,fR:[3,D3.ANK,11],fL:[3,D3.ANK,-11],kR:[1,0,.3],kL:[1,0,-.3]}; capPel(p);
+    return withHands(p,(B,g)=>{ const a=mix(50,160,up)*RAD; const S=B['sho'+SD(g)]; const dir=vn(V(UP,-Math.cos(a),[1,0,0],Math.sin(a),[0,0,1],g*.1)); return arm2(S,dir,vn(V(dir,1,[1,0,0],.2))); }); },
+  kit:(R,u,B,pal)=>{ const hist=t=>{ const P=ANIM3.cuerdas_golpes.pose(((t%1)+1)%1); const Bt=body3(P); return [Bt.handR,Bt.handL]; };
+    const H=[]; for(let i=0;i<=ROPE2.n;i++) H.push(hist(u-i/ROPE2.n*ROPE2.lag));
+    G.forEach((g,gi)=>{ const h0=B['hand'+SD(g)]; const A=[ROPE2.A[0],ROPE2.A[1],h0[2]*.4]; let q=h0;
+      for(let i=1;i<=ROPE2.n;i++){ const t=i/ROPE2.n; const past=H[i][gi]; const base=vm(h0,A,t); const restY=mix(h0[1],A[1],t);
+        const dy=(past[1]-H[0][gi][1])*Math.pow(1-t,1.1)*1.0; const sag=-10*Math.sin(Math.PI*t)*(1-t*.3);
+        const y=Math.max(1.4,base[1]+(past[1]-h0[1])*Math.pow(1-t,.9)+sag*.6+dy*0);
+        const p=[base[0],y,base[2]]; R.cap(q,p,1.4,1.4,'#2b2f36'); q=p; } }); }});
 /*M3-END*/
 /* ---- Figura completa ---- */
 function autoCable(ex,t,P){ // ejercicios de polea sin cable definido: la polea se coloca donde tiene sentido
@@ -5527,9 +5771,9 @@ A.animFb=v=>{ const [id,n]=v.split('|'); S.animFb=S.animFb||{}; S.animFb[id]=S.a
 A.ceLike=id=>openLayer('picker',{mode:'replace',from:null,q:'',m:'',mine:false,onPick:pid=>{ const c=S.customEx.find(x=>x.id===id); if(c){ c.like=pid; loadExercises(S.customEx); Object.keys(ICON_CACHE).forEach(k=>{ if(k.startsWith(id)) delete ICON_CACHE[k]; }); Object.keys(VB_CACHE).forEach(k=>{ if(k.startsWith(id)) delete VB_CACHE[k]; }); save(); toast('Animación elegida'); } }});
 /* ---------- Revisión de animaciones (versiones de prueba) ---------- */
 // Animaciones ya aprobadas por el creador y su colega: se quitan del sello «En revisión» para todos
-const ANIM_OK=new Set(['press_pecho_maq','pec_deck','press_hombro_maq','remo_maq','hiperextensiones','curl_predicador','sentadilla_hack','prensa','cuello_maq','ergometro_brazos','rot_torso_maq','crunch_maq','gripper_maq','fondos_sentado_maq','ext_triceps_maq','curl_maquina','curl_predicador_man','curl_predicador_z','press_hombro_discos','deltoide_post_maq','laterales_maq','fondos_maquina_asistidos','super_fly','press_convergente','press_declinado_maq','press_inclinado_maq','encog_maq','ext_lumbar_maq','pullover_maq','remo_t_apoyado','ext_cuadriceps','remo_bajo_maq','remo_alto_maq','dominadas_maquina','jalon_unilateral_maq','jalon_maquina','gemelo_burro','gemelos_prensa','aduccion_multicadera','abduccion_multicadera','hiper_inversa','multicadera_ext','curl_femoral','curl_femoral_sentado','abduccion_maq','aduccion_maq','elev_gemelos_maq','gemelos_sentado','sentadilla_pendulo','v_squat','patada_gluteo_maq','hip_thrust_maq','glute_ham','nordico_maquina','curl_femoral_unilateral','curl_femoral_pie','hack_inversa','belt_squat','prensa_vertical','prensa_sentada','prensa_unilateral','ext_cuad_unilateral','cruce_poleas','face_pull','jalon_pecho','pullover_polea','remo_polea','curl_polea','patada_gluteo_polea','pallof','crunch_polea','ext_cuad_polea','curl_femoral_polea','abduccion_polea','aduccion_polea','jalon_supino','patada_polea','ext_cruzada_polea','ext_polea_inversa','curl_polea_alta','curl_bayesiano','jalon_una_mano','martillo_polea','curl_cuerda','rot_interna_polea','rot_externa_polea','frontal_polea','pajaros_polea','cruce_bajo_alto','encog_polea','smith_hombro','encog_smith','smith_remo','smith_rumano','smith_bulgara','elev_laterales_polea','jalon_cerrado','ext_triceps_polea','lenador','jalon_neutro','lenador_bajo','ext_polea_cabeza','ext_cuerda','remo_polea_unilateral','menton_polea','aperturas_polea_banco','cruce_alto_bajo','press_pecho_polea','smith_inclinado','smith_banca','gemelos_smith','smith_hip_thrust','smith_zancada','smith_frontal','smith_sentadilla','press_declinado','press_militar','press_hombro_man','elev_laterales','elev_frontales','pajaros','encogimientos','encogimientos_barra','remo_barra','remo_man','remo_t','kb_remo','curl_barra','curl_man','curl_martillo','press_frances','rot_landmine','crunch_fitball','rodillo_muneca','curl_inverso_z','curl_arrastre','curl_arana','rot_externa_man','press_z','push_press','press_landmine','lateral_tumbado','frontal_disco','press_svend','aperturas_inclinadas','remo_kroc','remo_pendlay','gemelo_unilateral_man','gemelos_barra','rack_pull','sentadilla','sentadilla_goblet','kb_goblet','zancadas','sentadilla_bulgara','step_up_man','zancada_inversa_barra','sentadilla_landmine','elev_gemelos_man','kb_snatch','pull_through','press_banca','wall_ball','balon_lateral','rollout_barra','paseo_maleta','inclinacion_lateral','granjero_hex','pinza_discos','ext_muneca','curl_muneca_barra','press_jm','press_tate','press_inclinado_barra','press_banca_man','press_inclinado_man','press_suelo_man','press_cerrado','aperturas_man','pullover_man','press_arnold','kb_press','remo_menton','remo_invertido','curl_concentrado','curl_inclinado','curl_muneca','ext_triceps_man','patada_triceps','paseo_granjero','sentadilla_frontal','sentadilla_sumo','thrusters','peso_muerto_unilateral','buenos_dias','press_frances_man','press_frances_z','martillo_cruzado','curl_zottman','curl_z','kb_swing','press_cubano','y_inclinado','banca_inversa','remo_meadows','remo_seal','remo_apoyado_man','curl_femoral_fitball','sentadilla_cosaca','pm_hexagonal','zancada_caminando_man','zancada_caminando_barra','box_squat','sentadilla_zercher','hip_thrust_man','hip_thrust','kb_turkish','kb_clean','curl_femoral_rodillas','hiper_gluteo','peso_muerto','peso_muerto_rumano','peso_muerto_rumano_man','peso_muerto_sumo','kb_pm','pm_piernas_rigidas','limpiaparabrisas','plancha_peso','silla_rodillas','fondos_anillas','flexiones_anillas','dominadas_neutras','tibial','gemelo_excentrico','frog_pumps','fire_hydrant','hip_thrust_unilateral','nordico_inverso','pil_patada_lateral','pil_una_pierna','pil_tijeras','fondos_pecho','flexiones_pared','flexiones_rodillas','flexiones','flexiones_declinadas','flexiones_diamante','pike_pushup','handstand_pushup','elev_laterales_banda','pull_apart','yoga_cuervo','yoga_barco','yoga_torsion','yoga_pinza','yoga_paloma','yoga_puente','yoga_silla','yoga_arbol','yoga_triangulo','yoga_guerrero2','yoga_guerrero1','yoga_cobra','dominadas','dominadas_supinas','dominadas_asistidas','dominadas_negativas','jalon_banda','remo_trx','remo_banda','superman','remo_mesa','remo_toalla','curl_toalla','puente_isquios','curl_femoral_toalla','elev_lateral_pierna','encog_escapular','colgarse','curl_banda','ext_triceps_banda','fondos_triceps','sentadilla_peso','sentarse_levantarse','sentadilla_pistol','sentadilla_pared','sentadilla_banda','zancadas_pc','zancada_inversa','step_up','curl_nordico','puente_gluteo','puente_gluteo_unilateral','patada_gluteo','abduccion_banda','monster_walk','elev_gemelos','plancha','plancha_lateral','plancha_toques','crunch','crunch_bici','elev_piernas','elev_rodillas_colgado','russian_twist','bird_dog','hollow_hold','yoga_perro','est_dorsal','est_gemelos','est_gluteo','est_flexor_cadera','est_triceps','est_hombro','est_pecho','est_cuadriceps','est_isquios','gato_vaca','circulos_brazos','equilibrio_pierna','l_sit','pallof_banda']);
+const ANIM_OK=new Set(['press_pecho_maq','pec_deck','press_hombro_maq','remo_maq','hiperextensiones','curl_predicador','sentadilla_hack','prensa','cuello_maq','ergometro_brazos','rot_torso_maq','crunch_maq','gripper_maq','fondos_sentado_maq','ext_triceps_maq','curl_maquina','curl_predicador_man','curl_predicador_z','press_hombro_discos','deltoide_post_maq','laterales_maq','fondos_maquina_asistidos','super_fly','press_convergente','press_declinado_maq','press_inclinado_maq','encog_maq','ext_lumbar_maq','pullover_maq','remo_t_apoyado','ext_cuadriceps','remo_bajo_maq','remo_alto_maq','dominadas_maquina','jalon_unilateral_maq','jalon_maquina','gemelo_burro','gemelos_prensa','aduccion_multicadera','abduccion_multicadera','hiper_inversa','multicadera_ext','curl_femoral','curl_femoral_sentado','abduccion_maq','aduccion_maq','elev_gemelos_maq','gemelos_sentado','sentadilla_pendulo','v_squat','patada_gluteo_maq','hip_thrust_maq','glute_ham','nordico_maquina','curl_femoral_unilateral','curl_femoral_pie','hack_inversa','belt_squat','prensa_vertical','prensa_sentada','prensa_unilateral','ext_cuad_unilateral','cruce_poleas','face_pull','jalon_pecho','pullover_polea','remo_polea','curl_polea','patada_gluteo_polea','pallof','crunch_polea','ext_cuad_polea','curl_femoral_polea','abduccion_polea','aduccion_polea','jalon_supino','patada_polea','ext_cruzada_polea','ext_polea_inversa','curl_polea_alta','curl_bayesiano','jalon_una_mano','martillo_polea','curl_cuerda','rot_interna_polea','rot_externa_polea','frontal_polea','pajaros_polea','cruce_bajo_alto','encog_polea','smith_hombro','encog_smith','smith_remo','smith_rumano','smith_bulgara','elev_laterales_polea','jalon_cerrado','ext_triceps_polea','lenador','jalon_neutro','lenador_bajo','ext_polea_cabeza','ext_cuerda','remo_polea_unilateral','menton_polea','aperturas_polea_banco','cruce_alto_bajo','press_pecho_polea','smith_inclinado','smith_banca','gemelos_smith','smith_hip_thrust','smith_zancada','smith_frontal','smith_sentadilla','press_declinado','press_militar','press_hombro_man','elev_laterales','elev_frontales','pajaros','encogimientos','encogimientos_barra','remo_barra','remo_man','remo_t','kb_remo','curl_barra','curl_man','curl_martillo','press_frances','rot_landmine','crunch_fitball','rodillo_muneca','curl_inverso_z','curl_arrastre','curl_arana','rot_externa_man','press_z','push_press','press_landmine','lateral_tumbado','frontal_disco','press_svend','aperturas_inclinadas','remo_kroc','remo_pendlay','gemelo_unilateral_man','gemelos_barra','rack_pull','sentadilla','sentadilla_goblet','kb_goblet','zancadas','sentadilla_bulgara','step_up_man','zancada_inversa_barra','sentadilla_landmine','elev_gemelos_man','kb_snatch','pull_through','press_banca','wall_ball','balon_lateral','rollout_barra','paseo_maleta','inclinacion_lateral','granjero_hex','pinza_discos','ext_muneca','curl_muneca_barra','press_jm','press_tate','press_inclinado_barra','press_banca_man','press_inclinado_man','press_suelo_man','press_cerrado','aperturas_man','pullover_man','press_arnold','kb_press','remo_menton','remo_invertido','curl_concentrado','curl_inclinado','curl_muneca','ext_triceps_man','patada_triceps','paseo_granjero','sentadilla_frontal','sentadilla_sumo','thrusters','peso_muerto_unilateral','buenos_dias','press_frances_man','press_frances_z','martillo_cruzado','curl_zottman','curl_z','kb_swing','press_cubano','y_inclinado','banca_inversa','remo_meadows','remo_seal','remo_apoyado_man','curl_femoral_fitball','sentadilla_cosaca','pm_hexagonal','zancada_caminando_man','zancada_caminando_barra','box_squat','sentadilla_zercher','hip_thrust_man','hip_thrust','kb_turkish','kb_clean','curl_femoral_rodillas','hiper_gluteo','peso_muerto','peso_muerto_rumano','peso_muerto_rumano_man','peso_muerto_sumo','kb_pm','pm_piernas_rigidas','limpiaparabrisas','plancha_peso','silla_rodillas','fondos_anillas','flexiones_anillas','dominadas_neutras','tibial','gemelo_excentrico','frog_pumps','fire_hydrant','hip_thrust_unilateral','nordico_inverso','pil_patada_lateral','pil_una_pierna','pil_tijeras','fondos_pecho','flexiones_pared','flexiones_rodillas','flexiones','flexiones_declinadas','flexiones_diamante','pike_pushup','handstand_pushup','elev_laterales_banda','pull_apart','yoga_cuervo','yoga_barco','yoga_torsion','yoga_pinza','yoga_paloma','yoga_puente','yoga_silla','yoga_arbol','yoga_triangulo','yoga_guerrero2','yoga_guerrero1','yoga_cobra','dominadas','dominadas_supinas','dominadas_asistidas','dominadas_negativas','jalon_banda','remo_trx','remo_banda','superman','remo_mesa','remo_toalla','curl_toalla','puente_isquios','curl_femoral_toalla','elev_lateral_pierna','encog_escapular','colgarse','curl_banda','ext_triceps_banda','fondos_triceps','sentadilla_peso','sentarse_levantarse','sentadilla_pistol','sentadilla_pared','sentadilla_banda','zancadas_pc','zancada_inversa','step_up','curl_nordico','puente_gluteo','puente_gluteo_unilateral','patada_gluteo','abduccion_banda','monster_walk','elev_gemelos','plancha','plancha_lateral','plancha_toques','crunch','crunch_bici','elev_piernas','elev_rodillas_colgado','russian_twist','bird_dog','hollow_hold','yoga_perro','est_dorsal','est_gemelos','est_gluteo','est_flexor_cadera','est_triceps','est_hombro','est_pecho','est_cuadriceps','est_isquios','gato_vaca','circulos_brazos','equilibrio_pierna','l_sit','pallof_banda','kb_halo','bandera_dragon','crunch_declinado','silla_piernas','muscle_up','copenhague','sentadilla_sissy','pil_teaser','flexiones_inclinadas','flexiones_archer','flexiones_pliometricas','press_bandas','face_pull_banda','ytw','fondos_banco','sentadilla_salto','zancada_lateral','elev_piernas_colgado','dead_bug','v_ups','rueda_abdominal','mov_articular','rot_toracica','cadera_9090','yoga_saludo','yoga_nino','pil_hundred','pil_roll_up','pil_circulos','pil_puente','pil_natacion','pil_sierra','pil_rodar','jumping_jacks','skipping','bear_crawl','marcha_sitio','caminata','correr_cinta','bici_estatica','remo_ergometro','trineo_empuje','trineo_arrastre','stepper','skierg','air_bike','bici_reclinada','spinning','cinta_inclinada','cinta_curva','arc_trainer','versaclimber','cuerdas_ondas']);
 // animaciones rehechas tras una revisión: se borra el voto "incorrecta" para volver a revisarlas (una sola vez por tanda)
-const ANIM_REDO_TAG='r5', ANIM_REDO=['kb_halo','bandera_dragon','crunch_declinado','silla_piernas','muscle_up','copenhague','sentadilla_sissy','pil_teaser','pil_rodar','pil_sierra','pil_natacion','pil_puente','pil_circulos','pil_roll_up','flexiones_inclinadas','flexiones_archer','flexiones_pliometricas','press_bandas','face_pull_banda','pil_hundred','yoga_nino','ytw','fondos_banco','sentadilla_salto','zancada_lateral','elev_piernas_colgado','dead_bug','v_ups','rueda_abdominal','yoga_saludo','cadera_9090','rot_toracica','mov_articular'];
+const ANIM_REDO_TAG='r6', ANIM_REDO=['mountain_climbers','burpees','saltar_comba','sprint','skater','box_jump','sombra_boxeo','eliptica','balon_suelo','escaladora','cuerdas_golpes'];
 function animRedo(){ if (!S||S.animRevTag===ANIM_REDO_TAG) return; const R=S.animRev||{}; ANIM_REDO.forEach(id=>{ if (R[id]&&R[id].v==='bad') delete R[id]; }); S.animRevTag=ANIM_REDO_TAG; save(); }
 const REV_GROUPS=[['maq','Máquinas'],['pol','Poleas'],['smi','Smith'],['libre','Peso libre'],['pc','Peso corporal'],['cardio','Cardio']];
 function revGroup(ex){ const e=ex.eq||[]; if (e.includes('maq')||e.includes('ghd')) return 'maq'; if (e.includes('pol')) return 'pol'; if (e.includes('smi')) return 'smi';
@@ -5755,7 +5999,9 @@ A.startWorkout=rid=>{
   if (!r.items.length){ toast('Añade ejercicios a la rutina primero'); return; }
   const go=()=>{
     const rec=records(); const snap={}; r.items.forEach(i=>{ if(rec[i.exId]) snap[i.exId]=Object.assign({},rec[i.exId]); });
-    S.active={routineId:r.id, name:r.name, start:Date.now(), items:r.items.map(it=>activeItemFrom(it,r)), rest:null, rec:snap, intensity:6};
+    const vj=viajeActivo(r), vUsed=[], vEq=vj?VIAJE_EQ[vj.eq]||VIAJE_EQ.pc:null;
+    S.active={routineId:r.id, name:r.name, start:Date.now(), items:r.items.map(it=>activeItemFrom(vj?travelItem(it,vEq,vUsed):it,r)), rest:null, rec:snap, intensity:6};
+    if (vj){ S.active.viaje={eq:vj.eq, n:S.active.items.filter(x=>x.viajeDe).length}; WK_VIAJE=null; }
     const aj=wkAjuste(r); if (aj && r.pandaria) S.active.ajuste={f:aj.f,why:aj.why}; WK_AJUSTE=null;
     save(true); openLayer('workout'); keepAwake();
     const ld=lastTrainedDays(); if (ld!==null && ld>=14 && r.pandaria) toast(`Volviste tras ${Math.round(ld)} días: PandarIA ajustó los pesos`);
@@ -6628,6 +6874,9 @@ SCREENS.workout=p=>{
     if (c.sleep===2&&c.energy===2) msgs.push('Llegas descansado y con energía: buen día para intentar un récord.');
     if (msgs.length) h=h.replace('<div class="lbody" style="padding-top:8px">',`<div class="lbody" style="padding-top:8px"><div class="banner blue"><span class="ic">${I('spark',20)}</span><div class="grow sm" style="line-height:1.45">${msgs.join('<br>')}</div></div>`);
   }
+  const vj=S.active&&S.active.viaje;
+  if (vj){ const sw=S.active.items.filter(x=>x.viajeDe);
+    h=h.replace('<div class="lbody" style="padding-top:8px">',`<div class="lbody" style="padding-top:8px"><div class="banner"><span class="ic">✈️</span><div class="grow sm" style="line-height:1.45"><b>${tx('Modo viaje','Travel mode')} · ${esc(VIAJE_N[vj.eq]||'')}</b><br>${sw.length?sw.map(x=>`${esc(getEx(x.viajeDe).n)} → ${esc(getEx(x.exId).n)}`).join('<br>'):tx('Todos tus ejercicios se pueden hacer con lo que tienes.','All your exercises can be done with what you have.')}<br><span class="xs mut">${tx('Tu rutina no cambia: solo la sesión de hoy.','Your routine does not change: only today’s session.')}</span>${kbLink('viaje',tx('Cómo elige','How it chooses'))}</div></div>`); }
   return h;
 };
 
@@ -6663,7 +6912,8 @@ function hoyCard(){
     <div class="sm mut" style="margin-top:4px">~${routineMinutes(nx.r)} min · ${plural(nx.r.items.filter(i=>!i.warm&&!i.cool).length,'ejercicio','ejercicios')}${ph?` · Bloque ${ph.n.toLowerCase()} (${ph.d})`:''}</div>
     ${nx.swapped?`<div class="xs" style="color:var(--blue);margin-top:6px">PandarIA adelantó esta rutina: los músculos de ${esc(nx.swapped.name)} aún se recuperan.</div>`:''}
     ${(rs=>rs.lvl==='buena'?'':`<div class="xs" style="color:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'};margin-top:6px;line-height:1.4">Recuperación ${rs.lvl}: ${esc(rs.msgs.join(' · '))}${kbLink('recuperacion.ajuste','Por qué')}</div>`)(recoveryState(nx.r))}
-    <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${nx.r.pandaria&&recoveryState(nx.r).lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">Suave</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>`;
+    <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${nx.r.pandaria&&recoveryState(nx.r).lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">Suave</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
+    <button class="link xs" style="margin-top:8px" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}</button>`;
   else { let k=1; while(k<8 && !S.plan.days.includes((dow+k)%7)) k++;
     body=`<div class="xs mut b" style="letter-spacing:1px">HOY</div><div class="b" style="font-size:20px;margin-top:2px">Día de descanso</div><div class="sm mut" style="margin-top:4px">Próximo entreno: ${k===1?'mañana':DAYS_LONG[(dow+k)%7]} · ${esc(nx.r.name)}</div>
     <button class="link sm" style="margin-top:10px" data-a="hoyChange">Entrenar igual hoy</button>`; }
@@ -6678,7 +6928,7 @@ function recoveryState(r){
   return {lvl:pts>=2?'baja':pts===1?'media':'buena', msgs};
 }
 A.startSoft=rid=>{ const KR=kb('recuperacion.ajuste'); WK_AJUSTE={f:KR.f, why:`Sesión suave: ${Math.round((1-KR.f)*100)} % menos de carga`, rid, t:Date.now()}; A.startWorkout(rid); };
-A.hoyChange=()=>sheet('¿Qué quieres entrenar hoy?',S.routines.filter(r=>!r.archived).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startWorkout(r.id)})));
+A.hoyChange=()=>sheet('¿Qué quieres entrenar hoy?',S.routines.filter(r=>!r.archived).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startWorkout(r.id)})).concat([{icon:'swap',label:tx('✈️ Modo viaje: una rutina sin equipo','✈️ Travel mode: a routine without equipment'),fn:()=>setTimeout(()=>sheet(tx('¿Qué rutina hacemos sin equipo?','Which routine without equipment?'),S.routines.filter(r=>!r.archived&&r.items.length).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startTravel(r.id)}))),250)}]));
 A.openPlan=()=>{ const ids=S.routines.filter(r=>!r.archived).map(r=>r.id); const pl=S.plan?clone(S.plan):{days:defaultDays(Math.min(ids.length,3)),order:ids.slice(0,6)}; openLayer('plan',{pl}); };
 SCREENS.plan = p => {
   const pl=p.pl; const all=S.routines.filter(r=>!r.archived);
@@ -6958,7 +7208,16 @@ function calcNutrition(){
 }
 function waterGoal(){ const w=bodyWeight(), K=kb('agua'), sx=(S.profile||{}).sex, ref=K.ref[sx==='h'?'h':sx==='m'?'m':'x'];
   const base=Math.min(ref*K.max, Math.max(ref*K.min, K.mlkg*w));
-  return Math.round((base+(trainedToday().length?K.entreno:0))/50)*50; }
+  const tt=trainedToday(); let extra=0;
+  if (tt.length){ const mins=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0); extra=K.entreno+Math.min(K.extraMax,Math.floor(Math.max(0,mins-K.largo)/30)*K.extra30); }
+  return Math.round((base+extra)/50)*50; }
+// Agua de las bebidas registradas en el diario (sin alcohol) y cafeína aproximada del día
+function isDrink(f){ const B=kb('agua.bebidas'); return !!f && !B.alcohol.includes(f.id) && (f.cat==='bebida' || B.lacteas.includes(f.id)) && f.id!=='19165' && f.id!=='14192'; }
+function diaryDrinks(k){ const out={ml:0, caf:0, n:0}; const C=kb('sup.cafeina_bebidas').mg100;
+  ((S.nutri&&S.nutri.diario&&S.nutri.diario[k||dayKey()])||[]).forEach(e=>{ const f=typeof alimGet==='function'?alimGet(e.fid):null; if (!isDrink(f)) return;
+    out.ml+=Math.max(0,(+e.gr||0)*(1-((f.c||0)+(f.p||0)+(f.g||0))/100)); out.n++; if (C[f.id]) out.caf+=(+e.gr||0)*C[f.id]/100; });
+  out.ml=Math.round(out.ml/10)*10; out.caf=Math.round(out.caf); return out; }
+function waterToday(k){ k=k||dayKey(); return ((nut().water||{})[k]||0)+diaryDrinks(k).ml; }
 // Tendencia de peso: pendiente de los pesajes de las últimas 4 semanas (kg por semana y % del peso)
 function weightTrend(days){ days=days||28; const from=Date.now()-days*DAY; const pts=S.measures.filter(m=>m.peso&&m.date>=from).map(m=>[m.date/DAY,+m.peso]).sort((x,y)=>x[0]-y[0]);
   if (pts.length<2) return null; const span=pts[pts.length-1][0]-pts[0][0]; if (span<10) return null;
@@ -7001,12 +7260,17 @@ function viewNutricion(){
   }
   }
   // agua
-  const wg=waterGoal(), wv=(n.water[dayKey()]||0), pct=Math.min(100,Math.round(wv/wg*100));
-  const days=[...Array(7).keys()].reverse().map(i=>{ const k=dayKey(Date.now()-i*DAY); return n.water[k]||0; });
+  const wg=waterGoal(), dd=diaryDrinks(dayKey()), wv=waterToday(), pct=Math.min(100,Math.round(wv/wg*100));
+  const days=[...Array(7).keys()].reverse().map(i=>waterToday(dayKey(Date.now()-i*DAY)));
+  const tt=trainedToday(), ttMin=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0), KA=kb('agua');
+  const extraTxt=!tt.length?'':ttMin>KA.largo+29?tx(`, + agua extra por tu entreno de ${Math.round(ttMin)} min`,`, + extra water for your ${Math.round(ttMin)}-min workout`):tx(', + 500 ml porque hoy entrenaste',', + 500 ml because you trained today');
   h+=`<div class="sec">Agua</div><div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString('es',{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString('es',{maximumFractionDigits:1})} L</span></div></div>
-    <div class="grow col" style="gap:8px"><button class="btn sm" data-a="water" data-v="250">${I('drop',16)} + Vaso 250 ml</button><button class="btn sm" data-a="water" data-v="500">${I('drop',16)} + Botella 500 ml</button><button class="btn sm ghost" data-a="water" data-v="-250">− 250 ml</button></div></div>
-    <div class="xs mut" style="margin-top:10px">Meta según tu peso y la referencia de la EFSA${trainedToday().length?', + 500 ml porque hoy entrenaste':''}. <button class="link xs" data-a="kbOpen" data-v="agua">Ver fuente</button></div>
+    <div class="grow col" style="gap:8px"><button class="btn sm" data-a="water" data-v="250">${I('drop',16)} + Vaso 250 ml</button><button class="btn sm" data-a="water" data-v="500">${I('drop',16)} + Botella 500 ml</button><div class="row" style="gap:6px"><button class="btn sm grow" data-a="wOther">${I('plus',16)} ${tx('Otra bebida','Other drink')}</button><button class="btn sm ghost" data-a="water" data-v="-250" aria-label="−250 ml">− 250</button></div></div></div>
+    ${dd.n?`<div class="xs" style="margin-top:10px;color:var(--blue);line-height:1.4">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}
+    ${cafLine(dd.caf)}
+    <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
     <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString('es'):''})}</div></div>`;
+  h+=supCardsHtml();
   h+=fastCard();
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
   return h;
@@ -7014,8 +7278,17 @@ function viewNutricion(){
 A.nGoal=v=>{ nut().goal=v; delete nut().ritmo; save(); render.keep=true; render(); };
 A.nRitmo=v=>{ nut().ritmo=v; save(); render.keep=true; render(); };
 A.nAdapt=()=>{ const n=nut(); n.adaptOff=!n.adaptOff; save(); render.keep=true; render(); toast(n.adaptOff?'Ajuste automático desactivado':'Ajuste automático activado'); };
-A.water=v=>{ const n=nut(), k=dayKey(); n.water[k]=Math.max(0,(n.water[k]||0)+(+v)); save(); render.keep=true; render(); if(+v>0) vibrate(15);
-  if ((n.water[k]||0)>=waterGoal() && (n.water[k]-(+v))<waterGoal()) toast('💧 ¡Meta de agua cumplida!'); };
+A.water=v=>{ const n=nut(), k=dayKey(), b0=waterToday(k); n.water[k]=Math.max(0,(n.water[k]||0)+(+v)); save(); render.keep=true; render(); if(+v>0) vibrate(15);
+  if (waterToday(k)>=waterGoal() && b0<waterGoal()) toast('💧 ¡Meta de agua cumplida!'); };
+// Otra bebida: se registra en el diario y cuenta para el agua
+A.wOther=()=>{ NUT_DAY=null; openLayer('alimBuscar',{m:mealNow(),q:'',tab:'todo',cat:'bebida',day:dayKey()}); };
+// Cafeína del día (EFSA): aviso suave según tu perfil
+function cafLimit(){ const K=kb('sup.cafeina'), p=S.profile||{}, sl=(S.nutri&&S.nutri.salud)||{};
+  if (p.age && p.age<kb('sup.prudencia').edad) return {mg:Math.round(K.jovenesMgkg*(bodyWeight()||50)), why:tx('en menores, 3 mg por kg al día','for under-18s, 3 mg per kg a day')};
+  if (sl.embarazo) return {mg:K.embarazo, why:tx('en embarazo y lactancia','in pregnancy and breastfeeding')};
+  return {mg:K.maxDia, why:tx('en adultos sanos','for healthy adults')}; }
+function cafLine(mg){ if (!mg) return ''; const L=cafLimit(), over=mg>L.mg, late=new Date().getHours()>=17 && mg>=kb('sup.cafeina_bebidas').sueno;
+  return `<div class="xs" style="margin-top:6px;line-height:1.4;color:${over?'var(--bad)':'var(--mut)'}">☕ ${tx(`Cafeína de hoy: unos ${mg} mg de ${L.mg} mg (límite de la EFSA ${L.why}).`,`Caffeine today: about ${mg} mg of ${L.mg} mg (EFSA limit ${L.why}).`)}${over?tx(' Te pasaste: mejor sin más café, té ni refrescos con cafeína hoy.',' Over the limit: better no more coffee, tea or caffeinated soft drinks today.'):late?tx(' Si tomas más por la tarde, puede costarte dormir.',' More in the evening may make it hard to sleep.'):''}${kbLink('sup.cafeina_bebidas',tx('Fuente','Source'))}</div>`; }
 
 
 /* ============ Diario de comidas (0.8 · etapa 3) ============
@@ -7626,6 +7899,7 @@ const ALIM_RAW=`
 const ALIM_CATS={fruta:'Frutas',verdura:'Verduras',legumbre:'Legumbres',cereal:'Cereales y panes',lacteo:'Lácteos',huevo:'Huevos',carne:'Carnes',ave:'Aves',pescado:'Pescados y mariscos',
   semilla:'Frutos secos y semillas',grasa:'Aceites y grasas',bebida:'Bebidas',dulce:'Dulces y postres',snack:'Snacks',preparado:'Comidas preparadas',condimento:'Condimentos y salsas',suplemento:'Suplementos',propio:'Mis alimentos',receta:'Mis recetas'};
 const ALIM_FL={L:'leche',H:'huevo',G:'gluten',M:'maní',N:'frutos secos',S:'soja',P:'pescado',C:'mariscos',Z:'sésamo'};
+const ALIM_FL_EN={L:'milk',H:'egg',G:'gluten',M:'peanut',N:'tree nuts',S:'soy',P:'fish',C:'shellfish',Z:'sesame'};
 const MEALS=[['desayuno','Desayuno'],['almuerzo','Almuerzo'],['merienda','Merienda'],['cena','Cena'],['snack','Snacks']];
 const ALIM_FREE=10; // alimentos y recetas propios en la versión gratis
 const ALIM={};
@@ -7715,6 +7989,7 @@ function diarioCard(){
       } else h+=`<div class="xs mut" style="margin-top:8px">Completa tu perfil para comparar con tu objetivo.</div>`;
     } else h+=`<button class="link xs" style="margin-top:8px" data-a="dPay">🔒 Compara con tu objetivo y mira tu semana · Premium</button>`;
   }
+  if (!hab && items.length>=2) h+=prem()?dietQualityHtml(k):`<button class="link xs" style="margin-top:6px;display:block" data-a="dQPay">🔒 ${tx('Calidad del día: fibra, sodio y proteína por comida · Premium','Diet quality: fibre, sodium and protein per meal · Premium')}</button>`;
   MEALS.forEach(([m,ml])=>{
     const es=items.filter(e=>e.m===m); const mk=Math.round(es.reduce((a,e)=>a+(+e.k||0),0));
     h+=`<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px"><div class="row"><b class="grow">${ml}</b>${!hab&&es.length?`<span class="xs mut" style="margin-right:8px">${fmtK(mk)}</span>`:''}<button class="btn sm" data-a="dAdd" data-v="${m}" aria-label="Añadir a ${ml}">${I('plus',16)}</button></div>
@@ -7735,14 +8010,44 @@ function habitosResumen(k){
 }
 A.dDay=v=>{ const cur=new Date(dayKeyOf()+'T12:00').getTime()+(+v)*DAY; const k=dayKey(cur); NUT_DAY = k===dayKey()||cur>Date.now()?null:k; render.keep=true; render(); };
 A.dPay=()=>payFor('diario');
+A.dQPay=()=>payFor('calidad');
+// Calidad del día: fibra (EFSA), sodio (OMS) y proteína repartida (ISSN). Avisos suaves, nunca alarmas.
+function dietQuality(k){
+  const it=dayItems(k), T=dayTotals(k), w=bodyWeight(), PC=kb('nut.proteina_comida');
+  const unk=m=>it.some(e=>e[m]==null);
+  const per=w?Math.max(PC.g[0], Math.round(w*PC.gkg)):PC.g[0];
+  const meals=MEALS.map(([m])=>m).filter(m=>m!=='snack' && it.some(e=>e.m===m));
+  const okMeals=meals.filter(m=>it.filter(e=>e.m===m).reduce((a,e)=>a+(+e.p||0),0)>=per);
+  return {fib:T.f, fibUnk:unk('f'), fibMeta:kb('dieta.fibra').g, na:T.na, naUnk:unk('na'), naMax:kb('dieta.sodio').mg, per, meals:meals.length, okMeals:okMeals.length};
+}
+function dietQualityHtml(k){
+  const q=dietQuality(k), isToday=k===dayKey(), late=!isToday||new Date().getHours()>=20;
+  const bar=(v,max,col)=>`<div class="mac" style="margin:4px 0 2px"><div class="mbar"><div style="width:${Math.min(100,Math.round(v/Math.max(1,max)*100))}%;background:${col}"></div></div></div>`;
+  const tips=[];
+  if (late && q.fib<q.fibMeta*0.6) tips.push(tx('Poca fibra hoy: legumbres, pan o arroz integral, fruta con piel o verduras la suben fácil.','Low fibre today: beans, wholegrain bread or rice, fruit with skin or vegetables raise it easily.'));
+  if (q.na>q.naMax) tips.push(tx('Bastante sodio hoy: mañana prueba con menos fiambres, quesos curados, salsas y comidas preparadas.','Quite a lot of sodium today: tomorrow try fewer cold cuts, aged cheeses, sauces and ready meals.'));
+  if (q.meals>=2 && q.okMeals<q.meals && late) tips.push(tx(`Para el músculo ayuda repartir la proteína: unos ${q.per} g en cada comida principal.`,`For muscle it helps to spread protein out: about ${q.per} g in each main meal.`));
+  return `<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">${tx('CALIDAD DEL DÍA','DIET QUALITY')}</div>
+    <div class="row xs"><span class="grow">${tx('Fibra','Fibre')}${kbLink('dieta.fibra','ⓘ')}</span><span>${tx(fmtNum(q.fib)+' de '+q.fibMeta+' g',Math.round(q.fib*10)/10+' of '+q.fibMeta+' g')}${q.fibUnk?tx(' aprox.',' approx.'):''}</span></div>${bar(q.fib,q.fibMeta,'var(--ok)')}
+    <div class="row xs" style="margin-top:6px"><span class="grow">${tx('Sodio','Sodium')}${kbLink('dieta.sodio','ⓘ')}</span><span>${Math.round(q.na).toLocaleString(tx('es','en'))} mg · ${tx('menos de','under')} ${q.naMax.toLocaleString(tx('es','en'))}${q.naUnk?tx(' aprox.',' approx.'):''}</span></div>${bar(q.na,q.naMax,q.na>q.naMax?'var(--bad)':'var(--gold)')}
+    ${q.meals?`<div class="row xs" style="margin-top:6px"><span class="grow">${tx(`Comidas con ${q.per} g de proteína o más`,`Meals with ${q.per} g of protein or more`)}${kbLink('nut.proteina_comida','ⓘ')}</span><span>${tx(q.okMeals+' de '+q.meals,q.okMeals+' of '+q.meals)}</span></div>`:''}
+    ${tips.map(t=>`<div class="xs" style="margin-top:6px;color:var(--blue);line-height:1.4">${esc(t)}</div>`).join('')}</div>`;
+}
 A.dAdd=m=>openLayer('alimBuscar',{m:m||mealNow(),q:'',tab:'todo',cat:'',day:dayKeyOf()});
 A.dCopy=()=>{ const k=dayKeyOf(), prev=dayKey(new Date(k+'T12:00').getTime()-DAY); const src=dayItems(prev);
   if (!src.length) return toast('No hay nada registrado el día anterior');
-  const n=nd(); n.diario[k]=(n.diario[k]||[]).concat(src.map(e=>Object.assign({},e,{id:uid(),t:Date.now()}))); save(); render.keep=true; render(); toast(`Copiados ${plural(src.length,'alimento','alimentos')}`); };
+  const n=nd(), add=src.map(e=>Object.assign({},e,{id:uid(),t:Date.now()})); n.diario[k]=(n.diario[k]||[]).concat(add); save(); render.keep=true; render(); toast(`Copiados ${plural(add.length,'alimento','alimentos')}`); diarioAdded(k,add); };
 A.dSaveMeal=()=>{ const k=dayKeyOf(); const opts=MEALS.filter(([m])=>dayItems(k).some(e=>e.m===m));
   if (!opts.length) return toast('Registra algo primero');
   sheet('¿Qué comida quieres guardar?',opts.map(([m,ml])=>({icon:'pin',label:ml,desc:dayItems(k).filter(e=>e.m===m).map(e=>e.n).slice(0,3).join(', '),fn:()=>promptBox({title:'Nombre de la comida',ph:'Por ejemplo: Mi desayuno',value:ml,okText:'Guardar',ok:v=>{ v=(v||'').trim()||ml;
     nd().comidas.push({id:uid(),n:v.slice(0,40),items:dayItems(k).filter(e=>e.m===m).map(e=>({f:e.fid,gr:e.gr,por:e.por||null,q:e.q||null}))}); save(); toast('Comida guardada: la encontrarás al añadir'); }})}))); };
+// Cada vez que se añade comida al diario (native.js la guarda también en Health Connect)
+function diarioAdded(k, entries){
+  const f=S.nutri&&S.nutri.fast, a=f&&f.active; if (!a || k!==dayKey() || !entries.length) return;
+  if (entries.every(e=>{ const x=alimGet(e.fid); return x && (x.k*(+e.gr||0)/100)<15; })) return; // agua, café o té solos no rompen el ayuno
+  const hh=(Date.now()-a.start)/3600000;
+  setTimeout(()=>confirmBox({title:tx('Estás en ayuno','You are fasting'),text:tx(`Registraste comida durante tu ayuno (llevas ${fmtHMl(hh)}). ¿Lo terminamos ahora?`,`You logged food during your fast (${Math.floor(hh)} h ${String(Math.floor(hh*60)%60).padStart(2,'0')} min so far). End it now?`),okText:tx('Terminar ayuno','End fast'),ok:()=>A.fastEnd(),noText:tx('Sigo ayunando','Keep fasting')}),350);
+}
 function dEntry(id){ const k=dayKeyOf(); return dayItems(k).find(e=>e.id===id); }
 A.dEdit=id=>{ const e=dEntry(id); if(!e) return; const f=alimGet(e.fid);
   if (!f) return sheet(e.n,[{icon:'trash',label:'Quitar del diario',fn:()=>dDel(id)}]);
@@ -7789,7 +8094,7 @@ A.alFav=id=>{ const n=nd(); const i=n.fav.indexOf(id); if(i>=0) n.fav.splice(i,1
 A.alPick=id=>{ const f=alimGet(id); if(!f) return; const p=alP(); if (p.receta) return recAmount(f); amountModal(f,{m:p.m}); };
 A.alMealAdd=id=>{ const c=nd().comidas.find(x=>x.id===id); if(!c) return; const p=alP(), k=p.day||dayKeyOf(), n=nd();
   const add=c.items.map(i=>{ const f=alimGet(i.f); if(!f) return null; return Object.assign(alimMac(f,i.gr),{id:uid(),fid:f.id,n:f.n,gr:i.gr,por:i.por,q:i.q,m:p.m,t:Date.now()}); }).filter(Boolean);
-  n.diario[k]=(n.diario[k]||[]).concat(add); save(); closeLayer(); render.keep=true; render(); toast(`${c.n}: ${plural(add.length,'alimento añadido','alimentos añadidos')}`); };
+  n.diario[k]=(n.diario[k]||[]).concat(add); save(); closeLayer(); render.keep=true; render(); toast(`${c.n}: ${plural(add.length,'alimento añadido','alimentos añadidos')}`); diarioAdded(k,add); };
 A.alMealDel=id=>confirmBox({title:'¿Borrar esta comida guardada?',text:'Tu diario no cambia.',danger:true,okText:'Borrar',ok:()=>{ const n=nd(); n.comidas=n.comidas.filter(x=>x.id!==id); save(); refreshTop(); }});
 
 /* ---------- Cantidad ---------- */
@@ -7815,10 +8120,10 @@ function amountModal(f, o){
     const e=Object.assign(alimMac(f,g),{id:AQ.edit||uid(),fid:f.id,n:f.n,gr:Math.round(g*10)/10,por:por==='100 g'?null:por,q:AQ.pi>=0&&por!=='100 g'?AQ.q:null,m:AQ.m,t:Date.now()});
     if (por==='100 g'){ e.por=null; e.q=null; }
     const arr=n.diario[k]=n.diario[k]||[]; const i=arr.findIndex(x=>x.id===e.id); if (i>=0) arr[i]=e; else arr.push(e);
-    save(); if (!AQ.edit && LAYERS.length && LAYERS[LAYERS.length-1].t==='alimBuscar') closeLayer(); render.keep=true; render(); if(!AQ.edit) toast(`${f.n} añadido`); vibrate(15); });
+    const isNew=!AQ.edit; save(); if (isNew && LAYERS.length && LAYERS[LAYERS.length-1].t==='alimBuscar') closeLayer(); render.keep=true; render(); if(isNew) toast(`${f.n} añadido`); vibrate(15); if (isNew) diarioAdded(k,[e]); });
   const del=o.edit?cb(()=>dDel(o.edit)):null;
   openModal(`<div class="sheet"><div class="grab"></div><h3 style="margin-bottom:4px">${esc(f.n)}</h3>
-    ${f.syn.length?`<div class="xs mut" style="margin:0 4px 10px">También: ${esc(f.syn.slice(0,4).join(', '))}</div>`:''}
+    ${f.syn.length&&!EN_LANG()?`<div class="xs mut" style="margin:0 4px 10px">También: ${esc(f.syn.slice(0,4).join(', '))}</div>`:''}
     ${cf.length?`<div class="banner" style="border-color:var(--bad);margin-bottom:10px"><span class="ic" style="color:var(--bad)">${I('alert',18)}</span><div class="grow sm">${esc(cf.join(' · '))}. Revisa la etiqueta si es un producto envasado.</div></div>`:''}
     <div class="chips" style="margin-bottom:10px">${P.map((x,i)=>`<button class="chip ${AQ.pi===i?'on':''}" data-a="aqPor" data-v="${i}">${esc(x[0])}</button>`).join('')}<button class="chip ${AQ.pi<0?'on':''}" data-a="aqPor" data-v="-1">Gramos</button></div>
     <div id="aqqbox" class="row" style="gap:8px;margin-bottom:10px;${AQ.pi<0?'display:none':''}"><span class="sm grow">Cantidad</span><button class="btn sm" data-a="aqStep" data-v="-0.5">−</button><input id="aqq" class="inp" style="width:80px;text-align:center" type="number" inputmode="decimal" step="0.25" min="0" value="${AQ.q}" data-in="aqQ"><button class="btn sm" data-a="aqStep" data-v="0.5">+</button></div>
@@ -7925,10 +8230,17 @@ function fastCard(){
       <button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="fastUnwell">Me siento mal</button></div>`;
   } else {
     h+=`<div class="card" style="text-align:center"><div class="xs mut b" style="letter-spacing:1px">VENTANA DE COMIDA</div><div style="font-size:15px;margin:8px 0 12px;line-height:1.45">${plan.h?`Plan ${plan.n}: ayunas ${plan.h} h y comes en ${24-plan.h} h.`:'Ayuno libre: inícialo cuando termines tu última comida.'}</div>
-      <button class="btn pri big" data-a="fastStart">${I('play',18)} Empezar ayuno ahora</button><button class="btn wide" style="margin-top:10px" data-a="fastStartPast">${I('timer',18)} Empecé antes: elegir hora</button></div>`;
+      <button class="btn pri big" data-a="fastStart">${I('play',18)} Empezar ayuno ahora</button>${(lm=>lm?`<button class="btn wide" style="margin-top:10px" data-a="fastFromDiary">${I('note',18)} ${tx('Desde mi última comida','Since my last meal')} (${hhmm(lm)})</button>`:'')(lastMealTs())}<button class="btn wide" style="margin-top:10px" data-a="fastStartPast">${I('timer',18)} Empecé antes: elegir hora</button>${fastWindowHtml()}</div>`;
   }
   return h+fastAdvice()+fastHistory();
 }
+// Ayuno conectado con el diario: hora de la última comida registrada (hoy o anoche)
+const hhmm = ts => new Date(ts).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+function diaryTimes(k){ return ((S.nutri&&S.nutri.diario&&S.nutri.diario[k])||[]).filter(e=>{ const f=alimGet(e.fid); return e.t && f && f.k*(+e.gr||0)/100>=15; }).map(e=>e.t).filter(t=>t<=Date.now()).sort((a,b)=>a-b); }
+function lastMealTs(){ const t=diaryTimes(dayKey()).concat(diaryTimes(dayKey(Date.now()-DAY))).filter(x=>Date.now()-x<kb('ayuno.diario').maxH*3600000); return t.length?Math.max(...t):null; }
+function fastWindowHtml(){ const t=diaryTimes(dayKey()); if (t.length<2) return '';
+  const h=(t[t.length-1]-t[0])/3600000; return `<div class="xs mut" style="margin-top:12px;line-height:1.4">${tx(`Según tu diario, hoy comiste entre las ${hhmm(t[0])} y las ${hhmm(t[t.length-1])} (${fmtHMl(h)}).`,`According to your diary, today you ate between ${hhmm(t[0])} and ${hhmm(t[t.length-1])} (${Math.floor(h)} h ${String(Math.floor(h*60)%60).padStart(2,'0')} min).`)}${kbLink('ayuno.diario',tx('Cómo funciona','How it works'))}</div>`; }
+A.fastFromDiary=()=>{ const lm=lastMealTs(); if (!lm) return toast(tx('No hay comidas recientes en tu diario','No recent meals in your diary')); const f=nut().fast; f.active={start:lm,goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast(tx(`Ayuno desde las ${hhmm(lm)}, tu última comida`,`Fasting since ${hhmm(lm)}, your last meal`)); };
 const fmtHM = h => { const m=Math.floor(h*60); return `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`; };
 const fmtHMl = h => { const m=Math.floor(h*60); return `${Math.floor(m/60)} h ${String(m%60).padStart(2,'0')} min`; };
 function fastAdvice(){
@@ -8106,6 +8418,163 @@ A.importCode=()=>promptBox({title:'Importar con código',text:'Pega el código q
 
 
 
+/* ============ Etapa 5 (0.8.4): suplementos, menús de ejemplo y modo viaje ============ */
+function nutSalud(){ const n=nut(); n.salud=Object.assign({embarazo:false,presion:false,rinon:false,corazon:false,medicacion:false},n.salud||{}); return n.salud; }
+const tx=(es,en)=>EN_LANG()?en:es;
+function supCardsHtml(){
+  return `<div class="sec">${tx('Más para tu alimentación','More for your diet')}</div>
+  <div class="card row tap" data-a="openSup" style="gap:12px"><span style="color:var(--ac)">${I('pill',24)}</span><div class="grow"><div class="b">${tx('Suplementos con evidencia','Evidence-based supplements')}</div><div class="sm mut" style="line-height:1.4">${tx('Creatina, cafeína, beta-alanina y proteína: cuánto, para qué y para quién no.','Creatine, caffeine, beta-alanine and protein: how much, what for and who should skip them.')}</div></div>${I('right',18)}</div>
+  <div class="card row tap" data-a="openMenu" style="gap:12px"><span style="color:var(--ok)">${I('leaf',24)}</span><div class="grow"><div class="b">${tx('Ejemplos de menú','Sample menus')}${prem()?'':' 🔒'}</div><div class="sm mut" style="line-height:1.4">${tx('Un día de comidas con tus calorías, tu alimentación y tus alergias.','A day of meals with your calories, your diet and your allergies.')}</div></div>${I('right',18)}</div>`;
+}
+A.openSup=()=>openLayer('suplementos',{});
+const SALUD_ITEMS=[['embarazo','Estoy embarazada o en lactancia','I am pregnant or breastfeeding'],['presion','Tengo la presión alta','I have high blood pressure'],['rinon','Tengo una enfermedad del riñón','I have kidney disease'],['corazon','Tengo una enfermedad del corazón o arritmias','I have heart disease or arrhythmias'],['medicacion','Tomo medicación de forma habitual','I take regular medication']];
+A.supSalud=k=>{ const s=nutSalud(); s[k]=!s[k]; save(); refreshTop(); };
+SCREENS.suplementos=()=>{
+  const p=S.profile||{}, sl=nutSalud(), w=bodyWeight(), menor=p.age && p.age<kb('sup.prudencia').edad;
+  const C=kb('sup.creatina'), F=kb('sup.cafeina'), B=kb('sup.betaalanina'), c=calcNutrition();
+  const warn=t=>`<div class="banner" style="border-color:var(--bad);margin-top:10px"><span class="ic" style="color:var(--bad)">${I('alert',18)}</span><div class="grow sm" style="line-height:1.45">${t}</div></div>`;
+  const card=(id,title,body,warns)=>`<div class="card" style="margin-bottom:10px"><div class="row" style="gap:8px;margin-bottom:8px"><b class="grow">${title}</b>${kbEvTag(KB[id].ev)}</div><div class="sm" style="line-height:1.5">${body}</div>${warns.filter(Boolean).map(warn).join('')}<button class="link xs" style="margin-top:8px" data-a="kbOpen" data-v="${id}">${tx('Ver fuente y detalles','See source and details')}</button></div>`;
+  let b=`<p class="sm mut" style="margin-top:0;line-height:1.5">${tx('Solo información con su fuente: PandarIA no vende suplementos ni recomienda marcas. La base sigue siendo entrenar, comer bien y dormir.','Information with its source only: PandarIA does not sell supplements or recommend brands. The foundation is still training, eating well and sleeping.')}</p>`;
+  if (menor) b+=warn(tx('Eres menor de edad: PandarIA no da dosis de suplementos para ti. Lo que necesitas para crecer y entrenar llega con la comida; si estás pensando en tomar algo, habla antes con tu médico.','You are under 18: PandarIA does not give supplement doses for you. What you need to grow and train comes from food; if you are thinking of taking something, talk to your doctor first.'));
+  b+=`<div class="sec">${tx('Sobre tu salud','About your health')}</div><div class="card" style="padding:4px 12px"><div class="xs mut" style="padding:8px 0 2px;line-height:1.4">${tx('Marca lo que corresponda para ver avisos personalizados. Se queda en tu teléfono.','Tick what applies to see personalised warnings. It stays on your phone.')}</div>${SALUD_ITEMS.map(([k,l,le])=>`<button class="srow" data-a="supSalud" data-v="${k}"><span class="check ${sl[k]?'on':''}">${sl[k]?I('check',16):''}</span><span class="grow sm">${tx(l,le)}</span></button>`).join('')}</div>`;
+  if (!menor){
+    const fMin=w?Math.round(w*F.mgkg[0]/10)*10:null, fMax=w?Math.round(Math.min(w*F.mgkg[1],F.maxToma*2)/10)*10:null;
+    b+=`<div class="sec">${tx('Lo que tiene más pruebas','What has the most evidence')}</div>`;
+    b+=card('sup.creatina',tx('Creatina monohidrato','Creatine monohydrate'),tx(
+      `Ayuda a ganar fuerza y músculo si entrenas con pesas o haces esfuerzos cortos e intensos. <b>${C.mant[0]} a ${C.mant[1]} g al día</b>, todos los días, a la hora que quieras (con comida es más cómodo). La carga${w?` (unos ${Math.round(w*C.carga)} g al día para ti, en 4 tomas)`:''} durante ${C.cargaDias[0]}–${C.cargaDias[1]} días es opcional: solo adelanta el efecto. Es normal subir 1 o 2 kg de peso por el agua del músculo.`,
+      `Helps you gain strength and muscle if you lift weights or do short, intense efforts. <b>${C.mant[0]} to ${C.mant[1]} g a day</b>, every day, at any time (easier with a meal). Loading${w?` (about ${Math.round(w*C.carga)} g a day for you, in 4 doses)`:''} for ${C.cargaDias[0]}–${C.cargaDias[1]} days is optional: it only brings the effect forward. Gaining 1 or 2 kg from the water stored in muscle is normal.`),
+      [sl.embarazo&&tx('En embarazo y lactancia no hay datos suficientes de seguridad: no la tomes sin consultarlo.','There is not enough safety data in pregnancy and breastfeeding: do not take it without asking your doctor.'), sl.rinon&&tx('Con una enfermedad del riñón, consulta a tu médico antes de tomarla.','With kidney disease, ask your doctor before taking it.'), sl.medicacion&&tx('Si tomas medicación, consulta a tu médico o farmacéutico antes.','If you take medication, ask your doctor or pharmacist first.')]);
+    b+=card('sup.cafeina',tx('Cafeína','Caffeine'),tx(
+      `Mejora el rendimiento en casi todos los deportes. Dosis útil: <b>${F.mgkg[0]} a ${F.mgkg[1]} mg por kg</b>${w?` (unos ${fMin}–${fMax} mg para ti)`:''}, unos ${F.minAntes} minutos antes. Empieza por lo bajo: más no rinde más. Cuenta el café, el té y los refrescos del día: ${sl.embarazo?`en embarazo y lactancia el límite de la EFSA es <b>${F.embarazo} mg al día</b>`:`la EFSA considera seguros hasta <b>${F.maxDia} mg al día</b> y ${F.maxToma} mg de una vez`}. Evítala en las 6 horas antes de dormir.`,
+      `Improves performance in almost every sport. Useful dose: <b>${F.mgkg[0]} to ${F.mgkg[1]} mg per kg</b>${w?` (about ${fMin}–${fMax} mg for you)`:''}, about ${F.minAntes} minutes before. Start low: more does not work better. Count the coffee, tea and soft drinks of the day: ${sl.embarazo?`in pregnancy and breastfeeding the EFSA limit is <b>${F.embarazo} mg a day</b>`:`EFSA considers up to <b>${F.maxDia} mg a day</b> and ${F.maxToma} mg at once safe`}. Avoid it in the 6 hours before bed.`),
+      [sl.presion&&tx('Con la presión alta, la cafeína puede subirla un rato: habla con tu médico antes de usarla para entrenar.','With high blood pressure, caffeine can raise it for a while: talk to your doctor before using it for training.'), sl.corazon&&tx('Con una enfermedad del corazón o arritmias, no tomes cafeína para entrenar sin consultarlo.','With heart disease or arrhythmias, do not take caffeine for training without asking your doctor.'), sl.embarazo&&tx(`En embarazo y lactancia no uses cafeína para entrenar; no pases de ${F.embarazo} mg al día en total.`,`In pregnancy and breastfeeding do not use caffeine for training; stay under ${F.embarazo} mg a day in total.`), sl.medicacion&&tx('Algunos medicamentos cambian cómo te afecta la cafeína: consulta a tu médico o farmacéutico.','Some medicines change how caffeine affects you: ask your doctor or pharmacist.')]);
+    b+=card('sup.betaalanina',tx('Beta-alanina','Beta-alanine'),tx(
+      `Útil en esfuerzos intensos de 1 a 4 minutos (series largas, intervalos, deportes de equipo). <b>${B.g[0]} a ${B.g[1]} g al día</b> repartidos en tomas de ${B.toma} g o menos, durante al menos ${B.semanas[0]} a ${B.semanas[1]} semanas: el efecto llega por acumulación. El hormigueo en la piel es inofensivo.`,
+      `Useful for intense efforts of 1 to 4 minutes (long sets, intervals, team sports). <b>${B.g[0]} to ${B.g[1]} g a day</b> split into doses of ${B.toma} g or less, for at least ${B.semanas[0]} to ${B.semanas[1]} weeks: the effect builds up over time. The tingling on the skin is harmless.`),
+      [sl.embarazo&&tx('En embarazo y lactancia no hay datos de seguridad: no la tomes.','There is no safety data in pregnancy and breastfeeding: do not take it.'), sl.medicacion&&tx('Si tomas medicación, consulta antes.','If you take medication, ask first.')]);
+    b+=card('sup.proteina',tx('Proteína en polvo','Protein powder'),tx(
+      `Es comida en formato práctico. Úsala solo si con tus comidas no llegas a tu proteína${c?` (<b>${c.prot} g al día</b> para tu objetivo)`:''}. Da el mismo resultado que la proteína de los alimentos. La encuentras en el diario como «Proteína de suero en polvo» o «de soja».`,
+      `It is food in a handy format. Use it only if your meals do not reach your protein${c?` (<b>${c.prot} g a day</b> for your goal)`:''}. It works the same as protein from food. You will find it in the diary as “Whey protein powder” or “Soy protein powder”.`),
+      [sl.rinon&&tx('Con una enfermedad del riñón, pregunta a tu médico cuánta proteína al día te conviene.','With kidney disease, ask your doctor how much protein a day is right for you.')]);
+  }
+  b+=`<div class="sec">${tx('Con prudencia','With caution')}</div><div class="card sm" style="line-height:1.5">
+    <div style="margin-bottom:6px">• ${tx('Elige productos con un sello de análisis independiente (por ejemplo, de deporte limpio).','Choose products with an independent testing seal (for example, for clean sport).')}</div>
+    <div style="margin-bottom:6px">• ${tx('Desconfía de los que prometen quemar grasa, «subir la testosterona» o resultados rápidos: pueden llevar sustancias no declaradas.','Be wary of products that promise to burn fat, “boost testosterone” or fast results: they may contain undeclared substances.')}</div>
+    <div>• ${tx('Si notas palpitaciones, nervios fuertes o malestar, déjalo y consulta.','If you notice palpitations, strong jitters or feel unwell, stop and see a doctor.')}</div>${kbLink('sup.prudencia',tx('Por qué','Why'))}</div>
+  <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">${tx('Información general basada en evidencia. No reemplaza el consejo de tu médico o nutricionista.','General evidence-based information. It does not replace advice from your doctor or dietitian.')}</p>`;
+  return lhdr(tx('Suplementos','Supplements'))+`<div class="lbody">${b}</div>`;
+};
+
+/* ---------- Ejemplos de menú (Premium) ---------- */
+const MENU_POOLS={
+  prot:['05064','05065','23563','23592','23600','10061','15237','15016','15262','15121','05711','01129','16426','16114','16070','16057','16015','16109'],
+  carb:['20045','20037','20121','20125','20137','11367','11508','20029'],
+  veg:['11091','11529','11253','11124','11458','11477','11053','11136','11205','11821','11210','11261','11959','11080'],
+  grasa:['04053'],
+  dBase:['20038','18075','08121','28397','36415','18363'],
+  dProt:['01293','01256','01116','01079','16139','01015','01132','01036','01123'],
+  fruta:['09003','09040','09200','09218','09316','09252','09148','09050','09236','09176','09132'],
+  merienda:[['01293','09050'],['01116','09040'],['18075','01228'],['09003','12061'],['01289','09316'],['19816','16398'],['16139','09040'],['18075','09037']]
+};
+const MENU_G={prot:{carne:130,ave:130,pescado:140,huevo:100,legumbre:180,ninguna:130}, carb:150, veg:150, grasa:10, dBase:{'20038':45,'18075':64,'08121':234,'28397':52,'36415':90,'18363':52}};
+function menuRng(seed){ let x=seed>>>0||1; return ()=>{ x^=x<<13; x>>>=0; x^=x>>17; x^=x<<5; x>>>=0; return x/4294967296; }; }
+function menuOk(id){ const f=ALIM[id]; return f && !alimConflicts(f).length; }
+function menuPick(r, ids, avoid){ const ok=ids.filter(id=>menuOk(id) && !(avoid||[]).includes(id)); return ok.length?ok[Math.floor(r()*ok.length)]:null; }
+function menuRound(g){ return g>=100?Math.round(g/10)*10:Math.max(5,Math.round(g/5)*5); }
+const MENU_LEAF=['11253','11959','11458'];
+function buildMenu(c, seed){
+  const r=menuRng(seed), K=kb('menu.ejemplo'), R=K.reparto, PR={desayuno:0.22, almuerzo:0.34, merienda:0.1, cena:0.34}, used=[], out=[];
+  const mk=(id,gr,role,max)=>({id,gr,role,max:max||gr*2.5,min:role==='grasa'?5:gr*0.5});
+  const main=(m)=>{ const items=[]; const p=menuPick(r,MENU_POOLS.prot,used); if (p){ used.push(p); const f=ALIM[p]; items.push(mk(p,MENU_G.prot[f.cat]||130,'prot',f.cat==='legumbre'?320:f.cat==='huevo'?150:230)); }
+    const cb=menuPick(r,MENU_POOLS.carb,used); if (cb){ used.push(cb); items.push(mk(cb,MENU_G.carb,'carb',300)); }
+    const v1=menuPick(r,MENU_POOLS.veg,used); if (v1){ used.push(v1); items.push(mk(v1,MENU_LEAF.includes(v1)?60:150,'veg')); }
+    const v2=menuPick(r,MENU_POOLS.veg,used); if (v2){ used.push(v2); items.push(mk(v2,MENU_LEAF.includes(v2)?40:100,'veg')); }
+    if (menuOk('04053')) items.push(mk('04053',MENU_G.grasa,'grasa',15));
+    return {m,items}; };
+  const unit=id=>{ const f=ALIM[id]; return f.por[0]?f.por[0][1]:100; };
+  { const items=[]; const b0=menuPick(r,MENU_POOLS.dBase,used); if (b0) items.push(mk(b0,MENU_G.dBase[b0]||50,'carb'));
+    const d0=menuPick(r,MENU_POOLS.dProt,used); if (d0){ const g=unit(d0); items.push(mk(d0,g,'prot',ALIM[d0].cat==='huevo'?g*3:g*2)); }
+    const fr=menuPick(r,MENU_POOLS.fruta,used); if (fr){ used.push(fr); items.push(mk(fr,Math.min(150,unit(fr)),'fija')); }
+    out.push({m:'desayuno',items}); }
+  out.push(main('almuerzo'));
+  { const opts=MENU_POOLS.merienda.filter(p=>p.every(menuOk)); const pr=opts.length?opts[Math.floor(r()*opts.length)]:null;
+    out.push({m:'merienda',items:pr?pr.map((id,i)=>mk(id,Math.min(170,unit(id)),i===0?'carb':'fija')):[]}); }
+  out.push(main('cena'));
+  const kc=it=>ALIM[it.id].k*it.gr/100, pr=it=>ALIM[it.id].p*it.gr/100, clampG=it=>{ it.gr=Math.max(it.min,Math.min(it.max,it.gr)); };
+  const fitK=M=>{ const goal=c.kcal*(R[M.m]||0.25);
+    for (let pass=0; pass<4; pass++){
+      const tot=M.items.reduce((a,it)=>a+kc(it),0); const diff=goal-tot; if (!tot || Math.abs(diff)<goal*0.04) break;
+      const sc=M.items.filter(it=>(it.role==='carb'||it.role==='grasa'||(pass>1&&it.role==='prot'&&diff>0)) && (diff>0?it.gr<it.max:it.gr>it.min)); const sk=sc.reduce((a,it)=>a+kc(it),0); if (!sk) break;
+      const f=Math.max(0.4,Math.min(2.5,1+diff/sk)); sc.forEach(it=>{ it.gr*=f; clampG(it); });
+    } };
+  out.forEach(M=>{
+    // 1) proteína de la comida cerca de su parte del día
+    const pGoal=c.prot*(PR[M.m]||0.25), pIt=M.items.filter(it=>it.role==='prot');
+    if (pIt.length){ const other=M.items.filter(it=>it.role!=='prot').reduce((a,it)=>a+pr(it),0), pp=pIt.reduce((a,it)=>a+pr(it),0);
+      if (pp>0){ const f=Math.max(0.7,(pGoal-other)/pp); pIt.forEach(it=>{ it.gr*=f; clampG(it); }); } }
+    fitK(M); });
+  // 3) si falta proteína en el día, más proteína en almuerzo y cena y menos hidratos
+  { const pDay=out.reduce((a,M)=>a+M.items.reduce((b,it)=>b+pr(it),0),0); let dp=c.prot*0.95-pDay;
+    if (dp>0) out.filter(M=>M.m==='almuerzo'||M.m==='cena').forEach(M=>{ M.items.filter(it=>it.role==='prot').forEach(it=>{ const room=(it.max-it.gr)*ALIM[it.id].p/100; const take=Math.min(room,dp/2); if (take>0){ it.gr+=take/(ALIM[it.id].p/100); clampG(it); } }); fitK(M); }); }
+  out.forEach(M=>{
+    M.items.forEach(it=>{ const F=ALIM[it.id]; it.gr=it.role==='grasa'?Math.max(5,Math.round(it.gr/5)*5):menuRound(it.gr);
+      if (['huevo','fruta','lacteo'].includes(F.cat) || /^18|^28|^36/.test(F.id)){
+        const P=F.por.find(p=>{ const q=Math.round(it.gr/p[1]); return q>=1 && q<=3 && Math.abs(it.gr/p[1]-q)<0.2; });
+        if (P){ it.q=Math.round(it.gr/P[1]); it.por=P[0]; it.gr=Math.round(it.q*P[1]*10)/10; } }
+      if (it.role==='grasa'){ const P=F.por.find(p=>/cucharada$/.test(p[0])); if (P && Math.abs(it.gr-P[1])<3){ it.q=1; it.por=P[0]; it.gr=P[1]; } } });
+    M.mac=M.items.reduce((a,it)=>{ const x=alimMac(ALIM[it.id],it.gr); MAC.forEach(k=>a[k]=(a[k]||0)+(+x[k]||0)); return a; },{});
+  });
+  const T=out.reduce((a,M)=>{ MAC.forEach(k=>a[k]=(a[k]||0)+(M.mac[k]||0)); return a; },{});
+  return {meals:out, T};
+}
+A.openMenu=()=>{ if (!prem()) return payFor('menu'); if (!calcNutrition()) return toast(tx('Completa tu perfil para calcular tus calorías','Complete your profile to calculate your calories')); openLayer('menu',{seed:Number(dayKey().replace(/-/g,''))}); };
+A.menuOtro=()=>{ const t=LAYERS[LAYERS.length-1]; t.p.seed=(t.p.seed*7+13)%2147483647; refreshTop(); };
+function menuEntries(M){ return M.items.map(it=>{ const f=ALIM[it.id]; return Object.assign(alimMac(f,it.gr),{id:uid(),fid:f.id,n:f.n,gr:it.gr,por:it.por||null,q:it.q||null,m:M.m,t:Date.now()}); }); }
+A.menuAdd=m=>{ const t=LAYERS[LAYERS.length-1], c=calcNutrition(); if (!c) return; const mn=buildMenu(c,t.p.seed); const ms=mn.meals.filter(M=>m==='all'||M.m===m);
+  const n=nd(), k=dayKey(), add=ms.flatMap(menuEntries); if (!add.length) return; n.diario[k]=(n.diario[k]||[]).concat(add); NUT_DAY=null; save(); render.keep=true; render();
+  toast(m==='all'?tx('Menú añadido a tu diario de hoy','Menu added to today’s diary'):tx(`${(MEALS.find(x=>x[0]===m)||[,''])[1]} añadido a tu diario`,'Meal added to your diary')); diarioAdded(k,add); };
+SCREENS.menu=p=>{
+  const c=calcNutrition(); if (!c) return lhdr(tx('Ejemplo de menú','Sample menu'))+`<div class="lbody"><p class="sm mut">${tx('Completa tu perfil.','Complete your profile.')}</p></div>`;
+  const mn=buildMenu(c,p.seed), P=nd().prefs, hab=habitos();
+  const dieta=(EN_LANG()?{todo:'',vegetariano:' · vegetarian',vegano:' · vegan'}:{todo:'',vegetariano:' · vegetariana',vegano:' · vegana'})[P.dieta]||'';
+  const evi=P.evitar.map(x=>EN_LANG()?ALIM_FL_EN[x]:ALIM_FL[x]).join(', ');
+  let b=`<p class="sm mut" style="margin-top:0;line-height:1.5">${tx('Una idea de día','An idea for one day')}${hab?'':tx(` para tus ${fmtK(c.kcal)} y ${c.prot} g de proteína`,` for your ${Math.round(c.kcal)} kcal and ${c.prot} g of protein`)}${esc(dieta)}${P.evitar.length?tx(`, sin ${esc(evi)}`,`, without ${esc(evi)}`):''}. ${tx('Cocina con poca sal y cambia lo que quieras.','Cook with little salt and swap whatever you like.')}${kbLink('menu.ejemplo',tx('Cómo se arma','How it works'))}</p>`;
+  if (!hab) b+=`<div class="stats"><div class="stat"><div class="v">${fmtK(mn.T.k)}</div><div class="l">${tx('de '+fmtK(c.kcal),'of '+Math.round(c.kcal)+' kcal')}</div></div><div class="stat"><div class="v">${Math.round(mn.T.p)} g</div><div class="l">${tx('proteína de '+c.prot+' g','protein of '+c.prot+' g')}</div></div><div class="stat"><div class="v">${Math.round(mn.T.f||0)} g</div><div class="l">${tx('fibra','fibre')}</div></div></div>`;
+  if (!hab && mn.T.p<c.prot*0.85) b+=`<div class="xs" style="color:var(--blue);margin:-2px 2px 10px;line-height:1.4">${tx('Este menú se queda algo corto de proteína: súmale un yogur griego, un vaso de leche o de bebida de soja, o pide otro menú.','This menu is a little short on protein: add a Greek yogurt, a glass of milk or soy milk, or ask for another menu.')}</div>`;
+  mn.meals.forEach(M=>{ if (!M.items.length) return; const ml=(MEALS.find(x=>x[0]===M.m)||[,M.m])[1];
+    b+=`<div class="card" style="margin-bottom:10px"><div class="row" style="margin-bottom:6px"><b class="grow">${ml}</b>${hab?'':`<span class="xs mut" style="margin-right:8px">${fmtK(M.mac.k)} · P ${Math.round(M.mac.p)} g</span>`}<button class="btn sm" data-a="menuAdd" data-v="${M.m}" aria-label="${tx('Añadir al diario','Add to diary')}">${I('plus',16)}</button></div>
+      ${M.items.map(it=>`<div class="row sm" style="padding:4px 0;gap:10px"><span class="grow">${esc(ALIM[it.id].n)}</span><span class="xs mut">${esc(porTxt({gr:it.gr,por:it.por,q:it.q}))}</span></div>`).join('')}</div>`; });
+  b+=`<div class="row" style="gap:8px;margin-top:6px"><button class="btn grow" data-a="menuOtro">${I('refresh',18)} ${tx('Otro menú','Another menu')}</button><button class="btn pri grow" data-a="menuAdd" data-v="all">${I('plus',18)} ${tx('Añadir todo a hoy','Add all to today')}</button></div>
+    <p class="xs mut" style="line-height:1.45;margin-top:14px">${tx('Datos de alimentos: USDA (dominio público). Un ejemplo orientativo, no una dieta médica. Si tienes una condición de salud, consulta a un profesional.','Food data: USDA (public domain). A guiding example, not a medical diet. If you have a health condition, see a professional.')}</p>`;
+  return lhdr(tx('Ejemplo de menú','Sample menu'))+`<div class="lbody">${b}</div>`;
+};
+
+/* ---------- Modo viaje: la sesión de hoy sin equipo ---------- */
+let WK_VIAJE=null;
+const VIAJE_EQ={pc:['pc','est'], bnd:['pc','est','bnd'], trx:['pc','est','trx'], hotel:['pc','est','man','ban','bnd']};
+const VIAJE_NS={pc:['Solo peso corporal','Bodyweight only'], bnd:['Peso corporal y bandas','Bodyweight and bands'], trx:['Peso corporal y TRX','Bodyweight and TRX'], hotel:['Gimnasio de hotel (mancuernas y banco)','Hotel gym (dumbbells and bench)']};
+const VIAJE_N=new Proxy({}, {get:(o,k)=>VIAJE_NS[k]?tx(VIAJE_NS[k][0],VIAJE_NS[k][1]):''});
+function travelSwap(exId, eq, used){
+  const ex=getEx(exId); if (!ex || hasEquip(ex,eq)) return exId;
+  let best=null, bs=-1e9;
+  for (const id in EX){ const o=EX[id]; if (id===exId || used.includes(id) || avoided(id) || !hasEquip(o,eq)) continue;
+    let sc=0; if (o.prim[0]===ex.prim[0]) sc+=6; else if (o.prim.some(m=>ex.prim.includes(m))) sc+=3; else continue;
+    if (o.pat===ex.pat) sc+=3; if (o.kind===ex.kind) sc+=1;
+    if (ex.mode!=='t') sc+=o.mode==='t'?-4:1; // una serie por repeticiones no se cambia por una postura mantenida
+    const tl=Math.max(ex.lvl||1, Math.min(3,userLevel())), dl=(o.lvl||1)-tl; sc-=dl<0?-dl*2:dl*1.2;
+    if (sc>bs){ bs=sc; best=id; } }
+  return best||exId;
+}
+function travelItem(it, eq, used){
+  const nid=travelSwap(it.exId, eq, used); if (nid===it.exId) return it;
+  used.push(nid); const o=getEx(nid), x=clone(it); x.exId=nid; x.viajeDe=it.exId;
+  x.sets=it.sets.map(s=>Object.assign({},s,{kg:null, reps:o.mode==='t'?null:(s.reps||12), time:o.mode==='t'?(s.time||30):null}));
+  return x;
+}
+function viajeActivo(r){ const v=WK_VIAJE; return v && r && v.rid===r.id && Date.now()-v.t<600000 ? v : null; }
+A.startTravel=rid=>{ const last=S.settings.viajeEq||'pc';
+  sheet(tx('Modo viaje: ¿qué tienes a mano?','Travel mode: what do you have?'),Object.keys(VIAJE_EQ).map(k=>({icon:k===last?'check':'dumbbell',label:VIAJE_N[k],desc:k==='pc'?tx('Suelo, pared y una silla o cama','Floor, wall and a chair or bed'):'',fn:()=>{ S.settings.viajeEq=k; WK_VIAJE={rid,eq:k,t:Date.now()}; A.startWorkout(rid); }}))); };
+
 /* ---------- Ciencia de PandarIA: la Biblioteca de evidencia en la app ---------- */
 const KB_EV_COL={solida:'ok', moderada:'blue', limitada:'', contradictoria:'ac'};
 const kbDate = s => { const [y,m,d]=String(s).split('-').map(Number); return EN_LANG()?new Date(y,m-1,d).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'}):`${d} de ${MESES[m-1]} de ${y}`; };
@@ -8151,7 +8620,7 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='0.8';
 const CHANGELOG=[
- {v:'0.8',t:'Nutrición completa y PandarIA con evidencia (en desarrollo)',items:['Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
+ {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
  {v:'0.5.1',t:'Mejoras de testers',items:['Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata','Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez']},
@@ -8182,7 +8651,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["Etapa 4 de 5: reglas que cambian resultados, con su fuente en Ciencia de PandarIA", "2 minutos de descanso en multiarticulares con peso para ganar músculo", "Bajar o ganar a tu ritmo (lento, normal o rápido) con límite de seguridad", "Objetivo de calorías que se ajusta con tu diario y tu peso (Premium)", "Check-in con efecto: menos carga si dormiste mal, y opción de empezar suave", "Minutos de actividad frente a la meta de la OMS en el informe semanal", "Meta de agua recalibrada y alternativas de dificultad parecida al estancarte"];
+const NOTAS_VERSION=["Etapa 5 de 5: la 0.8 completa", "Suplementos con evidencia: creatina, cafeína, beta-alanina y proteína, con avisos según tu salud", "Calidad del día (fibra, sodio y proteína por comida) y ejemplos de menú (Premium)", "Las bebidas del diario cuentan como agua, y ves tu cafeína del día", "Ayuno conectado con el diario y modo viaje sin equipo", "Health Connect guarda tus comidas y tu agua", "Todo lo nuevo de la 0.8 también en inglés", "Revisión 6: 11 animaciones de cardio corregidas"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
@@ -9267,8 +9736,954 @@ Difícil|Hard
 Dificultad|Difficulty`;
 const EN_MAP = new Map();
 const ES_EX_NAME = {};
+/* ---------- Inglés del contenido 0.8 (diario, Biblioteca, suplementos, menús, Health Connect) ---------- */
+const ALIM_EN_RAW=`09003|Apple with skin
+09004|Peeled apple
+09040|Banana
+09200|Orange
+09218|Mandarin
+09112|Grapefruit
+09150|Lemon
+09159|Lime
+09316|Strawberry
+09132|Grapes
+09252|Pear
+09236|Peach
+09021|Apricot
+09279|Plum
+09070|Cherry
+09148|Kiwi
+09266|Pineapple
+09176|Mango
+09226|Papaya
+09326|Watermelon
+09181|Cantaloupe
+09184|Honeydew melon
+09050|Blueberries
+09302|Raspberry
+09042|Blackberry
+09139|Guava
+09231|Passion fruit
+09089|Fig
+09094|Dried fig
+09421|Date
+09298|Raisins
+09291|Prune
+12104|Fresh coconut
+09286|Pomegranate
+09263|Persimmon
+09191|Nectarine
+09220|Mandarin in syrup
+09241|Peaches in syrup
+09270|Pineapple in syrup
+09100|Canned fruit cocktail
+09277|Plantain
+09278|Cooked plantain
+09447|Fried ripe plantain
+09446|Tostones
+09175|Mamey
+09062|Cherimoya
+09315|Soursop
+09164|Lychee
+09287|Prickly pear
+09060|Star fruit
+09116|Grapefruit segments
+09296|Quince
+09078|Cranberry
+09195|Green olives
+09193|Black olives
+09037|Avocado
+09322|Tamarind
+09001|Acerola
+09059|Breadfruit
+09313|Sapote
+09174|Loquat
+09318|Frozen strawberries
+09144|Jackfruit
+09079|Dried cranberries
+11529|Tomato
+11253|Lettuce
+11251|Romaine lettuce
+11252|Iceberg lettuce
+11457|Spinach
+11458|Cooked spinach
+11147|Swiss chard
+11148|Cooked Swiss chard
+11959|Arugula
+11109|Cabbage
+11112|Red cabbage
+11098|Brussels sprouts
+11090|Broccoli
+11091|Cooked broccoli
+11135|Cauliflower
+11136|Cooked cauliflower
+11124|Carrot
+11125|Cooked carrot
+11282|Onion
+11291|Green onion
+11246|Leek
+11215|Garlic
+11821|Red bell pepper
+11333|Green bell pepper
+11951|Yellow bell pepper
+11979|Hot chili pepper
+11205|Cucumber
+11477|Zucchini
+11485|Pumpkin
+11486|Cooked pumpkin
+11482|Butternut squash
+11209|Eggplant
+11210|Cooked eggplant
+11143|Celery
+11080|Beet
+11081|Cooked beet
+11429|Radish
+11260|Mushrooms
+11261|Cooked mushrooms
+11265|Portobello mushrooms
+11052|Green beans
+11053|Cooked green beans
+11304|Peas
+11305|Cooked peas
+11308|Canned peas
+11167|Corn
+11168|Cooked corn
+11172|Canned corn
+11352|Potato
+11367|Boiled potato
+11674|Baked potato
+11934|Mashed potatoes
+11403|Homemade fries
+11507|Sweet potato
+11508|Baked sweet potato
+11134|Cassava
+11602|Yam
+11519|Taro
+11011|Asparagus
+11012|Cooked asparagus
+11007|Artichoke
+11233|Kale
+11957|Fennel
+11963|Nopal
+11964|Cooked nopales
+11043|Bean sprouts
+11961|Hearts of palm
+11531|Crushed tomatoes
+11547|Tomato purée
+11546|Tomato paste
+11955|Sun-dried tomato
+11174|Creamed corn
+11297|Parsley
+11165|Cilantro
+02044|Basil
+11216|Fresh ginger
+11937|Pickles
+11439|Sauerkraut
+11446|Nori seaweed
+11584|Frozen mixed vegetables
+11278|Okra
+11149|Chayote
+11603|Jicama
+11564|Turnip
+11591|Watercress
+11213|Endive
+11952|Radicchio
+11819|Red chili pepper
+16015|Cooked black beans
+16033|Cooked kidney beans
+16050|Cooked white beans
+16043|Cooked pinto beans
+16316|Canned beans
+16103|Refried beans
+16070|Cooked lentils
+16069|Dry lentils
+16057|Cooked chickpeas
+16058|Canned chickpeas
+16158|Hummus
+16086|Cooked split peas
+16053|Cooked fava beans
+16109|Cooked soybeans
+11212|Edamame
+16426|Firm tofu
+16127|Silken tofu
+16114|Tempeh
+16087|Peanuts
+16090|Roasted peanuts
+16398|Peanut butter
+16081|Cooked mung beans
+20045|Cooked white rice
+20044|Raw white rice
+20037|Cooked brown rice
+20036|Raw brown rice
+36405|Rice and black beans
+20121|Cooked pasta
+20120|Dry pasta
+20125|Cooked whole wheat pasta
+20310|Cooked egg noodles
+20134|Cooked rice noodles
+20038|Oats
+08121|Oatmeal made with water
+20081|Wheat flour
+20080|Whole wheat flour
+20022|Cornmeal
+20017|Corn masa
+20137|Cooked quinoa
+20035|Raw quinoa
+20029|Cooked couscous
+20013|Bulgur
+20006|Cooked pearl barley
+18069|White bread
+18967|White sandwich bread
+18075|Whole wheat bread
+28397|Multigrain bread
+18060|Rye bread
+18041|Pita bread
+18042|Whole wheat pita
+18029|Baguette
+18350|Bread roll
+18239|Croissant
+18355|Sweet bread
+18070|Toast
+18228|Water crackers
+18235|Whole wheat crackers
+19816|Rice cakes
+18363|Corn tortilla
+18364|Flour tortilla
+18360|Corn tostada
+36415|Arepa
+08506|Corn flakes
+08037|Granola
+08504|Bran cereal
+20033|Oat bran
+20078|Wheat germ
+18079|Breadcrumbs
+18334|Pastry dough
+18023|Cornbread
+18293|Pancakes
+18367|Waffles
+19034|Popcorn
+18155|Ladyfingers
+20002|Cooked amaranth
+20032|Cooked millet
+20010|Cooked buckwheat
+20068|Tapioca
+20027|Cornstarch
+18001|Bagel
+28313|Whole wheat burger bun
+08124|Instant oats
+01077|Whole milk
+01079|Reduced-fat milk
+01085|Skim milk
+01090|Whole milk powder
+01091|Skim milk powder
+01095|Condensed milk
+01214|Evaporated milk
+01102|Chocolate milk
+01106|Goat milk
+16139|Soy milk
+14091|Almond milk
+14639|Rice milk
+14171|Coconut milk drink
+01116|Plain whole yogurt
+01118|Plain nonfat yogurt
+01293|Plain Greek yogurt
+01256|Nonfat Greek yogurt
+01120|Fruit yogurt
+01294|Greek yogurt with fruit
+01289|Kefir
+01228|Fresh cheese
+01026|Mozzarella
+01028|Light mozzarella
+01009|Cheddar
+01032|Parmesan
+01022|Danbo cheese
+01042|Sliced cheese
+01017|Cream cheese
+43274|Light cream cheese
+01036|Ricotta
+01037|Low-fat ricotta
+01015|Cottage cheese
+01159|Goat cheese
+01019|Feta cheese
+01004|Blue cheese
+01267|Cotija cheese
+01166|Oaxaca cheese
+01035|Provolone
+01040|Swiss cheese
+01053|Heavy cream
+01056|Sour cream
+01054|Whipped cream
+01001|Butter
+01145|Unsalted butter
+01225|Dulce de leche
+19094|Flan
+19095|Vanilla ice cream
+19270|Chocolate ice cream
+19201|Milk pudding
+36404|Rice pudding
+01082|1% milk
+01038|Romano cheese
+01025|Monterey Jack
+01119|Vanilla yogurt
+01049|Light cream
+01123|Egg
+01129|Hard-boiled egg
+01128|Fried egg
+01132|Scrambled eggs
+01131|Poached egg
+01130|Omelette
+01124|Egg white
+01125|Egg yolk
+01140|Quail egg
+01226|Liquid egg whites
+23562|Lean ground beef
+23572|Regular ground beef
+23563|Cooked lean ground beef
+23575|Cooked regular ground beef
+23601|Beef tenderloin
+23600|Grilled beef tenderloin
+23611|Strip steak
+23610|Grilled strip steak
+23656|Flank steak
+23654|Grilled flank steak
+13826|Beef short ribs
+23356|Top round
+23592|Grilled top round
+23602|Stew beef
+13325|Beef liver
+13327|Cooked beef liver
+23573|Beef patty
+10060|Pork loin
+10061|Roast pork loin
+10038|Pork chop
+10071|Pork shoulder
+10089|Pork ribs
+10860|Bacon
+07029|Ham
+07028|Lean ham
+07022|Hot dog sausage
+07024|Chicken sausage
+07019|Chorizo
+07005|Blood sausage
+07008|Mortadella
+07069|Salami
+07057|Pepperoni
+17014|Lamb
+17178|Rabbit
+17169|Goat meat
+13340|Beef tongue
+23640|Beef tripe
+23175|Ribeye steak
+13420|Eye of round
+13370|Beef brisket
+13479|T-bone steak
+23557|Extra-lean ground beef
+10220|Ground pork
+10011|Pork leg
+05062|Raw chicken breast
+05064|Grilled chicken breast
+05065|Boiled chicken breast
+05098|Chicken thigh
+05094|Chicken thigh with skin
+05073|Chicken drumstick
+05103|Chicken wings
+05009|Roast whole chicken
+05007|Fried chicken
+22978|Breaded chicken strips
+22974|Chicken nuggets
+05083|Shredded chicken
+05711|Turkey breast
+07046|Sliced turkey
+05666|Ground turkey
+05028|Chicken liver
+05142|Duck
+05333|Ground chicken
+05060|Chicken breast with skin
+15121|Tuna in water
+15119|Tuna in oil
+15127|Fresh tuna
+15236|Salmon
+15237|Grilled salmon
+15077|Smoked salmon
+15015|Hake
+15016|Baked hake
+15018|Salt cod
+15261|Tilapia
+15262|Cooked tilapia
+15020|Croaker
+15028|Sole
+15034|White fish
+15088|Sardines in oil
+15089|Sardines in tomato
+15046|Mackerel
+15241|Trout
+15100|Silverside
+15002|Anchovies
+15027|Breaded fish
+15270|Shrimp
+15271|Cooked shrimp
+15175|Squid
+15176|Fried calamari
+15165|Mussels
+15159|Clams
+15230|Octopus
+15140|Crab
+15148|Lobster
+15109|Crab sticks
+15181|Canned salmon
+15126|Albacore tuna in water
+15267|Pollock
+15111|Swordfish
+15092|Sea bass
+15194|Mahi-mahi
+15235|Catfish
+12061|Almonds
+12063|Roasted almonds
+12155|Walnuts
+12087|Cashews
+12120|Hazelnuts
+12151|Pistachios
+12078|Brazil nuts
+12142|Pecans
+12131|Macadamia nuts
+12167|Chestnuts
+12135|Mixed nuts
+12006|Chia seeds
+12220|Flaxseeds
+12036|Sunflower seeds
+12014|Pumpkin seeds
+12023|Sesame seeds
+12166|Tahini
+12195|Almond butter
+12108|Shredded coconut
+12118|Coconut milk
+04053|Olive oil
+04060|Sunflower oil
+44005|Corn oil
+04582|Canola oil
+04044|Soybean oil
+04047|Coconut oil
+04610|Margarine
+04002|Lard
+04025|Mayonnaise
+04641|Light mayonnaise
+14411|Water
+14209|Black coffee
+14210|Espresso
+14215|Instant coffee
+14355|Tea
+14278|Green tea
+14545|Herbal tea
+09206|Fresh orange juice
+09209|Bottled orange juice
+09016|Apple juice
+09135|Grape juice
+09273|Pineapple juice
+11540|Tomato juice
+09251|Peach nectar
+09435|Guava nectar
+14293|Lemonade
+14148|Cola
+14416|Diet cola
+14144|Lemon-lime soda
+14150|Orange soda
+14155|Tonic water
+14121|Soda water
+14154|Energy drink
+14003|Beer
+14006|Light beer
+14305|Non-alcoholic beer
+14096|Red wine
+14106|White wine
+14253|Rosé wine
+14037|Rum
+14058|Whey protein isolate
+12119|Coconut water
+01105|Hot chocolate
+14638|Horchata
+19165|Cocoa powder
+14192|Sweetened cocoa powder
+09152|Lemon juice
+11655|Carrot juice
+09128|Grapefruit juice
+09442|Pomegranate juice
+19335|Sugar
+19334|Brown sugar
+19296|Honey
+19353|Maple syrup
+19297|Jam
+43028|Light jam
+09143|Guava paste
+19120|Milk chocolate
+19904|Dark chocolate
+19080|Semisweet chocolate
+19087|White chocolate
+19132|Chocolates
+18213|Sweet cookies
+18166|Sandwich cookies
+18159|Chocolate chip cookies
+18133|Sponge cake
+18096|Chocolate cake
+18147|Cheesecake
+18120|Pound cake
+18274|Muffin
+18255|Doughnut
+18959|Guava pastry
+18301|Apple pie
+18151|Brownie
+19107|Hard candy
+19106|Gummies
+19116|Marshmallows
+19173|Gelatin dessert
+19176|Sugar-free gelatin
+43046|Nougat
+19015|Cereal bar
+19125|Hazelnut spread
+19205|Baked custard
+19217|Ice pop
+19129|Pancake syrup
+19336|Powdered sugar
+19411|Potato chips
+19056|Nachos
+19041|Pork rinds
+19047|Pretzel sticks
+25027|Plantain chips
+16089|Salted peanuts
+25014|Buttered popcorn
+18214|Cheese crackers
+21224|Cheese pizza
+22903|Pepperoni pizza
+21107|Hamburger
+21089|Cheeseburger
+21118|Hot dog
+36041|Beef lasagna
+36046|Spaghetti with tomato sauce
+36630|Spaghetti with meat sauce
+22970|Macaroni and cheese
+36602|Fried rice
+21060|Bean burrito
+21063|Beef and bean burrito
+21486|Beef taco
+36050|Cheese enchiladas
+36052|Cheese quesadilla
+36411|Corn tamale
+36403|Beef empanada
+22971|Potato salad
+06419|Chicken noodle soup
+06217|Vegetable soup
+06194|Chicken broth
+06008|Beef broth
+22905|Beef stew
+22904|Chili con carne
+36401|Chicken and rice
+21518|Chicken wrap
+21138|Fast-food fries
+21401|Fast-food nuggets
+21519|Breakfast burrito
+22899|Ravioli
+36407|Rice with pigeon peas
+36417|Red rice
+36418|Restaurant refried beans
+36413|Black bean soup
+36409|Cheese pupusa
+36408|Bean pupusa
+36412|Pork tamale
+36416|Buñuelos
+25050|Cassava chips
+36055|Ravioli with tomato sauce
+36059|Chicken parmesan
+36601|Spring roll
+36621|Sweet and sour chicken
+36603|Beef and vegetable stir-fry
+36625|Vegetable lo mein
+11370|Hash browns
+14179|Coffee with milk drink
+06559|Tomato soup
+06968|Cream of mushroom soup
+06037|Lentil soup
+06449|Pea soup
+36414|Tripe soup
+02047|Salt
+11935|Ketchup
+02046|Mustard
+16123|Soy sauce
+06931|Pasta sauce
+06631|Hot sauce
+06164|Salsa
+06150|Barbecue sauce
+43015|Caesar dressing
+04639|Ranch dressing
+04135|Vinaigrette
+02053|Vinegar
+02069|Balsamic vinegar
+06264|White sauce
+06626|Pesto
+06981|Bouillon cube
+06930|Cheese sauce
+06112|Teriyaki sauce
+19918|Sweetener
+18375|Brewer's yeast
+02030|Black pepper
+02027|Oregano
+02014|Cumin
+02010|Cinnamon
+02028|Paprika
+02043|Turmeric
+02009|Chili powder
+14066|Whey protein powder
+14067|Soy protein powder
+14062|Meal replacement shake
+19177|Collagen powder`;
+const ALIM_EN={}; ALIM_EN_RAW.split('\n').forEach(l=>{ const i=l.indexOf('|'); ALIM_EN[l.slice(0,i)]=l.slice(i+1); });
+Object.keys(ALIM_EN).forEach(id=>{ if (ALIM[id]) ALIM[id].key+=' '+anorm(ALIM_EN[id]); });
+const EN_08=`Diario de comidas|Food diary
+ÚLTIMOS 7 DÍAS (KCAL)|LAST 7 DAYS (KCAL)
+Datos de alimentos: USDA, base de datos de nutrientes de referencia (dominio público). Revisa siempre la etiqueta de los productos envasados.|Food data: USDA reference nutrient database (public domain). Always check the label of packaged products.
+RITMO PARA BAJAR|PACE TO LOSE
+RITMO PARA GANAR|PACE TO GAIN
+Lento|Slow
+Rápido|Fast
+Por qué|Why
+Cómo funciona|How it works
+Desactivar el ajuste automático|Turn off automatic adjustment
+Activar el ajuste automático|Turn on automatic adjustment
+Fórmula de Mifflin-St Jeor|Mifflin-St Jeor equation
+(fuente)|(source)
+Ver fuente|See source
+Más para tu alimentación|More for your diet
+El ayuno ayuda a ordenar las comidas, pero lo que más cuenta es el total de calorías del día.|Fasting helps structure your meals, but what matters most is your total calories for the day.
+Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.|This section gives general guidance and does not replace a dietitian or doctor. If you have a health condition, ask before changing your diet.
+Modo hábitos: registras lo que comes sin contar calorías.|Habits mode: you log what you eat without counting calories.
+Comidas del día|Meals today
+Frutas y verduras|Fruit and vegetables
+Comidas con proteína|Meals with protein
+Estás en modo hábitos: PandarIA no muestra calorías ni números. Puedes cambiarlo en las preferencias del diario.|You are in habits mode: PandarIA does not show calories or numbers. You can change it in the diary preferences.
+Tiempos aproximados · información general, no consejo médico|Approximate times · general information, not medical advice
+Desayuno|Breakfast
+Almuerzo|Lunch
+Merienda|Afternoon snack
+Cena|Dinner
+Snacks|Snacks
+CATEGORÍAS|CATEGORIES
+Frutas|Fruit
+Verduras|Vegetables
+Legumbres|Legumes
+Cereales y panes|Grains and breads
+Lácteos|Dairy
+Huevos|Eggs
+Carnes|Meat
+Aves|Poultry
+Pescados y mariscos|Fish and seafood
+Frutos secos y semillas|Nuts and seeds
+Aceites y grasas|Oils and fats
+Bebidas|Drinks
+Dulces y postres|Sweets and desserts
+Comidas preparadas|Ready meals
+Condimentos y salsas|Condiments and sauces
+Suplementos|Supplements
+Mis alimentos|My foods
+Mis recetas|My recipes
+‹ Todas las categorías|‹ All categories
+Todos|All
+Recientes|Recent
+Favoritos|Favourites
+Comidas|Meals
+Míos|Mine
+Toca la estrella de un alimento para tenerlo aquí.|Tap a food’s star to keep it here.
+Aún no guardaste comidas. En el diario, toca «Guardar comida» para repetir un desayuno o almuerzo con un toque.|You have not saved any meals yet. In the diary, tap “Save meal” to repeat a breakfast or lunch with one tap.
+Añadir|Add
+Guardar cambios|Save changes
+Quitar del diario|Remove from diary
+Cantidad|Amount
+Gramos|Grams
+Fuente: USDA, base de datos de nutrientes de referencia.|Source: USDA reference nutrient database.
+Copia los datos de la etiqueta. Si la etiqueta da los valores por porción, escribe cuántos gramos tiene esa porción.|Copy the label data. If the label gives values per serving, enter how many grams that serving weighs.
+Porción|Serving
+Gramos de esa porción|Grams in that serving
+POR PORCIÓN|PER SERVING
+Calorías (kcal)|Calories (kcal)
+Proteína (g)|Protein (g)
+Carbohidratos (g)|Carbs (g)
+Grasas (g)|Fat (g)
+Fibra (g)|Fibre (g)
+Azúcares (g)|Sugars (g)
+Sodio (mg)|Sodium (mg)
+leche|milk
+huevo|egg
+gluten|gluten
+maní|peanut
+frutos secos|tree nuts
+soja|soy
+pescado|fish
+mariscos|shellfish
+sésamo|sesame
+Lleva carne, pollo, pescado o marisco|Contains meat, poultry, fish or seafood
+Ej.: Barrita de avena de mi marca|E.g. My brand’s oat bar
+1 porción|1 serving
+Raciones que salen|Servings it makes
+Añade los ingredientes con sus gramos.|Add the ingredients with their grams.
+Añadir ingrediente|Add ingredient
+Ej.: Guiso de lentejas de mamá|E.g. Mum’s lentil stew
+Preferencias de comida|Food preferences
+Alimentación|Diet
+Como de todo|I eat everything
+Vegetariana|Vegetarian
+Vegana|Vegan
+Alergias o alimentos que evito|Allergies or foods I avoid
+PandarIA te avisa cuando un alimento los contiene. Es una ayuda, no una garantía: en productos envasados revisa siempre la etiqueta.|PandarIA warns you when a food contains them. It is a help, not a guarantee: always check the label on packaged products.
+Modo hábitos|Habits mode
+Registra lo que comes sin ver calorías ni números.|Log what you eat without seeing calories or numbers.
+Listo|Done
+Nuevo alimento|New food
+Nueva receta|New recipe
+Receta|Recipe
+Guardar alimento|Save food
+Guardar receta|Save recipe
+Borrar receta|Delete recipe
+Nombre|Name
+Copiar ayer|Copy yesterday
+Copiar el día anterior|Copy previous day
+Guardar comida|Save meal
+Preferencias|Preferences
+Hoy|Today
+Ayer|Yesterday
+Completa tu perfil para comparar con tu objetivo.|Complete your profile to compare with your goal.
+🔒 Compara con tu objetivo y mira tu semana · Premium|🔒 Compare with your goal and see your week · Premium
+Ciencia de PandarIA|PandarIA science
+Recuperación|Recovery
+Actividad física|Physical activity
+Entrenamiento|Training
+Nutrición|Nutrition
+Seguridad|Safety
+Evidencia sólida|Strong evidence
+Evidencia moderada|Moderate evidence
+Evidencia limitada|Limited evidence
+Evidencia contradictoria|Conflicting evidence
+Dominio público, con crédito|Public domain, credited
+Consejo de la fuente, con nuestras palabras|The source’s advice, in our words
+Criterio propio de PandarIA|PandarIA’s own criterion
+Cómo usamos las fuentes|How we use sources
+Dominio público:|Public domain:
+se incluye en la app, siempre con su crédito.|included in the app, always credited.
+Otras fuentes:|Other sources:
+solo tomamos el consejo, escrito con nuestras palabras, y las citamos.|we only take the advice, written in our own words, and cite them.
+Criterio propio:|Own criterion:
+cuando ninguna fuente da el número exacto, PandarIA usa uno prudente y lo marca así.|when no source gives the exact number, PandarIA uses a cautious one and labels it as such.
+Fuentes citadas|Sources cited
+Historial de la Biblioteca|Library history
+PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.|PandarIA gives general guidance on exercise and diet. It does not diagnose or replace a health professional.
+Lo usa|Used in
+Para quién|Who it is for
+Uso de la fuente|Use of the source
+Revisar antes de|Review before
+En la app desde|In the app since
+FUENTE|SOURCE
+FUENTES|SOURCES
+Orientación general basada en evidencia; no reemplaza a un profesional de la salud.|General evidence-based guidance; it does not replace a health professional.
+Ver toda la Biblioteca|See the whole Library
+Organización Mundial de la Salud|World Health Organization
+Autoridad Europea de Seguridad Alimentaria (EFSA)|European Food Safety Authority (EFSA)
+OMS|WHO
+OMS, resumido por la World Obesity Federation.|WHO, summarised by the World Obesity Federation.
+Ajustes de Health Connect|Health Connect settings
+Health Connect no está conectado|Health Connect is not connected
+Tú eliges qué datos compartir. Puedes desconectarlo cuando quieras.|You choose what data to share. You can disconnect it at any time.
+Conectar Health Connect|Connect Health Connect
+Tus datos de salud se quedan en tu teléfono: PandarIA Fit no los envía a ningún servidor.|Your health data stays on your phone: PandarIA Fit does not send it to any server.
+Política de privacidad|Privacy policy
+Conecta PandarIA Fit con Health Connect para leer pasos, peso y pulso de Samsung Health u otras apps, y guardar allí tus entrenos, tu peso, tus comidas y tu agua.|Connect PandarIA Fit with Health Connect to read steps, weight and heart rate from Samsung Health or other apps, and save your workouts, weight, meals and water there.
+Pasos hoy|Steps today
+Media 7 días|7-day average
+Actualizar ahora|Update now
+Leer de Health Connect|Read from Health Connect
+Pasos|Steps
+Hoy y media de 7 días|Today and 7-day average
+Peso|Weight
+Se añade solo a Mi historial › Cuerpo|Added automatically to My history › Body
+Pulso|Heart rate
+En reposo o la última medida|Resting or latest reading
+Guardar en Health Connect|Save to Health Connect
+Entrenos|Workouts
+Como calorías activas estimadas por duración e intensidad|As active calories estimated from duration and intensity
+Cuando registras tu peso en Cuerpo|When you log your weight in Body
+Las calorías de lo que añades hoy a tu diario|The calories of what you add to today’s diary
+Agua|Water
+Cada vaso o botella que sumas|Each glass or bottle you add
+Si quitas algo del diario o del agua, bórralo también en Health Connect: PandarIA solo añade.|If you remove something from the diary or water, delete it in Health Connect too: PandarIA only adds.
+PandarIA|PandarIA
+Usar mis pasos en las recomendaciones|Use my steps in recommendations
+Ajusta tus calorías diarias según tu actividad|Adjusts your daily calories to your activity
+Permisos en Health Connect|Health Connect permissions
+Desconectar|Disconnect
+Pulso en reposo|Resting heart rate
+Pulso última medida|Heart rate, latest reading
+Datos de antes de actualizar|Data from before the update
+Una repetición más que la última vez|One more rep than last time
+Modo viaje: ¿qué tienes a mano?|Travel mode: what do you have?
+Más para tu alimentación|More for your diet
+Ejemplos de menú|Sample menus
+Agua del día|Water today
+Meta de agua|Water goal
+Objetivo fuerza|Strength goal
+Objetivo músculo|Muscle goal
+Objetivo resistencia|Endurance goal
+Objetivo bajar grasa|Fat-loss goal
+Objetivo salud|Health goal
+Objetivo flexibilidad|Flexibility goal
+Descanso en multiarticulares|Rest on compound lifts
+Alternativas de dificultad parecida|Alternatives of similar difficulty
+Cuánto subir el peso|How much to add
+Doble progresión|Double progression
+Bajar tras dos fallos|Lower after two misses
+Sesión muy exigente|Very hard session
+Volver tras una pausa|Coming back after a break
+Bloques de 6 semanas|6-week blocks
+Semana de descarga|Deload week
+Series de calentamiento|Warm-up sets
+Series semanales para músculo|Weekly sets for muscle
+Aviso de pocas series|Low-volume warning
+Equilibrio entre músculos|Muscle balance
+Máximo estimado|Estimated max
+Peso inicial prudente|Cautious starting weight
+Horas de sueño|Hours of sleep
+Días con poco descanso|Poorly rested days
+Músculo entrenado hace poco|Recently trained muscle
+Actividad semanal|Weekly activity
+Metabolismo en reposo|Resting metabolism
+Factor de actividad|Activity factor
+Ritmo para bajar grasa|Fat-loss pace
+Superávit para ganar músculo|Surplus to build muscle
+Objetivo que se ajusta solo|Self-adjusting target
+Proteína diaria|Daily protein
+Proteína por comida|Protein per meal
+Grasas mínimas|Minimum fat
+IMC bajo|Low BMI
+Menores de edad|Under 18
+Agua diaria|Daily water
+Bebidas que cuentan como agua|Drinks that count as water
+Cafeína de las bebidas|Caffeine in drinks
+Ayuno con prudencia|Fasting with caution
+Creatina|Creatine
+Cafeína antes de entrenar|Caffeine before training
+Beta-alanina|Beta-alanine
+Proteína en polvo|Protein powder
+Suplementos con prudencia|Supplements with caution
+Fibra diaria|Daily fibre
+Sodio diario|Daily sodium
+Ayuno conectado con el diario|Fasting linked to the diary
+Modo viaje|Travel mode
+Ejercicios de alto impacto|High-impact exercises
+Fuerza en menores|Strength training for minors
+Más descanso desde los 50|More rest from age 50
+Empezar desde cero|Starting from zero
+Series, repeticiones y descanso de las rutinas de fuerza|Sets, reps and rest in strength routines
+Series, repeticiones y descanso de las rutinas de músculo|Sets, reps and rest in muscle routines
+Rutinas de resistencia|Endurance routines
+Rutinas de bajar grasa|Fat-loss routines
+Rutinas de salud y bienestar|Health and wellbeing routines
+Rutinas de flexibilidad|Flexibility routines
+Descanso de los multiarticulares en rutinas de músculo|Rest on compound lifts in muscle routines
+Cambios de ejercicio por estancamiento o molestia|Exercise swaps for plateaus or discomfort
+Sugerencia de peso en cada serie|Weight suggestion for each set
+Sugerencia de repeticiones en cada serie|Rep suggestion for each set
+Sugerencia de peso al volver|Weight suggestion when coming back
+Rutinas de PandarIA con periodización activada|PandarIA routines with periodisation on
+Semanas de descarga y aviso de descarga|Deload weeks and deload warning
+Consejo del día|Tip of the day
+Músculos rezagados e informe semanal|Lagging muscles and weekly report
+Informe de equilibrio|Balance report
+Récords, progreso y peso inicial|Records, progress and starting weight
+Peso inicial estimado|Estimated starting weight
+Aviso de recuperación y consejo del día|Recovery warning and tip of the day
+Check-in, «Hoy toca» y sugerencias del entreno|Check-in, “Up next” and workout suggestions
+Aviso al abrir una rutina|Warning when opening a routine
+Calorías diarias|Daily calories
+Calorías para bajar grasa|Calories to lose fat
+Calorías para ganar músculo|Calories to build muscle
+Calorías diarias (Premium)|Daily calories (Premium)
+Macros diarios|Daily macros
+Calorías y ayuno|Calories and fasting
+Cafeína del día en Agua|Today’s caffeine in Water
+Consejos del ayuno|Fasting tips
+Suplementos y cafeína del día|Supplements and today’s caffeine
+Calidad del día en el diario (Premium)|Diet quality in the diary (Premium)
+Ejemplos de menú (Premium)|Sample menus (Premium)
+Ayuno intermitente|Intermittent fasting
+«Hoy toca» y Empezar rutina|“Up next” and Start routine
+Ejercicios que PandarIA no elige|Exercises PandarIA will not pick
+Repeticiones en menores|Reps for minors
+Descansos|Rest times
+Series por ejercicio|Sets per exercise
+Adultos sanos|Healthy adults
+Adultos y mayores|Adults and older adults
+Adultos que entrenan|Adults who train
+Adultos de 18 a 60 años|Adults aged 18 to 60
+Adultos y mayores de 65|Adults and over-65s
+Adultos|Adults
+Menores de 18|Under 18
+Adultos sanos que entrenan|Healthy adults who train
+Mayores de 60 o IMC de 30 o más|Over 60 or BMI of 30 or more
+Desde 50 años|From age 50
+Personas sedentarias|Sedentary people
+Valores dietéticos de referencia: agua|Dietary reference values: water
+Valores dietéticos de referencia: hidratos de carbono y fibra alimentaria|Dietary reference values: carbohydrates and dietary fibre
+Ayuno iniciado|Fast started
+Tu cuerpo usa la energía de tu última comida.|Your body is using the energy from your last meal.
+Azúcar estable|Stable blood sugar
+El azúcar en sangre se estabiliza. Bebe agua.|Blood sugar stabilises. Drink water.
+Reservas en uso|Using reserves
+Tu cuerpo empieza a tirar de sus reservas de glucógeno.|Your body starts drawing on its glycogen stores.
+Estado de ayuno|Fasted state
+La insulina baja y el cuerpo usa más grasa como energía.|Insulin drops and the body uses more fat for energy.
+Más quema de grasa|More fat burning
+Estás en la zona del 16:8. ¡Buen trabajo!|You are in the 16:8 zone. Great work!
+Cetosis leve|Mild ketosis
+Puede empezar una cetosis leve. Escucha a tu cuerpo.|Mild ketosis may begin. Listen to your body.
+Ayuno largo|Long fast
+No hay beneficios extra en alargarlo. Considera romperlo con proteína y verduras.|There is no extra benefit in going longer. Consider breaking it with protein and vegetables.
+Crear rutina para estos músculos|Create a routine for these muscles
+Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.|Sets per muscle. For muscle growth, 10–20 per week are recommended.
+Rosé wine|Rosé wine`;
+const KB_LOG_EN={'1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
+ '1.1':'Rules that change results: 2 minutes of rest on weighted compound lifts for muscle; weight-loss pace of 0.5 to 1 % of body weight per week instead of a fixed 15 %; a calorie target that adjusts with your diary and weight; a lighter load if you arrive poorly rested; water goal recalibrated with the EFSA reference; alternatives of similar difficulty.',
+ '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
+const EN_08_RX=[
+  [/^Te quedan ([\d.]+) kcal de ([\d.]+) kcal$/,'$1 kcal left of $2 kcal'],[/^([\d.]+) kcal por encima de tu objetivo de ([\d.]+) kcal$/,'$1 kcal over your goal of $2 kcal'],
+  [/^Alrededor de ([\d,]+) kg por semana \(([\d,]+) % de tu peso\)\.(.*)$/,(m,a,b,c)=>`About ${a.replace(',','.')} kg per week (${b.replace(',','.')} % of your weight).${c?' PandarIA applied its safety limit: it never removes more than 25 % of your expenditure or goes below your resting metabolism.':''}`],
+  [/^(\d+) % más de calorías que tu mantenimiento\.$/,'$1 % more calories than your maintenance.'],
+  [/^Objetivo que se ajusta solo: Faltan días de diario: (\d+) de (\d+)\.$/,'Self-adjusting target: diary days missing: $1 of $2.'],
+  [/^Objetivo que se ajusta solo: Faltan pesajes: necesito al menos dos separados 10 días\.$/,'Self-adjusting target: missing weigh-ins: I need at least two, 10 days apart.'],
+  [/^Objetivo que se ajusta solo: (.*)$/,'Self-adjusting target: the data does not match the formula (missing meals in the diary?), so it is not used.'],
+  [/^con tu perfil y tus entrenos de la semana\. Proteína: ([\d,]+) g por kg \(la ISSN recomienda 1,4–2,0 g\/kg si entrenas, y algo más en déficit\)\.$/,(m,a)=>`with your profile and this week’s workouts. Protein: ${a.replace(',','.')} g per kg (ISSN recommends 1.4–2.0 g/kg if you train, and a bit more in a deficit).`],
+  [/^Plan ([\d:]+): ayunas (\d+) h y comes en (\d+) h\.$/,'Plan $1: fast $2 h and eat within $3 h.'],
+  [/^Añadir a (desayuno|almuerzo|merienda|cena|snack)$/,(m,a)=>'Add to '+({desayuno:'breakfast',almuerzo:'lunch',merienda:'afternoon snack',cena:'dinner',snack:'snacks'})[a]],
+  [/^También: /,'Also: '],
+  [/^(Contiene .+|No es vegetariano|No es vegano)(\. Revisa la etiqueta si es un producto envasado\.)$/,(m,a)=>a.split(' · ').map(x=>x==='No es vegetariano'?'Not vegetarian':x==='No es vegano'?'Not vegan':'Contains '+(({leche:'milk',huevo:'egg',gluten:'gluten','maní':'peanut','frutos secos':'tree nuts',soja:'soy',pescado:'fish',mariscos:'shellfish','sésamo':'sesame'})[x.replace(/^Contiene /,'')]||x.replace(/^Contiene /,''))).join(' · ')+'. Check the label if it is a packaged product.'],
+  [/^Estos son los números que PandarIA usa para decidir, con su fuente y su nivel de evidencia\. Biblioteca versión ([\d.]+): (\d+) reglas\.$/,'These are the numbers PandarIA uses to decide, with their source and level of evidence. Library version $1: $2 rules.'],
+  [/^(\d+) · (sólida|moderada|limitada|contradictoria)$/,(m,n,e)=>n+' · '+({'sólida':'strong',moderada:'moderate',limitada:'limited',contradictoria:'conflicting'})[e]],
+  [/ y col\.$/,' et al.'],[/\(posicionamiento del ACSM\)/,'(ACSM position stand)'],[/\(metaanálisis\)/,'(meta-analysis)'],[/\(consenso de la AASM y la SRS\)/,'(AASM and SRS consensus)'],[/\(creatina\)/,'(creatine)'],
+  [/Directrices de la OMS sobre actividad física y comportamientos sedentarios/,'WHO guidelines on physical activity and sedentary behaviour'],[/Clasificación del índice de masa corporal en adultos \(informe de expertos de la OMS\)/,'BMI classification in adults (WHO expert report)'],
+  [/Valores dietéticos de referencia: hidratos de carbono y fibra alimentaria/,'Dietary reference values: carbohydrates and dietary fibre'],[/Valores dietéticos de referencia: agua/,'Dietary reference values: water'],
+  [/^(\d+) de noviembre de (\d+) · app /,'November $1, $2 · app '],
+  [/^(\d+(?:[.,]\d+)?(?:\/\d+)?) (.+?) · ([\d.,]+) (kcal|g)$/,(m,q,p,v,u)=>q+' '+enPor(p)+' · '+v+' '+u],
+  [/^([\d.,]+) × (.+?) · ([\d.,]+) g$/,(m,q,p,v)=>q+' × '+enPor(p)+' · '+v+' g'],
+  [/^(.+) añadido$/,(m,a)=>(EN_MAP.get(a)||a)+' added'],[/^Copiados (\d+) alimentos?$/,(m,n)=>`Copied ${n} food${n==='1'?'':'s'}`],
+  [/^(.+): (\d+) alimentos? añadidos?$/,(m,a,n)=>`${a}: ${n} food${n==='1'?'':'s'} added`],
+  [/^(\d+) seguidos ✓$/,'$1 in a row ✓'],
+  [/^Plan (.+)\. Toca para empezarlo\.$/,'Plan $1. Tap to start it.'],
+  [/^de (\d+) h · (.+)$/,'of $1 h · $2'],[/^Siguiente: (.+) a las (\d+) h$/,(m,a,h)=>`Next: ${EN_MAP.get(a)||a} at ${h} h`]
+];
+const EN_POR={'taza':'cup','unidad':'unit','unidades':'units','porción':'serving','cucharada':'tbsp','cucharadas':'tbsp','cucharadita':'tsp','cucharaditas':'tsp','vaso':'glass','pieza':'piece','piezas':'pieces','lata':'can','rebanada':'slice','rebanadas':'slices','plato':'plate','puñado':'handful','mediano':'medium','mediana':'medium','filete':'fillet','grande':'large','hoja':'leaf','hojas':'leaves','pote':'pot','feta':'slice','barra':'bar','bife':'steak','sobre':'packet','cuadrito':'square','pequeña':'small','pequeño':'small','tallo':'stalk','tajada':'slice','scoop':'scoop','copa':'glass','rodaja':'slice','rodajas':'slices','ramillete':'floret','pizca':'pinch','mitad':'half','medida':'measure','medidas':'measures','botella':'bottle','bola':'scoop','yema':'yolk','uvas':'grapes','trozo':'piece','tiras':'strips','tira':'strip','tapa':'wrapper','tacita':'small cup','ramita':'sprig','racimo':'bunch','penca':'pad','pechuga':'breast','medallón':'patty','mazorca':'ear','lonja':'slice','diente':'clove','cubo':'cube','clara':'white','cerezas':'cherries','bulbo':'bulb','bolsita':'bag','aceituna':'olive','picada':'chopped','picado':'chopped','en':'','rodajas':'slices','cubos':'cubes','trozos':'pieces','puré':'purée','gajos':'segments','mitades':'halves','rallada':'grated','entera':'whole','molida':'ground','desmenuzada':'crumbled','derretida':'melted','compacta':'packed','cocida':'cooked','de':'','empanada':'empanada'};
+function enPor(p){ return p.split(' ').map(w=>EN_POR[w]!=null?EN_POR[w]:w).filter(Boolean).join(' '); }
+EN_08_RX.push([/^(\d+(?:\/\d+)?|\d+ ×) ([a-zñáéíóú ]+)$/,(m,q,p)=>p.split(' ').every(w=>EN_POR[w]!=null)?q+' '+enPor(p):m]);
+
 function buildEN(){
   if (EN_MAP.size) return;
+  EN_08.split('\n').forEach(l=>{ const i=l.indexOf('|'); if(i>0) EN_MAP.set(l.slice(0,i).trim(),l.slice(i+1).trim()); });
+  Object.values(ALIM).forEach(f=>{ if (ALIM_EN[f.id]) EN_MAP.set(f.n,ALIM_EN[f.id]); });
+  KB_RULES.forEach(r=>{ if (KB_EN_T[r.id]) EN_MAP.set(r.t,KB_EN_T[r.id]); });
+  KB_LOG.forEach(l=>{ if (KB_LOG_EN[l.v]) EN_MAP.set(l.t,KB_LOG_EN[l.v]); });
+  [['Schoenfeld, Ogborn y Krieger','Schoenfeld, Ogborn and Krieger'],['Helms, Aragon y Fitschen','Helms, Aragon and Fitschen'],['Mifflin, St Jeor y col.','Mifflin, St Jeor et al.']].forEach(([a,b])=>EN_MAP.set(a,b));
   (EN_UI+'\n'+EN_EXTRA).split('\n').forEach(l=>{ const [a,b]=l.split('|'); if(a&&b) EN_MAP.set(a.trim(),b.trim()); });
   EN_EX.split('\n').forEach(l=>{ const [id,n]=l.split('|'); if (EX[id]) EN_MAP.set(EX[id].n,n); });
   EXPLORE.forEach(s=>{ EN_MAP.has(s.n)||0; });
@@ -9321,6 +10736,7 @@ const EN_RX = [
   [/^Día (\d+)$/,'Day $1'],[/Cuerpo completo/,'Full body'],[/^Torso/,'Upper body'],[/^Pierna/,'Legs'],[/^Empuje/,'Push'],[/^Tirón/,'Pull'],[/Plan PandarIA/,'PandarIA plan'],
   [/^Rutina de /,'Routine: '],[/^Próxima: /,'Next: '],[/^Última: hoy$/,'Last: today'],[/^· Hoy$/,'· Today'],[/^· Nunca$/,'· Never'],[/^Hoy$/,'Today'],[/(\d+) semanas de racha/,'$1-week streak'],[/ejercicios más/,'more exercises'],[/Buscar entre (\d+) ejercicios/,'Search $1 exercises'],[/Buscar por nombre o músculo/,'Search by name or muscle'],[/(\d+) rutinas$/,'$1 routines']
 ];
+EN_RX.unshift(...EN_08_RX);
 function trText(t){
   const s=t.trim(); if (!s) return null;
   if (EN_MAP.has(s)) return t.replace(s,EN_MAP.get(s));
