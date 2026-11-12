@@ -1,0 +1,6361 @@
+{
+ "prescripcion_fuerza": {
+  "sentadilla": [
+   {
+    "sets": 3,
+    "range": [
+     3,
+     6
+    ],
+    "rest": 180,
+    "time": null
+   },
+   {
+    "sets": 4,
+    "range": [
+     3,
+     6
+    ],
+    "rest": 180,
+    "time": null
+   },
+   {
+    "sets": 5,
+    "range": [
+     3,
+     6
+    ],
+    "rest": 180,
+    "time": null
+   }
+  ],
+  "curl_barra": [
+   {
+    "sets": 3,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": null
+   }
+  ],
+  "plancha": [
+   {
+    "sets": 3,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": 30
+   },
+   {
+    "sets": 3,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": 40
+   },
+   {
+    "sets": 3,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": 50
+   }
+  ],
+  "correr_cinta": [
+   {
+    "sets": 1,
+    "range": [
+     3,
+     6
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     3,
+     6
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     3,
+     6
+    ],
+    "rest": 60,
+    "time": 600
+   }
+  ],
+  "est_isquios": [
+   {
+    "sets": 2,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 10,
+    "time": 35
+   },
+   {
+    "sets": 2,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 10,
+    "time": 35
+   },
+   {
+    "sets": 2,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 10,
+    "time": 35
+   }
+  ]
+ },
+ "prescripcion_musculo": {
+  "sentadilla": [
+   {
+    "sets": 2,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": null
+   },
+   {
+    "sets": 4,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 90,
+    "time": null
+   }
+  ],
+  "curl_barra": [
+   {
+    "sets": 2,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 90,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 90,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 90,
+    "time": null
+   }
+  ],
+  "plancha": [
+   {
+    "sets": 2,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 90,
+    "time": 40
+   },
+   {
+    "sets": 3,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 90,
+    "time": 50
+   },
+   {
+    "sets": 3,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 90,
+    "time": 60
+   }
+  ],
+  "correr_cinta": [
+   {
+    "sets": 1,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     8,
+     12
+    ],
+    "rest": 60,
+    "time": 600
+   }
+  ],
+  "est_isquios": [
+   {
+    "sets": 2,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 10,
+    "time": 45
+   },
+   {
+    "sets": 2,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 10,
+    "time": 45
+   },
+   {
+    "sets": 2,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 10,
+    "time": 45
+   }
+  ]
+ },
+ "prescripcion_grasa": {
+  "sentadilla": [
+   {
+    "sets": 2,
+    "range": [
+     12,
+     15
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     12,
+     15
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 4,
+    "range": [
+     12,
+     15
+    ],
+    "rest": 45,
+    "time": null
+   }
+  ],
+  "curl_barra": [
+   {
+    "sets": 2,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 45,
+    "time": null
+   }
+  ],
+  "plancha": [
+   {
+    "sets": 2,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 45,
+    "time": 30
+   },
+   {
+    "sets": 3,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 45,
+    "time": 40
+   },
+   {
+    "sets": 3,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 45,
+    "time": 50
+   }
+  ],
+  "correr_cinta": [
+   {
+    "sets": 1,
+    "range": [
+     12,
+     15
+    ],
+    "rest": 60,
+    "time": 1200
+   },
+   {
+    "sets": 1,
+    "range": [
+     12,
+     15
+    ],
+    "rest": 60,
+    "time": 1200
+   },
+   {
+    "sets": 1,
+    "range": [
+     12,
+     15
+    ],
+    "rest": 60,
+    "time": 1200
+   }
+  ],
+  "est_isquios": [
+   {
+    "sets": 2,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 10,
+    "time": 35
+   },
+   {
+    "sets": 2,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 10,
+    "time": 35
+   },
+   {
+    "sets": 2,
+    "range": [
+     14,
+     18
+    ],
+    "rest": 10,
+    "time": 35
+   }
+  ]
+ },
+ "prescripcion_resistencia": {
+  "sentadilla": [
+   {
+    "sets": 2,
+    "range": [
+     15,
+     20
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     15,
+     20
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 4,
+    "range": [
+     15,
+     20
+    ],
+    "rest": 45,
+    "time": null
+   }
+  ],
+  "curl_barra": [
+   {
+    "sets": 2,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 45,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 45,
+    "time": null
+   }
+  ],
+  "plancha": [
+   {
+    "sets": 2,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 45,
+    "time": 40
+   },
+   {
+    "sets": 3,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 45,
+    "time": 50
+   },
+   {
+    "sets": 3,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 45,
+    "time": 60
+   }
+  ],
+  "correr_cinta": [
+   {
+    "sets": 1,
+    "range": [
+     15,
+     20
+    ],
+    "rest": 60,
+    "time": 1200
+   },
+   {
+    "sets": 1,
+    "range": [
+     15,
+     20
+    ],
+    "rest": 60,
+    "time": 1200
+   },
+   {
+    "sets": 1,
+    "range": [
+     15,
+     20
+    ],
+    "rest": 60,
+    "time": 1200
+   }
+  ],
+  "est_isquios": [
+   {
+    "sets": 2,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 10,
+    "time": 45
+   },
+   {
+    "sets": 2,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 10,
+    "time": 45
+   },
+   {
+    "sets": 2,
+    "range": [
+     17,
+     23
+    ],
+    "rest": 10,
+    "time": 45
+   }
+  ]
+ },
+ "prescripcion_flexibilidad": {
+  "sentadilla": [
+   {
+    "sets": 2,
+    "range": [
+     8,
+     10
+    ],
+    "rest": 15,
+    "time": null
+   },
+   {
+    "sets": 2,
+    "range": [
+     8,
+     10
+    ],
+    "rest": 15,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     8,
+     10
+    ],
+    "rest": 15,
+    "time": null
+   }
+  ],
+  "curl_barra": [
+   {
+    "sets": 2,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 15,
+    "time": null
+   },
+   {
+    "sets": 2,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 15,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 15,
+    "time": null
+   }
+  ],
+  "plancha": [
+   {
+    "sets": 2,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 15,
+    "time": 40
+   },
+   {
+    "sets": 2,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 15,
+    "time": 50
+   },
+   {
+    "sets": 3,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 15,
+    "time": 60
+   }
+  ],
+  "correr_cinta": [
+   {
+    "sets": 1,
+    "range": [
+     8,
+     10
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     8,
+     10
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     8,
+     10
+    ],
+    "rest": 60,
+    "time": 600
+   }
+  ],
+  "est_isquios": [
+   {
+    "sets": 2,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 10,
+    "time": 45
+   },
+   {
+    "sets": 2,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 10,
+    "time": 45
+   },
+   {
+    "sets": 2,
+    "range": [
+     10,
+     13
+    ],
+    "rest": 10,
+    "time": 45
+   }
+  ]
+ },
+ "prescripcion_salud": {
+  "sentadilla": [
+   {
+    "sets": 2,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 75,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 75,
+    "time": null
+   },
+   {
+    "sets": 4,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 75,
+    "time": null
+   }
+  ],
+  "curl_barra": [
+   {
+    "sets": 2,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 75,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 75,
+    "time": null
+   },
+   {
+    "sets": 3,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 75,
+    "time": null
+   }
+  ],
+  "plancha": [
+   {
+    "sets": 2,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 75,
+    "time": 30
+   },
+   {
+    "sets": 3,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 75,
+    "time": 40
+   },
+   {
+    "sets": 3,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 75,
+    "time": 50
+   }
+  ],
+  "correr_cinta": [
+   {
+    "sets": 1,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 60,
+    "time": 600
+   },
+   {
+    "sets": 1,
+    "range": [
+     10,
+     15
+    ],
+    "rest": 60,
+    "time": 600
+   }
+  ],
+  "est_isquios": [
+   {
+    "sets": 2,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 10,
+    "time": 35
+   },
+   {
+    "sets": 2,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 10,
+    "time": 35
+   },
+   {
+    "sets": 2,
+    "range": [
+     12,
+     18
+    ],
+    "rest": 10,
+    "time": 35
+   }
+  ]
+ },
+ "prescripcion_mayor_55": [
+  {
+   "sets": 3,
+   "range": [
+    8,
+    12
+   ],
+   "rest": 105,
+   "time": null
+  },
+  {
+   "sets": 3,
+   "range": [
+    8,
+    12
+   ],
+   "rest": 105,
+   "time": null
+  }
+ ],
+ "prescripcion_sedentario": [
+  {
+   "sets": 2,
+   "range": [
+    8,
+    12
+   ],
+   "rest": 90,
+   "time": null
+  },
+  {
+   "sets": 2,
+   "range": [
+    8,
+    12
+   ],
+   "rest": 90,
+   "time": null
+  }
+ ],
+ "prescripcion_menor_16": [
+  {
+   "sets": 3,
+   "range": [
+    6,
+    10
+   ],
+   "rest": 180,
+   "time": null
+  },
+  {
+   "sets": 3,
+   "range": [
+    6,
+    10
+   ],
+   "rest": 180,
+   "time": null
+  }
+ ],
+ "peso_inicial_hombre": [
+  [
+   35,
+   65
+  ],
+  [
+   25,
+   47.5
+  ],
+  [
+   42.5,
+   77.5
+  ],
+  [
+   10,
+   20
+  ],
+  [
+   17.5,
+   30
+  ]
+ ],
+ "peso_inicial_mujer": [
+  27.5,
+  15,
+  35,
+  12.5
+ ],
+ "peso_inicial_sin_perfil": [
+  27.5,
+  22.5
+ ],
+ "items_construidos": [
+  {
+   "exId": "sentadilla",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": 35,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": 35,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": 35,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "plancha",
+   "sets": [
+    {
+     "t": "n",
+     "reps": null,
+     "kg": null,
+     "time": 50
+    },
+    {
+     "t": "n",
+     "reps": null,
+     "kg": null,
+     "time": 50
+    },
+    {
+     "t": "n",
+     "reps": null,
+     "kg": null,
+     "time": 50
+    }
+   ],
+   "rest": 90,
+   "range": null,
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "curl_barra",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 10,
+     "kg": 10,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 10,
+     "kg": 10,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 10,
+     "kg": 10,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    10,
+    15
+   ],
+   "note": "",
+   "sticky": ""
+  }
+ ],
+ "nutricion_hombre_bajar": {
+  "bmr": 1768,
+  "tdee": 2430,
+  "kcal": 2070,
+  "prot": 160,
+  "fat": 64,
+  "carbs": 214,
+  "goal": "bajar",
+  "notes": [],
+  "pk": 2,
+  "w": 80
+ },
+ "nutricion_hombre_mantener": {
+  "bmr": 1768,
+  "tdee": 2430,
+  "kcal": 2430,
+  "prot": 128,
+  "fat": 64,
+  "carbs": 336,
+  "goal": "mantener",
+  "notes": [],
+  "pk": 1.6,
+  "w": 80
+ },
+ "nutricion_hombre_ganar": {
+  "bmr": 1768,
+  "tdee": 2430,
+  "kcal": 2670,
+  "prot": 144,
+  "fat": 64,
+  "carbs": 380,
+  "goal": "ganar",
+  "notes": [],
+  "pk": 1.8,
+  "w": 80
+ },
+ "nutricion_mujer_ganar": {
+  "bmr": 1288,
+  "tdee": 1771,
+  "kcal": 1950,
+  "prot": 108,
+  "fat": 48,
+  "carbs": 272,
+  "goal": "ganar",
+  "notes": [],
+  "pk": 1.8,
+  "w": 60
+ },
+ "nutricion_imc_bajo": {
+  "bmr": 1555,
+  "tdee": 2138,
+  "kcal": 2140,
+  "prot": 88,
+  "fat": 44,
+  "carbs": 348,
+  "goal": "mantener",
+  "notes": [
+   "Tu índice de masa corporal es bajo: no recomendamos déficit calórico. Te mostramos el mantenimiento."
+  ],
+  "pk": 1.6,
+  "w": 55
+ },
+ "nutricion_menor": {
+  "bmr": 1422,
+  "tdee": 1955,
+  "kcal": 1950,
+  "prot": 96,
+  "fat": 48,
+  "carbs": 284,
+  "goal": "mantener",
+  "notes": [
+   "En menores de 18 las necesidades cambian con el crecimiento: usa esto solo como orientación y consulta a un profesional."
+  ],
+  "pk": 1.6,
+  "w": 60
+ },
+ "nutricion_sin_perfil": null,
+ "agua_sin_entreno": 2800,
+ "agua_con_entreno": 3300,
+ "plan_musculo_3d": [
+  {
+   "name": "Cuerpo completo A",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentadilla_peso",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "zancadas_pc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "flexiones",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "ytw",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "curl_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      }
+     ],
+     "rest": 90,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "fondos_banco",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "plancha",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      }
+     ],
+     "rest": 90,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Cuerpo completo B",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentarse_levantarse",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "patada_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "flexiones_inclinadas",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "ytw",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "fondos_banco",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "elev_gemelos",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "russian_twist",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Cuerpo completo C",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentadilla_peso",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "zancadas_pc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "frog_pumps",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "flexiones_pared",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "ytw",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "fondos_banco",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 6,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      6,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "curl_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      }
+     ],
+     "rest": 90,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "plancha_toques",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "sombra_boxeo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      }
+     ],
+     "rest": 90,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_cuadriceps",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  }
+ ],
+ "plan_fuerza_4d": [
+  {
+   "name": "Torso A",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "flexiones",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      }
+     ],
+     "rest": 90,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "pike_pushup",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_pecho",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Pierna A",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentadilla_peso",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "zancadas_pc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "curl_femoral_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "elev_gemelos",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Torso B",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "flexiones_inclinadas",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 40
+      }
+     ],
+     "rest": 90,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "pike_pushup",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_pecho",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Pierna B",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentadilla_salto",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "zancadas_pc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 3,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 180,
+     "range": [
+      3,
+      6
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo_unilateral",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "curl_femoral_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "tibial",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  }
+ ],
+ "plan_grasa_2d": [
+  {
+   "name": "Cuerpo completo A",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentadilla_peso",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "zancadas_pc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "flexiones",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "ytw",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "curl_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      }
+     ],
+     "rest": 45,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "fondos_banco",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "plancha",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      }
+     ],
+     "rest": 45,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "jumping_jacks",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      }
+     ],
+     "rest": 45,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Cuerpo completo B",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentarse_levantarse",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "patada_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "flexiones_pared",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "ytw",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "fondos_banco",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "tibial",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 15,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "crunch_bici",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 14,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 45,
+     "range": [
+      14,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "jumping_jacks",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 30
+      }
+     ],
+     "rest": 45,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  }
+ ],
+ "plan_flexibilidad_3d": [
+  {
+   "name": "Movilidad y flexibilidad A",
+   "items": [
+    {
+     "exId": "yoga_pinza",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_guerrero1",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_puente",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_pecho",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_hombro",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_nino",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_triangulo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_saludo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 180
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 180
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Movilidad y flexibilidad B",
+   "items": [
+    {
+     "exId": "cadera_9090",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_perro",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_silla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_pecho",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "circulos_brazos",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "rot_toracica",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_cobra",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_torsion",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Movilidad y flexibilidad C",
+   "items": [
+    {
+     "exId": "yoga_perro",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_guerrero2",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_puente",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_pecho",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_hombro",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "gato_vaca",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_cobra",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "yoga_torsion",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 45
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  }
+ ],
+ "plan_salud_5d": [
+  {
+   "name": "Empuje",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 420,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "flexiones_archer",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "flexiones",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "handstand_pushup",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_pecho",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Tirón",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 420,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 50
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 50
+      },
+      {
+       "t": "n",
+       "reps": null,
+       "kg": null,
+       "time": 50
+      }
+     ],
+     "rest": 75,
+     "range": null,
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "ytw",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      12,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_hombro",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Pierna",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 420,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentadilla_peso",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "zancadas_pc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "curl_nordico",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      12,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Torso",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 420,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "flexiones",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "pike_pushup",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_pecho",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Pierna",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 420,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentarse_levantarse",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "curl_femoral_toalla",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      12,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "nordico_inverso",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 12,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      12,
+      18
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  }
+ ],
+ "plan_casa_prioridad_gluteos": [
+  {
+   "name": "Cuerpo completo A",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "thrusters",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 8,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 8,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 8,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "peso_muerto_unilateral",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 10,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 10,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 10,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "flexiones",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_kroc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Cuerpo completo B",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "peso_muerto_rumano_man",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 10,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 10,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 10,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "zancadas",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 6,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 6,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 6,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "puente_gluteo_unilateral",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_kroc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "press_suelo_man",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_isquios",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  },
+  {
+   "name": "Cuerpo completo C",
+   "items": [
+    {
+     "exId": "mov_articular",
+     "sets": [
+      {
+       "t": "n",
+       "time": 300,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "warm": true
+    },
+    {
+     "exId": "sentadilla_goblet",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 8,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 8,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 8,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "patada_gluteo",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "frog_pumps",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 10,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_mesa",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": null,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "press_arnold",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      }
+     ],
+     "rest": 90,
+     "range": [
+      8,
+      12
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "est_cuadriceps",
+     "sets": [
+      {
+       "t": "n",
+       "time": 40,
+       "reps": null,
+       "kg": null
+      }
+     ],
+     "rest": 10,
+     "range": null,
+     "note": "",
+     "sticky": "",
+     "cool": true
+    }
+   ]
+  }
+ ],
+ "grupo_pecho_triceps": [
+  {
+   "exId": "mov_articular",
+   "sets": [
+    {
+     "t": "n",
+     "time": 300
+    }
+   ],
+   "rest": 10,
+   "range": null,
+   "note": "",
+   "sticky": "",
+   "warm": true
+  },
+  {
+   "exId": "flexiones",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "flexiones_inclinadas",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "flexiones_rodillas",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "flexiones_diamante",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "fondos_banco",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "est_pecho",
+   "sets": [
+    {
+     "t": "n",
+     "time": 40
+    }
+   ],
+   "rest": 10,
+   "range": null,
+   "note": "",
+   "sticky": "",
+   "cool": true
+  }
+ ],
+ "grupo_piernas": [
+  {
+   "exId": "mov_articular",
+   "sets": [
+    {
+     "t": "n",
+     "time": 300
+    }
+   ],
+   "rest": 10,
+   "range": null,
+   "note": "",
+   "sticky": "",
+   "warm": true
+  },
+  {
+   "exId": "sentadilla_salto",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 180,
+   "range": [
+    3,
+    6
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "zancadas_pc",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 3,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 180,
+   "range": [
+    3,
+    6
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "puente_gluteo",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "curl_femoral_toalla",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 8,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    8,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "est_isquios",
+   "sets": [
+    {
+     "t": "n",
+     "time": 40
+    }
+   ],
+   "rest": 10,
+   "range": null,
+   "note": "",
+   "sticky": "",
+   "cool": true
+  }
+ ],
+ "grupo_espalda_20min": [
+  {
+   "exId": "remo_mesa",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 6,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 6,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    6,
+    12
+   ],
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "remo_toalla",
+   "sets": [
+    {
+     "t": "n",
+     "reps": null,
+     "kg": null,
+     "time": 40
+    },
+    {
+     "t": "n",
+     "reps": null,
+     "kg": null,
+     "time": 40
+    }
+   ],
+   "rest": 90,
+   "range": null,
+   "note": "",
+   "sticky": ""
+  },
+  {
+   "exId": "ytw",
+   "sets": [
+    {
+     "t": "n",
+     "reps": 10,
+     "kg": null,
+     "time": null
+    },
+    {
+     "t": "n",
+     "reps": 10,
+     "kg": null,
+     "time": null
+    }
+   ],
+   "rest": 90,
+   "range": [
+    10,
+    15
+   ],
+   "note": "",
+   "sticky": ""
+  }
+ ],
+ "sugerencia_tras_tope": [
+  [
+   {
+    "kg": 30,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 30,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 30,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   }
+  ],
+  [
+   {
+    "kg": 37.5,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 37.5,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 37.5,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": 13,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": 13,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": 13,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": "Un poco más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": "Un poco más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": "Un poco más que la última vez"
+   }
+  ]
+ ],
+ "sugerencia_sin_tope": [
+  [
+   {
+    "kg": 28.5,
+    "reps": 10,
+    "time": null,
+    "why": "Intenta una repetición más"
+   },
+   {
+    "kg": 28.5,
+    "reps": 10,
+    "time": null,
+    "why": "Intenta una repetición más"
+   },
+   {
+    "kg": 28.5,
+    "reps": 10,
+    "time": null,
+    "why": "Intenta una repetición más"
+   }
+  ],
+  [
+   {
+    "kg": 36,
+    "reps": 10,
+    "time": null,
+    "why": "Intenta una repetición más"
+   },
+   {
+    "kg": 36,
+    "reps": 10,
+    "time": null,
+    "why": "Intenta una repetición más"
+   },
+   {
+    "kg": 36,
+    "reps": 10,
+    "time": null,
+    "why": "Intenta una repetición más"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": 10,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": 10,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": 10,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": "Un poco más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": "Un poco más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": "Un poco más que la última vez"
+   }
+  ]
+ ],
+ "sugerencia_tras_parar_30_dias": [
+  [
+   {
+    "kg": 22.5,
+    "reps": 8,
+    "time": null,
+    "why": "Semana de descarga del bloque: más liviano"
+   },
+   {
+    "kg": 22.5,
+    "reps": 8,
+    "time": null,
+    "why": "Semana de descarga del bloque: más liviano"
+   },
+   {
+    "kg": 22.5,
+    "reps": 8,
+    "time": null,
+    "why": "Semana de descarga del bloque: más liviano"
+   }
+  ],
+  [
+   {
+    "kg": 25,
+    "reps": 8,
+    "time": null,
+    "why": "Semana de descarga del bloque: más liviano"
+   },
+   {
+    "kg": 25,
+    "reps": 8,
+    "time": null,
+    "why": "Semana de descarga del bloque: más liviano"
+   },
+   {
+    "kg": 25,
+    "reps": 8,
+    "time": null,
+    "why": "Semana de descarga del bloque: más liviano"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": 11,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": 11,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   },
+   {
+    "kg": null,
+    "reps": 11,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": null,
+    "time": 60,
+    "why": ""
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 60,
+    "why": ""
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 60,
+    "why": ""
+   }
+  ]
+ ],
+ "sugerencia_esfuerzo_alto": [
+  [
+   {
+    "kg": 31,
+    "reps": 12,
+    "time": null,
+    "why": "Sesión anterior muy exigente: mantén"
+   },
+   {
+    "kg": 31,
+    "reps": 12,
+    "time": null,
+    "why": "Sesión anterior muy exigente: mantén"
+   },
+   {
+    "kg": 31,
+    "reps": 12,
+    "time": null,
+    "why": "Sesión anterior muy exigente: mantén"
+   }
+  ],
+  [
+   {
+    "kg": 38.5,
+    "reps": 12,
+    "time": null,
+    "why": "Sesión anterior muy exigente: mantén"
+   },
+   {
+    "kg": 38.5,
+    "reps": 12,
+    "time": null,
+    "why": "Sesión anterior muy exigente: mantén"
+   },
+   {
+    "kg": 38.5,
+    "reps": 12,
+    "time": null,
+    "why": "Sesión anterior muy exigente: mantén"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": 12,
+    "time": null,
+    "why": "Mantén las repeticiones"
+   },
+   {
+    "kg": null,
+    "reps": 12,
+    "time": null,
+    "why": "Mantén las repeticiones"
+   },
+   {
+    "kg": null,
+    "reps": 12,
+    "time": null,
+    "why": "Mantén las repeticiones"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": ""
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": ""
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": ""
+   }
+  ]
+ ],
+ "analisis_tras_sesion": {
+  "sugg": [
+   {
+    "kind": "actualizar",
+    "title": "Actualizar pesos de la rutina",
+    "data": {
+     "items": [
+      {
+       "progress": true,
+       "sets": [
+        {
+         "t": "n",
+         "reps": 8,
+         "kg": 35,
+         "time": null
+        },
+        {
+         "t": "n",
+         "reps": 8,
+         "kg": 35,
+         "time": null
+        },
+        {
+         "t": "n",
+         "reps": 8,
+         "kg": 35,
+         "time": null
+        }
+       ],
+       "line": "Press de banca con barra 35 kg × 8"
+      },
+      {
+       "progress": true,
+       "sets": [
+        {
+         "t": "n",
+         "reps": 8,
+         "kg": 35,
+         "time": null
+        },
+        {
+         "t": "n",
+         "reps": 8,
+         "kg": 35,
+         "time": null
+        },
+        {
+         "t": "n",
+         "reps": 8,
+         "kg": 35,
+         "time": null
+        }
+       ],
+       "line": "Remo con barra 35 kg × 8"
+      },
+      {
+       "progress": true,
+       "sets": [
+        {
+         "t": "n",
+         "reps": 10,
+         "kg": 25,
+         "time": null
+        },
+        {
+         "t": "n",
+         "reps": 10,
+         "kg": 25,
+         "time": null
+        },
+        {
+         "t": "n",
+         "reps": 10,
+         "kg": 25,
+         "time": null
+        }
+       ],
+       "line": "Curl con barra 25 kg × 10"
+      }
+     ]
+    },
+    "why": "La sobrecarga progresiva es la base de las ganancias de fuerza y músculo.",
+    "text": "Progresaste en 3 ejercicios. Actualizo la rutina con tus nuevos números: Press de banca con barra 35 kg × 8 · Remo con barra 35 kg × 8 · Curl con barra 25 kg × 10."
+   }
+  ],
+  "completions": 6
+ },
+ "analisis_estancado": {
+  "sugg": [
+   {
+    "kind": "cambiar",
+    "exId": "press_banca",
+    "title": "Press de banca con barra: estancado",
+    "text": "Sin mejoras en 4 entrenos. Propongo Flexiones en pared para dar un estímulo nuevo al mismo músculo.",
+    "why": "Variar el ejercicio ayuda a romper estancamientos.",
+    "data": {
+     "to": "flexiones_pared"
+    },
+    "stagnant": true
+   },
+   {
+    "kind": "cambiar",
+    "exId": "sentadilla",
+    "title": "Sentadilla con barra: estancado",
+    "text": "Sin mejoras en 4 entrenos. Propongo Sentadilla con peso corporal para dar un estímulo nuevo al mismo músculo.",
+    "why": "Variar el ejercicio ayuda a romper estancamientos.",
+    "data": {
+     "to": "sentadilla_peso"
+    },
+    "stagnant": true
+   }
+  ]
+ },
+ "analisis_poco_sueno": [
+  "recuperacion",
+  "actualizar"
+ ],
+ "series_por_musculo": {
+  "sets": {
+   "movilidad": 4,
+   "cuadriceps": 12,
+   "gluteos": 12,
+   "gemelos": 6,
+   "isquios": 16,
+   "pecho": 12,
+   "triceps": 12,
+   "hombros": 18,
+   "abdomen": 18,
+   "dorsales": 12,
+   "biceps": 6
+  },
+  "lagging": []
+ },
+ "alternativas": [
+  [
+   "flexiones_pared",
+   "flexiones_inclinadas",
+   "flexiones_rodillas",
+   "flexiones",
+   "flexiones_archer"
+  ],
+  [
+   "sentadilla_peso",
+   "sentarse_levantarse",
+   "sentadilla_pared",
+   "sentadilla_salto",
+   "sentadilla_pistol"
+  ],
+  [
+   "remo_mesa",
+   "remo_toalla",
+   "est_dorsal"
+  ],
+  [
+   "curl_toalla"
+  ]
+ ],
+ "orden_de_la_sesion": [
+  "sentadilla",
+  "ext_cuadriceps",
+  "press_banca",
+  "remo_barra",
+  "curl_barra",
+  "plancha",
+  "mov_articular"
+ ],
+ "bloqueo_lesion_rodilla": [
+  "box_jump",
+  "burpees",
+  "cinta_curva",
+  "curl_nordico",
+  "ext_cuad_polea",
+  "ext_cuad_unilateral",
+  "ext_cuadriceps",
+  "nordico_inverso",
+  "saltar_comba",
+  "sentadilla_bulgara",
+  "sentadilla_cosaca",
+  "sentadilla_frontal",
+  "sentadilla_pistol",
+  "sentadilla_salto",
+  "sentadilla_sissy",
+  "sentadilla_zercher",
+  "skater",
+  "smith_bulgara",
+  "smith_zancada",
+  "sprint",
+  "wall_ball",
+  "zancada_caminando_barra",
+  "zancada_caminando_man",
+  "zancadas",
+  "zancadas_pc"
+ ],
+ "bloqueo_edad_65": [
+  "balon_suelo",
+  "box_jump",
+  "burpees",
+  "cinta_curva",
+  "cuerdas_golpes",
+  "flexiones_pliometricas",
+  "jumping_jacks",
+  "muscle_up",
+  "saltar_comba",
+  "sentadilla_pistol",
+  "sentadilla_salto",
+  "skater",
+  "skipping",
+  "sprint",
+  "wall_ball"
+ ],
+ "bloqueo_imc_32": {
+  "bmi": 32.17993079584775,
+  "blocked": [
+   "balon_suelo",
+   "box_jump",
+   "burpees",
+   "cinta_curva",
+   "cuerdas_golpes",
+   "flexiones_pliometricas",
+   "jumping_jacks",
+   "muscle_up",
+   "saltar_comba",
+   "sentadilla_pistol",
+   "sentadilla_salto",
+   "skater",
+   "skipping",
+   "sprint",
+   "wall_ball"
+  ]
+ },
+ "periodizacion_6_semanas": [
+  [
+   "volumen",
+   {
+    "n": "Volumen",
+    "d": "semana 1 de 3",
+    "t": "Más repeticiones para construir base."
+   }
+  ],
+  [
+   "volumen",
+   {
+    "n": "Volumen",
+    "d": "semana 2 de 3",
+    "t": "Más repeticiones para construir base."
+   }
+  ],
+  [
+   "volumen",
+   {
+    "n": "Volumen",
+    "d": "semana 3 de 3",
+    "t": "Más repeticiones para construir base."
+   }
+  ],
+  [
+   "intensidad",
+   {
+    "n": "Intensidad",
+    "d": "semana 1 de 2",
+    "t": "Más peso y menos repeticiones."
+   }
+  ],
+  [
+   "intensidad",
+   {
+    "n": "Intensidad",
+    "d": "semana 2 de 2",
+    "t": "Más peso y menos repeticiones."
+   }
+  ],
+  [
+   "descarga",
+   {
+    "n": "Descarga",
+    "d": "1 semana",
+    "t": "Más liviano para recuperarte."
+   }
+  ],
+  [
+   "volumen",
+   {
+    "n": "Volumen",
+    "d": "semana 1 de 3",
+    "t": "Más repeticiones para construir base."
+   }
+  ]
+ ],
+ "descansos_preajustes": [
+  "Calentamientos con 1:30 de descanso",
+  [
+   90,
+   90,
+   180,
+   180,
+   180,
+   180
+  ],
+  "+30 s antes de las dos últimas series",
+  [
+   90,
+   90,
+   180,
+   210,
+   210,
+   180
+  ],
+  "Todas las series con 3:00",
+  [
+   180,
+   180,
+   180,
+   180,
+   180,
+   180
+  ]
+ ],
+ "informe_semanal": {
+  "report": {
+   "wk": 1793577600000,
+   "n": 3,
+   "vol": 4368,
+   "pvol": 3075,
+   "mins": 180,
+   "prs": 0,
+   "top": [
+    [
+     "pecho",
+     9
+    ],
+    [
+     "cuadriceps",
+     9
+    ]
+   ],
+   "low": [
+    "dorsales",
+    "hombros",
+    "isquios",
+    "gluteos"
+   ],
+   "main": "Dale más series a: espalda (dorsales), hombros, isquiotibiales, glúteos."
+  },
+  "streak": 3,
+  "records": {
+   "press_banca": {
+    "kg": 32.5,
+    "reps": 0,
+    "vol": 390,
+    "time": 0,
+    "date": 1794398400000,
+    "kgReps": 12
+   },
+   "sentadilla": {
+    "kg": 38.5,
+    "reps": 0,
+    "vol": 462,
+    "time": 0,
+    "date": 1794398400000,
+    "kgReps": 12
+   }
+  }
+ },
+ "equilibrio_muscular": {
+  "c": {
+   "push": 48,
+   "pull": 0,
+   "quad": 0,
+   "ham": 0,
+   "upper": 72,
+   "lower": 0
+  },
+  "msgs": [
+   "Haces 48 series de empuje y 0 de tirón. Suma remos o dominadas: proteges los hombros y mejoras la postura.",
+   "Solo el 0 % de tus series son de piernas. Las piernas son la mitad de tu cuerpo: dales más protagonismo."
+  ]
+ },
+ "ayuno_consejos_exigente": "<div class=\"card\"><div class=\"row sm\" style=\"align-items:flex-start;padding:4px 0;line-height:1.45\"><span style=\"color:var(--ac)\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z\"/></svg></span><span>Para empezar te sugiero 12:12 o 14:10 y subir de a poco cuando te sientas cómodo.</span></div><div class=\"row sm\" style=\"align-items:flex-start;padding:4px 0;line-height:1.45\"><span style=\"color:var(--ac)\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z\"/></svg></span><span>Con poca actividad física, un plan de 20:4 es muy exigente. Prueba con 16:8.</span></div><div class=\"row sm\" style=\"align-items:flex-start;padding:4px 0;line-height:1.45\"><span style=\"color:var(--ac)\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z\"/></svg></span><span>Para ganar músculo con ventanas cortas, asegúrate de llegar a tus calorías y proteína en la ventana de comida.</span></div></div>",
+ "ayuno_consejos_activo": "<div class=\"card\"><div class=\"row sm\" style=\"align-items:flex-start;padding:4px 0;line-height:1.45\"><span style=\"color:var(--ac)\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z\"/></svg></span><span>Llevas más de 24 horas. Más allá de tu plan no hay beneficios extra; considera romper el ayuno.</span></div><div class=\"row sm\" style=\"align-items:flex-start;padding:4px 0;line-height:1.45\"><span style=\"color:var(--ac)\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z\"/></svg></span><span>El ayuno ayuda a ordenar las comidas, pero lo que más cuenta es el total de calorías del día.</span></div></div>",
+ "consejo_del_dia": [
+  "Las bebidas azucaradas suman muchas calorías sin saciar. Prefiere agua.",
+  "Los glúteos fuertes protegen tu espalda baja y tus rodillas.",
+  "Come despacio: la saciedad tarda unos 20 minutos en llegar.",
+  "Un core fuerte no son solo abdominales: planchas, dead bug y bird dog cuentan mucho.",
+  "La creatina monohidratada es uno de los suplementos con más evidencia para la fuerza.",
+  "Las superseries de músculos opuestos ahorran tiempo sin perder rendimiento.",
+  "La fruta entera sacia más que el jugo y conserva la fibra.",
+  "Si no tienes tiempo, 20 minutos bien hechos superan a no entrenar.",
+  "Si entrenas en ayunas y te mareas, come algo ligero antes de la próxima sesión.",
+  "Graba tu técnica de vez en cuando: verte desde fuera corrige errores que no sientes."
+ ]
+}
