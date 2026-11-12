@@ -1,0 +1,24 @@
+# Muestra la huella SHA-1 y SHA-256 de la llave con la que se firma la APK.
+# Las huellas no son secretas: Google Cloud las pide para el inicio de sesión con Google.
+# Se ejecuta a mano: pestaña Actions › "Huella de la firma" › Run workflow.
+name: Huella de la firma
+
+on:
+  workflow_dispatch:
+
+jobs:
+  huella:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Leer la huella de la llave
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then echo "Falta el secreto KEYSTORE_BASE64"; exit 1; fi
+          echo "$KEYSTORE_BASE64" | base64 -d > firma.jks
+          keytool -list -v -keystore firma.jks -alias "$KEY_ALIAS" -storepass "$KEYSTORE_PASSWORD" | grep -E "SHA1:|SHA256:" | tee huellas.txt
+          rm firma.jks
+          echo "### Huellas de la firma de PandarIA Fit" >> $GITHUB_STEP_SUMMARY
+          sed 's/^/    /' huellas.txt >> $GITHUB_STEP_SUMMARY
