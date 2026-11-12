@@ -17,6 +17,15 @@
     "LocalNotifications": {
       "smallIcon": "ic_stat_pandaria",
       "iconColor": "#ff7a1a"
+    },
+    "SocialLogin": {
+      "providers": {
+        "google": true,
+        "facebook": false,
+        "apple": false,
+        "twitter": false
+      },
+      "logLevel": 1
     }
   }
 }
