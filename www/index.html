@@ -2330,6 +2330,10 @@ const RAD=Math.PI/180, UP=[0,1,0];
 function rotAx(v,ax,deg){ const a=deg*RAD, c=Math.cos(a), s=Math.sin(a), k=vn(ax); return va(va(vk(v,c),vk(vx(k,v),s)),vk(k,vd(k,v)*(1-c))); }
 const ease=u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
 const mix=(a,b,u)=>a+(b-a)*u;
+// curva suave (Catmull-Rom) que pasa por todos los puntos: u de 0 a 1 recorre la lista
+function crv(pts,u){ const n=pts.length-1; const x=Math.min(n-1e-6,Math.max(0,u*n)), i=Math.floor(x), t=x-i;
+  const p0=pts[Math.max(0,i-1)], p1=pts[i], p2=pts[i+1], p3=pts[Math.min(n,i+2)]; const t2=t*t, t3=t2*t;
+  return [0,1,2].map(k=>.5*(2*p1[k]+(-p0[k]+p2[k])*t+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*t2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*t3)); }
 function ik3(a,t,l1,l2,pole){
   let d=vs(t,a), L=vl(d); const mx=l1+l2-.05, mn=Math.abs(l1-l2)+.5; let T=t;
   if (L>mx){ T=va(a,vk(d,mx/L)); L=mx; } else if (L<mn){ T=va(a,vk(d,mn/(L||1))); L=mn; }
@@ -2345,7 +2349,7 @@ function body3(p){
   const B={f,r};
   B.pel=p.pel;
   B.mid=vp(B.pel,d,D3.T1);
-  let d2=rotAx(d,r,-(p.bk||0)); let r2=r; if (p.twist){ r2=rotAx(r,d2,p.twist); }
+  let d2=rotAx(d,r,-(p.bk||0)); let r2=p.side?rotAx(r,f,p.side):r; if (p.twist){ r2=rotAx(r2,d2,p.twist); } // al inclinarse de lado los hombros también se inclinan
   B.neck=vp(B.mid,d2,D3.T2); B.d=d; B.d2=d2; B.r2=r2; B.nf=vn(vx(d2,r2)); // nf: delante del pecho
   const sh=p.sh||0;
   B.shoR=vp(B.neck,r2,D3.SW,d2,-1.6+sh); B.shoL=vp(B.neck,r2,-D3.SW,d2,-1.6+sh);
@@ -2356,6 +2360,8 @@ function body3(p){
     const ht=p['h'+s]||vp(sho,UP,-(D3.UA+D3.FA-1),f,1.5);
     const ep=p['e'+s]||vp([0,0,0],f,-.45,r,.65*sg,UP,-.45);
     const A=ik3(sho,ht,D3.UA,D3.FA,ep); B['elb'+s]=A.j; B['hand'+s]=A.t;
+    // muñeca: p.wR/p.wL = hacia dónde apuntan los dedos (si no, siguen al antebrazo)
+    const wd=p['w'+s]?vn(p['w'+s]):vn(vs(A.t,A.j)); B['wd'+s]=wd; B['fing'+s]=vp(A.t,wd,3.4); B['wr'+s]=!!p['w'+s];
     const hip=B['hip'+s];
     const at=p['f'+s]||[hip[0]+1,D3.ANK,hip[2]];
     const kp=p['k'+s]||vp([0,0,0],f,1,r,.12*sg);
@@ -2373,7 +2379,9 @@ function cam3(c){ const y=(c&&c.yaw||0)*RAD, pt=(c&&c.pitch||0)*RAD; const cy=Ma
   return p=>{ const x1=p[0]*cy-p[2]*sy, z1=p[0]*sy+p[2]*cy; return [x1, FLOOR_Y-(p[1]*cp-z1*sp), z1*cp+p[1]*sp]; }; }
 /* lista de piezas con profundidad (se dibujan de atrás hacia delante) */
 function R3(pr){ this.pr=pr; this.it=[]; }
-R3.prototype.add=function(dep,s){ this.it.push([dep,s]); };
+R3.prototype.add=function(dep,s){ this.it.push([dep+(this._bias||0),s]); };
+// lo que se dibuja dentro de under() queda siempre detrás del cuerpo (bancos, colchonetas, almohadillas bajo el tronco)
+R3.prototype.under=function(fn){ const b=this._bias; this._bias=-2e4; try{ fn(); } finally { this._bias=b; } };
 R3.prototype.dot=function(a,r,col,op,dz){ const A=this.pr(a); this.add(A[2]+(dz||0),dot([A[0],A[1]],r,col,op)); };
 R3.prototype.line=function(a,b,w,col,op){ const A=this.pr(a), B=this.pr(b); this.add((A[2]+B[2])/2,seg([A[0],A[1]],[B[0],B[1]],w,col,op)); };
 R3.prototype.poly=function(pts,col,op,dep,stroke){ const P=pts.map(this.pr); P.forEach(q=>bb(q[0],q[1])); const d=dep??P.reduce((s,q)=>s+q[2],0)/P.length;
@@ -2399,11 +2407,11 @@ function drawBody3(R,B,pal,ex){
   ['R','L'].forEach(s=>{ const hip=B['hip'+s], kn=B['knee'+s], an=B['ank'+s]; const c=sideC(kn);
     R.cap(hip,kn,5.1,3.9,c.skin); R.cap(hip,vm(hip,kn,.42),5.6,4.7,c.shorts); R.cap(kn,an,3.8,2.5,c.skin); R.cap(B['heel'+s],B['toe'+s],2.5,1.9,c.shoe);
     const sh=B['sho'+s], el=B['elb'+s], h=B['hand'+s]; const ca=sideC(el);
-    R.cap(sh,el,3.6,2.8,ca.skin); R.cap(sh,vm(sh,el,.34),4.1,3.7,ca.top); R.cap(el,h,2.75,2.15,ca.skin); R.dot(h,2.55,ca.skin,null,.3);
+    R.cap(sh,el,3.6,2.8,ca.skin); R.cap(sh,vm(sh,el,.34),4.1,3.7,ca.top); R.cap(el,h,2.75,2.15,ca.skin); if (B['wr'+s]) R.cap(h,vp(h,B['wd'+s],2.6),2.4,2.1,ca.skin,null,.3); else R.dot(h,2.55,ca.skin,null,.3);
   });
   const N=pal.n;
   R.cap(B.pel,B.mid,6.1,5.5,N.top); R.cap(B.mid,B.neck,5.6,5.2,N.top); R.cap(B.shoL,B.shoR,4.6,4.6,N.top); R.dot(vp(vm(B.mid,B.neck,.55),B.nf,1.6),5.6,N.top);
-  R.cap(B.hipL,B.hipR,5.7,5.7,N.shorts); R.dot(vp(B.pel,B.nf,-1.6,B.d,1),5.6,N.shorts);
+  R.cap(B.hipL,B.hipR,5.7,5.7,N.shorts);
   const nk=vp(B.neck,B.hd,1.2); R.cap(B.neck,nk,2.6,2.4,N.skin); R.dot(B.head,D3.HR,N.skin);
   if (pal.band){ const c=vp(B.head,B.hd,2.1), pts=[]; const hc=R.pr(B.head)[2];
     for(let i=0;i<=24;i++){ const t=i/24*Math.PI*2; pts.push(vp(c,B.r2,Math.cos(t)*6.05,B.nf,Math.sin(t)*6.05)); }
@@ -2443,7 +2451,7 @@ const K3={
   tube:(R,a,b,r,c)=>R.cap(a,b,r,r,c),
   pad:(R,c,len,wid,th,pitch,pal,yaw)=>{ // almohadilla: largo en x (girada pitch grados hacia arriba), ancho en z, grosor
     let ax=rotAx([1,0,0],[0,0,1],pitch||0), ay=rotAx(UP,[0,0,1],pitch||0), az=[0,0,1]; if (yaw){ ax=rotAx(ax,UP,yaw); ay=rotAx(ay,UP,yaw); az=rotAx(az,UP,yaw); }
-    R.box(c,ax,ay,az,len/2,th/2,wid/2,pal.pad,pal); },
+    const dr=()=>R.box(c,ax,ay,az,len/2,th/2,wid/2,pal.pad,pal); if (c[1]<2.5) R.under(dr); else dr(); }, // colchoneta en el suelo: siempre debajo
   stack:(R,x,z,top,pal,rot)=>{ // torre con pila de discos
     const ax=rot?[0,0,1]:[1,0,0], az=rot?[1,0,0]:[0,0,1];
     R.box([x,top/2,z],ax,UP,az,5,top/2,5,pal.frame,pal);
@@ -2464,6 +2472,10 @@ K3.backPad=(R,bottom,lean,len,pal)=>{ const d=rotAx(UP,[0,0,1],lean), ax=rotAx([
   R.cap(vp(bottom,d,len*.45,ax,-5),vp([bottom[0],1,0],ax,-5),1.6,1.6,pal.frame); };
 K3.kb=(R,h,pal,dn)=>{ const d=dn||[0,-1,0]; R.cap(vp(h,[0,0,1],-2.2),vp(h,[0,0,1],2.2),1,1,pal.steel); R.dot(vp(h,d,5.6),5,pal.mono?'#fff':'#3a4250'); R.dot(vp(h,d,5.6,[-1,1,0],1.4),1.4,pal.plateE,.6,.5); };
 K3.db=(R,c,ax,pal)=>{ const a=vp(c,ax,-4.4), b=vp(c,ax,4.4); R.cap(a,b,1.1,1.1,pal.steel); [a,b].forEach(q=>{ R.cap(vp(q,ax,-1),vp(q,ax,1.6),3.8,3.8,pal.mono?'#fff':'#aab4c2'); }); };
+// barra Z: tramo central en zigzag (agarres inclinados), puntas rectas con discos
+K3.ez=(R,a,b,pal)=>{ const ax=vn(vs(b,a)); let up=vx(ax,[0,1,0]); if (vl(up)<.2) up=vx(ax,[1,0,0]); up=vn(vx(up,ax)); const m=vm(a,b,.5), L=vl(vs(b,a))/2+2.5;
+  const P=[vp(m,ax,-L-9),vp(m,ax,-L),vp(m,ax,-L*.64,up,2.4),vp(m,ax,-L*.3,up,-1.8),vp(m,ax,0,up,.3),vp(m,ax,L*.3,up,-1.8),vp(m,ax,L*.64,up,2.4),vp(m,ax,L),vp(m,ax,L+9)];
+  for(let i=0;i<P.length-1;i++) R.cap(P[i],P[i+1],1,1,pal.steel); [[P[0],1],[P[8],-1]].forEach(([q,g])=>K3.plate(R,vp(q,ax,g*3),ax,pal,6)); };
 K3.bar=(R,a,b,pal,plates,rad)=>{ const ax=vn(vs(b,a)); const ext=rad?9:16; const A=vp(a,ax,-ext), Bq=vp(b,ax,ext); R.cap(A,Bq,1,1,pal.steel); if(plates!==false) [[A,1],[Bq,-1]].forEach(([q,g])=>{ K3.plate(R,vp(q,ax,g*4),ax,pal,rad||8.5); if(!rad) K3.plate(R,vp(q,ax,g*6),ax,pal,8.5); }); };
 
 /* render de un ejercicio 3D */
@@ -2505,8 +2517,8 @@ const arcH=(S,a,b,len,e)=>vp(S,slerp(a,b,e),len);
 // la cadera nunca sube más de lo que alcanzan las piernas (si no, los pies se despegan y parece que salta)
 function capPel(p,mx){ mx=mx||37.8; [['R',1],['L',-1]].forEach(([s,g])=>{ const f=p['f'+s]; if(!f) return; const dx=f[0]-p.pel[0], dz=f[2]-g*D3.HW; const h=Math.sqrt(Math.max(0,mx*mx-dx*dx-dz*dz)); p.pel=[p.pel[0],Math.min(p.pel[1],f[1]+h),p.pel[2]]; }); return p; }
 // almohadilla bajo el tronco tumbado (banco plano, inclinado o declinado): siempre justo debajo de la espalda
-function torsoPad(R,B,pal,o){ o=o||{}; const ax=vn(vs(B.neck,B.pel)); const c=vp(vm(B.pel,B.neck,.5),B.nf,-8.3,ax,o.shift||-2); R.box(c,ax,B.nf,vn(vx(ax,B.nf)),o.half||19,2,9,pal.pad,pal);
-  (o.posts||[-14,10]).forEach(k=>{ const q=vp(c,ax,k,B.nf,-2); K3.post(R,q,[q[0],1,0],pal); }); }
+function torsoPad(R,B,pal,o){ o=o||{}; R.under(()=>{ const ax=vn(vs(B.neck,B.pel)); const c=vp(vm(B.pel,B.neck,.5),B.nf,-8.3,ax,o.shift||-2); R.box(c,ax,B.nf,vn(vx(ax,B.nf)),o.half||19,2,o.wid||9,pal.pad,pal);
+  (o.posts||[-14,10]).forEach(k=>{ const q=vp(c,ax,k,B.nf,-2); K3.post(R,q,[q[0],1,0],pal); }); }); }
 // palanca colgante: eje arriba y brazo hasta el asa (el asa se dibuja vertical)
 function hangLever(R,piv,h,pal,plate){ K3.tube(R,piv,vp(h,UP,4),1.8,pal.steelD); R.dot(piv,2.6,pal.frame); K3.handle(R,h,UP,pal,3.4); if (plate) K3.plate(R,vm(piv,h,.25),[0,0,1],pal,9); }
 function frameTower(R,x,top,zw,pal){ [1,-1].forEach(g=>K3.post(R,[x,0,g*zw],[x,top,g*zw],pal)); K3.tube(R,[x,top,-zw],[x,top,zw],1.7,pal.frame); }
@@ -3038,14 +3050,15 @@ const LIE={flat:{pel:[0,34.2,0],lean:-90,fR:[20,D3.ANK,11],fL:[20,D3.ANK,-11],kR
   dec:{pel:[4,38,0],lean:-110,fR:[23,27,8],fL:[23,27,-8],kR:[0,1,.2],kL:[0,1,-.2]},
   floor:{pel:[0,7.4,0],lean:-90,fR:[20,D3.ANK,10],fL:[20,D3.ANK,-10],kR:[0,1,.2],kL:[0,1,-.2]}};
 const lie=(t,o)=>Object.assign(JSON.parse(JSON.stringify(LIE[t])),o||{});
-function lieKit(R,B,pal,t){
-  if (t==='floor'){ K3.pad(R,[B.pel[0]-8,.6,0],62,24,1.2,0,pal); return; }
+function lieKit(R,B,pal,t){ R.under(()=>lieKit0(R,B,pal,t)); }
+function lieKit0(R,B,pal,t){
+  if (t==='floor'){ K3.pad(R,[B.pel[0]-8,1,0],62,24,2,0,pal); return; }
   if (t==='flat') torsoPad(R,B,pal,{half:24,shift:-6});
   else if (t==='inc'){ torsoPad(R,B,pal,{half:18,shift:2,posts:[-8]}); K3.pad(R,vp(B.pel,UP,-8.2,[1,0,0],3),14,18,4,0,pal); K3.post(R,[B.pel[0]+3,B.pel[1]-10,0],[B.pel[0]+3,1,0],pal); }
   else { torsoPad(R,B,pal,{half:21,shift:3,posts:[-14,12]}); const a=vm(B.ankR,B.ankL,.5); K3.roller(R,[a[0]+1,a[1]+5.5,0],pal,8); K3.post(R,[a[0]+4,0,0],[a[0]+2,a[1]+4,0],pal); }
 }
 const HOLD={
-  bar:(R,B,pal)=>K3.bar(R,B.handL,B.handR,pal), ez:(R,B,pal)=>K3.bar(R,B.handL,B.handR,pal,true,6),
+  bar:(R,B,pal)=>K3.bar(R,B.handL,B.handR,pal), ez:(R,B,pal)=>K3.ez(R,B.handL,B.handR,pal),
   db:(R,B,pal,ax)=>G.forEach(g=>K3.db(R,B['hand'+SD(g)],ax?ax(B,g):[0,0,1],pal)),
   db1:(R,B,pal,ax)=>K3.db(R,B.handR,ax?ax(B,1):[0,0,1],pal),
   dbV:(R,B,pal)=>K3.db(R,vp(mid2(B),UP,-1),UP,pal),
@@ -3315,6 +3328,240 @@ def3('rollout_barra',{cams:[CAMP,CAM34],ph:['Estira','Vuelve'],...ecc(1500,1200)
   pose:u=>{ const e=ease(u); const ph=mix(18,58,e)*RAD; const kn=[0,3.8,0]; const pel=vp(kn,[1,0,0],19.3*Math.sin(ph),UP,19.3*Math.cos(ph)); const p={pel,lean:mix(42,84,e),head:-15,fR:[-19,4.5,6],fL:[-19,4.5,-6],kR:[1,-1,0],kL:[1,-1,0],ffR:[0,-1,0],fuR:[1,0,0],ffL:[0,-1,0],fuL:[1,0,0]};
     const B0=body3(p); const S=B0.shoR; const bx=S[0]+Math.sqrt(Math.max(1,26.2*26.2-(S[1]-8.5)**2)); return withHands(p,(B,g)=>[[bx,8.5,g*13],vp([0,0,0],B.f,-.3,UP,-1,B.r,g*.4)]); },
   kit:(R,u,B,pal)=>{ HOLD.bar(R,B,pal); K3.pad(R,[-6,.6,0],26,22,1.2,0,pal); }});
+/* ===== Revisión 3: correcciones de peso libre ===== */
+// brazo exacto: dirección hombro→codo (ed) y codo→mano (fd); el codo cae justo donde se pide, sin saltos
+const arm2=(S,ed,fd)=>{ ed=vn(ed); const E=vp(S,ed,D3.UA); return [vp(E,vn(fd),D3.FA),ed]; };
+const V=(...k)=>vp([0,0,0],...k);
+// punto más adelantado de las piernas a una altura (muslo y tibia), para que la barra pase por delante y no a través
+function legFront(B,y){ let fx=-1e9; ['R','L'].forEach(s=>{ [[B['hip'+s],B['knee'+s],5.6],[B['knee'+s],B['ank'+s],3.9]].forEach(([a,b,r])=>{ const lo=Math.min(a[1],b[1]), hi=Math.max(a[1],b[1]); if (y<lo-r||y>hi+r) return;
+  let x; if (hi-lo<2*r) x=Math.max(a[0],b[0]); else { const t=Math.max(0,Math.min(1,(y-a[1])/(b[1]-a[1]))); x=a[0]+(b[0]-a[0])*t; } fx=Math.max(fx,x+r); }); }); return fx; }
+
+/* PESOS MUERTOS: la barra sube pegada pero por delante de tibias y muslos */
+function dlDef2(ids,o){ def3(ids,{cams:o.cams||[CAMP,CAM34,CAMF],ph:o.ph||['Sube','Baja'],...ecc(o.t0||1000,o.t1||1500),
+  pose:function(u){ const e=ease(u); const lean=mix(o.l0,o.l1,e), sl=Math.sin(lean*RAD), cl=Math.cos(lean*RAD); const w=o.w??8, out=o.out??6;
+    const p={lean,head:mix(o.h0??-10,o.h1??0,e),fR:[2,D3.ANK,w],fL:[2,D3.ANK,-w],kR:[1,0,.2+out/60],kL:[1,0,-.2-out/60],ffR:rotAx([1,0,0],UP,-out),ffL:rotAx([1,0,0],UP,out)};
+    let bx=o.bx??4; const y=mix(o.y0,o.y1,e), drop=o.drop??26.3;
+    for (let it=0;it<5;it++){ p.pel=[bx-24.4*sl-(o.back??6.5)*cl,y,0]; capPel(p); const B0=body3(p); const need=legFront(B0,B0.shoR[1]-drop-(o.cy||0))+(o.clr??1.6); if (need<=bx+.05) break; bx=need; }
+    return withHands(p,(B,g)=>o.hands?o.hands(B,g,e,bx):[[bx,B['sho'+SD(g)][1]-drop,g*(o.hz??12)],[-.4,0,g*1]]); },
+  kit:function(R,u,B,pal){ o.kit&&o.kit(R,u,B,pal); }}); }
+dlDef2('peso_muerto',{l0:63,l1:0,y0:24,y1:43,kit:(R,u,B,pal)=>HOLD.bar(R,B,pal)});
+dlDef2('peso_muerto_sumo',{l0:50,l1:0,y0:22,y1:43,w:17,out:30,hz:8,kit:(R,u,B,pal)=>HOLD.bar(R,B,pal)});
+dlDef2('peso_muerto_rumano',{ph:['Baja','Sube'],t0:1500,t1:1000,l0:0,l1:70,y0:43,y1:38,h0:0,h1:-12,kit:(R,u,B,pal)=>HOLD.bar(R,B,pal)});
+dlDef2('pm_piernas_rigidas',{ph:['Baja','Sube'],t0:1500,t1:1000,l0:0,l1:74,y0:43,y1:43,h0:0,h1:-10,back:4,kit:(R,u,B,pal)=>HOLD.bar(R,B,pal)});
+dlDef2('peso_muerto_rumano_man',{ph:['Baja','Sube'],t0:1500,t1:1000,l0:0,l1:70,y0:43,y1:38,h0:0,h1:-12,hz:9.5,clr:4.6,kit:(R,u,B,pal)=>HOLD.db(R,B,pal)});
+dlDef2('kb_pm',{l0:58,l1:0,y0:26,y1:43,w:13,out:14,hz:2.2,cy:5.6,clr:3.5,back:9,kit:(R,u,B,pal)=>K3.kb(R,mid2(B),pal)});
+dlDef2('buenos_dias',{ph:['Baja','Sube'],t0:1600,t1:1100,l0:0,l1:70,y0:43,y1:38,h0:0,h1:-20,back:2,clr:-99,hands:backBar,kit:(R,u,B,pal)=>barBack(R,B,pal)});
+// barra hexagonal: más grande, centrada en las manos; asas paralelas a los pies dentro de los laterales
+function hexBar(R,c,pal,hz){ const y=c[1]; const P=[[19,0],[9,17],[-9,17],[-19,0],[-9,-17],[9,-17]].map(([x,z])=>[c[0]+x,y,z]); for(let i=0;i<6;i++) R.cap(P[i],P[(i+1)%6],1.2,1.2,pal.steel);
+  G.forEach(g=>{ R.cap([c[0]-5,y,g*hz],[c[0]+5,y,g*hz],1.3,1.3,pal.steel); [-5,5].forEach(x=>R.cap([c[0]+x,y,g*hz],[c[0]+x,y,g*17],1,1,pal.steel)); R.cap([c[0],y,g*17],[c[0],y,g*31],1.1,1.1,pal.steel); K3.plate(R,[c[0],y,g*25],[0,0,1],pal,8.5); }); }
+dlDef2('pm_hexagonal',{l0:40,l1:0,y0:25,y1:43,w:7,bx:1,back:0,hz:13,clr:-99,hands:(B,g)=>[[1,B['sho'+SD(g)][1]-26.3,g*13],[-.2,0,g*1]],kit:(R,u,B,pal)=>hexBar(R,[1,B.handR[1],0],pal,13)});
+ANIM3.peso_muerto_rumano.ph=ANIM3.pm_piernas_rigidas.ph=ANIM3.peso_muerto_rumano_man.ph=ANIM3.buenos_dias.ph=['Baja','Sube'];
+// peso muerto a una pierna: la rodilla de la pierna que sube apunta hacia delante de pie y hacia el suelo abajo (no se tuerce)
+def3('peso_muerto_unilateral',{cams:[CAMP,CAM34],ph:['Baja','Sube'],...ecc(1600,1200),
+  pose:u=>{ const e=ease(u); const lean=mix(0,80,e); const p={pel:[mix(0,-3,e),43,0],lean,fL:[1,D3.ANK,-6],kL:[1,0,-.1],kR:vn(vm([1,.05,.05],[0,-1,0],e))}; const B0=body3(p);
+    p.fR=vp(B0.hipR,B0.d,-38,B0.f,mix(4,0,e)); if (e<.15) p.fR=vm([1,D3.ANK+2,6],p.fR,e/.15); p.tR=mix(0,40,e);
+    return withHands(p,(B,g)=>[vp(B['sho'+SD(g)],UP,-26.3,B.r,g*1.5),[-.3,0,g*1]]); },
+  kit:(R,u,B,pal)=>HOLD.db1(R,B,pal,B=>B.f)});
+
+// mancuerna pequeña (ligera)
+const dbS=(R,c,ax,pal)=>{ const a=vp(c,ax,-3.6), b=vp(c,ax,3.6); R.cap(a,b,1,1,pal.steel); [a,b].forEach(q=>R.cap(vp(q,ax,-.8),vp(q,ax,1.2),2.6,2.6,pal.mono?'#fff':'#aab4c2')); };
+/* MUÑECAS: el antebrazo queda quieto apoyado en el muslo y solo se dobla la muñeca */
+function onLine(S,base,t,len){ const w=vs(base,S); const b=vd(w,t), c=vd(w,w)-len*len; const D=b*b-c; return D<0?-b:-b+Math.sqrt(D); }
+def3(['curl_muneca','ext_muneca','curl_muneca_barra'],{cams:[CAM34,CAMP],ph:['Sube','Baja'],tm:[700,1000],hd:300,
+  pose:function(u){ const e=ease(u); const p=sitP(0,40,{head:-25,fR:[22,D3.ANK,9],fL:[22,D3.ANK,-9]});
+    return withHands(p,(B,g)=>{ const s=SD(g), S=B['sho'+s], hip=B['hip'+s], kn=B['knee'+s]; const t=vn(vs(kn,hip)); const base=vp(hip,UP,6.3,B.r,-g*.8);
+      const k=Math.min(onLine(S,base,t,D3.UA),vl(vs(kn,hip))+5-D3.FA); const E=vp(base,t,k); const H=vp(E,t,D3.FA);
+      const ax=vn(vx(t,UP)); p['w'+s]=rotAx(t,ax,mix(-58,45,e)); return [H,vs(E,vm(S,H,.5))]; }); },
+  kit:function(R,u,B,pal){ K3.pad(R,[0,SEATY-2,0],34,14,4,0,pal); K3.post(R,[-12,SEATY-4,0],[-12,1,0],pal);
+    const gp=s=>vp(B['hand'+s],B['wd'+s],2.3); if (this._id==='curl_muneca_barra') K3.bar(R,gp('L'),gp('R'),pal,true,5.5); else G.forEach(g=>dbS(R,gp(SD(g)),[0,0,1],pal)); }});
+
+/* HOMBRO */
+// Press Arnold: empieza con las mancuernas delante de la cara (palmas hacia ti, codos delante y abajo);
+// los codos se abren a los lados mientras las palmas giran hacia fuera y se termina empujando arriba
+def3('press_arnold',{cams:[CAM34,CAMF,CAMP],ph:['Gira y empuja','Baja'],...ecc(1500,1700),
+  pose:u=>withHands(standP(),(B,g)=>{ const S=B['sho'+SD(g)], f=B.f, r=vk(B.r,g), q=ease(u);
+    const ED=[V(f,.62,UP,-.78,r,.1),V(f,.4,UP,-.6,r,.7),V(r,.92,UP,-.2,f,.1),V(UP,1,r,.3,f,.05)];
+    const FD=[V(UP,1,f,-.05,r,-.18),V(UP,1,r,-.08),V(UP,1,r,-.06),V(UP,1,r,-.08)];
+    return arm2(S,crv(ED,q),crv(FD,q)); }),
+  kit:(R,u,B,pal)=>{ const q=ease(u); HOLD.db(R,B,pal,(B,g)=>rotAx([0,0,1],UP,g*80*Math.sin(Math.min(1,q*1.5)*Math.PI))); }});
+// Press cubano: remo al mentón (codos a la altura de los hombros), giro de los antebrazos hacia arriba y press
+def3('press_cubano',{cams:[CAM34,CAMF,CAMP],ph:['Sube, gira y empuja','Baja'],...ecc(2200,2000),
+  pose:u=>withHands(standP(),(B,g)=>{ const S=B['sho'+SD(g)], f=B.f, r=vk(B.r,g), q=ease(u);
+    const ED=[V(UP,-1,f,.08,r,.14),V(r,.95,UP,-.28,f,.12),V(r,.95,UP,-.18,f,.12),V(r,.95,UP,-.12,f,.1),V(UP,1,r,.32,f,.04)];
+    const FD=[V(UP,-1,f,.15,r,-.05),V(UP,-.95,f,.3,r,-.05),V(f,1,UP,.05,r,-.05),V(UP,1,f,.05,r,-.05),V(UP,1,r,-.06)];
+    return arm2(S,crv(ED,q),crv(FD,q)); }),
+  kit:(R,u,B,pal)=>HOLD.db(R,B,pal)});
+// rack de kettlebell: codo pegado delante de las costillas, mano delante del hombro, la bola por fuera del antebrazo
+const RACK_E=(f,r)=>V(UP,-.9,f,.38,r,.12), RACK_F=(f,r)=>V(UP,.92,f,.2,r,-.28);
+const kbOut=(B,s,g)=>{ const fd=vn(vs(B['hand'+s],B['elb'+s])); return vn(V(fd,-.5,B.r,g*.75,B.f,.05)); };
+def3('kb_press',{cams:[CAM34,CAMF,CAMP],ph:['Empuja','Baja'],...ecc(1100,1500),
+  pose:u=>withHands(standP(),one(B=>{ const S=B.shoR, f=B.f, r=B.r, q=ease(u);
+    return arm2(S,crv([RACK_E(f,r),V(r,.85,f,.4,UP,-.2),V(UP,1,r,.22)],q),crv([RACK_F(f,r),V(UP,1,r,-.12,f,.05),V(UP,1,r,-.04)],q)); },restHip)),
+  kit:(R,u,B,pal)=>K3.kb(R,B.handR,pal,kbOut(B,'R',1))});
+// Halo: la kettlebell (cogida por los cuernos) rodea la cabeza a la altura de la frente; la bola siempre hacia fuera
+def3('kb_halo',{cams:[CAM34,CAMF],loop:true,tm:[3400],
+  pose:u=>withHands(standP(),(B,g)=>{ const a=u*Math.PI*2; const rad=V(B.f,Math.cos(a),B.r,Math.sin(a)); const tg=vn(vx(UP,rad)); const C=vp(B.head,UP,-3.5);
+    return [vp(C,rad,11.5,tg,-g*2.4),vn(V(UP,.7,B.r,g*.8,rad,-.25))]; }),
+  kit:(R,u,B,pal)=>{ const a=u*Math.PI*2; const rad=V(B.f,Math.cos(a),B.r,Math.sin(a)); K3.kb(R,mid2(B),pal,vn(V(rad,1,UP,-.2))); }});
+def3('remo_menton',{cams:[CAM34,CAMF,CAMP],ph:['Sube','Baja'],...ecc(900,1400),
+  pose:u=>withHands(standP(),(B,g)=>{ const S=B['sho'+SD(g)]; const e=ease(u); return [vm(vp(S,UP,-25.2,B.f,7.5,B.r,-g*3),vp(S,UP,-4,B.f,8.5,B.r,-g*3.6),e),vp([0,0,0],UP,mix(.2,1,e),B.r,g*1.3,B.f,-.2)]; }),
+  kit:(R,u,B,pal)=>HOLD.bar(R,B,pal)});
+// pecho apoyado en banco inclinado: almohadilla más corta y estrecha (los brazos cuelgan por fuera)
+const chestPad=(R,B,pal)=>{ R.box(vp(vm(B.pel,B.neck,.4),B.nf,7.4),B.nf,B.d2,B.r2,2.2,11,5.5,pal.pad,pal); K3.post(R,[-6,0,0],[-4,26,0],pal); K3.pad(R,[-22,D3.ANK-1.5,0],14,22,3,0,pal); };
+raiseDef('y_inclinado',{cams:[CAMP,CAM34],p:{pel:[-8,40,0],lean:52,fR:[-22,D3.ANK+4,7],fL:[-22,D3.ANK+4,-7],kR:[1,0,0],kL:[1,0,0],head:-15},a:(B,g)=>vp([0,0,0],UP,-1,B.r,g*.12),b:(B,g)=>vp([0,0,0],B.d2,1,B.r2,g*.6),pole:(B,g)=>vp([0,0,0],UP,1,B.r,g*.3),ax:(B)=>B.f});
+ANIM3.y_inclinado.kit=(R,u,B,pal)=>{ chestPad(R,B,pal); HOLD.db(R,B,pal,B=>B.f); };
+ANIM3.y_inclinado.ph=['Sube','Baja'];
+
+/* ESPALDA */
+// Meadows: la barra sale de un landmine delante; se coge el extremo y los discos quedan entre la mano y el anclaje
+rowDef('remo_meadows',{one:true,rest:B=>[vp(B.kneeL,UP,4,B.f,2),[0,-1,-.4]],p:()=>({pel:[-6,40,0],lean:55,head:-15,fR:[-6,D3.ANK,8],fL:[10,D3.ANK,-8],kR:[1,0,.2],kL:[1,0,-.2]}),z:8,
+  kit:(R,u,B,pal)=>{ const h=B.handR, pv=[60,1,10]; const d=vn(vs(pv,h)); R.cap(pv,vp(h,d,-2.5),1.4,1.4,pal.steelD); R.dot(pv,2.4,pal.frame); K3.plate(R,vp(h,d,6.5),d,pal,8.5); K3.plate(R,vp(h,d,8.5),d,pal,8.5); }});
+rowDef('remo_apoyado_man',{p:()=>({pel:[-8,40,0],lean:52,fR:[-22,D3.ANK+4,7],fL:[-22,D3.ANK+4,-7],kR:[1,0,0],kL:[1,0,0],head:-15}),z:10.5,back:1,
+  kit:(R,u,B,pal)=>{ chestPad(R,B,pal); HOLD.db(R,B,pal,B=>B.f); }});
+ANIM3.remo_seal.kit=(R,u,B,pal)=>{ R.under(()=>{ K3.pad(R,[-6,46.3,0],64,18,4,0,pal); [-30,14].forEach(x=>K3.post(R,[x,44,0],[x,1,0],pal)); K3.base(R,[-36,0],[20,0],pal); }); HOLD.bar(R,B,pal); };
+// Remo invertido: talones fijos en el suelo, cuerpo recto como una tabla que gira sobre los talones; la barra no se mueve
+def3('remo_invertido',{cams:[CAMP,CAM34],ph:['Tira','Baja'],...ecc(900,1400),
+  pose:u=>{ const e=ease(u); const be=mix(22,38,e)*RAD; const ank=[36,D3.ANK,0]; const pel=[ank[0]-38.2*Math.cos(be),ank[1]+38.2*Math.sin(be),0];
+    const p={pel,lean:-(90-be/RAD),head:0,fR:[36,D3.ANK,7],fL:[36,D3.ANK,-7],kR:[0,1,0],kL:[0,1,0],ffR:vn([.25,1,0]),fuR:vn([-1,.25,0]),ffL:vn([.25,1,0]),fuL:vn([-1,.25,0])};
+    return withHands(p,(B,g)=>[[-9,52,g*14],vp([0,0,0],B.d2,-.4,UP,-.5,B.r2,g*.7)]); },
+  kit:(R,u,B,pal)=>{ G.forEach(g=>K3.post(R,[-9,0,g*28],[-9,62,g*28],pal)); R.cap([-9,52,-31],[-9,52,31],1.2,1.2,pal.steel); }});
+
+/* BRAZOS */
+// curl con el codo exacto: el codo se coloca a la longitud real del brazo (no salta) y la mano gira a su alrededor
+function curlDef2(ids,o){ def3(ids,{cams:o.cams||[CAMP,CAM34],ph:['Sube','Baja'],...ecc(o.t0||900,o.t1||1500),
+  pose:function(u){ const e=ease(u); const p=o.p?o.p(u):standP({lean:-2});
+    return withHands(p,(B,g)=>{ if (o.one&&g<0) return o.rest?o.rest(B):restHip(B,g); const S=B['sho'+SD(g)]; const E0=o.E?o.E(B,g,S,e):vp(S,UP,-14,B.f,1.5,B.r,g*(o.ew||1)); const ed=vn(vs(E0,S)), E=vp(S,ed,D3.UA);
+      const a=mix(o.a0??12,o.a1??138,e)*RAD; const dn=vn(o.dn?o.dn(B,g):vk(UP,-1)); let side=o.side?o.side(B,g):B.f; side=vn(vs(side,vk(dn,vd(side,dn))));
+      return [vp(E,dn,D3.FA*Math.cos(a),side,D3.FA*Math.sin(a)),ed]; }); },
+  kit:(R,u,B,pal)=>{ o.kit&&o.kit(R,u,B,pal); HOLD[o.hold](R,B,pal,o.ax); }}); }
+curlDef2('curl_z',{hold:'ez',ew:1.8});
+curlDef2('curl_zottman',{hold:'db',ew:1.4});
+curlDef2('martillo_cruzado',{hold:'db',ew:1.2,ax:hammerAx,side:(B,g)=>V(B.f,.85,B.r,-g*.5),a1:112});
+curlDef2('curl_concentrado',{hold:'db1',one:true,rest:B=>[vp(B.kneeL,UP,5,B.f,2),[0,-1,-.4]],p:()=>sitP(0,32,{fR:[22,D3.ANK,14],fL:[22,D3.ANK,-14],head:-20}),
+  E:(B)=>vp(B.kneeR,B.r,-3.8,UP,5,B.f,-4.5),side:(B)=>V(B.f,.55,B.r,-.45,UP,.2),a1:128,
+  kit:(R,u,B,pal)=>{ K3.pad(R,[0,SEATY-2,0],34,14,4,0,pal); K3.post(R,[-12,SEATY-4,0],[-12,1,0],pal); K3.post(R,[12,SEATY-4,0],[12,1,0],pal); }});
+curlDef2('curl_inclinado',{hold:'db',p:()=>({pel:[2,29,0],lean:-50,fR:[22,D3.ANK,11],fL:[22,D3.ANK,-11]}),E:(B,g,S)=>vp(S,UP,-14,B.f,-1.5,B.r,g*2.2),
+  kit:(R,u,B,pal)=>R.under(()=>{ torsoPad(R,B,pal,{half:18,shift:2,posts:[-8],wid:6}); K3.pad(R,vp(B.pel,UP,-8.2,[1,0,0],3),14,18,4,0,pal); K3.post(R,[B.pel[0]+3,B.pel[1]-10,0],[B.pel[0]+3,1,0],pal); })});
+// Extensión de tríceps con una mancuerna: brazos junto a la cabeza (un poco por delante), solo se dobla el codo por detrás
+def3('ext_triceps_man',{cams:[CAMP,CAM34],ph:['Extiende','Baja'],...ecc(900,1500),
+  pose:u=>withHands(standP(),(B,g)=>{ const S=B['sho'+SD(g)]; const ed=vn(V(UP,1,B.f,.22,B.r,g*.16)); const E=vp(S,ed,D3.UA); const a=mix(115,4,ease(u))*RAD;
+    let H=vp(E,ed,D3.FA*Math.cos(a),B.f,-D3.FA*Math.sin(a)); H=[H[0],H[1],g*3]; H=vp(E,vn(vs(H,E)),D3.FA); return [H,ed]; }),
+  kit:(R,u,B,pal)=>K3.db(R,vp(mid2(B),UP,-4.2),UP,pal)});
+// Patada de tríceps: el brazo queda pegado al cuerpo y quieto; solo se estira el antebrazo hacia atrás
+def3('patada_triceps',{cams:[CAMP,CAM34],ph:['Extiende','Vuelve'],...ecc(900,1200),
+  pose:u=>withHands(standP({lean:62,pel:[-4,40,0],head:-15,fR:[-8,D3.ANK,8],fL:[10,D3.ANK,-8],kR:[1,0,.2],kL:[1,0,-.2]}),one((B)=>{ const ed=vn(V(B.d2,-1,B.r,.1,B.nf,.06)); const f0=vn(V(UP,-1,B.f,.35)); return arm2(B.shoR,ed,slerp(f0,ed,ease(u))); },(B)=>[vp(B.kneeL,UP,4,B.f,2),[0,-1,-.4]])),
+  kit:(R,u,B,pal)=>HOLD.db1(R,B,pal,B=>B.f)});
+
+/* CARGAS: manos por fuera de los muslos; en el paseo de maleta la otra mano en la cintura */
+def3(['paseo_granjero','paseo_maleta','granjero_hex','pinza_discos'],{cams:[CAM34,CAMP,CAMF],loop:true,tm:[1500],
+  pose:function(u){ const id=this._id; const one=id==='paseo_maleta'; const p=walkP(u,{side:one?-3:0});
+    return withHands(p,(B,g)=>{ if (one&&g<0) return [vp(B.hipL,B.r2,-6.6,B.d,5.5,B.f,-.5),vn(V(B.r2,-1,B.f,-.4,UP,-.1))]; const S=B['sho'+SD(g)]; const out=id==='granjero_hex'?5.6:id==='pinza_discos'?5:7.2; return [vp(S,UP,-25.6,B.r,g*out),[-.2,0,g*1]]; }); },
+  kit:function(R,u,B,pal){ const id=this._id;
+    if (id==='granjero_hex') hexBar(R,[B.pel[0],B.handR[1],0],pal,vl([0,0,B.handR[2]]));
+    else if (id==='pinza_discos') G.forEach(g=>K3.plate(R,vp(B['hand'+SD(g)],[0,0,1],g*1.6),[0,0,1],pal,7));
+    else if (id==='paseo_maleta') K3.db(R,B.handR,B.f,pal); else HOLD.db(R,B,pal,B=>B.f); }});
+
+/* PIERNAS */
+squatDef('box_squat',{off:-3,y1:28.5,l1:28,hands:backBar,kit:(R,u,B,pal)=>{ barBack(R,B,pal); R.box([-8,11.2,0],[1,0,0],UP,[0,0,1],8,11.2,10,pal.pad,pal); }});
+// frontal: la barra apoyada en los hombros, codos altos hacia delante y las manos junto a los hombros
+squatDef('sentadilla_frontal',{off:5,l0:2,l1:14,hands:(B,g)=>[vp(B['sho'+SD(g)],B.nf,5,B.d2,1.5,B.r2,g*1.5),vn(V(B.nf,1,B.d2,-.1,B.r2,g*.25))],kit:(R,u,B,pal)=>{ const c=vp(B.neck,B.nf,6.5,B.d2,.5); K3.bar(R,vp(c,B.r2,-18),vp(c,B.r2,18),pal); }});
+// Zercher: la barra en el pliegue de los codos, manos juntas delante del pecho
+const crook=(B,s)=>{ const e=B['elb'+s]; return vp(e,vn(va(vn(vs(B['hand'+s],e)),vn(vs(B['sho'+s],e)))),3); };
+squatDef('sentadilla_zercher',{off:8,l0:3,l1:20,hands:(B,g)=>[vp(B.neck,B.nf,11,B.d2,-6,B.r2,g*1.4),vn(V(UP,-1,B.nf,.25,B.r2,g*.7))],kit:(R,u,B,pal)=>{ const a=crook(B,'L'), b=crook(B,'R'); K3.bar(R,a,b,pal); }});
+squatDef('sentadilla_sumo',{w:17,out:32,l0:2,l1:12,y1:26,hands:(B,g)=>{ const S=B['sho'+SD(g)]; return [vp(S,UP,-25.5,B.r,-g*6.2,B.f,2),[-.2,0,g*1]]; },kit:(R,u,B,pal)=>K3.db(R,vp(mid2(B),UP,-5.4,B.f,.8),UP,pal)});
+// Thrusters: mancuernas sobre los hombros; al subir pasan por fuera de la cabeza
+squatDef('thrusters',{off:6,l0:2,l1:22,y1:26,ph:['Baja','Sube y empuja'],t0:1300,t1:1300,hands:(B,g,e)=>{ const S=B['sho'+SD(g)]; const q=ease(Math.max(0,(.45-e)/.45)); const r=vk(B.r,g);
+  return [crv([vp(S,B.f,5,UP,3,r,3),vp(S,B.f,3,UP,14,r,3.6),vp(S,UP,25.5,r,1,B.f,1)],q),vn(V(r,1,UP,mix(-.8,-.1,q),B.f,mix(.3,0,q)))]; },kit:(R,u,B,pal)=>HOLD.db(R,B,pal,B=>B.f)});
+// Wall ball: balón sujeto delante del pecho con las manos a los lados; sube por delante de la cara (sin tocarla)
+const wbC=(B,e)=>{ const q=ease(Math.max(0,(.45-e)/.45)); return crv([vp(B.neck,B.nf,9.5,B.d2,-5),vp(B.neck,B.f,15.5,UP,9.5),vp(B.neck,UP,24,B.f,5)],q); };
+squatDef('wall_ball',{cams:[CAM34,CAMP],off:6,l0:2,l1:22,y1:26,ph:['Baja','Sube y lanza'],t0:1300,t1:1300,hands:(B,g,e)=>{ const C=wbC(B,e); const q=ease(Math.max(0,(.45-e)/.45)); return [vp(C,B.r,g*6.4,B.f,-.6),vn(vm(V(UP,-1,B.r,g*.8),V(B.r,g,UP,-.2),q))]; },
+  kit:(R,u,B,pal)=>{ const e=ease(u); R.dot(wbC(B,e),6.4,pal.ball); R.box([46,48,0],[1,0,0],UP,[0,0,1],1.2,48,16,pal.frame,pal); R.box([44.6,86,0],[1,0,0],UP,[0,0,1],.3,2,5,'#ff7a1a',pal); }});
+// Sentadilla cosaca: la pierna estirada con la rodilla y la punta hacia arriba; las dos puntas algo abiertas
+def3('sentadilla_cosaca',{cams:[CAMF,CAM34],ph:['Baja','Sube'],...ecc(1500,1100),
+  pose:u=>{ const e=ease(u); const p={pel:[mix(0,-4,e),mix(40,24,e),mix(0,12,e)],lean:mix(4,22,e),fR:[2,D3.ANK,22],fL:[2,D3.ANK,-22],kR:[1,0,.6],kL:vn(vm([1,0,-.3],[.3,1,-.2],e)),tL:mix(0,-40,e),ffR:rotAx([1,0,0],UP,-25),ffL:rotAx([1,0,0],UP,20)}; capPel(p,38.3);
+    return withHands(p,(B,g)=>[vp(B.neck,B.nf,8.5,B.d2,-9,B.r2,g*3),vp([0,0,0],UP,-1,B.r2,g*.5)]); },
+  kit:(R,u,B,pal)=>K3.kb(R,mid2(B),pal)});
+// Zancadas caminando: ciclo completo (paso al frente, bajar, subir y traer el pie de atrás), alternando piernas
+function walkLunge(id,hold){ def3(id,{cams:[CAMP,CAM34],loop:true,tm:[4200],
+  pose:u=>{ const half=u<.5?0:1, s=(u%.5)*2; const L=half?'L':'R', T=half?'R':'L', gl=half?-1:1;
+    const st=ease(Math.min(1,s/.25)), dn=s<.25?0:s<.55?ease((s-.25)/.3):s<.8?1-ease((s-.55)/.25):0, bk=s<.8?0:ease((s-.8)/.2);
+    const p={pel:[0,41-17*dn,0],lean:hold==='bar'?6:2};
+    p['f'+L]=[mix(0,16,st)-16*bk,D3.ANK+4*Math.sin(Math.PI*Math.min(1,s/.25))*(s<.25?1:0),gl*6]; p['k'+L]=[1,0,gl*.1];
+    p['f'+T]=[mix(0,-18,st)+18*bk,D3.ANK+(s>=.8?5*Math.sin(Math.PI*bk):0),-gl*6]; p['k'+T]=[1,-.4*Math.max(st-bk,0),-gl*.1]; p['t'+T]=s<.8?mix(0,30,st)+22*dn:30*(1-bk);
+    capPel(p); return withHands(p,(B,g)=>hold==='bar'?backBar(B,g):[vp(B['sho'+SD(g)],UP,-25.8,B.r,g*7),[-.2,0,g*1]]); },
+  kit:(R,u,B,pal)=>{ if (hold==='bar') barBack(R,B,pal); else HOLD.db(R,B,pal,B=>B.f); }}); }
+walkLunge('zancada_caminando_man','db'); walkLunge('zancada_caminando_barra','bar');
+// Curl femoral con fitball: espalda alta y cabeza apoyadas en el suelo, cadera arriba, talones sobre el balón
+def3('curl_femoral_fitball',{cams:[CAM34,CAMP],ph:['Flexiona','Estira'],...ecc(1000,1400),
+  pose:u=>{ const e=ease(u); const lean=mix(-106,-126,e); const S0=[-22,6,0]; const d=rotAx(UP,[0,0,1],-lean); const pel=vp(S0,d,-24.4); const ax=mix(36,24,e);
+    const p={pel,lean,head:-lean-90+2,fR:[ax,29,7],fL:[ax,29,-7],kR:[0,1,.1],kL:[0,1,-.1],ffR:[0,1,0],fuR:[-1,0,0],ffL:[0,1,0],fuL:[-1,0,0]}; return withHands(p,(B,g)=>[[B.pel[0]-14,1.6,g*15],[0,1,g*.3]]); },
+  kit:(R,u,B,pal)=>{ const a=vm(B.ankR,B.ankL,.5); R.dot([a[0]+2,13,0],13,pal.ball,pal.mono?.3:.9); K3.pad(R,[-14,.6,0],48,26,1.2,0,pal); }});
+// Hip thrust con mancuerna: las manos sujetan los extremos de la mancuerna sobre la cadera
+ANIM3.hip_thrust_man.pose=function(u){ const e=ease(u); const lean=mix(-58,-88,e); const S0=[-22,35,0]; const d=rotAx(UP,[0,0,1],-lean); const pel=vp(S0,d,-24.5); const p={pel,lean,head:mix(10,30,e),fR:[19,D3.ANK,8],fL:[19,D3.ANK,-8],kR:[1,.4,.2],kL:[1,.4,-.2]};
+  return withHands(p,(B,g)=>[vp(B.pel,UP,7.8,B.r,g*6.2),[0,-1,g*.8]]); };
+
+/* KETTLEBELL */
+def3('kb_swing',{cams:[CAMP,CAM34],ph:['Impulsa','Baja'],...ecc(1000,1100),hd:150,
+  pose:u=>{ const e=ease(u); const lean=mix(62,0,e); const p={lean,head:mix(-15,0,e),pel:[mix(-14,0,e),mix(38,43,e),0],fR:[2,D3.ANK,11],fL:[2,D3.ANK,-11],kR:[1,0,.3],kL:[1,0,-.3]}; capPel(p);
+    return withHands(p,(B,g)=>{ const S=vm(B.shoR,B.shoL,.5); return [vp(arcH(S,vn(vs([2,18,0],S)),vp([0,0,0],B.f,1,UP,.05),26,e),B.r,g*1.6),vp([0,0,0],B.r,g*1,B.f,-.2)]; }); },
+  kit:(R,u,B,pal)=>{ const S=vm(B.shoR,B.shoL,.5); K3.kb(R,mid2(B),pal,vn(vs(mid2(B),S))); }});
+// Cargada: la kettlebell sube pegada al cuerpo (codo alto y atrás) y la mano "rodea" la bola hasta el rack, en un solo movimiento suave
+def3('kb_clean',{cams:[CAMP,CAM34],ph:['Sube','Baja'],...ecc(1300,1400),
+  pose:u=>{ const e=ease(u); const qq=ease(Math.min(1,e/.55)); const lean=mix(58,0,qq); const p={lean,head:mix(-15,0,qq),pel:[mix(-13,0,qq),mix(38,43,qq),0],fR:[2,D3.ANK,11],fL:[2,D3.ANK,-11],kR:[1,0,.3],kL:[1,0,-.3]}; capPel(p);
+    return withHands(p,(B,g)=>{ if (g<0) return [vp(B.shoL,UP,-24,B.r,-6,B.f,2),[0,-1,-.4]]; const S=B.shoR, f=B.f, r=B.r; const low=vn(vs([2,17,3],S));
+      return arm2(S,crv([low,V(UP,-1,f,.12,r,.06),V(UP,-.5,f,-.3,r,.75),RACK_E(f,r)],e),crv([low,V(UP,-1,f,.14,r,-.02),V(UP,.2,f,.95,r,-.25),RACK_F(f,r)],e)); }); },
+  kit:(R,u,B,pal)=>{ const e=ease(u); const dn=vn(vm([0,-1,0],kbOut(B,'R',1),Math.max(0,Math.min(1,(e-.5)/.42)))); K3.kb(R,B.handR,pal,dn); }});
+// Levantamiento turco: tumbado → codo → mano → puente → pierna por debajo hasta rodilla → de pie. El brazo de la kettlebell siempre vertical
+def3('kb_turkish',{cams:[CAM34,CAMP],ph:['Sube','Baja'],tm:[4200,4200],hd:500,
+  pose:u=>{ const K=[
+      {pel:[0,7.4,0],lean:-90,side:0,fR:[14,D3.ANK,9],fL:[34,D3.ANK,-13],kR:[0,1,.3],kL:[0,1,-.1],lh:[-6,2.6,-26],le:[0,1,-.4]},
+      {pel:[0,7.4,0],lean:-66,side:-26,fR:[14,D3.ANK,9],fL:[34,D3.ANK,-13],kR:[0,1,.3],kL:[0,1,-.1],lh:[-12,2.6,-19],le:[0,-1,-.2]},
+      {pel:[0,7.4,0],lean:-36,side:-30,fR:[14,D3.ANK,9],fL:[34,D3.ANK,-13],kR:[0,1,.3],kL:[0,1,-.1],lh:[-18,2.6,-27],le:[-.3,0,-1]},
+      {pel:[5,15,-2],lean:-34,side:-38,fR:[14,D3.ANK,9],fL:[32,D3.ANK,-13],kR:[.3,1,.3],kL:[0,1,-.1],lh:[-18,2.6,-27],le:[-.3,0,-1]},
+      {pel:[2,22,-2],lean:-6,side:-30,fR:[16,D3.ANK,8],fL:[-17,4.5,-8],kR:[1,0,.1],kL:[1,-.5,-.2],lh:[-6,2.6,-26],le:[-.3,0,-1]},
+      {pel:[0,24,0],lean:0,side:0,fR:[16,D3.ANK,7],fL:[-19,4.5,-6],kR:[1,0,.1],kL:[1,-.5,-.1],lh:null},
+      {pel:[0,43,0],lean:0,side:0,fR:[1,D3.ANK,7],fL:[1,D3.ANK,-7],kR:[1,0,.1],kL:[1,0,-.1],lh:null}];
+    const n=K.length-1, x=Math.min(n-1e-6,u*n), i=Math.floor(x), t=ease(x-i);
+    const p=blendP(K[i],K[i+1],t); delete p.lh; delete p.le; capPel(p,38.3);
+    const B0=body3(p); const side=vp(B0.hipL,B0.r,-7,UP,4,B0.f,1);
+    const lh=k=>K[k].lh||side; const LH=vm(lh(i),lh(i+1),t), LE=vn(vm(K[i].le||[0,-1,-.5],K[i+1].le||[0,-1,-.5],t));
+    return withHands(p,(B,g)=>g>0?[vp(B.shoR,UP,26.6,B.r,.5),[0,-.2,1]]:[LH,LE]); },
+  kit:(R,u,B,pal)=>{ K3.pad(R,[8,.6,0],70,40,1.2,0,pal); K3.kb(R,B.handR,pal,vn(V(UP,-.6,B.r,.55,[1,0,0],-.2))); }});
+
+/* CORE */
+def3('balon_lateral',{cams:[CAMF,CAM34,{yaw:90,pitch:55}],ph:['Gira','Vuelve'],...ecc(1100,1100),
+  pose:function(u){ const ph=mix(-45,45,ease(u)); const p=standP({fR:[1,D3.ANK,11],fL:[1,D3.ANK,-11],kR:[1,0,.4],kL:[1,0,-.4],pel:[0,41,0],twist:ph*.6,pyaw:ph*.3});
+    return withHands(p,(B,g)=>{ const S=vm(B.shoR,B.shoL,.5); const a=-ph*RAD; const dir=vn(V([1,0,0],Math.cos(a),[0,0,1],Math.sin(a),UP,-.15)); const side=vn(vx(dir,UP)); const C=vp(S,dir,19);
+      return [vp(C,side,-g*6.3),vp([0,0,0],UP,-1,side,-g*.6)]; }); },
+  kit:(R,u,B,pal)=>R.dot(mid2(B),6,pal.ball)});
+// Inclinación lateral: la mancuerna cuelga de la mano derecha y el tronco se inclina hacia ese lado; la otra mano en la cintura
+def3('inclinacion_lateral',{cams:[CAMF,CAM34],ph:['Baja','Sube'],...ecc(1200,1100),
+  pose:u=>{ const sd=mix(-5,20,ease(u)); const p=standP({side:sd,pel:[0,43,-sd*.06],fR:[1,D3.ANK,9],fL:[1,D3.ANK,-9]});
+    return withHands(p,(B,g)=>g>0?[vp(B.shoR,UP,-26.2,B.r,1.2),[-.2,0,1]]:[vp(B.hipL,B.r2,-6.6,B.d,5.5,B.f,-.5),vn(V(B.r2,-1,B.f,-.4))]); },
+  kit:(R,u,B,pal)=>K3.db(R,B.handR,B.f,pal)});
+// Rueda con barra: los discos nunca se despegan del suelo (el tronco se inclina lo justo para que los brazos lleguen)
+def3('rollout_barra',{cams:[CAMP,CAM34],ph:['Estira','Vuelve'],...ecc(1600,1300),
+  pose:u=>{ const e=ease(u); const ph=mix(10,60,e)*RAD; const kn=[0,3.8,0]; const pel=vp(kn,[1,0,0],19.3*Math.sin(ph),UP,19.3*Math.cos(ph)); const p={pel,lean:mix(62,88,e),head:-15,fR:[-19,4.5,6],fL:[-19,4.5,-6],kR:[1,-1,0],kL:[1,-1,0],ffR:[0,-1,0],fuR:[1,0,0],ffL:[0,-1,0],fuL:[1,0,0]};
+    for (let it=0;it<20;it++){ const B0=body3(p); if (B0.shoR[1]-8.5<=26.6) break; p.lean+=1.5; }
+    const B0=body3(p); const S=B0.shoR; const bx=S[0]+Math.sqrt(Math.max(.5,26.8*26.8-(S[1]-8.5)**2)); return withHands(p,(B,g)=>[[bx,8.5,g*13],vp([0,0,0],B.f,-.3,UP,-1,B.r,g*.4)]); },
+  kit:(R,u,B,pal)=>{ HOLD.bar(R,B,pal); K3.pad(R,[-6,.6,0],26,22,1.2,0,pal); }});
+
+/* MÁQUINAS que quedaban */
+// Hiperextensión 45° para glúteo: la almohadilla queda bajo la cadera y el tronco baja por delante de ella (no la atraviesa)
+ANIM3.hiper_gluteo.pose=function(u){ const e=ease(u); const p={pel:[5,37.5,0],lean:mix(104,45,e),bk:mix(18,10,e),head:20,fR:[-20,8,7],fL:[-20,8,-7],kR:[1,0,0],kL:[1,0,0],ffR:vn([1,1,0]),fuR:vn([-1,1,0]),ffL:vn([1,1,0]),fuL:vn([-1,1,0])};
+  return withHands(p,(B,g)=>[vp(B.neck,B.nf,5,B.d2,-6,B.r2,-g*3),vp([0,0,0],B.nf,-.2,B.d2,-1,B.r2,g*1)]); };
+ANIM3.hiper_gluteo.kit=function(R,u,B,pal){ const ax=vn([1,1,0]), ay=vn([-1,1,0]); R.box(vp([5,27,0],ay,-1.4,ax,-2),ax,ay,[0,0,1],5.5,2.6,9,pal.pad,pal); R.box([-21,5,0],ax,ay,[0,0,1],1.4,5,10,pal.steelD,pal); K3.roller(R,[-24,11,0],pal,8);
+  K3.tube(R,[-22,3,0],[8,25,0],1.8,pal.frame); K3.post(R,[10,0,0],[9,25,0],pal); K3.base(R,[-30,0],[18,0],pal); };
+// Curl femoral arrodillado: el muslo de la pierna que trabaja va hacia atrás, así el talón sube por detrás del glúteo
+ANIM3.curl_femoral_rodillas.pose=function(u){ const p={pel:[0,40,0],lean:72,head:-30,fL:[-19,23.5,-7],kL:[0,-1,0],ffL:[0,-1,0],fuL:[1,0,0]}; const B0=body3(p); const kn=vp(B0.hipR,vn([-1,-.9,0]),D3.TH-.3);
+  const al=mix(8,92,ease(u))*RAD; p.fR=vp(kn,[1,0,0],-(D3.SH-.3)*Math.cos(al),UP,(D3.SH-.3)*Math.sin(al)); p.kR=vn(vs(kn,vm(B0.hipR,p.fR,.5))); p.ffR=vn(V([1,0,0],-Math.sin(al),UP,-Math.cos(al))); p.fuR=vn(V([1,0,0],Math.cos(al),UP,-Math.sin(al)));
+  return withHands(p,(B,g)=>{ const S=B['sho'+SD(g)]; return [vp(S,UP,-12,[1,0,0],10,B.r,g*2),[-1,-.3,g*.3]]; }); };
+
+// Pull through: bisagra de cadera con poca flexión de rodilla; la cuerda pasa entre las piernas
+def3('pull_through',{cams:[CAMP,CAM34],ph:['Sube','Baja'],...ecc(1000,1500),
+  pose:u=>{ const e=ease(u); const p=standP({lean:mix(74,0,e),pel:[mix(-15,0,e),mix(39.5,42.6,e),0],head:mix(-20,0,e),fR:[2,D3.ANK,12],fL:[2,D3.ANK,-12],kR:[1,0,.35],kL:[1,0,-.35]}); capPel(p);
+    return withHands(p,(B,g)=>{ const S=vm(B.shoR,B.shoL,.5); const lo=vn(vs([-3,22,0],S)); const hi=vp([0,0,0],UP,-1,B.f,.12); return [vp(arcH(S,lo,hi,25.5,e),B.r,g*2.2),vp([0,0,0],B.f,-.2,B.r,g*1)]; }); },
+  kit:(R,u,B,pal)=>{ const top=[-46,6,0]; tower(R,-46,0,6,null,pal); ropeY(R,top,B.handR,B.handL,pal); }});
 /*M3-END*/
 /* ---- Figura completa ---- */
 function autoCable(ex,t,P){ // ejercicios de polea sin cable definido: la polea se coloca donde tiene sentido
@@ -3499,6 +3746,7 @@ function load(){
   catch(e){ S = DEF(); }
   S.settings = Object.assign(DEF().settings, S.settings||{});
   loadExercises(S.customEx);
+  try{ animRedo(); }catch(e){}
 }
 let saveT=null;
 function save(now){
@@ -4093,10 +4341,10 @@ A.animFb=v=>{ const [id,n]=v.split('|'); S.animFb=S.animFb||{}; S.animFb[id]=S.a
 A.ceLike=id=>openLayer('picker',{mode:'replace',from:null,q:'',m:'',mine:false,onPick:pid=>{ const c=S.customEx.find(x=>x.id===id); if(c){ c.like=pid; loadExercises(S.customEx); Object.keys(ICON_CACHE).forEach(k=>{ if(k.startsWith(id)) delete ICON_CACHE[k]; }); Object.keys(VB_CACHE).forEach(k=>{ if(k.startsWith(id)) delete VB_CACHE[k]; }); save(); toast('Animación elegida'); } }});
 /* ---------- Revisión de animaciones (versiones de prueba) ---------- */
 // Animaciones ya aprobadas por el creador y su colega: se quitan del sello «En revisión» para todos
-const ANIM_OK=new Set([
-  // 0.7 · revisión del creador (máquinas, poleas y Smith)
-  'press_pecho_maq','pec_deck','press_hombro_maq','remo_maq','hiperextensiones','curl_predicador','sentadilla_hack','prensa','cuello_maq','ergometro_brazos','rot_torso_maq','crunch_maq','gripper_maq','fondos_sentado_maq','ext_triceps_maq','curl_maquina','curl_predicador_man','curl_predicador_z','press_hombro_discos','deltoide_post_maq','laterales_maq','fondos_maquina_asistidos','super_fly','press_convergente','press_declinado_maq','press_inclinado_maq','encog_maq','ext_lumbar_maq','pullover_maq','remo_t_apoyado','ext_cuadriceps','remo_bajo_maq','remo_alto_maq','dominadas_maquina','jalon_unilateral_maq','jalon_maquina','gemelo_burro','gemelos_prensa','aduccion_multicadera','abduccion_multicadera','hiper_inversa','multicadera_ext','curl_femoral','curl_femoral_sentado','abduccion_maq','aduccion_maq','elev_gemelos_maq','gemelos_sentado','sentadilla_pendulo','v_squat','patada_gluteo_maq','hip_thrust_maq','glute_ham','nordico_maquina','curl_femoral_unilateral','curl_femoral_pie','hack_inversa','belt_squat','prensa_vertical','prensa_sentada','prensa_unilateral','ext_cuad_unilateral','cruce_poleas','face_pull','jalon_pecho','pullover_polea','remo_polea','curl_polea','patada_gluteo_polea','pallof','crunch_polea','ext_cuad_polea','curl_femoral_polea','abduccion_polea','aduccion_polea','jalon_supino','patada_polea','ext_cruzada_polea','ext_polea_inversa','curl_polea_alta','curl_bayesiano','jalon_una_mano','martillo_polea','curl_cuerda','rot_interna_polea','rot_externa_polea','frontal_polea','pajaros_polea','cruce_bajo_alto','encog_polea','smith_hombro','encog_smith','smith_remo','smith_rumano','smith_bulgara'
-]);
+const ANIM_OK=new Set(['press_pecho_maq','pec_deck','press_hombro_maq','remo_maq','hiperextensiones','curl_predicador','sentadilla_hack','prensa','cuello_maq','ergometro_brazos','rot_torso_maq','crunch_maq','gripper_maq','fondos_sentado_maq','ext_triceps_maq','curl_maquina','curl_predicador_man','curl_predicador_z','press_hombro_discos','deltoide_post_maq','laterales_maq','fondos_maquina_asistidos','super_fly','press_convergente','press_declinado_maq','press_inclinado_maq','encog_maq','ext_lumbar_maq','pullover_maq','remo_t_apoyado','ext_cuadriceps','remo_bajo_maq','remo_alto_maq','dominadas_maquina','jalon_unilateral_maq','jalon_maquina','gemelo_burro','gemelos_prensa','aduccion_multicadera','abduccion_multicadera','hiper_inversa','multicadera_ext','curl_femoral','curl_femoral_sentado','abduccion_maq','aduccion_maq','elev_gemelos_maq','gemelos_sentado','sentadilla_pendulo','v_squat','patada_gluteo_maq','hip_thrust_maq','glute_ham','nordico_maquina','curl_femoral_unilateral','curl_femoral_pie','hack_inversa','belt_squat','prensa_vertical','prensa_sentada','prensa_unilateral','ext_cuad_unilateral','cruce_poleas','face_pull','jalon_pecho','pullover_polea','remo_polea','curl_polea','patada_gluteo_polea','pallof','crunch_polea','ext_cuad_polea','curl_femoral_polea','abduccion_polea','aduccion_polea','jalon_supino','patada_polea','ext_cruzada_polea','ext_polea_inversa','curl_polea_alta','curl_bayesiano','jalon_una_mano','martillo_polea','curl_cuerda','rot_interna_polea','rot_externa_polea','frontal_polea','pajaros_polea','cruce_bajo_alto','encog_polea','smith_hombro','encog_smith','smith_remo','smith_rumano','smith_bulgara','elev_laterales_polea','jalon_cerrado','ext_triceps_polea','lenador','jalon_neutro','lenador_bajo','ext_polea_cabeza','ext_cuerda','remo_polea_unilateral','menton_polea','aperturas_polea_banco','cruce_alto_bajo','press_pecho_polea','smith_inclinado','smith_banca','gemelos_smith','smith_hip_thrust','smith_zancada','smith_frontal','smith_sentadilla','press_declinado','press_militar','press_hombro_man','elev_laterales','elev_frontales','pajaros','encogimientos','encogimientos_barra','remo_barra','remo_man','remo_t','kb_remo','curl_barra','curl_man','curl_martillo','press_frances','rot_landmine','crunch_fitball','rodillo_muneca','curl_inverso_z','curl_arrastre','curl_arana','rot_externa_man','press_z','push_press','press_landmine','lateral_tumbado','frontal_disco','press_svend','aperturas_inclinadas','remo_kroc','remo_pendlay','gemelo_unilateral_man','gemelos_barra','rack_pull','sentadilla','sentadilla_goblet','kb_goblet','zancadas','sentadilla_bulgara','step_up_man','zancada_inversa_barra','sentadilla_landmine','elev_gemelos_man','kb_snatch']);
+// animaciones rehechas tras una revisión: se borra el voto "incorrecta" para volver a revisarlas (una sola vez por tanda)
+const ANIM_REDO_TAG='r3', ANIM_REDO=['hiper_gluteo','curl_femoral_rodillas','pull_through','press_banca','press_inclinado_barra','press_banca_man','press_inclinado_man','press_suelo_man','press_cerrado','aperturas_man','pullover_man','press_arnold','kb_press','remo_menton','remo_invertido','curl_concentrado','curl_inclinado','curl_muneca','ext_triceps_man','patada_triceps','paseo_granjero','wall_ball','balon_lateral','rollout_barra','paseo_maleta','inclinacion_lateral','granjero_hex','pinza_discos','ext_muneca','curl_muneca_barra','press_jm','press_tate','press_frances_man','press_frances_z','martillo_cruzado','curl_zottman','curl_z','kb_halo','press_cubano','y_inclinado','banca_inversa','remo_meadows','remo_seal','remo_apoyado_man','sentadilla_cosaca','pm_piernas_rigidas','sentadilla_frontal','sentadilla_sumo','thrusters','peso_muerto','curl_femoral_fitball','pm_hexagonal','zancada_caminando_man','zancada_caminando_barra','box_squat','sentadilla_zercher','hip_thrust_man','hip_thrust','kb_turkish','kb_clean','kb_swing','buenos_dias','kb_pm','peso_muerto_unilateral','peso_muerto_sumo','peso_muerto_rumano','peso_muerto_rumano_man'];
+function animRedo(){ if (!S||S.animRevTag===ANIM_REDO_TAG) return; const R=S.animRev||{}; ANIM_REDO.forEach(id=>{ if (R[id]&&R[id].v==='bad') delete R[id]; }); S.animRevTag=ANIM_REDO_TAG; save(); }
 const REV_GROUPS=[['maq','Máquinas'],['pol','Poleas'],['smi','Smith'],['libre','Peso libre'],['pc','Peso corporal'],['cardio','Cardio']];
 function revGroup(ex){ const e=ex.eq||[]; if (e.includes('maq')||e.includes('ghd')) return 'maq'; if (e.includes('pol')) return 'pol'; if (e.includes('smi')) return 'smi';
   if (ex.pat==='cardio'||['cin','bic','eli','rem','esc','ski','aib','cue','cdb','trn'].some(q=>e.includes(q))) return 'cardio'; if (['bar','man','kb','ez','hex','lmn','bal','fit'].some(q=>e.includes(q))) return 'libre'; return 'pc'; }
@@ -5732,7 +5980,7 @@ A.importCode=()=>promptBox({title:'Importar con código',text:'Pega el código q
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='0.7';
 const CHANGELOG=[
- {v:'0.7',t:'Animaciones en 3D: máquinas, poleas, Smith y peso libre',items:['95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
+ {v:'0.7',t:'Animaciones en 3D: máquinas, poleas, Smith y peso libre',items:['Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
  {v:'0.5.1',t:'Mejoras de testers',items:['Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata','Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez']},
  {v:'0.5',t:'Biblioteca de gimnasio',items:['176 ejercicios nuevos: 386 en total, casi todos de máquinas, Smith, poleas y accesorios de gimnasio','12 equipos nuevos en Mis equipos: Smith, landmine, barra hexagonal, barra Z, banco GHD, trineo, balón medicinal, fitball, cuerdas de batalla, escaladora, SkiErg y air bike','Biblioteca clasificada por músculo, con filtro por tipo de equipo y búsqueda por apodos (mariposa, multipower, gravitron…)','PandarIA: prioriza máquinas y Smith para principiantes y más peso libre para avanzados','PandarIA: sugiere pasar de la versión guiada al peso libre cuando ya progresas','PandarIA: si un ejercicio te molesta, ofrece primero la versión en máquina','PandarIA: incrementos y peso inicial según el tipo de equipo, y lesiones del perfil actualizadas con los ejercicios nuevos','Nueva sección de Explorar: Solo máquinas, con 5 rutinas','Créditos e historial de cambios en Ajustes']},
