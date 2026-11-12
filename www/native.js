@@ -11,6 +11,44 @@
   const BACKUP = 'pandaria-backup.json', BACKUP_PREV = 'pandaria-backup-anterior.json';
   document.documentElement.classList.add('native-android');
 
+  /* ---------- 14. Cuenta de Google para la copia en Drive (0.9) ---------- */
+  // Inicio de sesión con el sistema de Android (Credential Manager) y permiso drive.appdata:
+  // solo la carpeta oculta de la app en el Drive del usuario. El ID de cliente web no es secreto.
+  const SL = P('SocialLogin');
+  const GOOGLE_WEB_ID = '879792644217-pd24e4p8954m522jvjf1mhj0skg74t2u.apps.googleusercontent.com';
+  const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+  let slInit = null, tok = null, tokAt = 0;
+  const slReady = () => slInit || (slInit = SL.initialize({google: {webClientId: GOOGLE_WEB_ID, mode: 'online'}}).catch(e => { slInit = null; throw e; }));
+  const claims = jwt => { try{ const b = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4))))); }catch(e){ return {}; } };
+  safe(() => { const D = P('Device'); return D && D.getInfo().then(i => { window.PF_MODELO = [i.manufacturer, i.model].filter(Boolean).join(' '); }); });
+  if (SL) window.PFCloud = {
+    ok: true,
+    async signIn(){
+      await slReady();
+      const res = await SL.login({provider: 'google', options: {scopes: [DRIVE_SCOPE]}});
+      const r = (res && res.result) || {}, pr = r.profile || {}, c = r.idToken ? claims(r.idToken) : {};
+      const at = r.accessToken && r.accessToken.token;
+      if (!at) throw new Error('drive-scope');
+      tok = at; tokAt = Date.now();
+      const sub = c.sub || pr.id; if (!sub) throw new Error('auth');
+      return {sub: String(sub), email: c.email || pr.email || '', name: c.name || pr.name || '', given: c.given_name || pr.givenName || ''};
+    },
+    async token(force){
+      if (!force && tok && Date.now() - tokAt < 45 * 60000) return tok;
+      try{
+        await slReady();
+        if (force || !tok) { try{ await SL.refresh({provider: 'google', options: {scopes: [DRIVE_SCOPE]}}); }catch(e){} }
+        const a = await SL.getAuthorizationCode({provider: 'google'});
+        if (a && a.accessToken){ tok = a.accessToken; tokAt = Date.now(); return tok; }
+        await SL.refresh({provider: 'google', options: {scopes: [DRIVE_SCOPE]}});
+        const b = await SL.getAuthorizationCode({provider: 'google'});
+        if (b && b.accessToken){ tok = b.accessToken; tokAt = Date.now(); return tok; }
+      }catch(e){}
+      tok = null; return null;
+    },
+    async signOut(){ tok = null; try{ await slReady(); await SL.logout({provider: 'google'}); }catch(e){} }
+  };
+
   /* ---------- 1. Datos a prueba de borrados ---------- */
   // Si el WebView perdió sus datos pero existe la copia nativa, la recupera y recarga.
   async function restoreIfNeeded(){
@@ -266,6 +304,7 @@
     if (!notifOk && !NS().asked && S.settings.onboarded) setTimeout(askNotifModal, 1500);
     rescheduleAll();
   }
+  window.pfNotif = { ok: () => !!notifOk, ask: async () => { NS().asked = true; save(); await enableNotifs(); return notifOk; } };
   function askNotifModal(){
     NS().asked = true; save();
     openModal(`<div class="modal"><h3>🔔 Activa las notificaciones</h3><p class="mut" style="line-height:1.5;margin:0 0 18px">PandarIA te avisará cuando termine el descanso, cuándo toca entrenar, cuándo beber agua y las fases de tu ayuno. Eliges cada aviso en Ajustes › Notificaciones.</p>

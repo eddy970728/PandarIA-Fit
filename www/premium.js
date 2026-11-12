@@ -51,34 +51,53 @@
     return body + await checkChars(body);
   }
   const fmtDev = c => c ? `PF-${c.slice(0,4)}-${c.slice(4,8)}-${c.slice(8,12)}-${c.slice(12,14)}` : '…';
+  // Código de cuenta (0.9): sale del identificador interno de la cuenta de Google, nunca del correo
+  let ACC = null;
+  async function accountCode(){ const c = typeof S !== 'undefined' && S && S.settings && S.settings.cloud; if (!c || !c.sub) return null;
+    const body = toB32(await sha(`pandaria-fit|acct|${c.sub}`), 12); return body + await checkChars(body); }
+  const fmtAcc = c => c ? `PA-${c.slice(0,4)}-${c.slice(4,8)}-${c.slice(8,12)}-${c.slice(12,14)}` : '…';
 
   /* ---------- Licencia ---------- */
   let pubKey = null;
   async function key(){ if (!pubKey) pubKey = await subtle.importKey('raw', b64bytes(PUB), {name:'ECDSA', namedCurve:'P-256'}, false, ['verify']); return pubKey; }
-  async function verify(code, dev){
+  // v1: código para un teléfono. v2: código para una cuenta de Google (vale en cualquier teléfono con esa cuenta).
+  async function verify(code, dev, acc){
     const c = clean(code); if (c.length < 100) return null;
     const bytes = fromB32(c, 66); if (!bytes || bytes.length < 66) return null;
     const days = (bytes[0] << 8) | bytes[1], sig = bytes.slice(2, 66);
     const exp = days === 0 ? 'P' : new Date(EPOCH + days * DAYMS).toISOString().slice(0, 10);
     try{
-      const ok = await subtle.verify({name:'ECDSA', hash:'SHA-256'}, await key(), sig, enc(`PANDARIA-FIT|v1|${dev}|${exp}`));
-      return ok ? {exp, code: c} : null;
+      if (dev && await subtle.verify({name:'ECDSA', hash:'SHA-256'}, await key(), sig, enc(`PANDARIA-FIT|v1|${dev}|${exp}`))) return {exp, code: c, kind: 'dev'};
+      if (acc && await subtle.verify({name:'ECDSA', hash:'SHA-256'}, await key(), sig, enc(`PANDARIA-FIT|v2|${acc}|${exp}`))) return {exp, code: c, kind: 'acct', acc};
+      return null;
     }catch(e){ return null; }
   }
   const expired = l => l && l.exp !== 'P' && new Date().toISOString().slice(0, 10) > l.exp;
-  window.isPremium = () => !!(PREM && !expired(PREM));
+  window.isPremium = () => !!(PREM && !expired(PREM) && (PREM.kind !== 'acct' || PREM.acc === ACC));
   window.premiumInfo = () => PREM;
   async function loadLicense(){
     let raw = FS ? await readFile('pf-license.json') : null;
     if (!raw){ try{ raw = localStorage.getItem(LSL); }catch(e){} }
     if (!raw) return;
     try{
-      const l = JSON.parse(raw), v = await verify(l.code, DEV);
+      const l = JSON.parse(raw);
+      // una licencia de cuenta se guarda aunque ahora no haya sesión: vuelve a valer al entrar con esa cuenta
+      if (l.kind === 'acct' && l.acc && l.acc !== ACC){ const v0 = await verify(l.code, null, l.acc); if (v0) PREM = Object.assign({at: l.at || Date.now()}, v0); return; }
+      const v = await verify(l.code, DEV, ACC);
       if (v){ PREM = Object.assign({at: l.at || Date.now()}, v); try{ localStorage.setItem(LSL, JSON.stringify(PREM)); }catch(e){} if (FS) writeFile('pf-license.json', JSON.stringify(PREM)); }
     }catch(e){}
   }
+  async function saveLicense(){ const raw = JSON.stringify(PREM); try{ localStorage.setItem(LSL, raw); }catch(e){} if (FS) await writeFile('pf-license.json', raw); }
+  // Llamadas desde la copia en Drive (index.html)
+  window.pfAccountChanged = async () => { try{ ACC = await accountCode(); }catch(e){ ACC = null; } render.keep = true; render(); if (LAYERS.length) refreshTop(); if (typeof scheduleNotifs === 'function') scheduleNotifs(); };
+  window.pfAccountLicense = () => (PREM && PREM.kind === 'acct') ? {code: PREM.code, acc: PREM.acc, at: PREM.at} : null;
+  window.pfRestoreAccountLicense = async l => {
+    try{ if (!l || !l.code) return; if (!ACC) ACC = await accountCode(); if (PREM && PREM.kind === 'dev' && !expired(PREM)) return;
+      const v = await verify(l.code, null, ACC); if (!v || expired(v)) return;
+      PREM = Object.assign({at: l.at || Date.now()}, v); await saveLicense(); render.keep = true; render(); toast('Premium recuperado con tu cuenta');
+    }catch(e){} };
   async function activate(code){
-    const v = await verify(code, DEV);
+    const v = await verify(code, DEV, ACC);
     if (!v) return false;
     if (expired(v)) return 'expired';
     PREM = Object.assign({at: Date.now()}, v);
@@ -120,16 +139,18 @@
       b += `<div class="sec">Comprar</div><div class="card"><button class="btn pri wide" disabled style="opacity:.55">Pago único · ${PRICE_ONCE}</button><button class="btn wide" disabled style="opacity:.55;margin-top:8px">Suscripción · ${PRICE_MONTH} al mes</button>
         <div class="xs mut" style="text-align:center;margin-top:10px"><b>Próximamente.</b> Pago una sola vez con las mejoras futuras incluidas, o una suscripción mensual.</div></div>`;
       b += `<div class="sec">¿No puedes pagarlo? Pídeselo al creador</div><div class="card">
-        <p class="sm" style="margin:0 0 12px;line-height:1.5">PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Solo funcionará en este teléfono; si borras la app tendrás que pedirlo de nuevo.</p>
+        ${ACC ? `<p class="sm" style="margin:0 0 12px;line-height:1.5">PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Con tu cuenta de Google, el desbloqueo funciona en cualquier teléfono donde inicies sesión.</p>
+        <div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">TU CÓDIGO DE CUENTA</div>
+        <div class="codebox" style="font-size:19px">${fmtAcc(ACC)}</div>` : `<p class="sm" style="margin:0 0 12px;line-height:1.5">PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Solo funcionará en este teléfono; si borras la app tendrás que pedirlo de nuevo.${typeof cloudAvail === 'function' && cloudAvail() ? ' Si inicias sesión con Google en Ajustes › Tus datos, funcionará en cualquier teléfono con tu cuenta.' : ''}</p>
         <div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">TU CÓDIGO DE TELÉFONO</div>
-        <div class="codebox" style="font-size:19px">${fmtDev(DEV)}</div>
+        <div class="codebox" style="font-size:19px">${fmtDev(DEV)}</div>`}
         <div class="row" style="gap:8px;margin-top:10px"><button class="btn grow sm" data-a="pfCopyDev">${I('copy',16)} Copiar</button><button class="btn grow sm" data-a="pfShareDev">${I('upload',16)} Compartir</button></div>
         <button class="btn pri wide" style="margin-top:8px" data-a="pfMail">${I('note',18)} Enviar correo al creador</button>
         <div class="xs mut b" style="letter-spacing:1px;margin:18px 0 6px">CÓDIGO DE DESBLOQUEO</div>
         <textarea id="pfcode" class="inp" rows="3" placeholder="Pega aquí el código que te enviaron (empieza por PFU-)" style="font-family:ui-monospace,Menlo,monospace;font-size:13px"></textarea>
         <button class="btn ok wide" style="margin-top:10px" data-a="pfActivate">${I('check',18)} Activar Premium</button></div>`;
     } else {
-      b += `<div class="sec">Tu licencia</div><div class="card" style="padding:4px 14px"><div class="kv"><span class="mut">Estado</span><b style="color:var(--ok)">Activa</b></div><div class="kv"><span class="mut">Duración</span><b>${cap1(fmtExp(PREM.exp))}</b></div><div class="kv"><span class="mut">Activada</span><b>${fmtDate(PREM.at)}</b></div><div class="kv"><span class="mut">Teléfono</span><b style="font-family:ui-monospace,Menlo,monospace;font-size:13px">${fmtDev(DEV)}</b></div></div>`;
+      b += `<div class="sec">Tu licencia</div><div class="card" style="padding:4px 14px"><div class="kv"><span class="mut">Estado</span><b style="color:var(--ok)">Activa</b></div><div class="kv"><span class="mut">Duración</span><b>${cap1(fmtExp(PREM.exp))}</b></div><div class="kv"><span class="mut">Activada</span><b>${fmtDate(PREM.at)}</b></div>${PREM.kind === 'acct' ? `<div class="kv"><span class="mut">Cuenta</span><b style="font-size:13px">${esc((S.settings.cloud && S.settings.cloud.email) || fmtAcc(PREM.acc))}</b></div>` : `<div class="kv"><span class="mut">Teléfono</span><b style="font-family:ui-monospace,Menlo,monospace;font-size:13px">${fmtDev(DEV)}</b></div>`}</div>`;
     }
     return lhdr('Premium') + `<div class="lbody">${b}<p class="xs mut" style="text-align:center;margin:18px 8px 0;line-height:1.5">Tus datos siempre son tuyos: exportar, copias de seguridad, accesibilidad y seguridad nunca se bloquean.</p></div>`;
   };
@@ -139,8 +160,8 @@
   A.pfPay = () => pay('notif');
   A.openPremium = () => openLayer('premium', {});
   const copyText = t => { try{ navigator.clipboard.writeText(t).then(() => toast('Copiado'), () => fallbackCopy(t)); }catch(e){ fallbackCopy(t); } };
-  A.pfCopyDev = () => copyText(fmtDev(DEV));
-  const mailBody = () => `Hola, quiero usar PandarIA Fit Premium.\n\nMi código de teléfono: ${fmtDev(DEV)}\nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!`;
+  A.pfCopyDev = () => copyText(ACC ? fmtAcc(ACC) : fmtDev(DEV));
+  const mailBody = () => ACC ? `Hola, quiero usar PandarIA Fit Premium.\n\nMi código de cuenta: ${fmtAcc(ACC)}\nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!` : `Hola, quiero usar PandarIA Fit Premium.\n\nMi código de teléfono: ${fmtDev(DEV)}\nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!`;
   A.pfShareDev = () => {
     const text = mailBody();
     if (Share) Share.share({title:'Desbloqueo PandarIA Fit', text, dialogTitle:'Enviar código'}).catch(() => {});
@@ -156,7 +177,8 @@
       if (typeof sfx === 'function') sfx('finish'); if (typeof confetti === 'function') confetti({n:150});
       refreshTop(); render.keep = true; render(); toast(`🎉 ¡Premium activado! (${fmtExp(PREM.exp)})`);
       if (typeof scheduleNotifs === 'function') scheduleNotifs();
-    } else toast(r === 'expired' ? 'Ese código ya caducó. Pide uno nuevo.' : 'Código no válido para este teléfono. Revisa que esté completo.');
+      if (PREM.kind === 'acct' && typeof cloudBackup === 'function') setTimeout(() => cloudBackup({}), 800);
+    } else toast(r === 'expired' ? 'Ese código ya caducó. Pide uno nuevo.' : ACC ? 'Código no válido para este teléfono ni para tu cuenta. Revisa que esté completo.' : 'Código no válido para este teléfono. Revisa que esté completo.');
   };
 
   /* ---------- Candados (P2) ---------- */
@@ -277,6 +299,8 @@
   (async () => {
     if (!subtle) return;
     try{ DEV = await deviceCode(); }catch(e){}
+    const esperaS = () => new Promise(r => { const t = () => (typeof S !== 'undefined' && S && S.settings) ? r() : setTimeout(t, 40); t(); });
+    await esperaS(); try{ ACC = await accountCode(); }catch(e){}
     await loadLicense();
     const go = () => { if (typeof S === 'undefined' || !S) return setTimeout(go, 60); render.keep = true; render(); if (LAYERS.length) refreshTop(); if (typeof scheduleNotifs === 'function') scheduleNotifs(); };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();

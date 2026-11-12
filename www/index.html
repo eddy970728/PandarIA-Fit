@@ -1778,6 +1778,10 @@ const ICONS = {
   download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
   upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
   bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  heart:'<path d="M12 20s-7-4.4-9-9.2C1.6 7.3 4 4 7.3 4c2 0 3.4 1.1 4.7 2.7C13.3 5.1 14.7 4 16.7 4 20 4 22.4 7.3 21 10.8 19 15.6 12 20 12 20z"/>',
+  back:'<path d="M15 18l-6-6 6-6"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
   moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
   ruler:'<path d="M21.3 8.7 8.7 21.3a1 1 0 0 1-1.4 0l-4.6-4.6a1 1 0 0 1 0-1.4L15.3 2.7a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4zM7.5 10.5l2 2M10.5 7.5l2 2M13.5 4.5l2 2"/>',
   user:'<path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="5"/>',
@@ -5484,6 +5488,7 @@ function boot(){
   scheduleReminder();
   if (!S.settings.onboarded) setTimeout(()=>openLayer('onboard',{step:0,level:'principiante',preset:null}),300);
   try{ updInit(); }catch(e){}
+  setTimeout(()=>{ try{ cloudBoot(); }catch(e){} },0);
 }
 if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 
@@ -5984,6 +5989,7 @@ A.startWorkout=rid=>{
   go();
 };
 const wkItem = u => S.active.items.find(x=>x.uid===u);
+{ const _fwC=finishWorkout; finishWorkout=function(){ const r=_fwC.apply(this,arguments); try{ if (cloudS()) setTimeout(()=>cloudAuto('entreno'),2500); }catch(e){} return r; }; }
 // Un número muy por encima de tu historial suele ser un error de tecleo (1000 kg en vez de 100): se pregunta antes de guardarlo
 function serieRara(it, s, ex){
   const kg=s.kg??s.sk, reps=s.reps??s.sr, time=s.time??s.st, h=exHistory(it.exId,20), sets=h.flatMap(x=>x.sets||[]).filter(x=>x.t!=='c');
@@ -6838,8 +6844,9 @@ function fueraDeRango(k, v){ const L=LIMITES[k]; if (!L || v==null || v==='' || 
 function perfilErr(p){ for (const k of ['age','height','weight']){ const e=fueraDeRango(k,p[k]); if (e) return e; } return null; }
 function readProfileForm(p, prefix){
   prefix=prefix||'pf';
-  const g=k=>{ const el=document.getElementById(prefix+'_'+k); return el?el.value.trim():''; };
-  p.name=g('name'); ['age','height','weight'].forEach(k=>{ const v=g(k); p[k]=v===''?null:+v; });
+  const el=k=>document.getElementById(prefix+'_'+k), g=k=>el(k)?el(k).value.trim().replace(',','.'):'';
+  // solo se leen los campos que están en pantalla (la bienvenida pide el nombre en otro paso)
+  if (el('name')) p.name=g('name'); ['age','height','weight'].forEach(k=>{ if (!el(k)) return; const v=g(k); p[k]=v===''?null:+v; });
   return p;
 }
 SCREENS.profile = p => {
@@ -8626,7 +8633,7 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='0.9';
 const CHANGELOG=[
- {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y más alimentos (en desarrollo)',items:['Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
+ {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y más alimentos (en desarrollo)',items:['Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
  {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
@@ -8658,7 +8665,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["0.9 · Etapa 1 de 5: correcciones", "La app ya no acepta datos imposibles (por ejemplo 800 kg o 2 años)", "Pregunta antes de guardar un pesaje o una serie muy distintos a lo habitual", "Máximo 40 fotos de progreso; la primera se conserva siempre", "Si la memoria se llena, tus entrenos se guardan igual", "Prueba automática de unos 780 botones antes de cada versión"];
+const NOTAS_VERSION=["0.9 · Etapa 2 de 5: tu cuenta de Google", "Bienvenida nueva, con «Continuar con Google» o «Usar sin cuenta»", "Copia automática en tu Google Drive (opcional y privada)", "En un teléfono nuevo recuperas entrenos, rutinas, diario, fotos y Premium", "Nunca se pisan datos sin preguntarte", "Premium con tu cuenta: funciona en cualquier teléfono", "Ajustes › Tus datos: guardar, recuperar, cerrar sesión y borrar la copia"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
@@ -8702,41 +8709,279 @@ A.updToggle=()=>{ S.settings.updAvisos=S.settings.updAvisos===false; save(); ref
 function updInit(){ if (!AVISOS_DEV) return; S.upd=S.upd||{}; const b=updBuild(); if (b!=null && S.upd.seen==null){ S.upd.seen=b; save(); }
   if (b!=null && S.upd.list) { S.upd.list=S.upd.list.filter(updNewer); }
   setTimeout(()=>updCheck(false),2500); document.addEventListener('visibilitychange',()=>{ if (!document.hidden) updCheck(false); }); }
-/* ---------- Bienvenida en 4 pasos ---------- */
+/* ============ 0.9 · Etapa 2: bienvenida, cuenta de Google y copia en Google Drive ============
+   La app funciona igual sin cuenta. Con Google, una copia de tus datos se guarda en la carpeta oculta
+   de la app en TU Google Drive (permiso drive.appdata: la app no ve el resto de tu Drive).
+   PFCloud lo pone native.js (inicio de sesión de Android); sin él, la opción no aparece. */
+const DRIVE_FILE='pandaria-fit-copia.json', DRIVE_API='https://www.googleapis.com/drive/v3/files', DRIVE_UP='https://www.googleapis.com/upload/drive/v3/files';
+const cloudAvail = () => !!(window.PFCloud && PFCloud.ok);
+const cloudS = () => (S.settings.cloud && S.settings.cloud.sub) ? S.settings.cloud : null;
+let CLOUD_DEV=null;
+function cloudDev(){ if (CLOUD_DEV) return CLOUD_DEV; let id=null; try{ id=localStorage.getItem('pandaria-fit-instalacion'); }catch(e){}
+  if (!id){ id=Math.random().toString(36).slice(2,10)+Date.now().toString(36); try{ localStorage.setItem('pandaria-fit-instalacion',id); }catch(e){} } return CLOUD_DEV=id; }
+function cloudResumen(d){ d=d||S; const dias=Object.keys((d.nutri&&d.nutri.diario)||{}).filter(k=>(d.nutri.diario[k]||[]).length).length;
+  const last=(d.sessions||[]).reduce((m,x)=>Math.max(m,x.end||x.start||0),0);
+  return {entrenos:(d.sessions||[]).length, rutinas:(d.routines||[]).filter(r=>!r.archived).length, dias, fotos:(d.measures||[]).filter(m=>m.foto).length, ultimo:last}; }
+const resumenTxt = r => tx(`${plural(r.entrenos,'entreno','entrenos')}, ${plural(r.rutinas,'rutina','rutinas')}${r.dias?`, ${plural(r.dias,'día','días')} de diario`:''}${r.fotos?`, ${plural(r.fotos,'foto','fotos')}`:''}`,
+  `${r.entrenos} workout${r.entrenos===1?'':'s'}, ${r.rutinas} routine${r.rutinas===1?'':'s'}${r.dias?`, ${r.dias} diary day${r.dias===1?'':'s'}`:''}${r.fotos?`, ${r.fotos} photo${r.fotos===1?'':'s'}`:''}`);
+function hace(ts){ if (!ts) return tx('nunca','never'); const m=Math.round((Date.now()-ts)/60000);
+  if (m<1) return tx('ahora mismo','just now'); if (m<60) return tx(`hace ${m} min`,`${m} min ago`); const h=Math.round(m/60); if (h<24) return tx(`hace ${h} h`,`${h} h ago`);
+  return tx(`el ${fmtDate(ts)}`,`on ${fmtDate(ts)}`); }
+function cloudErrTxt(e){ const m=String(e&&e.message||e||'');
+  if (/cancel/i.test(m)) return null;
+  if (/28444|Developer console|10:/.test(m)) return tx('Google rechazó la configuración de la app (huella o ID de cliente). Avisa al creador.','Google rejected the app configuration (fingerprint or client ID). Tell the developer.');
+  if (/drive-scope/.test(m)) return tx('Sin el permiso de Drive no se puede guardar la copia. Vuelve a intentarlo y marca la casilla de Google Drive.','Without the Drive permission the backup cannot be saved. Try again and tick the Google Drive box.');
+  if (/No credentials|no account|NoCredential/i.test(m)) return tx('No hay ninguna cuenta de Google en este teléfono. Añádela en los Ajustes de Android › Cuentas.','There is no Google account on this phone. Add one in Android Settings › Accounts.');
+  if (/offline|network|Failed to fetch|NetworkError/i.test(m)) return tx('Sin conexión a internet. Lo intentaremos más tarde.','No internet connection. We will try again later.');
+  if (/auth/.test(m)) return tx('Tu sesión de Google caducó. Vuelve a iniciar sesión en Ajustes › Tus datos.','Your Google session expired. Sign in again in Settings › Your data.');
+  if (/drive 403/.test(m)) return tx('Google Drive no dejó guardar la copia (¿espacio lleno?).','Google Drive did not allow saving the backup (storage full?).');
+  return tx('No se pudo conectar con Google Drive. Inténtalo de nuevo.','Could not connect to Google Drive. Try again.'); }
+
+/* ---------- Google Drive (carpeta oculta de la app) ---------- */
+async function gfetch(url, opt, again){
+  if (navigator.onLine===false) throw new Error('offline');
+  const t=await PFCloud.token(!!again); if (!t) throw new Error('auth');
+  const r=await fetch(url, Object.assign({}, opt||{}, {headers:Object.assign({}, (opt||{}).headers||{}, {Authorization:'Bearer '+t})}));
+  if (r.status===401 && !again) return gfetch(url, opt, true);
+  if (r.status===401) throw new Error('auth');
+  if (!r.ok) throw new Error('drive '+r.status);
+  return r; }
+async function driveFind(){
+  const q=encodeURIComponent(`name='${DRIVE_FILE}' and trashed=false`);
+  const r=await gfetch(`${DRIVE_API}?spaces=appDataFolder&q=${q}&fields=files(id,modifiedTime,size,appProperties)&orderBy=modifiedTime%20desc&pageSize=10`);
+  const j=await r.json(); return (j.files||[])[0]||null; }
+async function gzBlob(str){
+  if (typeof CompressionStream==='undefined') return new Blob([str],{type:'application/json'});
+  return await new Response(new Blob([str]).stream().pipeThrough(new CompressionStream('gzip'))).blob(); }
+async function unGz(buf){
+  const u=new Uint8Array(buf); if (!(u[0]===0x1f && u[1]===0x8b)) return new TextDecoder().decode(u);
+  if (typeof DecompressionStream==='undefined') throw new Error('gzip');
+  return await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text(); }
+async function driveUpload(blob, props, fileId){
+  const meta=fileId?{appProperties:props}:{name:DRIVE_FILE, parents:['appDataFolder'], appProperties:props};
+  const B='pandaria'+Date.now().toString(36);
+  const body=new Blob([`--${B}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n`, JSON.stringify(meta), `\r\n--${B}\r\nContent-Type: application/octet-stream\r\n\r\n`, blob, `\r\n--${B}--`]);
+  const url=fileId?`${DRIVE_UP}/${fileId}?uploadType=multipart&fields=id`:`${DRIVE_UP}?uploadType=multipart&fields=id`;
+  const r=await gfetch(url,{method:fileId?'PATCH':'POST', headers:{'Content-Type':'multipart/related; boundary='+B}, body});
+  return (await r.json()).id; }
+async function driveDownload(id){ const r=await gfetch(`${DRIVE_API}/${id}?alt=media`); return await unGz(await r.arrayBuffer()); }
+async function driveDelete(id){ await gfetch(`${DRIVE_API}/${id}`,{method:'DELETE'}); }
+const fileInfo = f => { const a=(f&&f.appProperties)||{}; return {id:f.id, at:+a.at||Date.parse(f.modifiedTime)||0, dev:a.dev||'', modelo:a.modelo||'', r:{entrenos:+a.entrenos||0, rutinas:+a.rutinas||0, dias:+a.dias||0, fotos:+a.fotos||0}}; };
+
+/* ---------- Copia: guardar ---------- */
+let CLOUD_BUSY=false;
+function cloudEnvelope(){
+  const data=clone(S); delete data.settings.cloud;
+  const env={app:'PandarIA Fit', fmt:1, ver:APP_VERSION, dataVer:DATA_VER, at:Date.now(), dev:cloudDev(), modelo:(window.PF_MODELO||''), resumen:cloudResumen(), data};
+  if (typeof window.pfAccountLicense==='function'){ const l=window.pfAccountLicense(); if (l) env.prem=l; }
+  return env; }
+async function cloudBackup(o){
+  o=o||{}; const c=cloudS(); if (!c || !cloudAvail() || CLOUD_BUSY || (!S.settings.onboarded && !o.manual)) return false;
+  if (c.conflict && !o.force){ if (o.manual) cloudConflictAsk(); return false; }
+  CLOUD_BUSY=true; if (o.manual) toast(tx('Guardando en Google Drive…','Saving to Google Drive…'));
+  try{
+    const f=await driveFind(); const info=f?fileInfo(f):null;
+    // Otra instalación guardó después de nuestra última copia: no se pisa sin preguntar
+    if (info && info.dev && info.dev!==cloudDev() && info.at>(c.at||0) && !o.force){
+      c.conflict={at:info.at, modelo:info.modelo, r:info.r, id:info.id}; save(true); CLOUD_BUSY=false;
+      if (o.manual) cloudConflictAsk(); else toast(tx('Hay una copia más nueva de otro teléfono en tu Drive. Revisa Ajustes › Tus datos.','There is a newer backup from another phone in your Drive. Check Settings › Your data.'));
+      return false; }
+    const env=cloudEnvelope(), r=env.resumen;
+    const props={at:String(env.at), dev:env.dev, modelo:String(env.modelo||'').slice(0,60), ver:APP_VERSION, entrenos:String(r.entrenos), rutinas:String(r.rutinas), dias:String(r.dias), fotos:String(r.fotos)};
+    const id=await driveUpload(await gzBlob(JSON.stringify(env)), props, info?info.id:null);
+    const cc=cloudS(); if (cc){ Object.assign(cc,{at:env.at, fileId:id, pending:false, err:null, conflict:null, reauth:false}); save(true); }
+    CLOUD_BUSY=false; if (o.manual) toast(tx('✓ Copia guardada en tu Google Drive','✓ Backup saved to your Google Drive'));
+    if (LAYERS.length) refreshTop(); else { render.keep=true; render(); }
+    return true;
+  }catch(e){
+    CLOUD_BUSY=false; const cc=cloudS(); if (cc){ cc.pending=true; cc.err=cloudErrTxt(e); cc.reauth=/^auth$/.test(String(e&&e.message)); save(true); }
+    if (o.manual){ const t=cloudErrTxt(e); if (t) toast(t); }
+    return false; } }
+// Copia automática: al terminar un entreno, al abrir la app si pasó más de un día, y al volver la conexión
+function cloudAuto(motivo){ const c=cloudS(); if (!c || c.conflict || !S.settings.onboarded) return;
+  if (motivo==='entreno' || c.pending || Date.now()-(c.at||0)>20*3600e3) cloudBackup({}); }
+
+/* ---------- Copia: recuperar ---------- */
+async function cloudFetchEnvelope(id){
+  const env=JSON.parse(await driveDownload(id));
+  if (!env || env.app!=='PandarIA Fit' || !env.data || !Array.isArray(env.data.routines) || !Array.isArray(env.data.sessions)) throw new Error('formato');
+  return env; }
+function cloudApply(env, fileId){
+  const cur=S.settings.cloud, d=env.data; migrateData(d, null);
+  S=Object.assign(DEF(), d); S.settings=Object.assign(DEF().settings, d.settings||{});
+  S.settings.cloud=Object.assign({}, cur, {at:env.at, fileId, pending:false, err:null, conflict:null});
+  S.settings.onboarded=true; S.settings.cloudIntro=true;
+  loadExercises(S.customEx); applyTheme(); if (typeof applyLang==='function') applyLang(); save(true);
+  if (env.prem && typeof window.pfRestoreAccountLicense==='function') window.pfRestoreAccountLicense(env.prem);
+  closeAllLayers(); render();
+  toast(tx(`✓ Datos recuperados: ${resumenTxt(cloudResumen())}`,`✓ Data restored: ${resumenTxt(cloudResumen())}`)); }
+async function cloudRestore(info, sinPreguntar){
+  const go=async()=>{ toast(tx('Descargando tu copia…','Downloading your backup…'));
+    try{ const env=await cloudFetchEnvelope(info.id); cloudApply(env, info.id); }
+    catch(e){ toast(/formato|JSON/.test(String(e&&e.message)+e)?tx('La copia de Drive está dañada o no es de PandarIA Fit.','The Drive backup is damaged or not from PandarIA Fit.'):(cloudErrTxt(e)||'')); } };
+  if (sinPreguntar) return go();
+  confirmBox({title:tx('¿Recuperar la copia de Drive?','Restore the Drive backup?'),
+    text:tx(`Copia del ${fmtDate(info.at)} (${hhmm(info.at)})${info.modelo?' desde '+esc(info.modelo):''}: ${resumenTxt(info.r)}.<br><br>Reemplazará lo que hay ahora en este teléfono (${resumenTxt(cloudResumen())}).`,
+      `Backup from ${fmtDate(info.at)} (${hhmm(info.at)})${info.modelo?' from '+esc(info.modelo):''}: ${resumenTxt(info.r)}.<br><br>It will replace what is on this phone now (${resumenTxt(cloudResumen())}).`),
+    okText:tx('Recuperar','Restore'), ok:go}); }
+// Dos copias distintas: el teléfono y Drive. Nunca se pisa nada sin elegir.
+function cloudConflictAsk(){
+  const c=cloudS(); if (!c || !c.conflict) return; const k=c.conflict, loc=cloudResumen();
+  sheet(tx('Tu teléfono y tu Drive tienen datos distintos','Your phone and your Drive have different data'),[
+    {icon:'download',label:tx('Usar la copia de Drive','Use the Drive backup'),desc:tx(`Del ${fmtDate(k.at)}${k.modelo?' · '+k.modelo:''}: ${resumenTxt(k.r)}. Reemplaza lo de este teléfono.`,`From ${fmtDate(k.at)}${k.modelo?' · '+k.modelo:''}: ${resumenTxt(k.r)}. Replaces this phone.`),fn:()=>cloudRestore({id:k.id, at:k.at, modelo:k.modelo, r:k.r}, true)},
+    {icon:'upload',label:tx('Usar los datos de este teléfono','Use this phone’s data'),desc:tx(`${resumenTxt(loc)}. Reemplaza la copia de Drive.`,`${resumenTxt(loc)}. Replaces the Drive backup.`),fn:()=>setTimeout(()=>confirmBox({title:tx('¿Reemplazar la copia de Drive?','Replace the Drive backup?'),text:tx('La copia de Drive se sustituirá por los datos de este teléfono. No se puede deshacer.','The Drive backup will be replaced with this phone’s data. This cannot be undone.'),okText:tx('Reemplazar','Replace'),ok:()=>{ const cc=cloudS(); if(cc) cc.conflict=null; cloudBackup({manual:true, force:true}); }}),250)},
+    {icon:'close',label:tx('Decidir más tarde','Decide later'),desc:tx('Hasta que elijas, no se guardan copias automáticas.','Until you choose, no automatic backups are saved.'),fn:()=>{}}
+  ]); }
+
+/* ---------- Iniciar y cerrar sesión ---------- */
+async function cloudSignIn(desde){
+  if (!cloudAvail()) return toast(tx('Disponible en la app de Android','Available in the Android app'));
+  let u; try{ u=await PFCloud.signIn(); }catch(e){ const t=cloudErrTxt(e); if (t) toast(t); return null; }
+  S.settings.cloud={sub:u.sub, email:u.email||'', name:u.name||'', given:u.given||'', at:0, fileId:null, pending:false, err:null, conflict:null};
+  S.settings.cloudIntro=true; save(true);
+  if (typeof window.pfAccountChanged==='function') window.pfAccountChanged();
+  let info=null; try{ const f=await driveFind(); info=f?fileInfo(f):null; }catch(e){ const t=cloudErrTxt(e); if (t) toast(t); }
+  if (desde==='bienvenida') return {u, info};
+  const loc=cloudResumen(), vacio=!loc.entrenos && !loc.rutinas && !loc.dias;
+  if (info && vacio) cloudRestore(info);
+  else if (info){ S.settings.cloud.conflict={at:info.at, modelo:info.modelo, r:info.r, id:info.id}; save(true); render.keep=true; render(); if (LAYERS.length) refreshTop(); cloudConflictAsk(); }
+  else { toast(tx(`Sesión iniciada como ${u.email||u.name}`,`Signed in as ${u.email||u.name}`)); cloudBackup({manual:true}); }
+  if (LAYERS.length) refreshTop(); else { render.keep=true; render(); }
+  return {u, info}; }
+A.cloudSignIn=()=>cloudSignIn('ajustes');
+A.cloudSave=()=>cloudBackup({manual:true});
+A.cloudConflict=()=>cloudConflictAsk();
+A.cloudRestore=async()=>{ if (!cloudS()) return; toast(tx('Buscando tu copia…','Looking for your backup…'));
+  try{ const f=await driveFind(); if (!f) return toast(tx('Todavía no hay ninguna copia en tu Drive.','There is no backup in your Drive yet.')); cloudRestore(fileInfo(f)); }
+  catch(e){ const t=cloudErrTxt(e); if (t) toast(t); } };
+async function cloudSignOutRaw(){ try{ await PFCloud.signOut(); }catch(e){} S.settings.cloud=null; save(true); if (typeof window.pfAccountChanged==='function') window.pfAccountChanged(); }
+A.cloudSignOut=()=>confirmBox({title:tx('¿Cerrar sesión?','Sign out?'),text:tx('Tus datos siguen en este teléfono y tu copia de Drive no se borra. Dejarán de guardarse copias nuevas. Si tu Premium va con tu cuenta, en este teléfono se desactiva hasta que vuelvas a entrar.','Your data stays on this phone and your Drive backup is not deleted. New backups will stop. If your Premium is tied to your account, it turns off on this phone until you sign in again.'),okText:tx('Cerrar sesión','Sign out'),
+  ok:async()=>{ await cloudSignOutRaw(); render.keep=true; render(); if (LAYERS.length) refreshTop(); toast(tx('Sesión cerrada','Signed out')); }});
+A.cloudDelete=()=>confirmBox({title:tx('¿Borrar tu copia de Drive?','Delete your Drive backup?'),text:tx('Se borrará la copia de PandarIA Fit de tu Google Drive y se cerrará la sesión. Los datos de este teléfono no se tocan. No se puede deshacer.','The PandarIA Fit backup will be deleted from your Google Drive and you will be signed out. The data on this phone is not touched. This cannot be undone.'),okText:tx('Borrar copia','Delete backup'),
+  ok:async()=>{ try{ const f=await driveFind(); if (f) await driveDelete(f.id); await cloudSignOutRaw(); render.keep=true; render(); if (LAYERS.length) refreshTop(); toast(tx('Copia borrada y sesión cerrada','Backup deleted and signed out')); }
+    catch(e){ toast(cloudErrTxt(e)||tx('No se pudo borrar. Inténtalo de nuevo.','Could not delete. Try again.')); } }});
+
+/* ---------- Ajustes › Tus datos ---------- */
+function cloudCardHtml(){
+  if (!cloudAvail()) return '';
+  const c=cloudS();
+  if (!c) return `<div class="sec">${tx('Copia en Google Drive','Google Drive backup')}</div><div class="card"><div class="row" style="gap:12px;align-items:flex-start"><span style="color:var(--blue)">${I('upload',24)}</span><div class="grow"><div class="b">${tx('Guarda tus datos en tu Google Drive','Save your data in your Google Drive')}</div><div class="sm mut" style="line-height:1.45;margin-top:2px">${tx('Si cambias o pierdes el teléfono, inicias sesión y recuperas tus entrenos, rutinas, diario, fotos y tu Premium. Gratis y opcional.','If you change or lose your phone, sign in and get back your workouts, routines, diary, photos and Premium. Free and optional.')}</div></div></div>
+    <button class="btn pri wide" style="margin-top:12px" data-a="cloudSignIn">${I('user',18)} ${tx('Continuar con Google','Continue with Google')}</button>
+    <div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('La copia va a una carpeta oculta de tu Drive: PandarIA Fit no ve tus otros archivos y nadie más ve tus datos.','The backup goes to a hidden folder in your Drive: PandarIA Fit cannot see your other files and nobody else sees your data.')}</div></div>`;
+  const estado=c.conflict?`<span style="color:var(--gold)">${tx('Hay una copia distinta de otro teléfono','There is a different backup from another phone')}</span>`:c.pending?`<span style="color:var(--gold)">${tx('Pendiente de guardar','Waiting to save')}${c.err?' · '+esc(c.err):''}</span>`:`${tx('Última copia','Last backup')}: ${hace(c.at)}`;
+  return `<div class="sec">${tx('Copia en Google Drive','Google Drive backup')}</div><div class="card">
+    <div class="row" style="gap:12px"><span style="width:40px;height:40px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;flex:0 0 auto">${esc((c.name||c.email||'?').charAt(0).toUpperCase())}</span><div class="grow" style="min-width:0"><div class="b" style="overflow:hidden;text-overflow:ellipsis">${esc(c.name||c.email)}</div><div class="xs mut" style="overflow:hidden;text-overflow:ellipsis">${esc(c.email)}</div></div></div>
+    <div class="sm" style="margin-top:10px;line-height:1.45">${estado}</div>
+    ${c.conflict?`<button class="btn pri wide" style="margin-top:10px" data-a="cloudConflict">${tx('Elegir qué datos usar','Choose which data to keep')}</button>`:''}
+    ${c.reauth&&!c.conflict?`<button class="btn pri wide" style="margin-top:10px" data-a="cloudSignIn">${I('user',18)} ${tx('Volver a iniciar sesión','Sign in again')}</button>`:''}
+    <div class="row" style="gap:8px;margin-top:10px"><button class="btn grow sm" data-a="cloudSave">${I('upload',16)} ${tx('Guardar ahora','Save now')}</button><button class="btn grow sm" data-a="cloudRestore">${I('download',16)} ${tx('Recuperar','Restore')}</button></div>
+    <div class="row" style="gap:8px;margin-top:8px"><button class="btn grow sm ghost" data-a="cloudSignOut">${tx('Cerrar sesión','Sign out')}</button><button class="btn grow sm ghost" style="color:var(--bad)" data-a="cloudDelete">${tx('Borrar mi copia','Delete my backup')}</button></div>
+    <div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('Se guarda sola al terminar cada entreno y una vez al día, si hay internet.','It saves itself after each workout and once a day, when online.')}</div></div>`;
+}
+{ const _vaC=viewAjustes; viewAjustes=function(){ const h=_vaC.apply(this,arguments); const card=cloudCardHtml(); if (!card) return h;
+  // va justo después de «Tus datos» (native.js quita la sección Recordatorios que queda delante)
+  return h.replace('<div class="sec">Acerca de</div>', card+'<div class="sec">Acerca de</div>').replace('Tus datos se guardan solo en este dispositivo.', cloudS()?'Tus datos se guardan en este dispositivo y en tu Google Drive.':'Tus datos se guardan solo en este dispositivo.'); }; }
+
+/* ---------- Bienvenida nueva ---------- */
+// Pasos: hola, cuenta, (recuperar), nombre, perfil, equipo, (permisos), listo
+function obPasos(p){ const L=['hola','cuenta']; if (p.info) L.push('recuperar'); L.push('nombre','perfil','equipo'); if (window.pfNotif || A.hcConnect) L.push('permisos'); L.push('listo'); if (!cloudAvail()) L.splice(L.indexOf('cuenta'),1); return L; }
 SCREENS.onboard = p => {
-  const st=p.step||0, n=4; p.pf=p.pf||{injuries:[]};
-  const dots=`<div class="row" style="gap:6px;justify-content:center;margin-bottom:22px">${[...Array(n).keys()].map(i=>`<span style="width:${i===st?22:8}px;height:8px;border-radius:4px;background:${i<=st?'var(--ac)':'var(--line)'};transition:.2s"></span>`).join('')}</div>`;
+  p.pf=p.pf||{injuries:[]}; const L=obPasos(p); p.paso=p.paso||'hola'; if (!L.includes(p.paso)) p.paso=L[0];
+  const i=L.indexOf(p.paso), n=L.length;
+  const barra=`<div style="height:4px;border-radius:2px;background:var(--line);margin:0 0 26px;overflow:hidden"><div style="height:100%;width:${Math.round((i+1)/n*100)}%;background:var(--ac);border-radius:2px;transition:width .3s"></div></div>`;
+  const titulo=(t,d)=>`<div style="font-size:26px;font-weight:900;line-height:1.15;text-wrap:balance">${t}</div>${d?`<p class="mut" style="line-height:1.5;margin:10px 0 20px">${d}</p>`:''}`;
+  const atras=i>0&&p.paso!=='listo'?`<button class="btn" data-a="obBack" aria-label="${tx('Atrás','Back')}">${I('back',20)}</button>`:'';
   let b='', foot='';
-  if (st===0){
-    b=`<div style="text-align:center;padding-top:10px"><div style="width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('dumbbell',44)}</div>
-      <div style="font-size:30px;font-weight:900;margin-top:18px">PandarIA <span style="color:var(--ac)">Fit</span></div><p class="mut" style="line-height:1.5;margin:10px 6px 22px">Tu compañero de entrenamiento con un algoritmo que aprende de cada serie.</p></div>
-      ${[['dumbbell','Rutinas a tu medida','Crea las tuyas, elige de Explorar o deja que PandarIA diseñe tu plan.'],['spark','Te ayuda a progresar','Sugiere pesos, detecta estancamientos y renueva tus rutinas.'],['leaf','Nutrición y ayuno','Calorías, proteína, agua y ayuno supervisado.'],['chart','Todo tu progreso','Récords, gráficas, metas, informes semanales y fotos.']].map(([ic,t,d])=>`<div class="row" style="align-items:flex-start;gap:14px;padding:10px 4px"><span class="si" style="width:42px;height:42px;border-radius:12px;background:var(--acs);color:var(--ac);display:grid;place-items:center;flex:0 0 auto">${I(ic,22)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4">${d}</div></div></div>`).join('')}`;
-    foot=`<button class="btn pri big" data-a="obNext">Empezar</button><div class="xs mut" style="text-align:center;margin-top:10px">Una app de <b style="color:var(--ac)">LunaDog</b> · v${APP_VERSION}</div>`;
-  } else if (st===1){
-    b=`<div style="font-size:24px;font-weight:800">Cuéntanos de ti</div><p class="mut sm" style="line-height:1.45">PandarIA lo usa para elegir ejercicios seguros y estimar tus pesos y tu nutrición. Puedes saltarlo, pero las sugerencias serán menos precisas.</p>${profileForm(p.pf,'ob')}`;
-    foot=`<div class="row" style="gap:8px"><button class="btn grow" data-a="obSkip">Saltar</button><button class="btn pri grow" style="flex:2" data-a="obNext">Siguiente</button></div>`;
-  } else if (st===2){
-    b=`<div style="font-size:24px;font-weight:800">¿Dónde vas a entrenar?</div><p class="mut sm">Elige tu equipo; puedes afinarlo en Ajustes.</p>
-      ${PRESETS.map((x,i)=>`<button class="opt card" style="margin-bottom:8px;${p.preset===i?'border-color:var(--ac)':''}" data-a="obPreset" data-v="${i}"><span class="oi">${I(i===3?'dumbbell':i===0?'user':'weight',22)}</span><span class="grow"><div class="b">${x[0]}</div><div class="od">${x[1]}</div></span>${p.preset===i?`<span style="color:var(--ac)">${I('check',22)}</span>`:''}</button>`).join('')}
-      <div class="sec">Tu nivel</div><div class="seg">${['principiante','intermedio','avanzado'].map(l=>`<button class="${(p.level||'principiante')===l?'on':''}" data-a="obLevel" data-v="${l}">${LEVEL_NAMES[LEVELS[l]]}</button>`).join('')}</div>`;
-    foot=`<button class="btn pri big" data-a="obNext">Siguiente</button>`;
+  if (p.paso==='hola'){
+    b=`<div style="text-align:center;padding-top:18px"><div style="width:92px;height:92px;border-radius:26px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702;box-shadow:0 12px 34px rgba(255,122,26,.35)">${I('dumbbell',48)}</div>
+      <div style="font-size:32px;font-weight:900;margin-top:20px">PandarIA <span style="color:var(--ac)">Fit</span></div><p class="mut" style="line-height:1.5;margin:10px 10px 26px">${tx('Tu compañero de entrenamiento con un algoritmo que aprende de cada serie.','Your training partner with an algorithm that learns from every set.')}</p></div>
+      ${[['dumbbell',tx('Rutinas a tu medida','Routines made for you'),tx('Crea las tuyas, elige de Explorar o deja que PandarIA diseñe tu plan.','Build your own, pick from Explore or let PandarIA design your plan.')],['spark',tx('Te ayuda a progresar','Helps you progress'),tx('Sugiere pesos, detecta estancamientos y renueva tus rutinas.','Suggests weights, spots plateaus and refreshes your routines.')],['leaf',tx('Nutrición y ayuno','Nutrition and fasting'),tx('Diario de comidas, agua y ayuno supervisado.','Food diary, water and supervised fasting.')],['chart',tx('Todo tu progreso','All your progress'),tx('Récords, gráficas, metas, informes y fotos.','Records, charts, goals, reports and photos.')]].map(([ic,t,d])=>`<div class="row" style="align-items:flex-start;gap:14px;padding:9px 4px"><span style="width:42px;height:42px;border-radius:12px;background:var(--acs);color:var(--ac);display:grid;place-items:center;flex:0 0 auto">${I(ic,22)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4">${d}</div></div></div>`).join('')}`;
+    foot=`<button class="btn pri big" data-a="obNext">${tx('Empezar','Get started')}</button><div class="xs mut" style="text-align:center;margin-top:10px">${tx('Una app de','An app by')} <b style="color:var(--ac)">LunaDog</b> · v${APP_VERSION}</div>`;
+  } else if (p.paso==='cuenta'){
+    b=titulo(tx('¿Cómo quieres usar PandarIA?','How do you want to use PandarIA?'),tx('Puedes cambiarlo cuando quieras en Ajustes › Tus datos.','You can change it anytime in Settings › Your data.'))+
+      `<button class="opt card" style="margin-bottom:10px;padding:16px;${p.modo==='google'?'border-color:var(--ac)':''}" data-a="obGoogle"><span class="oi" style="color:var(--blue)">${I('user',24)}</span><span class="grow"><div class="b">${tx('Continuar con Google','Continue with Google')} <span class="xs" style="color:var(--ok);font-weight:800;margin-left:4px">${tx('RECOMENDADO','RECOMMENDED')}</span></div><div class="od" style="line-height:1.4">${tx('Copia en tu Google Drive: si cambias de teléfono recuperas todo, también tu Premium.','Backup in your Google Drive: if you change phones you get everything back, Premium included.')}</div></span>${p.modo==='google'?`<span style="color:var(--ac)">${I('check',22)}</span>`:''}</button>
+      <button class="opt card" style="padding:16px;${p.modo==='local'?'border-color:var(--ac)':''}" data-a="obLocal"><span class="oi">${I('lock',24)}</span><span class="grow"><div class="b">${tx('Usar sin cuenta','Use without an account')}</div><div class="od" style="line-height:1.4">${tx('Todo se guarda solo en este teléfono. Puedes conectar Google más tarde.','Everything stays on this phone only. You can connect Google later.')}</div></span>${p.modo==='local'?`<span style="color:var(--ac)">${I('check',22)}</span>`:''}</button>
+      ${p.u?`<div class="banner" style="margin-top:14px"><span class="ic" style="color:var(--ok)">${I('check',20)}</span><div class="grow sm">${tx('Sesión iniciada como','Signed in as')} <b>${esc(p.u.email||p.u.name)}</b></div></div>`:''}
+      <p class="xs mut" style="line-height:1.5;margin-top:16px">${tx('Con Google, la copia va a una carpeta oculta de tu propio Drive. PandarIA Fit no ve tus otros archivos, no tiene servidores y nadie más ve tus datos.','With Google, the backup goes to a hidden folder in your own Drive. PandarIA Fit cannot see your other files, has no servers and nobody else sees your data.')} ${A.hcPrivacy?`<a data-a="hcPrivacy" style="color:var(--ac)">${tx('Política de privacidad','Privacy policy')}</a>`:''}</p>`;
+    foot=`<div class="row" style="gap:8px">${atras}<button class="btn pri grow" style="flex:2" data-a="obNext" ${p.modo?'':'disabled'}>${tx('Siguiente','Next')}</button></div>`;
+  } else if (p.paso==='recuperar'){
+    const k=p.info;
+    b=titulo(tx('¡Ya usabas PandarIA!','You already used PandarIA!'),tx('Encontramos una copia tuya en Google Drive.','We found a backup of yours in Google Drive.'))+
+      `<div class="card" style="padding:16px"><div class="row" style="gap:12px"><span style="color:var(--ok)">${I('history',26)}</span><div class="grow"><div class="b">${tx('Copia del','Backup from')} ${fmtDate(k.at)} · ${hhmm(k.at)}</div><div class="sm mut" style="line-height:1.45;margin-top:2px">${resumenTxt(k.r)}${k.modelo?' · '+esc(k.modelo):''}</div></div></div></div>
+      <button class="btn pri big" style="margin-top:16px" data-a="obRestore">${I('download',20)} ${tx('Recuperar mis datos','Restore my data')}</button>
+      <button class="btn wide" style="margin-top:10px" data-a="obFresh">${tx('Empezar de cero en este teléfono','Start from scratch on this phone')}</button>
+      <p class="xs mut" style="line-height:1.5;margin-top:12px">${tx('Si empiezas de cero, tu copia de Drive no se toca hasta que decidas en Ajustes › Tus datos qué datos usar.','If you start from scratch, your Drive backup is not touched until you choose in Settings › Your data which data to keep.')}</p>`;
+    foot=`<div class="row" style="gap:8px">${atras}</div>`;
+  } else if (p.paso==='nombre'){
+    b=titulo(tx('¿Cómo te llamamos?','What should we call you?'),tx('Así te saludará PandarIA.','This is how PandarIA will greet you.'))+
+      `<input id="ob_name" class="inp" style="height:56px;font-size:20px" value="${esc(p.pf.name||'')}" placeholder="${tx('Tu nombre','Your name')}" maxlength="30" autocomplete="given-name">`;
+    foot=`<div class="row" style="gap:8px">${atras}<button class="btn pri grow" style="flex:2" data-a="obNext">${tx('Siguiente','Next')}</button></div>`;
+  } else if (p.paso==='perfil'){
+    b=titulo(tx(`Cuéntanos de ti${p.pf.name?', '+esc(p.pf.name):''}`,`Tell us about you${p.pf.name?', '+esc(p.pf.name):''}`),tx('PandarIA lo usa para elegir ejercicios seguros y estimar tus pesos y tu nutrición. Todo es opcional.','PandarIA uses it to pick safe exercises and estimate your weights and nutrition. Everything is optional.'))+
+      profileForm(p.pf,'ob').replace(/<div class="field"><label>Nombre<\/label>[\s\S]*?<\/div>/,'');
+    foot=`<div class="row" style="gap:8px">${atras}<button class="btn grow" data-a="obSkip">${tx('Ahora no','Not now')}</button><button class="btn pri grow" style="flex:2" data-a="obNext">${tx('Siguiente','Next')}</button></div>`;
+  } else if (p.paso==='equipo'){
+    b=titulo(tx('¿Dónde vas a entrenar?','Where will you train?'),tx('Elige tu equipo; puedes afinarlo en Ajustes.','Pick your equipment; you can fine-tune it in Settings.'))+
+      `${PRESETS.map((x,j)=>`<button class="opt card" style="margin-bottom:8px;${p.preset===j?'border-color:var(--ac)':''}" data-a="obPreset" data-v="${j}"><span class="oi">${I(j===3?'dumbbell':j===0?'user':'weight',22)}</span><span class="grow"><div class="b">${x[0]}</div><div class="od">${x[1]}</div></span>${p.preset===j?`<span style="color:var(--ac)">${I('check',22)}</span>`:''}</button>`).join('')}
+      <div class="sec">${tx('Tu nivel','Your level')}</div><div class="seg">${['principiante','intermedio','avanzado'].map(l=>`<button class="${(p.level||'principiante')===l?'on':''}" data-a="obLevel" data-v="${l}">${LEVEL_NAMES[LEVELS[l]]}</button>`).join('')}</div>`;
+    foot=`<div class="row" style="gap:8px">${atras}<button class="btn pri grow" style="flex:2" data-a="obNext">${tx('Siguiente','Next')}</button></div>`;
+  } else if (p.paso==='permisos'){
+    const nOk=window.pfNotif&&pfNotif.ok();
+    b=titulo(tx('Dos permisos opcionales','Two optional permissions'),tx('Puedes activarlos ahora o más tarde en Ajustes.','You can turn them on now or later in Settings.'))+
+      (window.pfNotif?`<div class="card" style="padding:16px;margin-bottom:10px"><div class="row" style="gap:12px;align-items:flex-start"><span style="color:var(--ac)">${I('bell',24)}</span><div class="grow"><div class="b">${tx('Notificaciones','Notifications')}</div><div class="sm mut" style="line-height:1.4;margin-top:2px">${tx('Fin del descanso, días de entreno, agua y fases del ayuno. Tú eliges cada aviso.','End of rest, training days, water and fasting phases. You choose each alert.')}</div></div></div>
+        <button class="btn ${nOk?'':'pri'} wide" style="margin-top:12px" data-a="obNotif" ${nOk?'disabled':''}>${nOk?I('check',18)+' '+tx('Activadas','On'):tx('Activar notificaciones','Turn on notifications')}</button></div>`:'')+
+      (A.hcConnect?`<div class="card" style="padding:16px"><div class="row" style="gap:12px;align-items:flex-start"><span style="color:var(--ok)">${I('heart',24)}</span><div class="grow"><div class="b">Health Connect</div><div class="sm mut" style="line-height:1.4;margin-top:2px">${tx('Lee tus pasos, peso y pulso de Samsung Health u otras apps, y guarda allí tus entrenos.','Reads your steps, weight and heart rate from Samsung Health or other apps, and saves your workouts there.')}</div></div></div>
+        <button class="btn wide" style="margin-top:12px" data-a="obHc">${tx('Conectar Health Connect','Connect Health Connect')}</button></div>`:'');
+    foot=`<div class="row" style="gap:8px">${atras}<button class="btn pri grow" style="flex:2" data-a="obNext">${tx('Siguiente','Next')}</button></div>`;
   } else {
-    b=`<div style="font-size:24px;font-weight:800">¡Todo listo${p.pf.name?', '+esc(p.pf.name):''}!</div><p class="mut sm" style="line-height:1.45">¿Cómo quieres empezar?</p>
-      <button class="opt card" style="margin-bottom:8px" data-a="obEnd" data-v="pandaria"><span class="oi">${I('spark',24)}</span><span class="grow"><div class="b">Que PandarIA diseñe mi plan</div><div class="od">Unas preguntas y tendrás tu plan semanal completo.</div></span></button>
-      <button class="opt card" style="margin-bottom:8px" data-a="obEnd" data-v="explorar"><span class="oi">${I('compass',24)}</span><span class="grow"><div class="b">Explorar rutinas</div><div class="od">Más de 60 rutinas para elegir.</div></span></button>
-      <button class="opt card" data-a="obEnd" data-v="propia"><span class="oi">${I('edit',24)}</span><span class="grow"><div class="b">Ir a Mis rutinas</div><div class="od">Crea la tuya o traslada tu rutina en papel.</div></span></button>`;
+    b=titulo(tx(`¡Todo listo${p.pf.name?', '+esc(p.pf.name):''}!`,`All set${p.pf.name?', '+esc(p.pf.name):''}!`),tx('¿Cómo quieres empezar?','How do you want to start?'))+
+      `<button class="opt card" style="margin-bottom:8px" data-a="obEnd" data-v="pandaria"><span class="oi">${I('spark',24)}</span><span class="grow"><div class="b">${tx('Que PandarIA diseñe mi plan','Let PandarIA design my plan')}</div><div class="od">${tx('Unas preguntas y tendrás tu plan semanal completo.','A few questions and you will have your full weekly plan.')}</div></span></button>
+      <button class="opt card" style="margin-bottom:8px" data-a="obEnd" data-v="explorar"><span class="oi">${I('compass',24)}</span><span class="grow"><div class="b">${tx('Explorar rutinas','Explore routines')}</div><div class="od">${tx('Más de 60 rutinas para elegir.','Over 60 routines to choose from.')}</div></span></button>
+      <button class="opt card" data-a="obEnd" data-v="propia"><span class="oi">${I('edit',24)}</span><span class="grow"><div class="b">${tx('Ir a Mis rutinas','Go to My routines')}</div><div class="od">${tx('Crea la tuya o traslada tu rutina en papel.','Build your own or copy your paper routine.')}</div></span></button>`;
   }
-  return `<div class="lbody" style="padding-top:28px">${dots}${b}</div>${foot?`<div class="lfoot">${foot}</div>`:''}`;
+  return `<div class="lbody" style="padding-top:24px">${barra}${b}</div>${foot?`<div class="lfoot">${foot}</div>`:''}`;
 };
-function obCommit(){ const p=pkP(); if (document.getElementById('ob_name')) readProfileForm(p.pf,'ob'); }
-A.obNext=()=>{ const p=pkP(); const enPerfil=!!document.getElementById('ob_name'); obCommit(); if (enPerfil){ const er=perfilErr(p.pf); if (er) return toast(er); } p.step=(p.step||0)+1; refreshTop(); const b=document.querySelector('#layers .layer:last-child .lbody'); if(b) b.scrollTop=0; };
-A.obSkip=()=>{ const p=pkP(); p.pf={injuries:[]}; p.step=2; refreshTop(); };
+function obCommit(){ const p=pkP(); if (p.paso==='nombre' || p.paso==='perfil') readProfileForm(p.pf,'ob'); }
+function obIr(paso){ const p=pkP(); p.paso=paso; refreshTop(); const b=document.querySelector('#layers .layer:last-child .lbody'); if (b) b.scrollTop=0; }
+A.obNext=()=>{ const p=pkP(); obCommit();
+  if (p.paso==='perfil'){ const er=perfilErr(p.pf); if (er) return toast(er); }
+  if (p.paso==='cuenta' && !p.modo) return;
+  const L=obPasos(p), i=L.indexOf(p.paso); obIr(L[Math.min(L.length-1,i+1)]); };
+A.obBack=()=>{ const p=pkP(); obCommit(); const L=obPasos(p), i=L.indexOf(p.paso); if (i>0) obIr(L[i-1]); };
+A.obSkip=()=>{ const p=pkP(); const nm=p.pf.name; p.pf={injuries:[], name:nm}; const L=obPasos(p); obIr(L[L.indexOf('perfil')+1]); };
+A.obLocal=async()=>{ const p=pkP(); if (p.u){ await cloudSignOutRaw(); p.u=null; p.info=null; } p.modo='local'; refreshTop(); };
+A.obGoogle=async()=>{ const p=pkP(); if (p.u){ p.modo='google'; return refreshTop(); }
+  const r=await cloudSignIn('bienvenida'); if (!r) return;
+  p.u=r.u; p.modo='google'; p.info=r.info||null; if (!p.pf.name) p.pf.name=r.u.given||(r.u.name||'').split(' ')[0]||'';
+  refreshTop(); setTimeout(()=>{ if (pkP()===p && p.paso==='cuenta') A.obNext(); },400); };
+A.obRestore=()=>{ const p=pkP(); if (p.info) cloudRestore(p.info, true); };
+A.obFresh=()=>{ const p=pkP(); const c=cloudS(); if (c && p.info){ c.conflict={at:p.info.at, modelo:p.info.modelo, r:p.info.r, id:p.info.id}; save(true); }
+  p.info=null; obIr('nombre'); };
+A.obNotif=async()=>{ if (!window.pfNotif) return; await pfNotif.ask(); refreshTop(); };
+A.obHc=()=>{ try{ A.hcConnect(); }catch(e){} };
 A.obEnd=v=>{
-  const p=pkP(); if(p.preset!=null) S.settings.equip=PRESETS[p.preset][2].slice(); S.settings.level=p.level||'principiante';
-  if (Object.values(p.pf).some(x=>x&&(!Array.isArray(x)||x.length))){ S.profile=p.pf; if(p.pf.weight && !S.measures.some(m=>m.peso)) S.measures.push({id:uid(),date:Date.now(),peso:p.pf.weight}); }
-  S.settings.onboarded=true; save(); closeLayer();
+  const p=pkP(); if (p.preset!=null) S.settings.equip=PRESETS[p.preset][2].slice(); S.settings.level=p.level||'principiante';
+  const hayPerfil=['age','height','weight','sex','fitness'].some(k=>p.pf[k]!=null&&p.pf[k]!=='') || (p.pf.injuries||[]).length;
+  if (hayPerfil || p.pf.name){ S.profile=Object.assign({injuries:[]}, S.profile||{}, p.pf); if (p.pf.weight && !S.measures.some(m=>m.peso)) S.measures.push({id:uid(),date:Date.now(),peso:p.pf.weight}); }
+  S.settings.onboarded=true; S.settings.cloudIntro=true; save(); closeLayer();
+  if (cloudS()) setTimeout(()=>cloudBackup({}),1500);
   setTimeout(()=>{ if (v==='pandaria') openLayer('wizPandaria',{step:0,goal:'musculo',days:3,minutes:60,level:S.settings.level,priorities:[]}); else if (v==='explorar'){ TAB='explorar'; render(); } },120);
 };
+
+/* ---------- Para quien ya tenía la app: una tarjeta breve, una sola vez ---------- */
+SCREENS.cloudIntro = () => `<div class="lbody" style="padding-top:34px"><div style="text-align:center"><div style="width:80px;height:80px;border-radius:24px;background:var(--acs);color:var(--ac);display:grid;place-items:center;margin:0 auto">${I('upload',40)}</div>
+  <div style="font-size:24px;font-weight:900;margin-top:18px;line-height:1.2;text-wrap:balance">${tx('Novedad: guarda tus datos en tu Google Drive','New: save your data in your Google Drive')}</div></div>
+  ${[[tx('Recupera todo si cambias de teléfono','Get everything back if you change phones'),tx('Entrenos, rutinas, diario, medidas, fotos y Premium.','Workouts, routines, diary, measurements, photos and Premium.')],[tx('Se guarda solo','It saves itself'),tx('Al terminar cada entreno y una vez al día.','After each workout and once a day.')],[tx('Privado','Private'),tx('Va a una carpeta oculta de tu Drive. Nadie más la ve.','It goes to a hidden folder in your Drive. Nobody else sees it.')]].map(([t,d])=>`<div class="row" style="gap:12px;align-items:flex-start;margin-top:16px"><span style="color:var(--ok)">${I('check',22)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4">${d}</div></div></div>`).join('')}
+  </div><div class="lfoot"><button class="btn pri big" data-a="ciGoogle">${I('user',20)} ${tx('Continuar con Google','Continue with Google')}</button><button class="btn wide" style="margin-top:8px" data-a="ciLater">${tx('Ahora no','Not now')}</button><div class="xs mut" style="text-align:center;margin-top:8px">${tx('Siempre disponible en Ajustes › Tus datos.','Always available in Settings › Your data.')}</div></div>`;
+A.ciLater=()=>{ S.settings.cloudIntro=true; save(); closeLayer(); };
+A.ciGoogle=async()=>{ S.settings.cloudIntro=true; save(); closeLayer(); await cloudSignIn('intro'); };
+function cloudBoot(){
+  if (!cloudAvail()) return;
+  if (S.settings.onboarded && !S.settings.cloudIntro && !cloudS()) setTimeout(()=>{ if (!LAYERS.length && !MODALS.length && !S.active) openLayer('cloudIntro',{}); },2500);
+  setTimeout(()=>cloudAuto('inicio'),5000);
+  document.addEventListener('visibilitychange',()=>{ if (!document.hidden) cloudAuto('volver'); });
+  window.addEventListener('online',()=>{ const c=cloudS(); if (c && c.pending) cloudBackup({}); });
+}
 
 /* ---------- Accesibilidad ---------- */
 function applyA11y(){ document.body.style.zoom = S.settings.bigText?'1.12':''; document.documentElement.dataset.contrast = S.settings.contrast?'high':''; }
@@ -9525,6 +9770,8 @@ Idioma|Language
 Recordatorios|Reminders
 Hora del aviso|Reminder time
 Tus datos|Your data
+Tus datos se guardan en este dispositivo y en tu Google Drive.|Your data is saved on this device and in your Google Drive.
+Tus datos se guardan solo en este dispositivo.|Your data is saved only on this device.
 Exportar copia de seguridad|Export backup
 Importar copia de seguridad|Import backup
 Exportar entrenos a Excel (CSV)|Export workouts to Excel (CSV)
