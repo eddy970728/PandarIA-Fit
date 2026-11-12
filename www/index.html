@@ -905,9 +905,10 @@ const ACHIEVEMENTS = [
      consejo → cualquier otra fuente: solo tomamos el consejo, con nuestras palabras, y la citamos.
      propio  → criterio de PandarIA, cuando no hay una fuente que dé el número exacto.
    Evidencia: solida · moderada · limitada · contradictoria.  'rev' = revisar antes de esa fecha. */
-const KB_VER='1.0';
+const KB_VER='1.1';
 const KB_LOG=[
-  {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'}
+  {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'},
+  {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'}
 ];
 const KB_LIC={pd:'Dominio público, con crédito', consejo:'Consejo de la fuente, con nuestras palabras', propio:'Criterio propio de PandarIA'};
 const KB_EV={solida:'Evidencia sólida', moderada:'Evidencia moderada', limitada:'Evidencia limitada', contradictoria:'Evidencia contradictoria'};
@@ -924,6 +925,7 @@ const KB_SRC={
   efsa2010:{n:'Valores dietéticos de referencia: agua', a:'Autoridad Europea de Seguridad Alimentaria (EFSA)', y:2010, pub:'EFSA', url:'https://www.efsa.europa.eu/es/press/news/nda100326', lic:'consejo'},
   aasm2015:{n:'Recommended amount of sleep for a healthy adult (consenso de la AASM y la SRS)', a:'Watson y col.', y:2015, pub:'Sleep 38(6):843–844', url:'https://www.aasm.org/resources/pdf/adultsleepdurationconsensus.pdf', lic:'consejo'},
   faigenbaum2009:{n:'Youth resistance training: updated position statement paper from the NSCA', a:'Faigenbaum y col.', y:2009, pub:'J Strength Cond Res 23(5 Supl):S60–S79', url:'https://pubmed.ncbi.nlm.nih.gov/19620931/', lic:'consejo'},
+  schoenfeld2016:{n:'Longer interset rest periods enhance muscle strength and hypertrophy in resistance-trained men', a:'Schoenfeld y col.', y:2016, pub:'J Strength Cond Res 30(7):1805–1812', url:'https://pubmed.ncbi.nlm.nih.gov/26605807/', lic:'consejo'},
   pandaria:{n:'Criterio propio de PandarIA', a:'PandarIA Fit', y:2026, pub:'', url:'', lic:'propio'}
 };
 // v = el valor que usan los algoritmos. t = qué dice, con nuestras palabras. usa = dónde lo usa la app.
@@ -941,6 +943,10 @@ const KB_RULES=[
     t:'Para la salud en general bastan cargas moderadas de 8 a 15 repeticiones, trabajando todos los grupos musculares 2 días o más por semana.', usa:'Rutinas de salud y bienestar', rev:'2028-11-01', desde:'0.8.1'},
   {id:'obj.flexibilidad', area:'entreno', n:'Objetivo flexibilidad', v:{reps:[8,10], sets:2, rest:15}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
     t:'En las rutinas de movilidad PandarIA usa pocas series y descansos mínimos: la prioridad es moverse con control.', usa:'Rutinas de flexibilidad', rev:'2027-11-01', desde:'0.8.1'},
+  {id:'descanso.multi', area:'entreno', n:'Descanso en multiarticulares', v:{s:120}, src:['schoenfeld2016','acsm2009'], lic:'consejo', ev:'moderada', pob:'Adultos que entrenan',
+    t:'En los ejercicios multiarticulares con peso (sentadilla, press, remo, peso muerto), descansar 2 minutos o más rinde más fuerza y músculo que descansar 1 minuto, porque permite mantener las repeticiones.', usa:'Descanso de los multiarticulares en rutinas de músculo', rev:'2028-11-01', desde:'0.8.3'},
+  {id:'alternativa.similar', area:'entreno', n:'Alternativas de dificultad parecida', v:{facil:-3, nivel:-1}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'Cuando PandarIA propone cambiar un ejercicio, busca uno que trabaje lo mismo con una dificultad parecida: evita pasar de un ejercicio con peso a uno mucho más fácil y cuenta como tuyo el equipo del ejercicio que ya haces.', usa:'Cambios de ejercicio por estancamiento o molestia', rev:'2027-11-01', desde:'0.8.3'},
   {id:'carga.subida', area:'entreno', n:'Cuánto subir el peso', v:{inf:0.05, sup:0.025}, src:['acsm2009'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
     t:'Cuando completas todas las series en el tope de repeticiones, se sube la carga entre un 2 y un 10 %. PandarIA sube un 5 % en piernas y un 2,5 % en el resto, como mínimo un disco.', usa:'Sugerencia de peso en cada serie', rev:'2028-11-01', desde:'0.8.1'},
   {id:'carga.doble', area:'entreno', n:'Doble progresión', v:{reps:1, repsFacil:2}, src:['acsm2009'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
@@ -970,6 +976,8 @@ const KB_RULES=[
   // ---------- Recuperación ----------
   {id:'sueno.adultos', area:'recuperacion', n:'Horas de sueño', v:{h:7}, src:['aasm2015'], lic:'consejo', ev:'solida', pob:'Adultos de 18 a 60 años',
     t:'Los adultos deberían dormir 7 horas o más cada noche de forma habitual.', usa:'Aviso de recuperación y consejo del día', rev:'2028-11-01', desde:'0.8.1'},
+  {id:'recuperacion.ajuste', area:'recuperacion', n:'Días con poco descanso', v:{f:0.9, intensa:9, horas:36}, src:['pandaria','aasm2015'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'Si en el check-in marcas que dormiste mal o tienes poca energía, o eliges empezar suave, PandarIA baja un 10 % la carga sugerida ese día. «Hoy toca» te avisa si vienes de una sesión muy exigente o tus músculos aún se recuperan.', usa:'Check-in, «Hoy toca» y sugerencias del entreno', rev:'2027-11-01', desde:'0.8.3'},
   {id:'recuperacion.48h', area:'recuperacion', n:'Músculo entrenado hace poco', v:{horas:48, series:6}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
     t:'Si un músculo de la rutina ya tuvo 6 series o más en las últimas 48 horas, PandarIA te avisa antes de empezar.', usa:'Aviso al abrir una rutina', rev:'2027-11-01', desde:'0.8.1'},
   // ---------- Actividad física ----------
@@ -980,10 +988,12 @@ const KB_RULES=[
     t:'Las calorías en reposo se calculan con la ecuación de Mifflin-St Jeor: 10 × peso + 6,25 × altura − 5 × edad, más 5 en hombres o menos 161 en mujeres. Si prefieres no decir tu sexo, PandarIA usa el punto medio.', usa:'Calorías diarias', rev:'2028-11-01', desde:'0.8.1'},
   {id:'nut.actividad', area:'nutricion', n:'Factor de actividad', v:{sedentario:1.2, activo:1.375, muy_activo:1.55, sem3:0.15, sem1:0.075}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
     t:'Las calorías en reposo se multiplican por un factor según tu actividad (1,2 a 1,55), y PandarIA lo sube un poco según tus entrenos de la última semana.', usa:'Calorías diarias', rev:'2027-11-01', desde:'0.8.1'},
-  {id:'nut.deficit', area:'nutricion', n:'Déficit para bajar grasa', v:{f:0.85}, src:['helms2014'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
-    t:'Para perder grasa sin perder músculo conviene bajar despacio, alrededor del 0,5 al 1 % del peso por semana. PandarIA lo aproxima con un 15 % menos de calorías.', usa:'Calorías para bajar grasa', rev:'2028-11-01', desde:'0.8.1'},
-  {id:'nut.superavit', area:'nutricion', n:'Superávit para ganar músculo', v:{f:1.1}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
-    t:'Para ganar músculo PandarIA suma un 10 % de calorías: suficiente para crecer sin acumular demasiada grasa.', usa:'Calorías para ganar músculo', rev:'2027-11-01', desde:'0.8.1'},
+  {id:'nut.deficit', area:'nutricion', n:'Ritmo para bajar grasa', v:{ritmo:{lento:0.005, normal:0.0075, rapido:0.01}, kcalKg:7700, maxDef:0.25}, src:['helms2014'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
+    t:'Para perder grasa sin perder músculo conviene bajar despacio, entre el 0,5 y el 1 % del peso por semana. PandarIA calcula el déficit para ese ritmo (cada kilo de grasa equivale a unas 7700 kcal, una estimación habitual), nunca quita más del 25 % de tu gasto y nunca baja de tu metabolismo en reposo.', usa:'Calorías para bajar grasa', rev:'2028-11-01', desde:'0.8.1'},
+  {id:'nut.superavit', area:'nutricion', n:'Superávit para ganar músculo', v:{lento:1.05, normal:1.1, rapido:1.15}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
+    t:'Para ganar músculo PandarIA suma un 5, 10 o 15 % de calorías según el ritmo que elijas: suficiente para crecer sin acumular demasiada grasa.', usa:'Calorías para ganar músculo', rev:'2027-11-01', desde:'0.8.1'},
+  {id:'nut.adaptativo', area:'nutricion', n:'Objetivo que se ajusta solo', v:{dias:14, minDias:10, minKcal:800, minSpan:10, peso:0.5, rango:[0.75,1.25]}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'Las fórmulas son una estimación. Con al menos 10 días de diario y dos pesajes separados 10 días o más en las últimas 2 semanas, PandarIA compara lo que comiste con cómo cambió tu peso, estima tu gasto real y lo mezcla a partes iguales con la fórmula. Si el dato sale muy raro, no lo usa.', usa:'Calorías diarias (Premium)', rev:'2027-11-01', desde:'0.8.3'},
   {id:'nut.proteina', area:'nutricion', n:'Proteína diaria', v:{bajar:2.0, mantener:1.6, ganar:1.8}, src:['issn2017','morton2018'], lic:'consejo', ev:'solida', pob:'Adultos que entrenan',
     t:'Si entrenas, 1,4 a 2,0 g de proteína por kg al día cubren lo necesario, y en déficit puede hacer falta más. El beneficio para el músculo se estabiliza alrededor de 1,6 g/kg.', usa:'Proteína diaria', rev:'2028-11-01', desde:'0.8.1'},
   {id:'nut.proteina_comida', area:'nutricion', n:'Proteína por comida', v:{gkg:0.25, g:[20,40], horas:[3,4]}, src:['issn2017'], lic:'consejo', ev:'moderada', pob:'Adultos que entrenan',
@@ -994,8 +1004,8 @@ const KB_RULES=[
     t:'Un índice de masa corporal por debajo de 18,5 se considera bajo peso. En ese caso PandarIA no propone déficit y muestra tu mantenimiento.', usa:'Calorías para bajar grasa', rev:'2028-11-01', desde:'0.8.1'},
   {id:'nut.menores', area:'seguridad', n:'Menores de edad', v:{edad:18}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Menores de 18',
     t:'En menores de 18 las necesidades cambian con el crecimiento: PandarIA solo muestra el mantenimiento como orientación y recomienda consultar a un profesional.', usa:'Calorías y ayuno', rev:'2027-11-01', desde:'0.8.1'},
-  {id:'agua', area:'nutricion', n:'Agua diaria', v:{mlkg:35, entreno:500}, src:['pandaria','efsa2010'], lic:'propio', ev:'limitada', pob:'Adultos',
-    t:'PandarIA calcula 35 ml por kg de peso más medio litro los días que entrenas. Como referencia, la EFSA considera adecuados 2,0 L al día en mujeres y 2,5 L en hombres.', usa:'Meta de agua', rev:'2027-11-01', desde:'0.8.1'},
+  {id:'agua', area:'nutricion', n:'Agua diaria', v:{mlkg:33, ref:{h:2000, m:1600, x:1800}, min:0.85, max:1.35, entreno:500}, src:['efsa2010','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'La EFSA considera adecuados 2,0 L de agua total al día en mujeres y 2,5 L en hombres, contando la que llega con la comida (se suele estimar en un 20 %). PandarIA parte de 33 ml por kg, lo mantiene cerca de esa referencia para que no se dispare en personas grandes ni se quede corto en pequeñas, y suma medio litro los días que entrenas.', usa:'Meta de agua', rev:'2028-11-01', desde:'0.8.1'},
   {id:'ayuno.prudencia', area:'seguridad', n:'Ayuno con prudencia', v:{inicioMaxH:18, inicioN:3, sedentarioMaxH:20, maxUtilH:24}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
     t:'PandarIA sugiere empezar por ayunos cortos (12 a 14 h), avisa si un plan es muy exigente para tu actividad y recomienda romper el ayuno pasadas 24 horas.', usa:'Consejos del ayuno', rev:'2027-11-01', desde:'0.8.1'},
   // ---------- Seguridad ----------
@@ -1014,6 +1024,7 @@ const KB={};
 function kb(id){ const r=KB[id]; if (!r) throw new Error('PandarIA: regla desconocida '+id); return r.v; }
 // Qué regla explica cada "por qué" que muestra la app
 const KB_WHY=[
+  [/^(Hoy llegas con poco descanso|Sesión suave)/,'recuperacion.ajuste'],
   [/^Completaste todas las series/,'carga.subida'], [/^Dos sesiones sin llegar/,'carga.bajada'], [/^Sesión anterior muy exigente/,'carga.esfuerzo'],
   [/^(Intenta una repetición más|Mismo peso|Una repetición más|Mantén las repeticiones|Un poco más que)/,'carga.doble'], [/^Volviste tras/,'regreso.pausa'],
   [/descarga/i,'descarga'], [/^Serie de calentamiento/,'calentamiento'], [/^Peso inicial estimado/,'peso.inicial'], [/bloque de intensidad/,'bloque']
@@ -1104,6 +1115,7 @@ function prescribe(ex, goal, level){
   let rest = G.rest;
   if (ex.kind==='a'){ sets=Math.min(sets,3); range=[range[0]+2,range[1]+3]; rest=Math.min(rest,90); }
   if (goal==='fuerza' && ex.kind==='a'){ range=[8,12]; rest=90; }
+  if (goal==='musculo' && ex.kind==='c' && ex.mode==='p') rest=Math.max(rest,kb('descanso.multi').s);
   sets=Math.max(2,Math.min(5,sets));
   let time=null;
   if (ex.mode==='t'){
@@ -1213,6 +1225,8 @@ function suggestSet(routine, item, idx){
     else { const rr=last.sets.map(x=>x.rir).filter(x=>x!=null); const ra=rr.length?rr.reduce((a,b)=>a+b,0)/rr.length:null;
       reps=Math.max(range[0],Math.min(reps+(ra!=null&&ra>=3?kb('carga.doble').repsFacil:kb('carga.doble').reps),range[1])); res.why= (+ref.reps||0)<range[0]?'Mismo peso: busca llegar al mínimo de repeticiones':'Intenta una repetición más'; }
     const KP=kb('regreso.pausa'); if (days>=KP.dias[0]){ const f=days>=KP.dias[2]?KP.f[2]:days>=KP.dias[1]?KP.f[1]:KP.f[0]; kg=roundTo(kg*f,incFor(ex)); res.why=`Volviste tras ${Math.round(days)} días: ajustamos el peso`; }
+    const AJ=wkAjuste(routine);
+    if (AJ && !deloadActive() && ph!=='descarga'){ kg=roundTo(kg*AJ.f,incFor(ex)); res.why=AJ.why; }
     if (deloadActive()){ kg=roundTo(kg*kb('descarga').f,incFor(ex)); res.why='Semana de descarga: más liviano'; }
     else if (ph==='descarga'){ kg=roundTo(kg*kb('descarga').f,incFor(ex)); res.why='Semana de descarga del bloque: más liviano'; }
     else if (ph==='intensidad') res.why+=' · bloque de intensidad (menos reps, más peso)';
@@ -1223,6 +1237,7 @@ function suggestSet(routine, item, idx){
     if (days>=14) reps=Math.max(range[0],Math.round(reps*0.85));
     if (deloadActive()) reps=Math.max(range[0],Math.round(reps*0.75));
     res.reps=reps; res.why= last.intensity<9?'Una repetición más que la última vez':'Mantén las repeticiones';
+    const AJr=wkAjuste(routine); if (AJr && !deloadActive()){ res.reps=Math.max(range[0],Math.round(reps*AJr.f)); res.why=AJr.why; }
   } else {
     let t=+ref.time||+set.time||30;
     if (last.intensity<9 && !['cardio','movilidad','estiramiento','yoga'].includes(ex.pat) && !item.warm && !item.cool) t+=5;
@@ -1231,6 +1246,10 @@ function suggestSet(routine, item, idx){
   }
   return res;
 }
+// Ajuste del día (check-in con poco descanso o «empezar suave»): solo mientras se prepara la sesión
+let WK_AJUSTE=null;
+function wkAjuste(routine){ const w=WK_AJUSTE; if (w && routine && (!w.rid||w.rid===routine.id) && Date.now()-(w.t||0)<600000) return w;
+  return S.active&&S.active.ajuste&&routine&&S.active.routineId===routine.id?S.active.ajuste:null; }
 function prevText(exId, idx, mode){
   const h=exHistory(exId,1)[0]; if (!h) return '';
   const s=h.sets[Math.min(idx,h.sets.length-1)]; if (!s) return '';
@@ -1242,15 +1261,18 @@ function prevText(exId, idx, mode){
 /* ---------- Alternativas ---------- */
 function alternatives(exId, exclude){
   const ex=getEx(exId), L=userLevel(); exclude=exclude||[];
-  const out=[];
+  const out=[], KA=kb('alternativa.similar');
+  const mine=[...new Set((S.settings.equip||[]).concat(ex.missing?[]:ex.eq))]; // el equipo del ejercicio que ya haces también cuenta como tuyo
   for (const id in EX){
-    const o=EX[id]; if (id===exId||exclude.includes(id)||avoided(id)||!hasEquip(o)) continue;
+    const o=EX[id]; if (id===exId||exclude.includes(id)||avoided(id)||!hasEquip(o,mine)) continue;
     let sc=0;
     if (o.prim[0]===ex.prim[0]) sc+=4; else if (o.prim.some(m=>ex.prim.includes(m))) sc+=2; else continue;
     if (o.pat===ex.pat) sc+=3;
     if (o.kind===ex.kind) sc+=1;
     if (o.lvl>L) sc-=2;
     if (o.mode===ex.mode) sc+=1;
+    if (ex.mode==='p' && o.mode!=='p' && !ex.missing) sc+=KA.facil;   // de un ejercicio con peso a uno sin carga: mucho más fácil
+    if (o.lvl<ex.lvl) sc+=KA.nivel*(ex.lvl-o.lvl);
     // si molesta, primero la versión guiada (máquina, Smith o polea) del mismo movimiento
     const guided=o.eq.some(q=>['maq','smi','pol'].includes(q));
     if ((S.settings.avoid||{})[exId]==='molesta' && guided) sc+=2;
@@ -5734,6 +5756,7 @@ A.startWorkout=rid=>{
   const go=()=>{
     const rec=records(); const snap={}; r.items.forEach(i=>{ if(rec[i.exId]) snap[i.exId]=Object.assign({},rec[i.exId]); });
     S.active={routineId:r.id, name:r.name, start:Date.now(), items:r.items.map(it=>activeItemFrom(it,r)), rest:null, rec:snap, intensity:6};
+    const aj=wkAjuste(r); if (aj && r.pandaria) S.active.ajuste={f:aj.f,why:aj.why}; WK_AJUSTE=null;
     save(true); openLayer('workout'); keepAwake();
     const ld=lastTrainedDays(); if (ld!==null && ld>=14 && r.pandaria) toast(`Volviste tras ${Math.round(ld)} días: PandarIA ajustó los pesos`);
     speak(`Empezamos ${r.name}. Primer ejercicio: ${getEx(r.items[0].exId).n}`);
@@ -6588,7 +6611,8 @@ A.startWorkout=rid=>{
   const chk={sleep:null,energy:null,sore:null};
   const q=(k,label,opts)=>`<div style="margin-bottom:14px"><div class="b sm" style="margin-bottom:8px">${label}</div><div class="seg" id="chk_${k}">${opts.map((o,i)=>`<button data-a="chkSet" data-v="${k}|${i}">${o}</button>`).join('')}</div></div>`;
   A.chkSet=v=>{ const [k,i]=v.split('|'); chk[k]=+i; document.querySelectorAll(`#chk_${k} button`).forEach((b,j)=>b.classList.toggle('on',j===+i)); };
-  const go=()=>{ _startWorkout(rid); if (S.active && S.active.routineId===rid && Object.values(chk).some(x=>x!=null)){ S.active.checkin=chk; save(); refreshTop(); } };
+  const go=()=>{ const KR=kb('recuperacion.ajuste'); if (chk.sleep===0||chk.energy===0) WK_AJUSTE={f:KR.f, why:`Hoy llegas con poco descanso: ${Math.round((1-KR.f)*100)} % menos de carga`, rid, t:Date.now()};
+    _startWorkout(rid); WK_AJUSTE=null; if (S.active && S.active.routineId===rid && Object.values(chk).some(x=>x!=null)){ S.active.checkin=chk; save(); refreshTop(); } };
   openModal(`<div class="sheet"><div class="grab"></div><h3>¿Cómo llegas hoy?</h3><p class="sm mut" style="margin:-6px 4px 16px;line-height:1.4">Opcional. No cambia tu sesión, pero PandarIA lo tiene en cuenta para sus sugerencias.</p>
     ${q('sleep','¿Cómo dormiste?',['Mal','Regular','Bien'])}${q('energy','¿Cómo está tu energía?',['Baja','Normal','Alta'])}${q('sore','¿Agujetas o molestias?',['Muchas','Algunas','Nada'])}
     <button class="btn pri big" data-a="cbm" data-v="${cb(go)}">${I('play',20)} Empezar</button>
@@ -6599,7 +6623,7 @@ SCREENS.workout=p=>{
   let h=_wkScreen(p); const c=S.active&&S.active.checkin;
   if (c){
     const msgs=[];
-    if (c.sleep===0||c.energy===0) msgs.push('Hoy vienes con poco descanso o energía. Si una serie te cuesta mucho, haz una menos: PandarIA no lo contará en tu contra.');
+    if (c.sleep===0||c.energy===0) msgs.push(S.active.ajuste?'Hoy vienes con poco descanso o energía: PandarIA bajó un 10 % la carga sugerida. Si una serie te cuesta mucho, haz una menos.':'Hoy vienes con poco descanso o energía. Si una serie te cuesta mucho, haz una menos: PandarIA no lo contará en tu contra.');
     if (c.sore===0) msgs.push('Tienes muchas agujetas: calienta más tiempo y baja el peso en los ejercicios de esa zona si molesta.');
     if (c.sleep===2&&c.energy===2) msgs.push('Llegas descansado y con energía: buen día para intentar un récord.');
     if (msgs.length) h=h.replace('<div class="lbody" style="padding-top:8px">',`<div class="lbody" style="padding-top:8px"><div class="banner blue"><span class="ic">${I('spark',20)}</span><div class="grow sm" style="line-height:1.45">${msgs.join('<br>')}</div></div>`);
@@ -6638,12 +6662,22 @@ function hoyCard(){
   else if (S.plan.days.includes(dow)) body=`<div class="xs mut b" style="letter-spacing:1px">HOY TOCA</div><div class="b" style="font-size:20px;margin-top:2px">${esc(nx.r.name)}</div>
     <div class="sm mut" style="margin-top:4px">~${routineMinutes(nx.r)} min · ${plural(nx.r.items.filter(i=>!i.warm&&!i.cool).length,'ejercicio','ejercicios')}${ph?` · Bloque ${ph.n.toLowerCase()} (${ph.d})`:''}</div>
     ${nx.swapped?`<div class="xs" style="color:var(--blue);margin-top:6px">PandarIA adelantó esta rutina: los músculos de ${esc(nx.swapped.name)} aún se recuperan.</div>`:''}
-    <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button><button class="btn" data-a="hoyChange">Cambiar</button></div>`;
+    ${(rs=>rs.lvl==='buena'?'':`<div class="xs" style="color:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'};margin-top:6px;line-height:1.4">Recuperación ${rs.lvl}: ${esc(rs.msgs.join(' · '))}${kbLink('recuperacion.ajuste','Por qué')}</div>`)(recoveryState(nx.r))}
+    <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${nx.r.pandaria&&recoveryState(nx.r).lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">Suave</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>`;
   else { let k=1; while(k<8 && !S.plan.days.includes((dow+k)%7)) k++;
     body=`<div class="xs mut b" style="letter-spacing:1px">HOY</div><div class="b" style="font-size:20px;margin-top:2px">Día de descanso</div><div class="sm mut" style="margin-top:4px">Próximo entreno: ${k===1?'mañana':DAYS_LONG[(dow+k)%7]} · ${esc(nx.r.name)}</div>
     <button class="link sm" style="margin-top:10px" data-a="hoyChange">Entrenar igual hoy</button>`; }
   return `<div class="card hoy">${strip}<div style="margin-top:12px">${body}</div><button class="xs mut" style="margin-top:10px" data-a="openPlan">${I('edit',12).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} Editar plan semanal</button></div>`;
 }
+function recoveryState(r){
+  const KR=kb('recuperacion.ajuste'), msgs=[]; let pts=0;
+  const fat=r?recoveryWarning(r):[]; if (fat.length){ pts++; msgs.push(`${fat.map(m=>MUSCLES[m]?MUSCLES[m].toLowerCase():m).slice(0,3).join(', ')} trabajados hace menos de 48 h`); }
+  const last=S.sessions[S.sessions.length-1];
+  if (last && Date.now()-last.end<KR.horas*3600000 && (last.intensity||0)>=KR.intensa){ pts++; msgs.push('tu última sesión fue muy exigente'); }
+  const ck=S.sessions.slice(-3).filter(s=>s.checkin); if (ck.length>=2 && ck.filter(s=>s.checkin.sleep===0||s.checkin.energy===0).length>=2){ pts+=2; msgs.push('varios días con poco descanso'); }
+  return {lvl:pts>=2?'baja':pts===1?'media':'buena', msgs};
+}
+A.startSoft=rid=>{ const KR=kb('recuperacion.ajuste'); WK_AJUSTE={f:KR.f, why:`Sesión suave: ${Math.round((1-KR.f)*100)} % menos de carga`, rid, t:Date.now()}; A.startWorkout(rid); };
 A.hoyChange=()=>sheet('¿Qué quieres entrenar hoy?',S.routines.filter(r=>!r.archived).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startWorkout(r.id)})));
 A.openPlan=()=>{ const ids=S.routines.filter(r=>!r.archived).map(r=>r.id); const pl=S.plan?clone(S.plan):{days:defaultDays(Math.min(ids.length,3)),order:ids.slice(0,6)}; openLayer('plan',{pl}); };
 SCREENS.plan = p => {
@@ -6770,6 +6804,7 @@ function histInformes(){
     const end=new Date(wk+6*DAY);
     h+=`<div class="card"><div class="row"><div class="grow"><div class="b">${i===0?'Esta semana':i===1?'Semana pasada':`Semana del ${fmtDate(wk)}`}</div><div class="xs mut">${fmtDate(wk)} al ${fmtDate(end.getTime())}</div></div>${r.prs?`<span class="tag" style="background:rgba(255,200,61,.15);color:var(--gold)">★ ${r.prs}</span>`:''}</div>
     <div class="stats" style="margin:12px 0 8px"><div class="stat"><div class="v">${r.n}</div><div class="l">Entrenos</div></div><div class="stat"><div class="v">${r.mins}</div><div class="l">Minutos</div></div><div class="stat"><div class="v">${fmtNum(Math.round(toUnit(r.vol)))}</div><div class="l">Volumen${r.pvol?` <span style="color:${r.vol>=r.pvol?'var(--ok)':'var(--bad)'}">${r.vol>=r.pvol?'▲':'▼'}${Math.abs(Math.round((r.vol-r.pvol)/r.pvol*100))}%</span>`:''}</div></div></div>
+    ${(O=>`<div class="mac" style="margin:4px 0 10px"><div class="mbar"><div style="width:${Math.min(100,Math.round(r.mins/O.moderada[0]*100))}%;background:${r.mins>=O.moderada[0]?'var(--ok)':'var(--blue)'}"></div></div><div class="row xs"><span class="grow">Actividad: ${r.mins} de ${O.moderada[0]} min recomendados por la OMS${kbLink('actividad.oms','Fuente')}</span><span>${r.mins>=O.moderada[0]?'✓':''}</span></div></div>`)(kb('actividad.oms'))}
     ${r.top.length?`<div class="xs mut">Más trabajados: ${r.top.map(([m,n])=>`${MUSCLES[m]} (${fmtNum(n)})`).join(', ')}</div>`:''}
     ${bal.map(m=>`<div class="sm" style="margin-top:8px;line-height:1.4;color:var(--blue)">⚖️ ${esc(m)}</div>`).join('')}
     <div class="sm" style="margin-top:10px;line-height:1.45"><span style="color:var(--ac)">${I('spark',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')}</span> ${esc(r.main)}</div></div>`;
@@ -6906,12 +6941,44 @@ function calcNutrition(){
   let goal=n.goal; const notes=[]; const bm=bmi();
   if (a<kb('nut.menores').edad){ goal='mantener'; notes.push('En menores de 18 las necesidades cambian con el crecimiento: usa esto solo como orientación y consulta a un profesional.'); }
   if (goal==='bajar' && bm && bm<kb('nut.imc_bajo').imc){ goal='mantener'; notes.push('Tu índice de masa corporal es bajo: no recomendamos déficit calórico. Te mostramos el mantenimiento.'); }
-  const kcal=Math.round((goal==='bajar'?tdee*kb('nut.deficit').f:goal==='ganar'?tdee*kb('nut.superavit').f:tdee)/10)*10;
+  // Gasto ajustado con tu diario y tu peso (Premium)
+  let tdeeUse=tdee, adapt=null;
+  if (n.adaptOff!==true && typeof nutAdapt==='function' && (typeof isPremium!=='function'||isPremium())){ adapt=nutAdapt(tdee,w); if (adapt&&adapt.ok) tdeeUse=adapt.tdee; }
+  const ritmo=n.ritmo||(goal==='ganar'?'normal':'lento'), KD=kb('nut.deficit');
+  let kcal, limite=false;
+  if (goal==='bajar'){ const want=w*(KD.ritmo[ritmo]||KD.ritmo.lento)*KD.kcalKg/7; const def=Math.min(want, tdeeUse*KD.maxDef); kcal=Math.max(bmr, tdeeUse-def); limite=tdeeUse-kcal<want-1; }
+  else if (goal==='ganar') kcal=tdeeUse*(kb('nut.superavit')[ritmo]||kb('nut.superavit').normal);
+  else kcal=tdeeUse;
+  kcal=Math.round(kcal/10)*10;
+  const tr=weightTrend(); if (goal==='bajar' && tr && tr.pct<-KD.ritmo.rapido*100) notes.push(`Estás bajando un ${fmtNum(-tr.pct)} % por semana: más del 1 % puede costarte músculo. Considera comer un poco más.`);
   const pk=kb('nut.proteina')[goal];
   const prot=Math.round(w*pk), fat=Math.round(w*kb('nut.grasa').gkg), carbs=Math.max(0,Math.round((kcal-prot*4-fat*9)/4));
-  return {bmr:Math.round(bmr),tdee:Math.round(tdee),kcal,prot,fat,carbs,goal,notes,pk,w};
+  const semana=goal==='bajar'?Math.round((tdeeUse-kcal)*7/KD.kcalKg*100)/100:null;
+  return {bmr:Math.round(bmr),tdee:Math.round(tdee),kcal,prot,fat,carbs,goal,notes,pk,w,ritmo,adapt,semana,limite};
 }
-function waterGoal(){ const w=bodyWeight(), K=kb('agua'); return Math.round((K.mlkg*w+(trainedToday().length?K.entreno:0))/50)*50; }
+function waterGoal(){ const w=bodyWeight(), K=kb('agua'), sx=(S.profile||{}).sex, ref=K.ref[sx==='h'?'h':sx==='m'?'m':'x'];
+  const base=Math.min(ref*K.max, Math.max(ref*K.min, K.mlkg*w));
+  return Math.round((base+(trainedToday().length?K.entreno:0))/50)*50; }
+// Tendencia de peso: pendiente de los pesajes de las últimas 4 semanas (kg por semana y % del peso)
+function weightTrend(days){ days=days||28; const from=Date.now()-days*DAY; const pts=S.measures.filter(m=>m.peso&&m.date>=from).map(m=>[m.date/DAY,+m.peso]).sort((x,y)=>x[0]-y[0]);
+  if (pts.length<2) return null; const span=pts[pts.length-1][0]-pts[0][0]; if (span<10) return null;
+  const mx=pts.reduce((a,p)=>a+p[0],0)/pts.length, my=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+  const sl=pts.reduce((a,p)=>a+(p[0]-mx)*(p[1]-my),0)/pts.reduce((a,p)=>a+(p[0]-mx)**2,0);
+  return {kgDay:sl, kgWeek:sl*7, pct:sl*7/my*100, span}; }
+// Gasto real estimado con el diario y el peso de los últimos días
+function nutAdapt(tdeeF, w){
+  const K=kb('nut.adaptativo'), D=(S.nutri&&S.nutri.diario)||{}; const end=Date.now()-DAY;
+  const days=[...Array(K.dias).keys()].map(i=>dayKey(end-i*DAY)).filter(k=>{ const it=D[k]||[]; return it.length>=2 && it.reduce((a,e)=>a+(+e.k||0),0)>=K.minKcal; });
+  if (days.length<K.minDias) return {ok:false, why:`Faltan días de diario: ${days.length} de ${K.minDias}`};
+  const pts=S.measures.filter(m=>m.peso && m.date>=end-(K.dias+3)*DAY && m.date<=Date.now()).map(m=>[m.date/DAY,+m.peso]).sort((x,y)=>x[0]-y[0]);
+  if (pts.length<2 || pts[pts.length-1][0]-pts[0][0]<K.minSpan) return {ok:false, why:'Faltan pesajes: necesito al menos dos separados 10 días'};
+  const mx=pts.reduce((a,p)=>a+p[0],0)/pts.length, my=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+  const sl=pts.reduce((a,p)=>a+(p[0]-mx)*(p[1]-my),0)/pts.reduce((a,p)=>a+(p[0]-mx)**2,0);
+  const intake=days.reduce((a,k)=>a+D[k].reduce((b,e)=>b+(+e.k||0),0),0)/days.length;
+  const obs=intake-sl*kb('nut.deficit').kcalKg;
+  if (obs<tdeeF*K.rango[0] || obs>tdeeF*K.rango[1]) return {ok:false, why:'Los datos no cuadran con la fórmula (¿faltan comidas en el diario?): no los uso', obs:Math.round(obs)};
+  return {ok:true, tdee:Math.round(tdeeF*(1-K.peso)+obs*K.peso), obs:Math.round(obs), intake:Math.round(intake), days:days.length, kgWeek:Math.round(sl*7*100)/100};
+}
 function viewNutricion(){
   const n=nut(), c=calcNutrition();
   let h=`<div class="hdr"><h1>Nutrición</h1></div>`;
@@ -6923,8 +6990,12 @@ function viewNutricion(){
   h+=`<div class="sec">Tu objetivo diario</div><div class="seg" style="margin-bottom:12px">${Object.entries(NGOALS).map(([k,v])=>`<button class="${n.goal===k?'on':''}" data-a="nGoal" data-v="${k}">${v}</button>`).join('')}</div>`;
   if (!c) h+=`<div class="card row" data-a="openProfile" style="cursor:pointer"><span style="color:var(--ac)">${I('user',24)}</span><div class="grow"><div class="b">Completa tu perfil</div><div class="sm mut">Necesito edad, sexo, altura y peso para calcular tus calorías y proteína.</div></div>${I('right',18)}</div>`;
   else {
-    h+=`<div class="card"><div class="row" style="align-items:flex-end"><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CALORÍAS</div><div style="font-size:34px;font-weight:900;line-height:1.1">${c.kcal.toLocaleString('es')} <span class="sm mut" style="font-weight:600">kcal</span></div></div><div class="xs mut" style="text-align:right">Mantenimiento ${c.tdee.toLocaleString('es')}<br>Basal ${c.bmr.toLocaleString('es')}</div></div>
+    h+=`<div class="card"><div class="row" style="align-items:flex-end"><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CALORÍAS</div><div style="font-size:34px;font-weight:900;line-height:1.1">${c.kcal.toLocaleString('es')} <span class="sm mut" style="font-weight:600">kcal</span></div></div><div class="xs mut" style="text-align:right">${c.adapt&&c.adapt.ok?`Mantenimiento ajustado ${c.adapt.tdee.toLocaleString('es')}`:`Mantenimiento ${c.tdee.toLocaleString('es')}`}<br>Basal ${c.bmr.toLocaleString('es')}</div></div>
     <div class="macros">${[['Proteína',c.prot,'#ff7a1a',c.prot*4],['Carbohidratos',c.carbs,'#3f9cff',c.carbs*4],['Grasas',c.fat,'#f5b82e',c.fat*9]].map(([l,g,col,k])=>`<div class="mac"><div class="mbar"><div style="width:${Math.round(k/c.kcal*100)}%;background:${col}"></div></div><div class="row"><span class="b grow">${l}</span><span class="b">${g} g</span></div></div>`).join('')}</div>
+    ${c.goal!=='mantener'?`<div class="xs mut b" style="letter-spacing:1px;margin-top:14px">RITMO ${c.goal==='bajar'?'PARA BAJAR':'PARA GANAR'}</div><div class="seg" style="margin-top:6px">${[['lento','Lento'],['normal','Normal'],['rapido','Rápido']].map(([k,l])=>`<button class="${c.ritmo===k?'on':''}" data-a="nRitmo" data-v="${k}">${l}</button>`).join('')}</div>
+      <div class="xs mut" style="margin-top:6px;line-height:1.4">${c.goal==='bajar'?`Alrededor de ${fmtNum(c.semana)} kg por semana (${fmtNum(Math.round(c.semana/c.w*1000)/10)} % de tu peso).${c.limite?' PandarIA aplicó su límite de seguridad: no quita más del 25 % de tu gasto ni baja de tu metabolismo en reposo.':''}`:`${Math.round((kb('nut.superavit')[c.ritmo]-1)*100)} % más de calorías que tu mantenimiento.`}${kbLink(c.goal==='bajar'?'nut.deficit':'nut.superavit','Por qué')}</div>`:''}
+    ${c.adapt?`<div class="sm" style="margin-top:12px;line-height:1.45;color:${c.adapt.ok?'var(--ok)':'var(--mut)'}">${c.adapt.ok?`Ajustado con tu diario: en ${c.adapt.days} días comiste de media ${fmtK(c.adapt.intake)} y tu peso cambió ${fmtNum(c.adapt.kgWeek)} kg por semana, así que tu gasto real ronda ${fmtK(c.adapt.obs)}.`:`Objetivo que se ajusta solo: ${esc(c.adapt.why)}.`}${kbLink('nut.adaptativo','Cómo funciona')}</div>`:''}
+    ${typeof isPremium!=='function'||isPremium()?`<button class="link xs" style="margin-top:6px" data-a="nAdapt">${nut().adaptOff?'Activar':'Desactivar'} el ajuste automático</button>`:''}
     <div class="xs mut" style="margin-top:10px;line-height:1.4">Fórmula de Mifflin-St Jeor <button class="link xs" data-a="kbOpen" data-v="nut.metabolismo">(fuente)</button> con tu perfil y tus entrenos de la semana. Proteína: ${fmtNum(c.pk)} g por kg (la ISSN recomienda 1,4–2,0 g/kg si entrenas, y algo más en déficit). <button class="link xs" data-a="kbOpen" data-v="nut.proteina">Ver fuente</button></div>
     ${c.notes.map(t=>`<div class="sm" style="margin-top:8px;color:var(--blue);line-height:1.4">${esc(t)}</div>`).join('')}</div>`;
   }
@@ -6934,13 +7005,15 @@ function viewNutricion(){
   const days=[...Array(7).keys()].reverse().map(i=>{ const k=dayKey(Date.now()-i*DAY); return n.water[k]||0; });
   h+=`<div class="sec">Agua</div><div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString('es',{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString('es',{maximumFractionDigits:1})} L</span></div></div>
     <div class="grow col" style="gap:8px"><button class="btn sm" data-a="water" data-v="250">${I('drop',16)} + Vaso 250 ml</button><button class="btn sm" data-a="water" data-v="500">${I('drop',16)} + Botella 500 ml</button><button class="btn sm ghost" data-a="water" data-v="-250">− 250 ml</button></div></div>
-    <div class="xs mut" style="margin-top:10px">Meta: 35 ml por kg${trainedToday().length?' + 500 ml porque hoy entrenaste':''}. <button class="link xs" data-a="kbOpen" data-v="agua">Ver fuente</button></div>
+    <div class="xs mut" style="margin-top:10px">Meta según tu peso y la referencia de la EFSA${trainedToday().length?', + 500 ml porque hoy entrenaste':''}. <button class="link xs" data-a="kbOpen" data-v="agua">Ver fuente</button></div>
     <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString('es'):''})}</div></div>`;
   h+=fastCard();
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
   return h;
 }
-A.nGoal=v=>{ nut().goal=v; save(); render.keep=true; render(); };
+A.nGoal=v=>{ nut().goal=v; delete nut().ritmo; save(); render.keep=true; render(); };
+A.nRitmo=v=>{ nut().ritmo=v; save(); render.keep=true; render(); };
+A.nAdapt=()=>{ const n=nut(); n.adaptOff=!n.adaptOff; save(); render.keep=true; render(); toast(n.adaptOff?'Ajuste automático desactivado':'Ajuste automático activado'); };
 A.water=v=>{ const n=nut(), k=dayKey(); n.water[k]=Math.max(0,(n.water[k]||0)+(+v)); save(); render.keep=true; render(); if(+v>0) vibrate(15);
   if ((n.water[k]||0)>=waterGoal() && (n.water[k]-(+v))<waterGoal()) toast('💧 ¡Meta de agua cumplida!'); };
 
@@ -8078,7 +8151,7 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='0.8';
 const CHANGELOG=[
- {v:'0.8',t:'Nutrición completa y PandarIA con evidencia (en desarrollo)',items:['Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
+ {v:'0.8',t:'Nutrición completa y PandarIA con evidencia (en desarrollo)',items:['Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
  {v:'0.5.1',t:'Mejoras de testers',items:['Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata','Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez']},
@@ -8109,7 +8182,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["Etapa 3 de 5: diario de comidas en Nutrición, con 597 alimentos que funcionan sin internet", "Porciones caseras o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas", "Crea tus alimentos con la etiqueta y tus recetas por raciones", "Preferencias vegetariana o vegana y alergias: PandarIA avisa cuando algo no encaja", "Modo hábitos para registrar sin ver calorías ni números", "Registrar es gratis; con Premium comparas el día con tu objetivo y ves tu semana"];
+const NOTAS_VERSION=["Etapa 4 de 5: reglas que cambian resultados, con su fuente en Ciencia de PandarIA", "2 minutos de descanso en multiarticulares con peso para ganar músculo", "Bajar o ganar a tu ritmo (lento, normal o rápido) con límite de seguridad", "Objetivo de calorías que se ajusta con tu diario y tu peso (Premium)", "Check-in con efecto: menos carga si dormiste mal, y opción de empezar suave", "Minutos de actividad frente a la meta de la OMS en el informe semanal", "Meta de agua recalibrada y alternativas de dificultad parecida al estancarte"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
