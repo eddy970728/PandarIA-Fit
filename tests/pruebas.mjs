@@ -170,6 +170,7 @@ for (const [nombre, fn] of casos) {
     resultados[nombre] = JSON.parse(JSON.stringify(w.eval(body) ?? null));
   } catch (e) { fallos.push(`${nombre}: error al ejecutar → ${e.message}`); }
 }
+const BIB = JSON.parse(w.eval(`JSON.stringify({rules:KB_RULES, src:KB_SRC, lic:Object.keys(KB_LIC), ev:Object.keys(KB_EV), areas:Object.keys(KB_AREAS), ver:KB_VER, log:KB_LOG, frozen:KB_RULES.every(r=>typeof r.v!=='object'||Object.isFrozen(r.v)), why:KB_WHY.map(x=>x[1]), sugg:Object.values(KB_SUGG)})`));
 cerrar();
 
 /* ---------- Comprobaciones que no dependen de resultados guardados ---------- */
@@ -205,6 +206,34 @@ if (fs.existsSync(COPIA07)) {
   comprobar('copia 0.7: una segunda carga no cambia nada', b.w.eval('JSON.stringify(S.sessions)') === JSON.stringify(d0.sessions) && b.w.localStorage.getItem('pandaria-fit-antes-v' + (d0.v || 1)) === raw);
   b.cerrar();
 } else fallos.push('falta tests/copia-0.7.json');
+
+
+/* ---------- Biblioteca de evidencia ---------- */
+{
+  const html = fs.readFileSync(HTML, 'utf8');
+  const ini = html.indexOf('/* ============ PandarIA · BIBLIOTECA DE EVIDENCIA'), fin = html.indexOf('/* ============ PandarIA · MOTOR DE ENTRENAMIENTO');
+  const fuera = html.slice(0, ini) + html.slice(fin);
+  const ids = BIB.rules.map(r => r.id), hoy = new Date().toISOString().slice(0, 10);
+  const mal = (f) => BIB.rules.filter(f).map(r => r.id).join(', ');
+  comprobar('biblioteca: sin reglas repetidas', new Set(ids).size === ids.length, ids.filter((x, i) => ids.indexOf(x) !== i).join(', '));
+  comprobar('biblioteca: cada regla tiene nombre, texto, uso, población, valor y versión', !mal(r => !r.n || !r.t || !r.usa || !r.pob || r.v == null || !r.desde), mal(r => !r.n || !r.t || !r.usa || !r.pob || r.v == null || !r.desde));
+  comprobar('biblioteca: cada regla tiene fuente y la fuente existe', !mal(r => !r.src || !r.src.length || r.src.some(s => !BIB.src[s])), mal(r => !r.src || !r.src.length || r.src.some(s => !BIB.src[s])));
+  comprobar('biblioteca: cada fuente tiene título, autor, año y tipo de licencia válido', Object.entries(BIB.src).every(([k, s]) => s.n && s.a && s.y && BIB.lic.includes(s.lic) && (s.lic === 'propio' || /^https:\/\//.test(s.url))), Object.entries(BIB.src).filter(([k, s]) => !(s.n && s.a && s.y && BIB.lic.includes(s.lic) && (s.lic === 'propio' || /^https:\/\//.test(s.url)))).map(x => x[0]).join(', '));
+  // regla de licencias: una regla nunca puede declarar un uso más libre que el de sus fuentes
+  const orden = { propio: 0, consejo: 1, pd: 2 };
+  const libre = r => r.lic === 'pd' && r.src.some(s => BIB.src[s].lic !== 'pd');
+  comprobar('biblioteca: tipo de licencia válido y nunca más libre que su fuente', !mal(r => !BIB.lic.includes(r.lic) || libre(r) || (r.lic === 'consejo' && r.src.every(s => BIB.src[s].lic === 'propio'))), mal(r => !BIB.lic.includes(r.lic) || libre(r)));
+  comprobar('biblioteca: nivel de evidencia válido', !mal(r => !BIB.ev.includes(r.ev)), mal(r => !BIB.ev.includes(r.ev)));
+  comprobar('biblioteca: área válida', !mal(r => !BIB.areas.includes(r.area)), mal(r => !BIB.areas.includes(r.area)));
+  comprobar('biblioteca: ninguna regla con la revisión vencida', !mal(r => !/^\d{4}-\d\d-\d\d$/.test(r.rev) || r.rev <= hoy), mal(r => !/^\d{4}-\d\d-\d\d$/.test(r.rev) || r.rev <= hoy));
+  comprobar('biblioteca: los valores no se pueden modificar desde el código', BIB.frozen);
+  comprobar('biblioteca: el historial coincide con la versión', BIB.log.length && BIB.log[BIB.log.length - 1].v === BIB.ver);
+  const usados = [...fuera.matchAll(/kb\('([^']+)'\)/g)].map(m => m[1]);
+  const desconocidos = [...new Set(usados.concat(BIB.why, BIB.sugg))].filter(x => !ids.includes(x));
+  comprobar('biblioteca: el código solo pide reglas que existen', !desconocidos.length, desconocidos.join(', '));
+  const sinUso = ids.filter(id => !fuera.includes(`'${id}'`) && !fuera.includes(`"${id}"`) && !BIB.why.includes(id) && !BIB.sugg.includes(id));
+  comprobar('biblioteca: cada regla se usa en la app', !sinUso.length, sinUso.join(', '));
+}
 
 /* ---------- Comparación con los resultados guardados ---------- */
 if (ACTUALIZAR) {
