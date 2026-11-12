@@ -179,6 +179,21 @@ caso('alimentos_modo_habitos', () => { __reset(HOMBRE); nut().habitos = true; co
   ['09040', '11090', '05064'].forEach((id, i) => { const f = alimGet(id); (n.diario[k] = n.diario[k] || []).push(Object.assign(alimMac(f, 100), { id: 'h' + i, fid: id, n: f.n, gr: 100, m: i ? 'almuerzo' : 'desayuno', t: 0 })); });
   const html = diarioCard(); return { numeros: /\d\s?kcal/.test(html), resumen: habitosResumen(k).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }; });
 
+// 59-64 · Etapa 4: reglas que cambian resultados
+caso('ritmos_nutricion', () => { __reset(HOMBRE); const out = {}; for (const g of ['bajar', 'ganar']) for (const r of ['lento', 'normal', 'rapido']) { nut().goal = g; nut().ritmo = r; const c = calcNutrition(); out[g + ':' + r] = [c.kcal, c.prot, c.carbs]; }
+  nut().goal = 'bajar'; nut().ritmo = 'rapido'; S.profile.weight = 120; S.measures = [{ id: 'm', date: __NOW - 90 * DAY, peso: 120 }]; out.grande = calcNutrition().kcal; return out; });
+caso('ajuste_automatico', () => { __reset(HOMBRE); nut().goal = 'mantener'; const n = nd();
+  for (let i = 1; i <= 14; i++) { const k = dayKey(__NOW - i * DAY); n.diario[k] = [{ id: 'a' + i, fid: '20045', n: 'Arroz', gr: 500, m: 'almuerzo', k: 1300, p: 0, c: 0, g: 0, t: 0 }, { id: 'b' + i, fid: '05064', n: 'Pollo', gr: 400, m: 'cena', k: 1000, p: 0, c: 0, g: 0, t: 0 }]; }
+  S.measures = [{ id: 'w1', date: __NOW - 15 * DAY, peso: 80.6 }, { id: 'w2', date: __NOW - 8 * DAY, peso: 80.3 }, { id: 'w3', date: __NOW - 1 * DAY, peso: 80 }];
+  const c = calcNutrition(); const raro = (() => { S.measures[2].peso = 70; return calcNutrition().adapt; })(); return { kcal: c.kcal, tdee: c.tdee, adapt: c.adapt, raro, trend: weightTrend() }; });
+caso('agua_por_tamano', () => { const out = {}; [['h', 50], ['h', 80], ['h', 130], ['m', 50], ['m', 70], ['m', 110], ['x', 75]].forEach(([sex, w]) => { __reset({ age: 30, height: 170, weight: w, sex }); out[sex + w] = waterGoal(); }); return out; });
+caso('dia_con_poco_descanso', () => { __reset(HOMBRE, { level: 'intermedio' }); const r = __routine([buildItem('press_banca', 'musculo', 2), buildItem('dominadas', 'musculo', 2)]); __hist(r, { n: 4, tope: true });
+  const normal = r.items.map(it => suggestSet(r, it, 0)); WK_AJUSTE = { f: kb('recuperacion.ajuste').f, why: 'Hoy llegas con poco descanso: 10 % menos de carga', rid: r.id, t: __NOW };
+  const suave = r.items.map(it => suggestSet(r, it, 0)); const otra = suggestSet(Object.assign({}, r, { id: 'otra' }), r.items[0], 0); WK_AJUSTE = null; return __clean({ normal, suave, otra }); });
+caso('estado_de_recuperacion', () => { __reset(HOMBRE); const r = __routine([buildItem('press_banca', 'musculo', 2), buildItem('remo_barra', 'musculo', 2)]); const out = { nada: recoveryState(r) };
+  __hist(r, { n: 1, fin: 0.5, intensidad: 10 }); out.reciente = recoveryState(r); S.sessions.forEach(x => x.checkin = { sleep: 0, energy: 0, sore: 1 }); __hist(r, { n: 2, fin: 0.3 }); S.sessions.forEach(x => x.checkin = { sleep: 0, energy: 1, sore: 1 }); out.mal = recoveryState(r); return out; });
+caso('alternativas_sin_barra_marcada', () => { __reset(HOMBRE); S.settings.equip = ['pc', 'est']; return ['press_banca', 'sentadilla', 'curl_barra', 'peso_muerto'].map(id => alternatives(id).slice(0, 3)); });
+
 /* ---------- Ejecución ---------- */
 const resultados = {}, fallos = [];
 const { w, errores, cerrar } = abrir();

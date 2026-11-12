@@ -154,7 +154,7 @@
      8,
      12
     ],
-    "rest": 90,
+    "rest": 120,
     "time": null
    },
    {
@@ -163,7 +163,7 @@
      8,
      12
     ],
-    "rest": 90,
+    "rest": 120,
     "time": null
    },
    {
@@ -172,7 +172,7 @@
      8,
      12
     ],
-    "rest": 90,
+    "rest": 120,
     "time": null
    }
   ],
@@ -888,7 +888,7 @@
     8,
     12
    ],
-   "rest": 105,
+   "rest": 135,
    "time": null
   },
   {
@@ -897,7 +897,7 @@
     8,
     12
    ],
-   "rest": 105,
+   "rest": 135,
    "time": null
   }
  ],
@@ -908,7 +908,7 @@
     8,
     12
    ],
-   "rest": 90,
+   "rest": 120,
    "time": null
   },
   {
@@ -917,7 +917,7 @@
     8,
     12
    ],
-   "rest": 90,
+   "rest": 120,
    "time": null
   }
  ],
@@ -996,7 +996,7 @@
      "time": null
     }
    ],
-   "rest": 90,
+   "rest": 120,
    "range": [
     8,
     12
@@ -1065,14 +1065,21 @@
  "nutricion_hombre_bajar": {
   "bmr": 1768,
   "tdee": 2430,
-  "kcal": 2070,
+  "kcal": 1990,
   "prot": 160,
   "fat": 64,
-  "carbs": 214,
+  "carbs": 194,
   "goal": "bajar",
   "notes": [],
   "pk": 2,
-  "w": 80
+  "w": 80,
+  "ritmo": "lento",
+  "adapt": {
+   "ok": false,
+   "why": "Faltan días de diario: 0 de 10"
+  },
+  "semana": 0.4,
+  "limite": false
  },
  "nutricion_hombre_mantener": {
   "bmr": 1768,
@@ -1084,7 +1091,14 @@
   "goal": "mantener",
   "notes": [],
   "pk": 1.6,
-  "w": 80
+  "w": 80,
+  "ritmo": "lento",
+  "adapt": {
+   "ok": false,
+   "why": "Faltan días de diario: 0 de 10"
+  },
+  "semana": null,
+  "limite": false
  },
  "nutricion_hombre_ganar": {
   "bmr": 1768,
@@ -1096,7 +1110,14 @@
   "goal": "ganar",
   "notes": [],
   "pk": 1.8,
-  "w": 80
+  "w": 80,
+  "ritmo": "normal",
+  "adapt": {
+   "ok": false,
+   "why": "Faltan días de diario: 0 de 10"
+  },
+  "semana": null,
+  "limite": false
  },
  "nutricion_mujer_ganar": {
   "bmr": 1288,
@@ -1108,7 +1129,14 @@
   "goal": "ganar",
   "notes": [],
   "pk": 1.8,
-  "w": 60
+  "w": 60,
+  "ritmo": "normal",
+  "adapt": {
+   "ok": false,
+   "why": "Faltan días de diario: 0 de 10"
+  },
+  "semana": null,
+  "limite": false
  },
  "nutricion_imc_bajo": {
   "bmr": 1555,
@@ -1122,7 +1150,14 @@
    "Tu índice de masa corporal es bajo: no recomendamos déficit calórico. Te mostramos el mantenimiento."
   ],
   "pk": 1.6,
-  "w": 55
+  "w": 55,
+  "ritmo": "lento",
+  "adapt": {
+   "ok": false,
+   "why": "Faltan días de diario: 0 de 10"
+  },
+  "semana": null,
+  "limite": false
  },
  "nutricion_menor": {
   "bmr": 1422,
@@ -1136,11 +1171,18 @@
    "En menores de 18 las necesidades cambian con el crecimiento: usa esto solo como orientación y consulta a un profesional."
   ],
   "pk": 1.6,
-  "w": 60
+  "w": 60,
+  "ritmo": "lento",
+  "adapt": {
+   "ok": false,
+   "why": "Faltan días de diario: 0 de 10"
+  },
+  "semana": null,
+  "limite": false
  },
  "nutricion_sin_perfil": null,
- "agua_sin_entreno": 2800,
- "agua_con_entreno": 3300,
+ "agua_sin_entreno": 2650,
+ "agua_con_entreno": 3150,
  "plan_musculo_3d": [
   {
    "name": "Cuerpo completo A",
@@ -4705,7 +4747,7 @@
        "time": null
       }
      ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
@@ -4735,7 +4777,7 @@
        "time": null
       }
      ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
@@ -4825,7 +4867,7 @@
        "time": null
       }
      ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
@@ -4892,37 +4934,7 @@
        "time": null
       }
      ],
-     "rest": 90,
-     "range": [
-      8,
-      12
-     ],
-     "note": "",
-     "sticky": ""
-    },
-    {
-     "exId": "zancadas",
-     "sets": [
-      {
-       "t": "n",
-       "reps": 8,
-       "kg": 6,
-       "time": null
-      },
-      {
-       "t": "n",
-       "reps": 8,
-       "kg": 6,
-       "time": null
-      },
-      {
-       "t": "n",
-       "reps": 8,
-       "kg": 6,
-       "time": null
-      }
-     ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
@@ -4982,7 +4994,7 @@
        "time": null
       }
      ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
@@ -5012,7 +5024,7 @@
        "time": null
       }
      ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
@@ -5079,40 +5091,10 @@
        "time": null
       }
      ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
-     ],
-     "note": "",
-     "sticky": ""
-    },
-    {
-     "exId": "patada_gluteo",
-     "sets": [
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
-      },
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
-      },
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
-      }
-     ],
-     "rest": 90,
-     "range": [
-      10,
-      15
      ],
      "note": "",
      "sticky": ""
@@ -5148,28 +5130,58 @@
      "sticky": ""
     },
     {
-     "exId": "remo_mesa",
+     "exId": "patada_gluteo",
      "sets": [
       {
        "t": "n",
-       "reps": 8,
+       "reps": 10,
        "kg": null,
        "time": null
       },
       {
        "t": "n",
-       "reps": 8,
+       "reps": 10,
        "kg": null,
        "time": null
       },
       {
        "t": "n",
-       "reps": 8,
+       "reps": 10,
        "kg": null,
        "time": null
       }
      ],
      "rest": 90,
+     "range": [
+      10,
+      15
+     ],
+     "note": "",
+     "sticky": ""
+    },
+    {
+     "exId": "remo_kroc",
+     "sets": [
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      },
+      {
+       "t": "n",
+       "reps": 8,
+       "kg": 4,
+       "time": null
+      }
+     ],
+     "rest": 120,
      "range": [
       8,
       12
@@ -5178,7 +5190,7 @@
      "sticky": ""
     },
     {
-     "exId": "press_arnold",
+     "exId": "press_hombro_man",
      "sets": [
       {
        "t": "n",
@@ -5199,7 +5211,7 @@
        "time": null
       }
      ],
-     "rest": 90,
+     "rest": 120,
      "range": [
       8,
       12
@@ -6060,10 +6072,10 @@
     "kind": "cambiar",
     "exId": "press_banca",
     "title": "Press de banca con barra: estancado",
-    "text": "Sin mejoras en 4 entrenos. Propongo Flexiones en pared para dar un estímulo nuevo al mismo músculo.",
+    "text": "Sin mejoras en 4 entrenos. Propongo Press inclinado con barra para dar un estímulo nuevo al mismo músculo.",
     "why": "Variar el ejercicio ayuda a romper estancamientos.",
     "data": {
-     "to": "flexiones_pared"
+     "to": "press_inclinado_barra"
     },
     "stagnant": true
    },
@@ -6071,10 +6083,10 @@
     "kind": "cambiar",
     "exId": "sentadilla",
     "title": "Sentadilla con barra: estancado",
-    "text": "Sin mejoras en 4 entrenos. Propongo Sentadilla con peso corporal para dar un estímulo nuevo al mismo músculo.",
+    "text": "Sin mejoras en 4 entrenos. Propongo Sentadilla frontal para dar un estímulo nuevo al mismo músculo.",
     "why": "Variar el ejercicio ayuda a romper estancamientos.",
     "data": {
-     "to": "sentadilla_peso"
+     "to": "sentadilla_frontal"
     },
     "stagnant": true
    }
@@ -6102,25 +6114,28 @@
  },
  "alternativas": [
   [
-   "flexiones_pared",
-   "flexiones_inclinadas",
-   "flexiones_rodillas",
-   "flexiones",
-   "flexiones_archer"
+   "press_inclinado_barra",
+   "press_declinado",
+   "banca_inversa",
+   "press_svend",
+   "flexiones_pared"
   ],
   [
+   "sentadilla_frontal",
+   "sentadilla_zercher",
+   "zancada_caminando_barra",
    "sentadilla_peso",
-   "sentarse_levantarse",
-   "sentadilla_pared",
-   "sentadilla_salto",
-   "sentadilla_pistol"
+   "sentarse_levantarse"
   ],
   [
-   "remo_mesa",
-   "remo_toalla",
-   "est_dorsal"
+   "dominadas_negativas",
+   "dominadas_supinas",
+   "dominadas_neutras",
+   "muscle_up",
+   "remo_mesa"
   ],
   [
+   "curl_arrastre",
    "curl_toalla"
   ]
  ],
@@ -6807,5 +6822,146 @@
  "alimentos_modo_habitos": {
   "numeros": false,
   "resumen": "Modo hábitos: registras lo que comes sin contar calorías. Comidas del día 2 Frutas y verduras 2 Comidas con proteína 1"
- }
+ },
+ "ritmos_nutricion": {
+  "bajar:lento": [
+   1990,
+   160,
+   194
+  ],
+  "bajar:normal": [
+   1820,
+   160,
+   151
+  ],
+  "bajar:rapido": [
+   1820,
+   160,
+   151
+  ],
+  "ganar:lento": [
+   2550,
+   144,
+   350
+  ],
+  "ganar:normal": [
+   2670,
+   144,
+   380
+  ],
+  "ganar:rapido": [
+   2790,
+   144,
+   410
+  ],
+  "grande": 2240
+ },
+ "ajuste_automatico": {
+  "kcal": 2530,
+  "tdee": 2430,
+  "adapt": {
+   "ok": true,
+   "tdee": 2530,
+   "obs": 2630,
+   "intake": 2300,
+   "days": 14,
+   "kgWeek": -0.3
+  },
+  "raro": {
+   "ok": false,
+   "why": "Los datos no cuadran con la fórmula (¿faltan comidas en el diario?): no los uso",
+   "obs": 8130
+  },
+  "trend": {
+   "kgDay": -0.7571428571428568,
+   "kgWeek": -5.299999999999997,
+   "pct": -6.886097877869204,
+   "span": 14
+  }
+ },
+ "agua_por_tamano": {
+  "h50": 1700,
+  "h80": 2650,
+  "h130": 2700,
+  "m50": 1650,
+  "m70": 2150,
+  "m110": 2150,
+  "x75": 2450
+ },
+ "dia_con_poco_descanso": {
+  "normal": [
+   {
+    "kg": 30,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": null,
+    "reps": 13,
+    "time": null,
+    "why": "Una repetición más que la última vez"
+   }
+  ],
+  "suave": [
+   {
+    "kg": 27.5,
+    "reps": 8,
+    "time": null,
+    "why": "Hoy llegas con poco descanso: 10 % menos de carga"
+   },
+   {
+    "kg": null,
+    "reps": 12,
+    "time": null,
+    "why": "Hoy llegas con poco descanso: 10 % menos de carga"
+   }
+  ],
+  "otra": {
+   "kg": 30,
+   "reps": 8,
+   "time": null,
+   "why": "Completaste todas las series: sube el peso"
+  }
+ },
+ "estado_de_recuperacion": {
+  "nada": {
+   "lvl": "buena",
+   "msgs": []
+  },
+  "reciente": {
+   "lvl": "media",
+   "msgs": [
+    "tu última sesión fue muy exigente"
+   ]
+  },
+  "mal": {
+   "lvl": "baja",
+   "msgs": [
+    "pecho, espalda (dorsales) trabajados hace menos de 48 h",
+    "varios días con poco descanso"
+   ]
+  }
+ },
+ "alternativas_sin_barra_marcada": [
+  [
+   "press_inclinado_barra",
+   "press_declinado",
+   "banca_inversa"
+  ],
+  [
+   "sentadilla_frontal",
+   "sentadilla_zercher",
+   "zancada_caminando_barra"
+  ],
+  [
+   "curl_arrastre",
+   "curl_toalla"
+  ],
+  [
+   "peso_muerto_rumano",
+   "buenos_dias",
+   "pm_piernas_rigidas"
+  ]
+ ]
 }
