@@ -289,7 +289,7 @@ if (fs.existsSync(COPIA07)) {
       let ultimo = null; w.addEventListener('error', e => { ultimo = e.message || String(e.error); });
       // en inglés se apunta todo texto que, después de traducir, sigue pareciendo español
       if (lang === 'en') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
-        if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
+        if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
       const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); TAB=${JSON.stringify(t)}; render();`);
       const botones = () => [...w.document.querySelectorAll('[data-a]')].map(e => [e.dataset.a, e.dataset.v || '']).filter(([x]) => !PELIGRO.test(x) && x !== 'tab');
@@ -300,7 +300,7 @@ if (fs.existsSync(COPIA07)) {
         if (vistos.has(x + v)) continue; vistos.add(x + v);
         reset(); if (!tocar(x, v)) continue; toques++;
         if (ultimo) { fallosR.push(`${t} › ${x}(${v}): ${ultimo}`); continue; }
-        if (lang !== 'es' || !w.eval('LAYERS.length+MODALS.length')) continue;
+        if ((lang !== 'es' && x !== 'ajGrupo') || !w.eval('LAYERS.length+MODALS.length')) continue;
         for (const [y, z] of botones().filter(([y]) => y !== 'back' && y !== 'closeModal' && y !== 'cbm').slice(0, 12)) {
           if (vistos.has(x + '>' + y + z)) continue; vistos.add(x + '>' + y + z);
           reset(); tocar(x, v); if (!tocar(y, z)) continue; toques++;
@@ -329,7 +329,9 @@ if (fs.existsSync(COPIA07)) {
   comprobar('alimentos: marcas de alérgenos y dieta válidas', !mal(f => /[^LHGMNSPCZAV]/.test(f.fl) || (f.fl.includes('A') && f.fl.includes('V'))), mal(f => /[^LHGMNSPCZAV]/.test(f.fl)));
   comprobar('alimentos: carnes, aves y pescados marcados como de origen animal', !mal(f => ['carne', 'ave', 'pescado'].includes(f.cat) && !f.fl.includes('A')));
   comprobar('alimentos: lácteos marcados con leche (salvo bebidas vegetales)', !mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')), mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')));
-  comprobar('alimentos: todos vienen del USDA', L.every(f => f.usda && /^\d{5}$/.test(f.id)));
+  const porId = Object.fromEntries(L.map(f => [f.id, f]));
+  comprobar('alimentos: todos vienen del USDA (las recetas típicas, de ingredientes del USDA)', L.every(f => (f.usda && /^\d{5}$/.test(f.id)) || (f.rec && /^R\d{2}$/.test(f.id) && f.ing.length && f.ing.every(([i, g]) => porId[i] && porId[i].usda && g > 0))), mal(f => !f.usda && !f.rec));
+  comprobar('recetas típicas: al menos 40, con sus alérgenos sumados de los ingredientes', L.filter(f => f.rec).length >= 40 && L.filter(f => f.rec).every(f => f.ing.every(([i]) => [...porId[i].fl.replace('V', '')].every(x => f.fl.includes(x)))), mal(f => f.rec && !f.ing.every(([i]) => [...porId[i].fl.replace('V', '')].every(x => f.fl.includes(x)))));
   const html = fs.readFileSync(HTML, 'utf8');
   comprobar('alimentos: la app da el crédito al USDA', /USDA, base de datos de nutrientes/.test(html) && /dominio público/.test(html));
 }

@@ -6374,13 +6374,13 @@
   "Graba tu técnica de vez en cuando: verte desde fuera corrige errores que no sientes."
  ],
  "alimentos_base": {
-  "n": 597,
+  "n": 637,
   "cats": {
    "carne": 44,
    "verdura": 89,
    "legumbre": 23,
    "bebida": 40,
-   "condimento": 27,
+   "condimento": 30,
    "semilla": 20,
    "fruta": 64,
    "suplemento": 5,
@@ -6388,8 +6388,8 @@
    "pescado": 38,
    "snack": 9,
    "cereal": 62,
-   "dulce": 37,
-   "preparado": 45,
+   "dulce": 40,
+   "preparado": 79,
    "ave": 19,
    "grasa": 10,
    "huevo": 10
@@ -6543,7 +6543,8 @@
  },
  "alimentos_busqueda": {
   "palta": [
-   "Palta"
+   "Palta",
+   "Guacamole"
   ],
   "aguacate": [
    "Palta"
@@ -6572,9 +6573,9 @@
   "patata": [
    "Papa",
    "Papa hervida",
+   "Patatas bravas",
    "Papa al horno",
-   "Ensalada de papa",
-   "Puré de papas"
+   "Pastel de papa"
   ],
   "papa": [
    "Papa",
