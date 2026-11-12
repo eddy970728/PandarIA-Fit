@@ -26,11 +26,19 @@ jobs:
       - name: Instalar Capacitor
         run: npm install
 
+      - name: Leer la version de la app
+        run: echo "VER=$(grep -oP "const APP_VERSION='\K[^']+" www/index.html)" >> $GITHUB_ENV
+
+      - name: Pruebas automaticas (si fallan, no se compila la APK)
+        run: |
+          npm install --no-save jsdom@25
+          node tests/pruebas.mjs
+
       - name: Conectar el codigo nativo al HTML
         run: |
           grep -q 'premium.js' www/index.html || sed -i 's#</body>#<script src="native.js"></script><script src="premium.js"></script></body>#' www/index.html
           sed -i '0,/<head>/s##<head><script>window.PF_BUILD=${{ github.run_number }}</script>#' www/index.html
-          node -e "const h=require('fs').readFileSync('www/index.html','utf8');const m=h.match(/const NOTAS_VERSION=(\[[^\n]*\]);/);const n=m?JSON.parse(m[1]):[];require('fs').writeFileSync('notas.md','Versión de prueba 0.7.${{ github.run_number }}. Descarga PandarIA-Fit.apk e instálala encima de la anterior.\n\n'+n.map(x=>'- '+x).join('\n')+'\n')"
+          node -e "const h=require('fs').readFileSync('www/index.html','utf8');const m=h.match(/const NOTAS_VERSION=(\[[^\n]*\]);/);const n=m?JSON.parse(m[1]):[];require('fs').writeFileSync('notas.md','Versión de prueba ${{ env.VER }}.${{ github.run_number }}. Descarga PandarIA-Fit.apk e instálala encima de la anterior.\n\n'+n.map(x=>'- '+x).join('\n')+'\n')"
           cat notas.md
 
       - name: Crear proyecto Android
@@ -43,7 +51,7 @@ jobs:
       - name: Numero de version automatico
         run: |
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
-          sed -i "s/versionName \"[^\"]*\"/versionName \"0.7.${{ github.run_number }}\"/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"${{ env.VER }}.${{ github.run_number }}\"/" android/app/build.gradle
 
       - name: Compilar
         run: |
@@ -71,7 +79,7 @@ jobs:
       - name: Publicar en Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.7.${{ github.run_number }}
-          name: PandarIA Fit 0.7.${{ github.run_number }}
+          tag_name: v${{ env.VER }}.${{ github.run_number }}
+          name: PandarIA Fit ${{ env.VER }}.${{ github.run_number }}
           body_path: notas.md
           files: PandarIA-Fit.apk
