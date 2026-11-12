@@ -280,13 +280,16 @@ if (fs.existsSync(COPIA07)) {
 if (fs.existsSync(COPIA07)) {
   const PELIGRO = /wipe|del|Del|Remove|import|export|Export|share|Share|Url|Mail|upd(Download|Open)|hcPrivacy|Discard|kbUrl|copy|Copy|photo|Photo|mPhoto|backup|Backup|xjump|mFile/;
   for (const lang of ['es', 'en']) {
-    let toques = 0; const fallosR = [];
+    let toques = 0; const fallosR = [], sinTraducir = new Set();
     for (const t of ['rutinas', 'explorar', 'nutricion', 'historial', 'ajustes']) {
       const a = abrir({ 'pandaria-fit-v1': fs.readFileSync(COPIA07, 'utf8') });
       await espera(900);
       const w = a.w;
       w.history.back = () => {}; w.history.go = () => {}; w.open = () => null;
       let ultimo = null; w.addEventListener('error', e => { ultimo = e.message || String(e.error); });
+      // en inglés se apunta todo texto que, después de traducir, sigue pareciendo español
+      if (lang === 'en') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
+        if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
       const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); TAB=${JSON.stringify(t)}; render();`);
       const botones = () => [...w.document.querySelectorAll('[data-a]')].map(e => [e.dataset.a, e.dataset.v || '']).filter(([x]) => !PELIGRO.test(x) && x !== 'tab');
@@ -305,9 +308,11 @@ if (fs.existsSync(COPIA07)) {
         }
       }
       await espera(200);
+      if (lang === 'en') w.eval('[...__ES]').forEach(x => sinTraducir.add(`${t}: ${x}`));
       a.cerrar();
     }
     console.log(`Recorrido en ${lang === 'es' ? 'español' : 'inglés'}: ${toques} botones tocados`);
+    if (lang === 'en') comprobar(`en inglés no queda texto en español (${sinTraducir.size} encontrados)`, !sinTraducir.size, [...sinTraducir].slice(0, 8).join(' | '));
     comprobar(`recorrido de pantallas en ${lang === 'es' ? 'español' : 'inglés'} sin errores (${toques} botones)`, !fallosR.length && toques > 150, fallosR.slice(0, 5).join(' | ') || `solo ${toques} botones`);
   }
 }
