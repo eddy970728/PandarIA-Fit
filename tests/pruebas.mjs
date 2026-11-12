@@ -53,6 +53,7 @@ window.HOMBRE = ${JSON.stringify(HOMBRE)}; window.MUJER = ${JSON.stringify(MUJER
 window.__NOW = ${NOW};
 window.__clean = o => JSON.parse(JSON.stringify(o, (k, v) => ['uid','id','sid','routineId','superset','created','itemUid'].includes(k) ? undefined : (typeof v === 'number' ? Math.round(v * 1000) / 1000 : v)));
 window.__reset = (profile, settings) => {
+  NUT_DAY = null;
   __seed(7); __setNow(${NOW});
   S = DEF(); S.settings.onboarded = true; Object.assign(S.settings, settings || {});
   S.profile = Object.assign({ injuries: [] }, profile || {});
@@ -159,6 +160,25 @@ caso('ayuno_consejos_activo', () => { __reset(HOMBRE); const f = nut().fast; f.p
 // 50 · Consejos del día
 caso('consejo_del_dia', () => { __reset(HOMBRE); const out = []; for (let d = 0; d < 5; d++) { __setNow(__NOW + d * DAY); out.push(tipOfDay('nut'), tipOfDay('entreno')); } __setNow(__NOW); return out; });
 
+// 52-58 · Diario de comidas
+caso('alimentos_base', () => { const L = Object.values(ALIM), cats = {}; L.forEach(f => cats[f.cat] = (cats[f.cat] || 0) + 1);
+  return { n: L.length, cats, muestra: ['09003', '01077', '05064', '18069', '20045', '16015', '36403', '04053'].map(id => { const f = ALIM[id]; return [f.n, f.k, f.p, f.c, f.g, f.fl, f.por]; }) }; });
+caso('alimentos_busqueda', () => { __reset(HOMBRE); const out = {};
+  ['palta', 'aguacate', 'frijoles', 'porotos negros', 'fresa', 'frutilla', 'patata', 'papa', 'elote', 'choclo', 'yuca', 'pollo', 'queso', 'jugo naranja', 'arroz', 'platano', 'cacahuate', 'zumo', 'jitomate', 'betabel']
+    .forEach(q => out[q] = alimSearch(q).slice(0, 5).map(f => f.n)); return out; });
+caso('alimentos_preferencias', () => { __reset(HOMBRE); const ids = ['01077', '18069', '09040', '05064', '15121', '15270', '16087', '12061', '16426', '01123', '19296', '36403'];
+  const out = {}; [['todo', []], ['vegetariano', []], ['vegano', []], ['todo', ['L', 'G']], ['todo', ['M', 'N', 'C', 'P']]].forEach(([d, e]) => { nd().prefs = { dieta: d, evitar: e }; out[d + ':' + e.join('')] = ids.map(id => alimConflicts(ALIM[id])); }); return out; });
+caso('alimentos_receta', () => { __reset(HOMBRE); const r = { id: 'r1', n: 'Lentejas', rac: 2, items: [{ f: '16070', g: 400 }, { f: '11124', g: 100 }, { f: '04053', g: 20 }] }; nd().recetas.push(r);
+  const f = alimGet('r1'); return { k: f.k, p: f.p, c: f.c, g: f.g, fl: f.fl, por: f.por, racion: alimMac(f, f.por[0][1]) }; });
+caso('alimentos_propio', () => { __reset(HOMBRE); A.alNew = A.alNew; nd().alim.push({ id: 'p1', n: 'Barrita', k: 400, p: 25, c: 45, g: 12.5, f: null, a: null, na: null, fl: 'MV', por: [['1 barrita', 40]] });
+  const f = alimGet('p1'); return [f.cat, f.propio, alimMac(f, 40), alimSearch('barri').map(x => x.n)]; });
+caso('alimentos_totales_dia', () => { __reset(HOMBRE); const n = nd(), k = dayKey();
+  [['09040', 236, 'desayuno'], ['01077', 244, 'desayuno'], ['20045', 180, 'almuerzo'], ['05064', 172, 'almuerzo'], ['04053', 13.5, 'almuerzo']].forEach(([id, gr, m], i) => { const f = alimGet(id); (n.diario[k] = n.diario[k] || []).push(Object.assign(alimMac(f, gr), { id: 'e' + i, fid: id, n: f.n, gr, m, t: 0 })); });
+  return { tot: dayTotals(k), recientes: alimRecent().map(f => f.n) }; });
+caso('alimentos_modo_habitos', () => { __reset(HOMBRE); nut().habitos = true; const k = dayKey(), n = nd();
+  ['09040', '11090', '05064'].forEach((id, i) => { const f = alimGet(id); (n.diario[k] = n.diario[k] || []).push(Object.assign(alimMac(f, 100), { id: 'h' + i, fid: id, n: f.n, gr: 100, m: i ? 'almuerzo' : 'desayuno', t: 0 })); });
+  const html = diarioCard(); return { numeros: /\d\s?kcal/.test(html), resumen: habitosResumen(k).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }; });
+
 /* ---------- Ejecución ---------- */
 const resultados = {}, fallos = [];
 const { w, errores, cerrar } = abrir();
@@ -170,6 +190,7 @@ for (const [nombre, fn] of casos) {
     resultados[nombre] = JSON.parse(JSON.stringify(w.eval(body) ?? null));
   } catch (e) { fallos.push(`${nombre}: error al ejecutar → ${e.message}`); }
 }
+const ALI = JSON.parse(w.eval(`JSON.stringify({list:Object.values(ALIM), cats:Object.keys(ALIM_CATS), fl:Object.keys(ALIM_FL)})`));
 const BIB = JSON.parse(w.eval(`JSON.stringify({rules:KB_RULES, src:KB_SRC, lic:Object.keys(KB_LIC), ev:Object.keys(KB_EV), areas:Object.keys(KB_AREAS), ver:KB_VER, log:KB_LOG, frozen:KB_RULES.every(r=>typeof r.v!=='object'||Object.isFrozen(r.v)), why:KB_WHY.map(x=>x[1]), sugg:Object.values(KB_SUGG)})`));
 cerrar();
 
@@ -207,6 +228,23 @@ if (fs.existsSync(COPIA07)) {
   b.cerrar();
 } else fallos.push('falta tests/copia-0.7.json');
 
+
+/* ---------- Base de alimentos ---------- */
+{
+  const L = ALI.list, ids = L.map(f => f.id), nombres = L.map(f => f.n.toLowerCase());
+  const mal = f => L.filter(f).map(x => x.n).slice(0, 10).join(', ');
+  comprobar('alimentos: al menos 550 alimentos', L.length >= 550, `hay ${L.length}`);
+  comprobar('alimentos: sin códigos ni nombres repetidos', new Set(ids).size === ids.length && new Set(nombres).size === nombres.length);
+  comprobar('alimentos: categoría válida', !mal(f => !ALI.cats.includes(f.cat)), mal(f => !ALI.cats.includes(f.cat)));
+  comprobar('alimentos: valores por 100 g posibles', !mal(f => ![f.k, f.p, f.c, f.g].every(v => Number.isFinite(v) && v >= 0) || f.k > 902 || f.p + f.c + f.g > 100.5), mal(f => ![f.k, f.p, f.c, f.g].every(v => Number.isFinite(v) && v >= 0) || f.k > 902 || f.p + f.c + f.g > 100.5));
+  comprobar('alimentos: porciones con gramos válidos', !mal(f => f.por.some(([l, g]) => !l || !(g > 0) || g > 2000)), mal(f => f.por.some(([l, g]) => !l || !(g > 0) || g > 2000)));
+  comprobar('alimentos: marcas de alérgenos y dieta válidas', !mal(f => /[^LHGMNSPCZAV]/.test(f.fl) || (f.fl.includes('A') && f.fl.includes('V'))), mal(f => /[^LHGMNSPCZAV]/.test(f.fl)));
+  comprobar('alimentos: carnes, aves y pescados marcados como de origen animal', !mal(f => ['carne', 'ave', 'pescado'].includes(f.cat) && !f.fl.includes('A')));
+  comprobar('alimentos: lácteos marcados con leche (salvo bebidas vegetales)', !mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')), mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')));
+  comprobar('alimentos: todos vienen del USDA', L.every(f => f.usda && /^\d{5}$/.test(f.id)));
+  const html = fs.readFileSync(HTML, 'utf8');
+  comprobar('alimentos: la app da el crédito al USDA', /USDA, base de datos de nutrientes/.test(html) && /dominio público/.test(html));
+}
 
 /* ---------- Biblioteca de evidencia ---------- */
 {

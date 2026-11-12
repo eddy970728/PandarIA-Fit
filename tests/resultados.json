@@ -6357,5 +6357,455 @@
   "Si no tienes tiempo, 20 minutos bien hechos superan a no entrenar.",
   "Si entrenas en ayunas y te mareas, come algo ligero antes de la próxima sesión.",
   "Graba tu técnica de vez en cuando: verte desde fuera corrige errores que no sientes."
- ]
+ ],
+ "alimentos_base": {
+  "n": 597,
+  "cats": {
+   "carne": 44,
+   "verdura": 89,
+   "legumbre": 23,
+   "bebida": 40,
+   "condimento": 27,
+   "semilla": 20,
+   "fruta": 64,
+   "suplemento": 5,
+   "lacteo": 55,
+   "pescado": 38,
+   "snack": 9,
+   "cereal": 62,
+   "dulce": 37,
+   "preparado": 45,
+   "ave": 19,
+   "grasa": 10,
+   "huevo": 10
+  },
+  "muestra": [
+   [
+    "Manzana con piel",
+    52,
+    0.3,
+    13.8,
+    0.2,
+    "",
+    [
+     [
+      "1 mediana",
+      182
+     ],
+     [
+      "1 pequeña",
+      149
+     ],
+     [
+      "1 taza",
+      125
+     ],
+     [
+      "1 taza en rodajas",
+      109
+     ]
+    ]
+   ],
+   [
+    "Leche entera",
+    61,
+    3.1,
+    4.8,
+    3.2,
+    "LV",
+    [
+     [
+      "1 vaso",
+      244
+     ],
+     [
+      "1 taza",
+      244
+     ]
+    ]
+   ],
+   [
+    "Pechuga de pollo a la plancha",
+    165,
+    31,
+    0,
+    3.6,
+    "A",
+    [
+     [
+      "1 pechuga mediana",
+      172
+     ],
+     [
+      "1 taza picada",
+      140
+     ]
+    ]
+   ],
+   [
+    "Pan blanco",
+    266,
+    8.8,
+    49.4,
+    3.3,
+    "G",
+    [
+     [
+      "1 rebanada",
+      25
+     ]
+    ]
+   ],
+   [
+    "Arroz blanco cocido",
+    130,
+    2.7,
+    28.2,
+    0.3,
+    "",
+    [
+     [
+      "1 taza",
+      158
+     ]
+    ]
+   ],
+   [
+    "Porotos negros cocidos",
+    132,
+    8.9,
+    23.7,
+    0.5,
+    "",
+    [
+     [
+      "1 taza",
+      172
+     ]
+    ]
+   ],
+   [
+    "Empanada de carne",
+    335,
+    11.3,
+    31.2,
+    18.4,
+    "AGH",
+    [
+     [
+      "1 unidad",
+      120
+     ],
+     [
+      "1 pieza",
+      89
+     ]
+    ]
+   ],
+   [
+    "Aceite de oliva",
+    884,
+    0,
+    0,
+    100,
+    "",
+    [
+     [
+      "1 cucharadita",
+      4.5
+     ],
+     [
+      "1 cucharada",
+      13.5
+     ],
+     [
+      "1 taza",
+      216
+     ]
+    ]
+   ]
+  ]
+ },
+ "alimentos_busqueda": {
+  "palta": [
+   "Palta"
+  ],
+  "aguacate": [
+   "Palta"
+  ],
+  "frijoles": [
+   "Frijoles refritos",
+   "Porotos negros cocidos",
+   "Frijoles refritos de restaurante",
+   "Arroz con frijoles negros",
+   "Pupusa de frijoles"
+  ],
+  "porotos negros": [
+   "Porotos negros cocidos",
+   "Arroz con frijoles negros",
+   "Sopa de frijoles negros"
+  ],
+  "fresa": [
+   "Frutilla",
+   "Frutillas congeladas"
+  ],
+  "frutilla": [
+   "Frutilla",
+   "Frutillas congeladas",
+   "Yogur con frutas"
+  ],
+  "patata": [
+   "Papa",
+   "Papa hervida",
+   "Papa al horno",
+   "Ensalada de papa",
+   "Puré de papas"
+  ],
+  "papa": [
+   "Papa",
+   "Papa hervida",
+   "Papa al horno",
+   "Papaya",
+   "Papas hash brown"
+  ],
+  "elote": [
+   "Choclo",
+   "Choclo cocido",
+   "Choclo en lata",
+   "Choclo cremoso",
+   "Pan de maíz"
+  ],
+  "choclo": [
+   "Choclo",
+   "Choclo cocido",
+   "Choclo en lata",
+   "Choclo cremoso",
+   "Palomitas de maíz"
+  ],
+  "yuca": [
+   "Mandioca",
+   "Chips de mandioca"
+  ],
+  "pollo": [
+   "Pechuga de pollo cruda",
+   "Pechuga de pollo a la plancha",
+   "Pollo frito",
+   "Pollo desmenuzado",
+   "Pollo entero asado"
+  ],
+  "queso": [
+   "Queso fresco",
+   "Queso mozzarella",
+   "Queso feta",
+   "Queso azul",
+   "Queso danbo"
+  ],
+  "jugo naranja": [
+   "Jugo de naranja natural",
+   "Jugo de naranja envasado"
+  ],
+  "arroz": [
+   "Arroz blanco cocido",
+   "Arroz rojo",
+   "Arroz con leche",
+   "Arroz blanco crudo",
+   "Arroz con gandules"
+  ],
+  "platano": [
+   "Banana",
+   "Plátano macho",
+   "Plátano macho cocido",
+   "Plátano maduro frito",
+   "Tostones"
+  ],
+  "cacahuate": [
+   "Maní",
+   "Maní tostado",
+   "Mantequilla de maní",
+   "Maní salado"
+  ],
+  "zumo": [
+   "Jugo de uva",
+   "Jugo de ananá",
+   "Jugo de limón",
+   "Jugo de manzana",
+   "Jugo de zanahoria"
+  ],
+  "jitomate": [
+   "Tomate"
+  ],
+  "betabel": [
+   "Remolacha",
+   "Remolacha cocida"
+  ]
+ },
+ "alimentos_preferencias": {
+  "todo:": [
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   []
+  ],
+  "vegetariano:": [
+   [],
+   [],
+   [],
+   [
+    "No es vegetariano"
+   ],
+   [
+    "No es vegetariano"
+   ],
+   [
+    "No es vegetariano"
+   ],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [
+    "No es vegetariano"
+   ]
+  ],
+  "vegano:": [
+   [
+    "No es vegano"
+   ],
+   [],
+   [],
+   [
+    "No es vegano"
+   ],
+   [
+    "No es vegano"
+   ],
+   [
+    "No es vegano"
+   ],
+   [],
+   [],
+   [],
+   [
+    "No es vegano"
+   ],
+   [
+    "No es vegano"
+   ],
+   [
+    "No es vegano"
+   ]
+  ],
+  "todo:LG": [
+   [
+    "Contiene leche"
+   ],
+   [
+    "Contiene gluten"
+   ],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [],
+   [
+    "Contiene gluten"
+   ]
+  ],
+  "todo:MNCP": [
+   [],
+   [],
+   [],
+   [],
+   [
+    "Contiene pescado"
+   ],
+   [
+    "Contiene mariscos"
+   ],
+   [
+    "Contiene maní"
+   ],
+   [
+    "Contiene frutos secos"
+   ],
+   [],
+   [],
+   [],
+   []
+  ]
+ },
+ "alimentos_receta": {
+  "k": 131.1153846153846,
+  "p": 7.096153846153847,
+  "c": 17.307692307692307,
+  "g": 4.1923076923076925,
+  "fl": "",
+  "por": [
+   [
+    "1 ración",
+    260
+   ]
+  ],
+  "racion": {
+   "k": 341,
+   "p": 18.5,
+   "c": 45,
+   "g": 10.9,
+   "f": 17.2,
+   "a": 6,
+   "na": 38.7
+  }
+ },
+ "alimentos_propio": [
+  "propio",
+  true,
+  {
+   "k": 160,
+   "p": 10,
+   "c": 18,
+   "g": 5,
+   "f": null,
+   "a": null,
+   "na": null
+  },
+  [
+   "Barrita",
+   "Barra de cereal"
+  ]
+ ],
+ "alimentos_totales_dia": {
+  "tot": {
+   "k": 996,
+   "p": 68.4,
+   "c": 116.3,
+   "g": 28.7,
+   "f": 6.8,
+   "a": 41.2,
+   "na": 236.7
+  },
+  "recientes": [
+   "Aceite de oliva",
+   "Pechuga de pollo a la plancha",
+   "Arroz blanco cocido",
+   "Leche entera",
+   "Banana"
+  ]
+ },
+ "alimentos_modo_habitos": {
+  "numeros": false,
+  "resumen": "Modo hábitos: registras lo que comes sin contar calorías. Comidas del día 2 Frutas y verduras 2 Comidas con proteína 1"
+ }
 }
