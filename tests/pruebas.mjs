@@ -258,6 +258,43 @@ if (fs.existsSync(COPIA07)) {
 } else fallos.push('falta tests/copia-0.7.json');
 
 
+/* ---------- Recorrido de pantallas: toca los botones de cada pestaña en español y en inglés ---------- */
+// Cada pestaña se abre en un navegador simulado nuevo; en español también se tocan los botones de lo que se abre.
+if (fs.existsSync(COPIA07)) {
+  const PELIGRO = /wipe|del|Del|Remove|import|export|Export|share|Share|Url|Mail|upd(Download|Open)|hcPrivacy|Discard|kbUrl|copy|Copy|photo|Photo|mPhoto|backup|Backup|xjump|mFile/;
+  for (const lang of ['es', 'en']) {
+    let toques = 0; const fallosR = [];
+    for (const t of ['rutinas', 'explorar', 'nutricion', 'historial', 'ajustes']) {
+      const a = abrir({ 'pandaria-fit-v1': fs.readFileSync(COPIA07, 'utf8') });
+      await espera(900);
+      const w = a.w;
+      w.history.back = () => {}; w.history.go = () => {}; w.open = () => null;
+      let ultimo = null; w.addEventListener('error', e => { ultimo = e.message || String(e.error); });
+      w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
+      const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); TAB=${JSON.stringify(t)}; render();`);
+      const botones = () => [...w.document.querySelectorAll('[data-a]')].map(e => [e.dataset.a, e.dataset.v || '']).filter(([x]) => !PELIGRO.test(x) && x !== 'tab');
+      const tocar = (x, v) => { const e = [...w.document.querySelectorAll('[data-a]')].find(e => e.dataset.a === x && (e.dataset.v || '') === v); if (!e) return false; ultimo = null; const n0 = a.errores.length;
+        try { e.click(); } catch (er) { ultimo = er.message; } if (!ultimo && a.errores.length > n0) ultimo = a.errores[a.errores.length - 1]; return true; };
+      const vistos = new Set(); reset();
+      for (const [x, v] of botones()) {
+        if (vistos.has(x + v)) continue; vistos.add(x + v);
+        reset(); if (!tocar(x, v)) continue; toques++;
+        if (ultimo) { fallosR.push(`${t} › ${x}(${v}): ${ultimo}`); continue; }
+        if (lang !== 'es' || !w.eval('LAYERS.length+MODALS.length')) continue;
+        for (const [y, z] of botones().filter(([y]) => y !== 'back' && y !== 'closeModal' && y !== 'cbm').slice(0, 12)) {
+          if (vistos.has(x + '>' + y + z)) continue; vistos.add(x + '>' + y + z);
+          reset(); tocar(x, v); if (!tocar(y, z)) continue; toques++;
+          if (ultimo) fallosR.push(`${t} › ${x}(${v}) › ${y}(${z}): ${ultimo}`);
+        }
+      }
+      await espera(200);
+      a.cerrar();
+    }
+    console.log(`Recorrido en ${lang === 'es' ? 'español' : 'inglés'}: ${toques} botones tocados`);
+    comprobar(`recorrido de pantallas en ${lang === 'es' ? 'español' : 'inglés'} sin errores (${toques} botones)`, !fallosR.length && toques > 150, fallosR.slice(0, 5).join(' | ') || `solo ${toques} botones`);
+  }
+}
+
 /* ---------- Base de alimentos ---------- */
 {
   const L = ALI.list, ids = L.map(f => f.id), nombres = L.map(f => f.n.toLowerCase());
