@@ -98,13 +98,14 @@
     ['timer','Intervalos sin límite','HIIT, EMOM y AMRAP personalizados.'],
     ['camera','Fotos de progreso','Guarda fotos y compáralas lado a lado.'],
     ['leaf','Calorías y macros','Tu objetivo diario de calorías, proteína, carbohidratos y grasas.'],
+    ['dumbbell','Rutinas ilimitadas','En la versión gratis, hasta 3 (contando las archivadas).'],
     ['edit','Ejercicios propios ilimitados','En la versión gratis, hasta 5.'],
     ['flame','Músculos en las animaciones','Mira en rojo qué músculos trabajan en cada ejercicio, y descansos ajustados por PandarIA en cada serie.']
   ];
   const REASONS = {
     pandaria:'Las rutinas diseñadas por PandarIA son parte de Premium.', explore:'Esta rutina es parte de Premium.', intervals:'Este modo de intervalos es parte de Premium.',
     history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.',
-    customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
+    customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
   SCREENS.premium = p => {
     const on = isPremium();
@@ -235,6 +236,28 @@
     const a = h.indexOf('<div class="sec">Tu objetivo diario</div>'), b = h.indexOf('<div class="sec">Agua</div>');
     if (a < 0 || b < 0) return h;
     return h.slice(0, a) + `<div class="pf-lockwrap" style="min-height:300px"><div class="pf-blur">${h.slice(a, b)}</div>${lockCard('Calorías y macros', 'nutrition')}</div>` + h.slice(b);
+  };
+
+  // Rutinas: hasta 3 en la versión gratis, contando las archivadas (para crear más hay que eliminar alguna)
+  const FREE_ROUTINES = 3;
+  const roomFor = (n=1) => !locked() || S.routines.length + n <= FREE_ROUTINES;
+  const guard = (fn, n) => function(){ const k = typeof n === 'function' ? n() : (n || 1); if (!roomFor(k)) return pay('routines'); return fn.apply(this, arguments); };
+  A.newRoutine = guard(A.newRoutine);
+  A.tplAdd = guard(A.tplAdd);
+  A.importCode = guard(A.importCode);
+  if (A.wgGo) A.wgGo = guard(A.wgGo);
+  if (A.wpAdd) A.wpAdd = guard(A.wpAdd, () => { const t = LAYERS[LAYERS.length-1]; return (t && t.p && t.p.program && t.p.program.length) || 1; });
+  const _se = A.saveEditor;
+  A.saveEditor = function(){ const t = LAYERS[LAYERS.length-1]; if (t && t.p && t.p.isNew && !roomFor(1)) return pay('routines'); return _se.apply(this, arguments); };
+  const _sh2 = sheet;
+  sheet = function(title, items){ if (Array.isArray(items)) items = items.map(it => it && it.label === 'Duplicar' ? Object.assign({}, it, {fn: guard(it.fn)}) : it); return _sh2.call(this, title, items); };
+  const _vr = viewRutinas;
+  viewRutinas = function(){
+    let h = _vr.apply(this, arguments);
+    if (!locked()) return h;
+    const n = S.routines.length, arch = S.routines.filter(r => r.archived).length;
+    const note = `<div class="xs mut" style="text-align:center;margin:-4px 0 12px">Versión gratis: ${Math.min(n, 99)} de ${FREE_ROUTINES} rutinas${arch ? ` (${arch} archivada${arch > 1 ? 's' : ''})` : ''}${n >= FREE_ROUTINES ? ' · elimina una para crear otra o <a data-a="pfGo" data-v="routines" style="color:var(--ac);font-weight:800">hazte Premium</a>' : ''}</div>`;
+    return h.replace(/(<button class="newbtn" data-a="newRoutine">[\s\S]*?<\/button>)/, `$1${note}`);
   };
 
   // Ejercicios propios: hasta 5 gratis
