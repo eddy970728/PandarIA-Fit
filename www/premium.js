@@ -258,7 +258,7 @@
     let h = _vr.apply(this, arguments);
     if (!locked()) return h;
     const n = S.routines.length, arch = S.routines.filter(r => r.archived).length;
-    const note = `<div class="xs mut" style="text-align:center;margin:-4px 0 12px">Versión gratis: ${Math.min(n, 99)} de ${FREE_ROUTINES} rutinas${arch ? ` (${arch} archivada${arch > 1 ? 's' : ''})` : ''}${n >= FREE_ROUTINES ? ' · elimina una para crear otra o <a data-a="pfGo" data-v="routines" style="color:var(--ac);font-weight:800">hazte Premium</a>' : ''}</div>`;
+    const note = `<div class="xs mut" style="text-align:center;margin:-4px 0 12px">${n > FREE_ROUTINES ? `Versión gratis: tienes ${n} rutinas${arch ? ` (${arch} archivada${arch > 1 ? 's' : ''})` : ''} y el límite es ${FREE_ROUTINES}. Puedes seguir usándolas todas; para crear otra, elimina ${n - FREE_ROUTINES + 1} o <a data-a="pfGo" data-v="routines" style="color:var(--ac);font-weight:800">hazte Premium</a>` : `Versión gratis: ${n} de ${FREE_ROUTINES} rutinas${arch ? ` (${arch} archivada${arch > 1 ? 's' : ''})` : ''}`}${n === FREE_ROUTINES ? ' · elimina una para crear otra o <a data-a="pfGo" data-v="routines" style="color:var(--ac);font-weight:800">hazte Premium</a>' : ''}</div>`;
     return h.replace(/(<button class="newbtn" data-a="newRoutine">[\s\S]*?<\/button>)/, `$1${note}`);
   };
 
