@@ -97,14 +97,15 @@
     ['chart','Progreso a fondo','Gráficas, series por músculo, informes semanales, desequilibrios y metas con fecha.'],
     ['timer','Intervalos sin límite','HIIT, EMOM y AMRAP personalizados.'],
     ['camera','Fotos de progreso','Guarda fotos y compáralas lado a lado.'],
-    ['leaf','Calorías y macros','Tu objetivo diario de calorías, proteína, carbohidratos y grasas.'],
+    ['leaf','Calorías y macros','Tu objetivo diario de calorías y macros, y tu diario de comidas comparado con él, día a día y semana a semana.'],
+    ['list','Alimentos y recetas sin límite','En la versión gratis, hasta 10. Registrar comidas es gratis.'],
     ['dumbbell','Rutinas ilimitadas','En la versión gratis, hasta 3 (contando las archivadas).'],
     ['edit','Ejercicios propios ilimitados','En la versión gratis, hasta 5.'],
     ['flame','Músculos en las animaciones','Mira en rojo qué músculos trabajan en cada ejercicio, y descansos ajustados por PandarIA en cada serie.']
   ];
   const REASONS = {
     pandaria:'Las rutinas diseñadas por PandarIA son parte de Premium.', explore:'Esta rutina es parte de Premium.', intervals:'Este modo de intervalos es parte de Premium.',
-    history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.',
+    history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.', diario:'Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.', alimProp:'En la versión gratis puedes crear hasta 10 alimentos y recetas propios.',
     customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
   SCREENS.premium = p => {

@@ -6916,6 +6916,9 @@ function viewNutricion(){
   const n=nut(), c=calcNutrition();
   let h=`<div class="hdr"><h1>Nutrición</h1></div>`;
   if (S.settings.lang!=='en') h+=`<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--ok)">${I('leaf',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO NUTRICIONAL DEL DÍA</div><div class="sm" style="margin-top:4px;line-height:1.45">${(t=>esc(t)+kbLink(tipRule(t)))(tipOfDay('nut'))}</div></div></div>`;
+  h+=diarioCard();
+  if (habitos()){ h+=`<div class="sec">Objetivo</div><div class="card sm mut" style="line-height:1.45">Estás en modo hábitos: PandarIA no muestra calorías ni números. Puedes cambiarlo en las preferencias del diario.</div>`; }
+  else {
   // calorías
   h+=`<div class="sec">Tu objetivo diario</div><div class="seg" style="margin-bottom:12px">${Object.entries(NGOALS).map(([k,v])=>`<button class="${n.goal===k?'on':''}" data-a="nGoal" data-v="${k}">${v}</button>`).join('')}</div>`;
   if (!c) h+=`<div class="card row" data-a="openProfile" style="cursor:pointer"><span style="color:var(--ac)">${I('user',24)}</span><div class="grow"><div class="b">Completa tu perfil</div><div class="sm mut">Necesito edad, sexo, altura y peso para calcular tus calorías y proteína.</div></div>${I('right',18)}</div>`;
@@ -6924,6 +6927,7 @@ function viewNutricion(){
     <div class="macros">${[['Proteína',c.prot,'#ff7a1a',c.prot*4],['Carbohidratos',c.carbs,'#3f9cff',c.carbs*4],['Grasas',c.fat,'#f5b82e',c.fat*9]].map(([l,g,col,k])=>`<div class="mac"><div class="mbar"><div style="width:${Math.round(k/c.kcal*100)}%;background:${col}"></div></div><div class="row"><span class="b grow">${l}</span><span class="b">${g} g</span></div></div>`).join('')}</div>
     <div class="xs mut" style="margin-top:10px;line-height:1.4">Fórmula de Mifflin-St Jeor <button class="link xs" data-a="kbOpen" data-v="nut.metabolismo">(fuente)</button> con tu perfil y tus entrenos de la semana. Proteína: ${fmtNum(c.pk)} g por kg (la ISSN recomienda 1,4–2,0 g/kg si entrenas, y algo más en déficit). <button class="link xs" data-a="kbOpen" data-v="nut.proteina">Ver fuente</button></div>
     ${c.notes.map(t=>`<div class="sm" style="margin-top:8px;color:var(--blue);line-height:1.4">${esc(t)}</div>`).join('')}</div>`;
+  }
   }
   // agua
   const wg=waterGoal(), wv=(n.water[dayKey()]||0), pct=Math.min(100,Math.round(wv/wg*100));
@@ -6939,6 +6943,887 @@ function viewNutricion(){
 A.nGoal=v=>{ nut().goal=v; save(); render.keep=true; render(); };
 A.water=v=>{ const n=nut(), k=dayKey(); n.water[k]=Math.max(0,(n.water[k]||0)+(+v)); save(); render.keep=true; render(); if(+v>0) vibrate(15);
   if ((n.water[k]||0)>=waterGoal() && (n.water[k]-(+v))<waterGoal()) toast('💧 ¡Meta de agua cumplida!'); };
+
+
+/* ============ Diario de comidas (0.8 · etapa 3) ============
+   Base de alimentos: USDA National Nutrient Database for Standard Reference, Release 28 (dominio público).
+   Valores por 100 g: k kcal · p proteína · c carbohidratos · g grasas · f fibra · a azúcares · na sodio (mg).
+   Nombres en español y sinónimos regionales: propios de PandarIA Fit.
+   Marcas: L leche · H huevo · G gluten · M maní · N frutos de cáscara · S soja · P pescado · C mariscos · Z sésamo ·
+           A de origen animal (no vegetariano) · V vegetariano pero no vegano. */
+const ALIM_RAW=`
+09003|Manzana con piel||fruta|52|0.3|13.8|0.2|2.4|10.4|1||1 mediana:182;1 pequeña:149;1 taza:125;1 taza en rodajas:109
+09004|Manzana sin piel||fruta|48|0.3|12.8|0.1|1.3|10.1|0||1 mediana:161;1 taza en rodajas:110;1 unidad grande:216
+09040|Banana|plátano,banano,guineo,cambur|fruta|89|1.1|22.8|0.3|2.6|12.2|1||1 mediana:118;1 pequeña:101;1 grande:136;1 taza en puré:225
+09200|Naranja|china|fruta|47|0.9|11.8|0.1|2.4|9.3|0||1 mediana:131;1 taza en gajos:180
+09218|Mandarina|tangerina,clementina|fruta|53|0.8|13.3|0.3|1.8|10.6|2||1 mediana:88;1 taza en gajos:195;1 unidad pequeña:76
+09112|Pomelo|toronja|fruta|42|0.8|10.7|0.1|1.6|6.9|0||1/2 mediano:123;1 taza en gajos:230
+09150|Limón|lima|fruta|29|1.1|9.3|0.3|2.8|2.5|2||1 mediano:58;1 taza en gajos:212
+09159|Lima ácida|limón verde|fruta|30|0.7|10.5|0.2|2.8|1.7|2||1 mediana:67
+09316|Frutilla|fresa,fresón|fruta|32|0.7|7.7|0.3|2|4.9|1||1 unidad grande:18;1 taza en mitades:152;1 taza en puré:232
+09132|Uva|uvas|fruta|69|0.7|18.1|0.2|0.9|15.5|2||1 racimo pequeño:92;10 uvas:49;1 taza:151
+09252|Pera|pera de agua|fruta|57|0.4|15.2|0.1|3.1|9.8|1||1 mediana:178;1 taza en rodajas:140;1 taza en cubos:161
+09236|Durazno|melocotón|fruta|39|0.9|9.5|0.2|1.5|8.4|0||1 mediano:150;1 unidad pequeña:130
+09021|Damasco|albaricoque,chabacano|fruta|48|1.4|11.1|0.4|2|9.2|1||1 unidad:35;1 taza en mitades:155;1 taza en rodajas:165
+09279|Ciruela|ciruela roja|fruta|46|0.7|11.4|0.3|1.4|9.9|0||1 unidad:66;1 taza en rodajas:165
+09070|Cereza|cerezas,guinda|fruta|63|1.1|16|0.2|2.1|12.8|0||10 cerezas:68;1 taza:138
+09148|Kiwi||fruta|61|1.1|14.7|0.5|3|9|3||1 unidad:69;1 taza en rodajas:180
+09266|Ananá|piña|fruta|50|0.5|13.1|0.1|1.4|9.8|1||1 rodaja:84;1 taza en trozos:165;1 unidad:905
+09176|Mango||fruta|60|0.8|15|0.4|1.6|13.7|1||1 unidad:336;1 taza en trozos:165
+09226|Papaya|fruta bomba,mamón,lechosa|fruta|43|0.5|10.8|0.3|1.7|7.8|8||1 taza en cubos:145;1 taza en puré:230
+09326|Sandía|melón de agua,patilla|fruta|30|0.6|7.5|0.1|0.4|6.2|1||1 tajada:286;1 taza:154
+09181|Melón|melón cantalupo,melón amarillo|fruta|34|0.8|8.2|0.2|0.9|7.9|16||1 tajada:69;1 taza:177;1 taza en cubos:160
+09184|Melón verde|melón honeydew|fruta|36|0.5|9.1|0.1|0.8|8.1|18||1 tajada:125;1 taza en cubos:170
+09050|Arándanos|blueberries|fruta|57|0.7|14.5|0.3|2.4|10|1||1 taza:148;50 unidades:68
+09302|Frambuesa|frambuesas|fruta|52|1.2|11.9|0.7|6.5|4.4|1||1 taza:123
+09042|Mora|zarzamora,moras|fruta|43|1.4|9.6|0.5|5.3|4.9|1||1 taza:144
+09139|Guayaba|guava|fruta|68|2.5|14.3|0.9|5.4|8.9|2||1 unidad:55;1 taza:165
+09231|Maracuyá|fruta de la pasión,parchita,chinola|fruta|97|2.2|23.4|0.7|10.4|11.2|28||1 unidad:18;1 taza:236
+09089|Higo|higos,breva|fruta|74|0.8|19.2|0.3|2.9|16.3|1||1 mediano:50;1 unidad grande:64
+09094|Higo seco||fruta|249|3.3|63.9|0.9|9.8|47.9|10||1 unidad:8;1 taza:149
+09421|Dátil|dátiles|fruta|277|1.8|75|0.1|6.7|66.5|1||1 unidad:24
+09298|Pasas de uva|pasas,uvas pasas|fruta|299|3.1|79.2|0.5|3.7|59.2|11||1 puñado:28;1 taza compacta:165;1 taza:145
+09291|Ciruela pasa|ciruelas secas|fruta|240|2.2|63.9|0.4|7.1|38.1|2||1 unidad:9.5;1 taza:174
+12104|Coco fresco|coco|fruta|354|3.3|15.2|33.5|9|6.2|20||1 trozo:45;1 taza rallada:80;1 unidad mediana:397
+09286|Granada||fruta|83|1.7|18.7|1.2|4|13.7|3||1 unidad:282;1/2 taza:87
+09263|Caqui|kaki,persimón|fruta|70|0.6|18.6|0.2|3.6|12.5|1||1 unidad:168
+09191|Nectarina|pelón|fruta|44|1.1|10.6|0.3|1.7|7.9|0||1 mediana:142;1 unidad pequeña:129
+09220|Mandarina en almíbar|gajos de mandarina en lata|fruta|61|0.5|16.2|0.1|0.7|15.5|6||1 taza:252
+09241|Durazno en almíbar|melocotón en almíbar|fruta|74|0.5|19.9|0.1|1.3|18.6|6||1 mitad:81;1 taza:262
+09270|Ananá en almíbar|piña en almíbar|fruta|78|0.3|20.2|0.1|0.8|16.9|1||1 rodaja:49;1 taza:254
+09100|Macedonia en lata|ensalada de frutas en lata,cóctel de frutas|fruta|73|0.4|18.9|0.1|1|17.9|6||1 taza:248
+09277|Plátano macho|plátano verde,plátano para cocinar,plátano hartón|fruta|122|1.3|31.9|0.4|2.3|15|4||1 unidad:179;1 taza en rodajas:148
+09278|Plátano macho cocido|plátano hervido|fruta|116|0.8|31.1|0.2|2.3|14|5||1 taza en puré:200;1 taza en rodajas:154
+09447|Plátano maduro frito|maduros fritos,tajadas|fruta|236|1.4|40.8|7.5|3.2|21.8|6||1 taza:169
+09446|Tostones|patacones,plátano verde frito|fruta|309|1.5|49.2|11.8|3.5|3.6|2||1 taza:118;10 rebanadas:53
+09175|Mamey||fruta|51|0.5|12.5|0.5|3||15||1 unidad:846
+09062|Chirimoya|anón|fruta|75|1.6|17.7|0.7|3|12.9|7||1 unidad:235;1 taza en trozos:160
+09315|Guanábana|graviola|fruta|66|1|16.8|0.3|3.3|13.5|14||1 taza:225;1 unidad:625
+09164|Lichi|litchi|fruta|66|0.8|16.5|0.4|1.3|15.2|1||1 unidad:10;1 taza:190
+09287|Tuna|higo chumbo,nopal fruta|fruta|41|0.7|9.6|0.5|3.6||5||1 unidad:103;1 taza:149
+09060|Carambola|fruta estrella|fruta|31|1|6.7|0.3|2.8|4|2||1 unidad:91;1 taza en cubos:132;1 taza en rodajas:108
+09116|Pomelo en gajos|toronja blanca|fruta|33|0.7|8.4|0.1|1.1|7.3|0||1/2 mediano:118;1 taza en gajos:230
+09296|Membrillo|dulce de membrillo crudo|fruta|57|0.4|15.3|0.1|1.9||4||1 unidad:92
+09078|Arándano rojo|cranberries|fruta|46|0.5|12|0.1|3.6|4.3|2||1 taza picada:110;1 taza entera:100
+09195|Aceitunas verdes|olivas verdes|fruta|145|1|3.8|15.3|3.3|0.5|1556||5 unidades:13;1 aceituna:2.7
+09193|Aceitunas negras|olivas negras|fruta|115|0.8|6.3|10.7|3.2|0|735||5 unidades:22;1 cucharada:8.4;1 unidad grande:4.4
+09037|Palta|aguacate,avocado|fruta|160|2|8.5|14.7|6.7|0.7|7||1/2 unidad:68;1 unidad:136;1 taza en cubos:150;1 taza en puré:230
+09322|Tamarindo||fruta|239|2.8|62.5|0.6|5.1|38.8|28||1 taza:120;1 unidad:2
+09001|Acerola|cereza de Barbados|fruta|32|0.4|7.7|0.3|1.1||7||1 taza:98;1 unidad:4.8
+09059|Fruta de pan|árbol del pan,mapén|fruta|103|1.1|27.1|0.2|4.9|11|2||1 taza:220;1/4 unidad:96
+09313|Zapote|chicozapote,níspero de Venezuela|fruta|83|0.4|20|1.1|5.3||12||1 unidad:170;1 taza:241
+09174|Níspero|níspero japonés|fruta|47|0.4|12.1|0.2|1.7||1||1 unidad:10;1 taza:149;1 unidad grande:20
+09318|Frutillas congeladas|fresas congeladas|fruta|35|0.4|9.1|0.1|2.1|4.6|2||1 taza:221
+09144|Jaca|yaca,jackfruit|fruta|95|1.7|23.2|0.6|1.5|19.1|2||1 taza en rodajas:165;1 taza:151
+09079|Pasas de arándano|arándanos deshidratados|fruta|308|0.2|82.8|1.1|5.3|72.6|5||1 cucharada:10;1/4 taza:40
+11529|Tomate|jitomate|verdura|18|0.9|3.9|0.2|1.2|2.6|5||1 mediano:123;1 pequeño:91;1 taza:149;1 taza picada:180
+11253|Lechuga|lechuga criolla,lechuga mantecosa|verdura|15|1.4|2.9|0.1|1.3|0.8|28||1 hoja:8;1 taza rallada:36
+11251|Lechuga romana|lechuga larga|verdura|17|1.2|3.3|0.3|2.1|1.2|8||1 hoja:6;1 taza rallada:47
+11252|Lechuga iceberg|lechuga repollada|verdura|14|0.9|3|0.1|1.2|2|10||1 hoja:8;1 taza rallada:72;1 taza picada:57
+11457|Espinaca|espinacas|verdura|23|2.9|3.6|0.4|2.2|0.4|79||1 puñado:30
+11458|Espinaca cocida||verdura|23|3|3.8|0.3|2.4|0.4|70||1 taza:180
+11147|Acelga|acelgas|verdura|19|1.8|3.7|0.2|1.6|1.1|213||1 hoja:48;1 taza:36
+11148|Acelga cocida||verdura|20|1.9|4.1|0.1|2.1|1.1|179||1 taza picada:175
+11959|Rúcula|rúgula,arúgula,rucola|verdura|25|2.6|3.6|0.7|1.6|2|27||1 puñado:20;1 hoja:2;1/2 taza:10
+11109|Repollo|col,repollo blanco|verdura|25|1.3|5.8|0.1|2.5|3.2|18||1 hoja:23;1 taza picada:89;1 taza rallada:70
+11112|Repollo colorado|col morada,lombarda|verdura|31|1.4|7.4|0.2|2.1|3.8|27||1 taza picada:89;1 taza rallada:70
+11098|Repollitos de Bruselas|coles de Bruselas|verdura|43|3.4|8.9|0.3|3.8|2.2|25||1 unidad:19;1 taza:88
+11090|Brócoli|brécol|verdura|34|2.8|6.6|0.4|2.6|1.7|33||1 ramillete:11;1 taza picada:91
+11091|Brócoli cocido||verdura|35|2.4|7.2|0.4|3.3|1.4|41||1/2 taza picada:78;1 tallo:280
+11135|Coliflor||verdura|25|1.9|5|0.3|2|1.9|30||1 ramillete:13;1 taza picada:107
+11136|Coliflor cocida||verdura|23|1.8|4.1|0.5|2.3|2.1|15||1/2 taza:62
+11124|Zanahoria|carota|verdura|41|0.9|9.6|0.2|2.8|4.7|69||1 mediana:61;1 taza picada:128;1 taza rallada:110
+11125|Zanahoria cocida||verdura|35|0.8|8.2|0.2|3|3.5|58||1 cucharada:9.7;1/2 taza en rodajas:78
+11282|Cebolla|cebolla blanca|verdura|40|1.1|9.3|0.1|1.7|4.2|4||1 mediana:110;1 cucharada picada:10;1 taza picada:160
+11291|Cebolla de verdeo|cebollín,cebolleta,cebollino,cebolla larga|verdura|32|1.8|7.3|0.2|2.6|2.3|16||1 tallo:15;1 taza picada:100;1 cucharada picada:6
+11246|Puerro|ajo porro|verdura|61|1.5|14.2|0.3|1.8|3.9|20||1 unidad:89
+11215|Ajo|ajos|verdura|149|6.4|33.1|0.5|2.1|1|17||1 diente:3;1 taza:136;1 cucharadita:2.8
+11821|Morrón rojo|pimiento rojo,pimentón rojo,ají rojo,chile morrón|verdura|31|1|6|0.3|2.1|4.2|4||1 mediano:119;1 taza picada:149;1 taza en rodajas:92
+11333|Morrón verde|pimiento verde,pimentón verde,ají verde|verdura|20|0.9|4.6|0.2|1.7|2.4|3||1 mediano:119;1 taza picada:149;1 taza en rodajas:92
+11951|Morrón amarillo|pimiento amarillo|verdura|27|1|6.3|0.2|0.9||2||1 grande:186;10 tiras:52
+11979|Ají picante|chile,guindilla,jalapeño|verdura|29|0.9|6.5|0.4|2.8|4.1|3||1 unidad:14;1 taza en rodajas:90
+11205|Pepino||verdura|15|0.7|3.6|0.1|0.5|1.7|2||1 mediano:201;1/2 taza en rodajas:52
+11477|Zapallito|calabacín,calabacita,zucchini|verdura|17|1.2|3.1|0.3|1|2.5|8||1 mediano:196;1 taza picada:124;1 taza en rodajas:113
+11485|Zapallo|calabaza,auyama,ahuyama|verdura|45|1|11.7|0.1|2|2.2|4||1 taza en cubos:140
+11486|Zapallo cocido|calabaza cocida|verdura|40|0.9|10.5|0.1|3.2|2|4||1 taza en cubos:205
+11482|Calabaza tipo anco|zapallo anco,calabaza moscada|verdura|40|0.8|10.4|0.1|1.5||3||1 taza en cubos:140
+11209|Berenjena||verdura|25|1|5.9|0.2|3|3.5|2||1 unidad:548;1 taza en cubos:82
+11210|Berenjena cocida||verdura|35|0.8|8.7|0.2|2.5|3.2|1||1 taza:99
+11143|Apio||verdura|16|0.7|3|0.2|1.6|1.3|80||1 tallo:40;1 taza picada:101
+11080|Remolacha|betabel,betarraga|verdura|43|1.6|9.6|0.2|2.8|6.8|78||1 unidad:82;1 taza:136
+11081|Remolacha cocida|betabel cocido|verdura|44|1.7|10|0.2|2|8|77||1/2 taza en rodajas:85
+11429|Rabanito|rábano|verdura|16|0.7|3.4|0.1|1.6|1.9|39||1 unidad:4.5;1 taza en rodajas:116;1 unidad grande:9
+11260|Champiñones|hongos,setas,champiñón|verdura|22|3.1|3.3|0.3|1|2|5||1 unidad:18;1 taza en trozos:70;1 taza entera:96
+11261|Champiñones cocidos|hongos salteados|verdura|28|2.2|5.3|0.5|2.2|2.3|2||1 taza en trozos:156;1 cucharada:9.8
+11265|Hongos portobello|portobello|verdura|22|2.1|3.9|0.3|1.3|2.5|9||1 unidad:84
+11052|Chauchas|ejotes,judías verdes,habichuelas,vainitas,porotos verdes|verdura|31|1.8|7|0.2|2.7|3.3|6||1 taza:100
+11053|Chauchas cocidas|ejotes cocidos,judías verdes cocidas|verdura|35|1.9|7.9|0.3|3.2|3.6|1||1 taza:125
+11304|Arvejas|chícharos,guisantes,petit pois|verdura|81|5.4|14.4|0.4|5.7|5.7|5||1 taza:145
+11305|Arvejas cocidas|chícharos cocidos,guisantes cocidos|verdura|84|5.4|15.6|0.2|5.5|5.9|3||1 taza:160
+11308|Arvejas en lata|guisantes en lata|verdura|68|4.5|11.4|0.8|4.9|3|273||1 taza:175;1 lata:313
+11167|Choclo|elote,maíz dulce,mazorca,jojoto|verdura|86|3.3|18.7|1.4|2|6.3|15||1 mazorca mediana:90;1 taza:145
+11168|Choclo cocido|elote cocido|verdura|96|3.4|21|1.5|2.4|4.5|1||1 mazorca:77
+11172|Choclo en lata|maíz en lata,granos de elote|verdura|67|2.3|14.3|1.2|2|4.4|205||1 taza:164;1 lata:211
+11352|Papa|patata|verdura|77|2|17.5|0.1|2.1|0.8|6||1 mediana:213;1/2 taza en cubos:75;1 unidad:369
+11367|Papa hervida|patata cocida,papa cocida|verdura|86|1.7|20|0.1|1.8|0.9|5||1 mediana:167;1/2 taza:78;1 unidad grande:300
+11674|Papa al horno|patata asada|verdura|93|2.5|21.1|0.1|2.2|1.2|10||1 mediana:173;1 unidad:299
+11934|Puré de papas|puré de patatas|verdura|113|1.9|16.8|4.2|1.5|1.4|317|LV|1 taza:210
+11403|Papas fritas caseras|patatas fritas|verdura|158|2.8|25.6|5.5|2|0.4|324||10 unidades:76
+11507|Boniato|batata,camote|verdura|86|1.6|20.1|0.1|3|4.2|55||1 mediano:130
+11508|Boniato al horno|batata asada,camote asado|verdura|90|2|20.7|0.1|3.3|6.5|36||1 mediano:114;1 taza:200;1 unidad grande:180
+11134|Mandioca|yuca,casava,aipim|verdura|160|1.4|38.1|0.3|1.8|1.7|14||1 taza:206;1 unidad:408
+11602|Ñame|ñame blanco|verdura|116|1.5|27.5|0.1|3.9|0.5|8||1 taza en cubos:136;1/2 taza en cubos:68
+11519|Malanga|taro,yautía,papa china|verdura|142|0.5|34.6|0.1|5.1|0.5|15||1 taza en rodajas:132
+11011|Espárragos|espárrago|verdura|20|2.2|3.9|0.1|2.1|1.9|2||1 unidad:16;1 taza:134
+11012|Espárragos cocidos||verdura|22|2.4|4.1|0.2|2|1.3|14||1/2 taza:90
+11007|Alcaucil|alcachofa|verdura|47|3.3|10.5|0.1|5.4|1|94||1 mediano:128
+11233|Kale|col rizada|verdura|49|4.3|8.8|0.9|3.6|2.3|38||1 taza:16
+11957|Hinojo||verdura|31|1.2|7.3|0.2|3.1|3.9|52||1 bulbo:234;1 taza en rodajas:87
+11963|Nopal|nopales|verdura|16|1.3|3.3|0.1|2.2|1.1|21||1 penca:43;1 taza en rodajas:86
+11964|Nopales cocidos||verdura|15|1.4|3.3|0.1|2|1.1|20||1 taza:149
+11043|Brotes de soja|germinado de soya,brotes de soya|verdura|30|3|5.9|0.2|1.8|4.1|6||1 taza:104
+11961|Palmitos|corazón de palma|verdura|28|2.5|4.6|0.6|2.4||426||1 unidad:33;1 taza:146
+11531|Tomate triturado|tomate en lata,pulpa de tomate|verdura|16|0.8|3.5|0.2|1.9|2.5|115||1 taza:240;1 cucharada:15
+11547|Puré de tomate|salsa de tomate natural|verdura|38|1.6|9|0.2|1.9|4.8|28||1 taza:250;1 lata:822
+11546|Extracto de tomate|pasta de tomate,concentrado de tomate|verdura|82|4.3|18.9|0.5|4.1|12.2|59||1 cucharada:16;1/4 taza:66;1 taza:262
+11955|Tomate seco||verdura|258|14.1|55.8|3|12.3|37.6|107||1 unidad:2;1 taza:54
+11174|Choclo cremoso|crema de elote|verdura|72|1.7|18.1|0.4|1.2|3.2|261||1 taza:256;1 lata:482
+11297|Perejil||verdura|36|3|6.3|0.8|3.3|0.8|56||1 cucharada:4;1 taza picada:60
+11165|Cilantro|culantro|verdura|23|2.1|3.7|0.5|2.8|0.9|46||1 cucharada:1;1/4 taza:4
+02044|Albahaca||verdura|23|3.1|2.6|0.6|1.6|0.3|4||5 hojas:2.5;2 cucharadas picada:5.3
+11216|Jengibre fresco|kion|verdura|80|1.8|17.8|0.8|2|1.7|13||1 cucharadita:2;1/4 taza en rodajas:24
+11937|Pepinillos en vinagre|pickles,pepinillos|verdura|12|0.5|2.4|0.3|1|1.1|809||1 unidad:35;1 rebanada:7
+11439|Chucrut|repollo fermentado|verdura|19|0.9|4.3|0.1|2.9|1.8|661||1 taza:142
+11446|Algas nori|nori|verdura|35|5.8|5.1|0.3|0.3|0.5|48||1 hoja:2.6;2 cucharadas:10
+11584|Verduras congeladas mixtas|mix de verduras,jardinera|verdura|65|2.9|13.1|0.1|4.4|3.1|35||1/2 taza:91
+11278|Quimbombó|okra,gombo,ñajú|verdura|33|1.9|7.5|0.2|3.2|1.5|7||1 taza:100
+11149|Chayote|guatila,papa del aire,cayote|verdura|19|0.8|4.5|0.1|1.7|1.7|2||1 unidad:203;1 taza:132
+11603|Jícama|nabo mexicano|verdura|38|0.7|8.8|0.1|4.9|1.8|4||1 taza en rodajas:120;1 taza:130
+11564|Nabo||verdura|28|0.9|6.4|0.1|1.8|3.8|67||1 mediano:122;1 taza en cubos:130;1 unidad grande:183
+11591|Berro|berros|verdura|11|2.3|1.3|0.1|0.5|0.2|41||1 taza picada:34;1 ramita:2.5
+11213|Endivia|achicoria|verdura|17|1.2|3.4|0.2|3.1|0.2|22||1/2 taza picada:25
+11952|Radicchio|achicoria roja|verdura|23|1.4|4.5|0.2|0.9|0.6|22||1 taza rallada:40;1 hoja:8
+11819|Ají rojo picante|chile rojo|verdura|40|1.9|8.8|0.4|1.5|5.3|9||1 unidad:45;1/2 taza picada:75
+16015|Porotos negros cocidos|frijoles negros,caraotas negras,judías negras|legumbre|132|8.9|23.7|0.5|8.7|0.3|1||1 taza:172
+16033|Porotos colorados cocidos|frijoles rojos,alubias rojas,frijol colorado|legumbre|127|8.7|22.8|0.5|7.4|0.3|2||1 taza:177;1 cucharada:11
+16050|Porotos blancos cocidos|alubias blancas,frijoles blancos,judías blancas|legumbre|139|9.7|25.1|0.3|6.3|0.3|6||1 taza:179;1 cucharada:11.2
+16043|Porotos pintos cocidos|frijoles pintos|legumbre|143|9|26.2|0.7|9|0.3|1||1 taza:171;1 cucharada:10.6
+16316|Porotos en lata|frijoles en lata|legumbre|91|6|16.6|0.3|6.9|0.2|138||1 taza:240
+16103|Frijoles refritos|porotos refritos|legumbre|90|5|13.6|2|3.7|0.5|370||1 taza:238;1 lata:442
+16070|Lentejas cocidas|lentejas|legumbre|116|9|20.1|0.4|7.9|1.8|2||1 taza:198;1 cucharada:12.3
+16069|Lentejas secas||legumbre|352|24.6|63.4|1.1|10.7|2|6||1 taza:192;1 cucharada:12
+16057|Garbanzos cocidos|garbanzo|legumbre|164|8.9|27.4|2.6|7.6|4.8|7||1 taza:164
+16058|Garbanzos en lata||legumbre|88|4.9|13.5|1.9|4.4||278||1 taza:240;1 lata:448
+16158|Hummus|humus,puré de garbanzos|legumbre|166|7.9|14.3|9.6|6||379|Z|1 cucharada:15;1 taza:246
+16086|Arvejas partidas cocidas|chícharos secos,guisantes secos|legumbre|118|8.3|21.1|0.4|8.3|2.9|2||1 taza:196;1 cucharada:12.2
+16053|Habas cocidas|habas|legumbre|110|7.6|19.6|0.4|5.4|1.8|5||1 taza:170
+16109|Soja cocida|soya cocida,porotos de soja|legumbre|172|18.2|8.4|9|6|3|1|S|1 taza:172;1 cucharada:10.7
+11212|Edamame||legumbre|121|11.9|8.9|5.2|5.2|2.2|6|S|1 taza:155
+16426|Tofu firme|tofu|legumbre|144|17.3|2.8|8.7|2.3||14|S|1 porción:85;1/2 taza:126
+16127|Tofu suave|tofu sedoso|legumbre|61|7.2|1.2|3.7|0.2|0.7|8|S|1 pieza:120;1 taza:248
+16114|Tempeh||legumbre|192|20.3|7.6|10.8|||9|S|1 taza:166
+16087|Maní|cacahuate,cacahuete,manías|legumbre|567|25.8|16.1|49.2|8.5|4.7|18|M|1 puñado:28;1 taza:146
+16090|Maní tostado|cacahuate tostado|legumbre|587|24.4|21.3|49.7|8.4|4.9|410|M|1 puñado:28
+16398|Mantequilla de maní|crema de cacahuate,mantequilla de cacahuete,pasta de maní|legumbre|598|22.2|22.3|51.4|5|10.5|17|M|1 cucharada:16;2 cucharadas:32;1 taza:258
+16081|Porotos mung cocidos|frijol mungo|legumbre|105|7|19.1|0.4|7.6|2|2||1 taza:202
+20045|Arroz blanco cocido|arroz|cereal|130|2.7|28.2|0.3|0.4|0.1|1||1 taza:158
+20044|Arroz blanco crudo||cereal|365|7.1|80|0.7|1.3|0.1|5||1 taza:185
+20037|Arroz integral cocido|arroz moreno|cereal|123|2.7|25.6|1|1.6|0.2|4||1 taza:195
+20036|Arroz integral crudo||cereal|367|7.5|76.2|3.2|3.6|0.7|5||1 taza:185
+36405|Arroz con frijoles negros|congrí,moros y cristianos,arroz con porotos negros,gallo pinto|cereal|151|4.6|24.4|3.9|3.4|0.9|420|A|1 porción:461;1 taza:146
+20121|Fideos cocidos|pasta cocida,espaguetis,tallarines,macarrones|cereal|158|5.8|30.9|0.9|1.8|0.6|1|G|1 taza:140
+20120|Fideos secos|pasta seca|cereal|371|13|74.7|1.5|3.2|2.7|6|G|1 porción:56;1 taza:91
+20125|Fideos integrales cocidos|pasta integral|cereal|149|6|30.1|1.7|3.9|0.8|4|G|1 taza:117
+20310|Fideos al huevo cocidos|tallarines al huevo|cereal|138|4.5|25.2|2.1|1.2|0.4|165|GHV|1 taza:160
+20134|Fideos de arroz cocidos|tallarines de arroz|cereal|108|1.8|24|0.2|1|0|19||1 taza:176
+20038|Avena|copos de avena,hojuelas de avena,avena en hojuelas|cereal|389|16.9|66.3|6.9|10.6||2|G|1/2 taza:40;1 taza:156
+08121|Avena cocida con agua|porridge,atol de avena|cereal|71|2.5|12|1.5|1.7|0.3|4|G|1 taza:234;1 cucharada:14.6
+20081|Harina de trigo|harina común,harina 000|cereal|364|10.3|76.3|1|2.7|0.3|2|G|1 cucharada:8;1 taza:125
+20080|Harina integral|harina de trigo integral|cereal|340|13.2|72|2.5|10.7|0.4|2|G|1 taza:120
+20022|Harina de maíz|polenta seca,sémola de maíz|cereal|370|7.1|79.5|1.8|3.9|1.6|7||1 taza:157
+20017|Masa de maíz|masa harina|cereal|363|8.5|76.6|3.7|6.4|1.6|5||1 taza:114
+20137|Quinoa cocida|quinua|cereal|120|4.4|21.3|1.9|2.8|0.9|7||1 taza:185
+20035|Quinoa cruda||cereal|368|14.1|64.2|6.1|7||5||1 taza:170
+20029|Cuscús cocido|cuscús|cereal|112|3.8|23.2|0.2|1.4|0.1|5|G|1 taza cocida:157;1 taza:528
+20013|Trigo burgol|bulgur|cereal|83|3.1|18.6|0.2|4.5|0.1|5|G|1 taza:182;1 cucharada:8.4
+20006|Cebada perlada cocida|cebada|cereal|123|2.3|28.2|0.4|3.8|0.3|3|G|1 taza:157
+18069|Pan blanco|pan francés,pan común,pan flauta|cereal|266|8.8|49.4|3.3|2.7|5.7|490|G|1 rebanada:25
+18967|Pan de molde blanco|pan de caja,pan lactal|cereal|238|10.7|43.9|2.1|9.2|5|478|G|1 rebanada:28
+18075|Pan integral|pan de trigo integral|cereal|252|12.4|42.7|3.5|6|4.3|455|G|1 rebanada:32
+28397|Pan multicereal|pan de semillas|cereal|265|13.4|43.3|4.2|7.4|6.4|381|G|1 rebanada:26
+18060|Pan de centeno||cereal|259|8.5|48.3|3.3|5.8|3.9|603|G|1 rebanada:32
+18041|Pan árabe|pan pita|cereal|275|9.1|55.7|1.2|2.2|1.3|536|G|1 unidad:60
+18042|Pan pita integral||cereal|262|9.8|55.9|1.7|6.1|2.9|527|G|1 unidad:64
+18029|Baguette|pan francés largo,flauta|cereal|272|10.8|51.9|2.4|2.2|4.6|602|G|1 rebanada:25
+18350|Bollo|bolillo,pan de hamburguesa,pancito|cereal|279|9.8|50.1|3.9|1.8|7.3|494|G|1 unidad:44
+18239|Medialuna|croissant,cuernito|cereal|406|8.2|45.8|21|2.6|11.3|467|GHLV|1 unidad:57
+18355|Pan dulce|concha,pan de leche|cereal|360|7.1|43.7|18.3|1.2||357|GHLV|1 unidad:66
+18070|Tostadas de pan|pan tostado,biscotes|cereal|290|9|54.5|4|2.9|6.2|537|G|1 unidad:22;1 taza:45
+18228|Galletas de agua|galletas saladas,crackers,galletitas de agua|cereal|418|9.5|74|8.6|2.8|1.3|941|G|5 unidades:15
+18235|Galletas integrales||cereal|427|10.6|69.5|14.1|10.3|1.2|704|G|5 unidades:20;1 porción:28
+19816|Galletas de arroz|tortitas de arroz|cereal|387|8.2|81.5|2.8|4.2|0.9|26||1 unidad:9
+18363|Tortilla de maíz|tortillas de maíz|cereal|218|5.7|44.6|2.9|6.3|0.9|45||1 unidad:26
+18364|Tortilla de trigo|tortilla de harina,rapiditas|cereal|306|8.2|49.4|8|3.5|3.7|736|G|1 unidad:45
+18360|Tostada de maíz|tostadas,taco crocante|cereal|476|6.4|63.5|21.8|6.7|1.5|324||1 unidad:13
+36415|Arepa|arepa de maíz|cereal|219|5.5|37.1|5.4|2.6|0.9|270||1 unidad:90;1 pieza:98
+08506|Copos de maíz|cereal de desayuno|cereal|357|5.9|88|0.9|2.7|7.8|571|G|1 taza:28
+08037|Granola|muesli tostado|cereal|489|13.7|53.9|24.3|8.9|19.8|26|GN|1/2 taza:61;1 taza:122
+08504|Cereal de salvado|salvado de trigo|cereal|310|10.2|79.8|3.4|16.9|17.2|586|G|1 porción:29;1 taza:42
+20033|Salvado de avena||cereal|246|17.3|66.2|7|15.4|1.4|4|G|1 cucharada:6;1 taza:94
+20078|Germen de trigo||cereal|360|23.1|51.8|9.7|13.2||12|G|1 cucharada:7;1 taza:115
+18079|Pan rallado|pan molido|cereal|395|13.3|72|5.3|4.5|6.2|732|G|1 cucharada:7;1 taza:108
+18334|Masa de tarta|masa de empanada,tapa de empanada,hojaldre|cereal|457|6.2|48.6|26.1|2.5|3.7|409|G|1 tapa de empanada:30;1 pieza:18
+18023|Pan de maíz|pan de elote,broa|cereal|330|6.6|54.5|9.6|2.3|16.1|599|GHLV|1 unidad:51;1 pieza:60
+18293|Panqueques|pancakes,hotcakes,tortitas|cereal|227|6.4|28.3|9.7|||439|GHLV|1 unidad:38
+18367|Waffles|gofres|cereal|291|7.9|32.9|14.1|||511|GHLV|1 unidad:75
+19034|Palomitas de maíz|pochoclo,pororó,cotufas,rositas de maíz,canchita|cereal|387|12.9|77.8|4.5|14.5|0.9|8||1 taza:8
+18155|Bizcochos|galletas de manteca|cereal|467|6.1|68.9|18.8|0.8|20.2|282|GHLV|1 unidad:5
+20002|Amaranto cocido|kiwicha,alegría cocida|cereal|102|3.8|18.7|1.6|2.1||6||1 taza:246
+20032|Mijo cocido|mijo|cereal|119|3.5|23.7|1|1.3|0.1|2||1 taza:174
+20010|Trigo sarraceno cocido|alforfón,kasha|cereal|92|3.4|19.9|0.6|2.7|0.9|4||1 taza:168
+20068|Tapioca|perlas de tapioca|cereal|358|0.2|88.7|0|0.9|3.4|1||1 cucharada:9.5;1 taza:152
+20027|Fécula de maíz|maicena,almidón de maíz|cereal|381|0.3|91.3|0.1|0.9|0|9||1 cucharada:8;1 taza:128
+18001|Bagel||cereal|264|10.6|52.4|1.3|1.6|8.4|422|G|1 unidad:105
+28313|Pan de hamburguesa integral|pan de hot dog integral|cereal|269|12.4|44.9|4.4|6.1|5.9|427|G|1 unidad:43
+08124|Avena instantánea|avena rápida|cereal|366|8.6|76.7|4.6|8.3|28.9|454|G|1 sobre:43
+01077|Leche entera|leche|lacteo|61|3.1|4.8|3.2|0|5|43|LV|1 vaso:244;1 taza:244
+01079|Leche semidescremada|leche semidesnatada,leche 2 %|lacteo|50|3.3|4.8|2|0|5.1|47|LV|1 vaso:244
+01085|Leche descremada|leche desnatada,leche light|lacteo|34|3.4|5|0.1|0|5.1|42|LV|1 vaso:245
+01090|Leche en polvo entera||lacteo|496|26.3|38.4|26.7|0|38.4|371|LV|1 cucharada:8;1/4 taza:32;1 taza:128
+01091|Leche en polvo descremada||lacteo|362|36.2|52|0.8|0|52|535|LV|1 cucharada:7;1/4 taza:30;1 taza:120
+01095|Leche condensada||lacteo|321|7.9|54.4|8.7|0|54.4|127|LV|1 cucharada:19;1 taza:306
+01214|Leche evaporada||lacteo|135|6.8|10|7.6|0|10|106|LV|1 taza:252
+01102|Leche chocolatada|cacao con leche,leche con chocolate|lacteo|83|3.2|10.3|3.4|0.8|9.5|60|LV|1 vaso:250
+01106|Leche de cabra||lacteo|69|3.6|4.5|4.1|0|4.5|50|LV|1 taza:244
+16139|Bebida de soja|leche de soja,leche de soya|lacteo|43|2.6|4.9|1.5|0.2|3.6|47|S|1 vaso:243
+14091|Bebida de almendras|leche de almendras|lacteo|15|0.6|0.6|1.1|0|0|71|N|1 vaso:240;1 taza:262
+14639|Bebida de arroz|leche de arroz|lacteo|47|0.3|9.2|1|0.3|5.3|39||1 vaso:240
+14171|Bebida de coco|leche de coco para beber|lacteo|31|0.2|2.9|2.1|0|2.5|19||1 vaso:240
+01116|Yogur natural entero|yogurt natural|lacteo|61|3.5|4.7|3.2|0|4.7|46|LV|1 pote:125
+01118|Yogur natural descremado|yogurt descremado|lacteo|56|5.7|7.7|0.2|0|7.7|77|LV|1 pote:125
+01293|Yogur griego natural|yogurt griego|lacteo|97|9|4|5|0|4|35|LV|1 pote:170
+01256|Yogur griego descremado||lacteo|59|10.2|3.6|0.4|0|3.2|36|LV|1 pote:170
+01120|Yogur con frutas|yogurt de frutilla,yogur bebible|lacteo|99|4|18.6|1.1|0|18.6|53|LV|1 pote:125
+01294|Yogur griego con frutas|yogurt griego de frutas|lacteo|106|7.3|12.3|3|0|12|37|LV|1 vaso:240
+01289|Kéfir||lacteo|41|3.8|4.5|0.9|0|4.6|40|LV|1 vaso:243
+01228|Queso fresco|queso blanco,queso de campo|lacteo|299|18.1|3|23.8|0|2.3|751|LV|1 rebanada:28;1 taza desmenuzada:122
+01026|Queso mozzarella|muzzarella,mozarela|lacteo|300|22.2|2.2|22.4|0|1|627|LV|1 rebanada:28;1 taza rallada:112
+01028|Queso mozzarella light||lacteo|254|24.3|2.8|15.9|0|1.1|619|LV|1 rebanada:28
+01009|Queso cheddar|queso amarillo|lacteo|404|22.9|3.1|33.3|0|0.5|653|LV|1 rebanada:28;1 taza en cubos:132;1 taza derretida:244
+01032|Queso parmesano|queso rallado,parmesano|lacteo|420|28.4|13.9|27.8|0|0.1|1804|LV|1 cucharada:5;1 taza:100
+01022|Queso danbo|queso de máquina,queso dambo,queso gouda|lacteo|356|24.9|2.2|27.4|0|2.2|819|LV|1 rebanada:28
+01042|Queso de sándwich|queso en fetas,queso americano|lacteo|366|18.1|4.8|30.7|0|2.3|1671|LV|1 feta:21;1 rebanada:28
+01017|Queso crema|queso untable|lacteo|350|6.2|5.5|34.4|0|3.8|314|LV|1 cucharada:14.5;1 taza:232
+43274|Queso crema light||lacteo|201|7.8|8.1|15.3|0|5.8|359|LV|1 cucharada:15;1 taza:240
+01036|Ricota|requesón,ricotta|lacteo|174|11.3|3|13|0|0.3|84|LV|1 cucharada:15;1/2 taza:124;1 taza:246
+01037|Ricota descremada|requesón light|lacteo|138|11.4|5.1|7.9|0|0.3|99|LV|1 cucharada:15;1/2 taza:124
+01015|Queso cottage|cottage|lacteo|81|10.4|4.8|2.3|0|4|308|LV|1 cucharada:14;1 taza:226
+01159|Queso de cabra||lacteo|264|18.5|0|21.1|0|0|459|LV|
+01019|Queso feta||lacteo|264|14.2|4.1|21.3|0|4.1|917|LV|1 taza desmenuzada:150
+01004|Queso azul|roquefort|lacteo|353|21.4|2.3|28.7|0|0.5|1146|LV|
+01267|Queso cotija|queso añejo|lacteo|366|20|4|30|0|0|1400|LV|2 cucharaditas:5
+01166|Queso Oaxaca|queso asadero|lacteo|356|22.6|2.9|28.3|0|2.9|705|LV|1 taza en cubos:132;1 taza rallada:113
+01035|Queso provolone|provoleta|lacteo|351|25.6|2.1|26.6|0|0.6|876|LV|1 rebanada:28;1 taza en cubos:132
+01040|Queso emmental|queso suizo,gruyere|lacteo|393|27|1.4|31|0|0|187|LV|1 rebanada:28;1 taza en cubos:132;1 taza derretida:244
+01053|Crema de leche|nata,crema para batir|lacteo|340|2.8|2.7|36.1|0|2.9|27|LV|1 cucharada:15;1 taza:120
+01056|Crema ácida|crema agria,sour cream|lacteo|198|2.4|4.6|19.4|0|3.4|31|LV|1 cucharada:12;1 taza:230
+01054|Crema chantilly|nata montada,crema batida|lacteo|257|3.2|12.5|22.2|0|8|8|LV|1 cucharada:3;1 taza:60
+01001|Manteca|mantequilla|lacteo|717|0.8|0.1|81.1|0|0.1|643|LV|1 cucharadita:5;1 cucharada:14
+01145|Manteca sin sal|mantequilla sin sal|lacteo|717|0.8|0.1|81.1|0|0.1|11|LV|1 cucharadita:5;1 cucharada:14.2
+01225|Dulce de leche|cajeta,arequipe,manjar|lacteo|315|6.8|55.4|7.3|0|49.7|129|LV|1 cucharada:19
+19094|Flan|flan casero,quesillo|lacteo|145|4.5|22.8|4|0|23.1|53|HLV|1 porción:150
+19095|Helado de crema|helado,nieve de leche|lacteo|207|3.5|23.6|11|0.7|21.2|80|LV|1 bola:66
+19270|Helado de chocolate||lacteo|216|3.8|28.2|11|1.2|25.4|76|LV|1 bola:66
+19201|Postre de leche|natillas,pudín|lacteo|130|1.4|22.6|3.8|0|17|142|LV|1 pote:113
+36404|Arroz con leche||lacteo|146|3.2|24.9|3.7|0.5|15.3|106|LV|1 porción:283;1 taza:253
+01082|Leche 1 %|leche parcialmente descremada|lacteo|42|3.4|5|1|0|5.2|44|LV|1 vaso:244
+01038|Queso romano|queso pecorino,queso de rallar|lacteo|387|31.8|3.6|26.9|0|0.7|1433|LV|1 cucharada:5
+01025|Queso Monterey|queso chihuahua,queso manchego mexicano|lacteo|373|24.5|0.7|30.3|0|0.5|600|LV|1 rebanada:28;1 taza en cubos:132;1 taza rallada:113
+01119|Yogur de vainilla|yogurt de vainilla|lacteo|85|4.9|13.8|1.2|0|13.8|66|LV|1 pote:125
+01049|Crema ligera|media crema,crema para café|lacteo|123|3.1|4.7|10.4|0|4.1|61|LV|1 cucharada:15
+01123|Huevo|huevo entero,blanquillo|huevo|143|12.6|0.7|9.5|0|0.4|142|HV|1 unidad:50;1 grande:56
+01129|Huevo duro|huevo cocido|huevo|155|12.6|1.1|10.6|0|1.1|124|HV|1 unidad:50;1 taza picada:136;1 cucharada:8.5
+01128|Huevo frito||huevo|196|13.6|0.8|14.8|0|0.4|207|HV|1 unidad:46
+01132|Huevo revuelto|huevos revueltos|huevo|149|10|1.6|11|0|1.4|145|HV|1 unidad:61;1 cucharada:13.7
+01131|Huevo pochado|huevo escalfado|huevo|143|12.5|0.7|9.5|0|0.4|297|HV|1 unidad:50
+01130|Omelette|tortilla francesa,omelet|huevo|154|10.6|0.6|11.7|0|0.3|155|HV|1 cucharada:15;1 unidad grande:61
+01124|Clara de huevo|claras|huevo|52|10.9|0.7|0.2|0|0.7|166|HV|1 clara:33;1 taza:243
+01125|Yema de huevo|yema|huevo|322|15.9|3.6|26.5|0|0.6|48|HV|1 yema:17;1 taza:243
+01140|Huevo de codorniz||huevo|158|13.1|0.4|11.1|0|0.4|141|HV|1 unidad:9
+01226|Claras pasteurizadas|claras líquidas|huevo|48|10|2|0|0|2|199|HV|1 cucharada:15;1/4 taza:60;1 taza:240
+23562|Carne picada magra|carne molida magra,picada especial|carne|176|20|0|10|0|0|66|A|
+23572|Carne picada común|carne molida,picada|carne|254|17.2|0|20|0|0|66|A|
+23563|Carne picada magra cocida|carne molida magra cocida|carne|217|26.1|0|11.8|0|0|68|A|1 porción:85
+23575|Carne picada común cocida|carne molida cocida|carne|272|27|0|17.4|0|0|91|A|1 porción:85
+23601|Bife de lomo|filete de res,solomillo,lomo de res|carne|153|22.1|0|6.5|0|0|56|A|
+23600|Bife de lomo a la plancha|filete asado,lomo asado|carne|200|29|0|8.4|0|0|60|A|
+23611|Bife de chorizo|entrecot,bistec de res,sirloin|carne|131|22.1|0|4.1|0|0|56|A|
+23610|Bife de chorizo a la plancha|bistec asado,entrecot asado|carne|178|29.4|0|5.8|0|0|61|A|
+23656|Vacío|falda,entraña,arrachera,flank|carne|141|21.6|0|5.5|0|0|55|A|1 porción:85;1 bife:188
+23654|Vacío asado|arrachera asada,falda asada|carne|186|27.9|0|7.4|0|0|57|A|1 porción:85;1 bife:383
+13826|Asado de tira|costilla de res,tira de asado,churrasco de costilla|carne|351|22.8|0|28.1|0||64|A|1 porción:85;1 pieza:289
+23356|Nalga|bola de lomo,cuadril,peceto,carne de res magra|carne|116|23.6|0|2.5|0|0|55|A|1 porción:85;1 bife:344
+23592|Nalga a la plancha|milanesa sin empanar,bistec de pierna|carne|177|31.6|0|4.7|0|0|43|A|
+23602|Carne para guiso|carne de res para estofado,osobuco,roast beef|carne|214|34.7|0|7.4|0|0|56|A|
+13325|Hígado de vaca|hígado de res|carne|135|20.4|3.9|3.6|0|0|69|A|1 porción:85
+13327|Hígado de vaca cocido|hígado encebollado|carne|175|26.5|5.2|4.7|0|0|77|A|1 rebanada:82
+23573|Hamburguesa de carne|carne para hamburguesa|carne|270|25.8|0|17.8|0|0|75|A|1 medallón:85
+10060|Lomo de cerdo|solomillo de cerdo,lomo de puerco|carne|109|20.9|0|2.2|0|0|53|A|1 porción:85
+10061|Lomo de cerdo asado|lomo de puerco asado|carne|143|26.2|0|3.5|0|0|57|A|1 porción:85;1 pieza:333
+10038|Chuleta de cerdo|bife de cerdo,costeleta de cerdo,chuleta de puerco|carne|209|25.6|0|11.1|0|0|55|A|1 unidad:120;1 porción:85
+10071|Bondiola|paleta de cerdo,pernil|carne|292|23.3|0|21.4|0|0|68|A|1 taza en cubos:135;1 porción:85
+10089|Costillas de cerdo|costillar,costillitas de cerdo|carne|397|29.1|0|30.3|0|0|93|A|1 porción:85;1 pieza:177
+10860|Panceta|tocino,bacon,tocineta|carne|548|35.7|1.4|43.3|0|0|2193|A|1 lonja:8
+07029|Jamón cocido|jamón york,jamón de sándwich,jamón|carne|163|16.6|3.8|8.6|1.3|0|1143|A|1 feta:20;1 rebanada:28
+07028|Jamón cocido magro||carne|100|16.9|0.6|3.4|0|0|1279|A|1 feta:20;1 rebanada:23
+07022|Salchicha|pancho,salchicha tipo viena,frankfurt|carne|316|11.2|3.4|28.3|0|1.3|992|A|1 unidad:45
+07024|Salchicha de pollo||carne|223|15.5|2.7|16.2|0|3|1027|A|1 unidad:45;1 porción:85
+07019|Chorizo|chorizo parrillero|carne|455|24.1|1.9|38.3|0|0|1235|A|1 unidad:60
+07005|Morcilla|morcilla criolla|carne|379|14.6|1.3|34.5|0|1.3|680|A|1 unidad:60;4 rebanadas:100
+07008|Mortadela||carne|308|15.2|5.5|24.6|0|4.4|960|A|1 feta:28
+07069|Salame|salami|carne|336|21.9|2.4|25.9|0|1|1740|A|1 feta:10;1 rebanada:12.3
+07057|Pepperoni||carne|504|19.2|1.2|46.3|0|0|1582|A|5 rodajas:10;1 porción:85;1 pieza:2
+17014|Cordero|carne de cordero,borrego|carne|191|28.3|0|7.7|0|0|68|A|1 porción:85;1 pieza:218
+17178|Conejo||carne|197|29.1|0|8.1|0||47|A|1 porción:85;1 pieza:313
+17169|Chivito|cabrito,chivo|carne|143|27.1|0|3|0|0|86|A|1 porción:85;1 pieza:340
+13340|Lengua de vaca|lengua de res|carne|284|19.3|0|22.3|0|0|65|A|1 porción:85
+23640|Mondongo|callos,pancita,tripa|carne|94|11.7|2|4|0|0|68|A|1 porción:85
+23175|Ojo de bife|ribeye,bife ancho|carne|154|21.9|0|7.4|0|0|56|A|1 porción:85
+13420|Peceto|cuete,redondo|carne|157|29.5|0|3.4|0|0|63|A|1 porción:85
+13370|Pecho de vaca|falda de res,brisket|carne|205|33.3|0|7|0|0|54|A|1 porción:85;1 bife:270
+13479|T-bone|bife con hueso,chuletón|carne|212|27.9|0|10.4|0|0|67|A|1 porción:85;1 bife:363
+23557|Carne picada extra magra|carne molida 95 %|carne|137|21.4|0|5|0|0|66|A|
+10220|Carne picada de cerdo|carne molida de cerdo|carne|297|25.7|0|20.8|0|0|73|A|1 porción:85
+10011|Pernil de cerdo|pierna de cerdo asada,lechón|carne|211|29.4|0|9.4|0|0|64|A|1 taza en cubos:135;1 porción:85
+05062|Pechuga de pollo cruda|pechuga|ave|120|22.5|0|2.6|0|0|45|A|1 porción:85;1 pieza:272
+05064|Pechuga de pollo a la plancha|pechuga asada|ave|165|31|0|3.6|0|0|74|A|1 pechuga mediana:172;1 taza picada:140
+05065|Pechuga de pollo hervida||ave|151|29|0|3|0|0|63|A|1 taza picada:140
+05098|Muslo de pollo|pata y muslo,pierna de pollo,contramuslo|ave|179|24.8|0|8.2|0|0|106|A|1 unidad:52
+05094|Muslo de pollo con piel||ave|232|23.3|0|14.7|0|0|102|A|1 unidad:62
+05073|Pata de pollo|pierna de pollo,drumstick|ave|155|24.2|0|5.7|0|0|128|A|1 unidad:44
+05103|Alitas de pollo|alas de pollo|ave|254|23.8|0|16.9|0|0|98|A|1 unidad:34;1 pieza:85
+05009|Pollo entero asado|pollo al spiedo,pollo rostizado|ave|239|27.3|0|13.6|0|0|82|A|1 taza picada:140
+05007|Pollo frito|pollo empanizado|ave|289|22.5|9.4|17.4|0.3|0|292|AGH|1 porción:85
+22978|Tiras de pollo empanizadas|pollo empanizado,milanesa de pollo,suprema rebozada|ave|240|14.6|14.9|13.6|1.7|0.6|527|AGH|1 pieza:21
+22974|Nuggets de pollo|patitas de pollo,deditos de pollo|ave|260|12.4|16.3|16.1|1.3|0.8|560|AGH|1 unidad:16;1 porción:87;1 pieza:18
+05083|Pollo desmenuzado|pollo deshebrado,ropa vieja de pollo|ave|185|26.3|0|8.1|0|0|78|A|1 porción:85;1 taza picada:160
+05711|Pechuga de pavo|pavo,guajolote|ave|136|29.5|0|2|0|0|114|A|1 unidad:863;1 porción:85
+07046|Fiambre de pavo|pechuga de pavo en fetas,jamón de pavo|ave|109|21.8|3.5|0.8|0.5|3.5|772|A|1 feta:20;1 rebanada:28
+05666|Carne picada de pavo|pavo molido|ave|213|27.1|0|11.6|0|0|90|A|1 porción:85
+05028|Hígado de pollo|higaditos|ave|167|24.5|0.9|6.5|0|0|76|A|
+05142|Pato||ave|201|23.5|0|11.2|0|0|65|A|1 taza picada:140
+05333|Carne picada de pollo|pollo molido|ave|189|23.3|0|10.9|0|0|75|A|1 porción:85
+05060|Pechuga de pollo con piel|pechuga con piel asada|ave|197|29.8|0|7.8|0|0|71|A|1 taza picada:140
+15121|Atún en agua|atún al natural|pescado|86|19.4|0|1|0|0|247|AP|1 lata:120;1 porción:85
+15119|Atún en aceite||pescado|198|29.1|0|8.2|0|0|416|AP|1 lata:120;1 taza:146
+15127|Atún fresco|atún rojo|pescado|109|24.4|0|0.5|0|0|45|AP|
+15236|Salmón|salmón rosado|pescado|208|20.4|0|13.4|0|0|59|AP|1 porción:85;1/2 filete:198
+15237|Salmón a la plancha|salmón asado|pescado|206|22.1|0|12.3|0|0|61|AP|1 filete:178;1 porción:85
+15077|Salmón ahumado||pescado|117|18.3|0|4.3|0|0|672|AP|1 feta:15;1 porción:85
+15015|Merluza|merluza cruda,abadejo|pescado|82|17.8|0|0.7|0|0|54|AP|1 filete:180;1 porción:85
+15016|Merluza al horno|bacalao fresco cocido,filete de merluza|pescado|105|22.8|0|0.9|0|0|78|AP|1 filete:180;1 porción:85
+15018|Bacalao salado||pescado|290|62.8|0|2.4|0|0|7027|AP|1 pieza:80
+15261|Tilapia|mojarra|pescado|96|20.1|0|1.7|0|0|52|AP|1 filete:116
+15262|Tilapia cocida|mojarra asada|pescado|128|26.1|0|2.6|0|0|56|AP|1 filete:87
+15020|Corvina|corvina blanca|pescado|104|17.8|0|3.2|0|0|56|AP|1 filete:79;1 porción:85
+15028|Lenguado|platija|pescado|70|12.4|0|1.9|0|0|296|AP|1 filete:163
+15034|Pescado blanco|filete de pescado|pescado|90|20|0|0.6|0|0|261|AP|1 filete:150;1 porción:85
+15088|Sardinas en aceite|sardinas en lata|pescado|208|24.6|0|11.4|0|0|307|AP|1 unidad:12;1 taza:149
+15089|Sardinas en tomate||pescado|185|20.9|0.5|10.4|0.1|0.4|414|AP|1 unidad:38;1 taza:89;1 lata:370
+15046|Caballa|macarela,verdel|pescado|205|18.6|0|13.9|0|0|90|AP|1 filete:112;1 porción:85
+15241|Trucha||pescado|168|23.8|0|7.4|0|0|61|AP|1 filete:71;1 porción:85
+15100|Pejerrey|boga,anchoa fresca|pescado|124|22.6|0|3.1|0||77|AP|1 porción:85
+15002|Anchoas|boquerones en aceite|pescado|210|28.9|0|9.7|0|0|3668|AP|1 unidad:4
+15027|Pescado empanizado|palitos de pescado,filetes de pescado rebozados,bastones de pescado|pescado|277|11|21.7|16.2|1.5|1.6|402|AGHP|1 unidad:28;1 pieza:57
+15270|Camarones|gambas,langostinos|pescado|85|20.1|0|0.5|||119|AC|1 porción:85
+15271|Camarones cocidos|gambas cocidas,langostinos cocidos|pescado|99|24|0.2|0.3|||111|AC|1 porción:85
+15175|Calamar|calamares,rabas|pescado|92|15.6|3.1|1.4|0|0|44|AC|1 porción:85
+15176|Calamares fritos|rabas fritas|pescado|175|17.9|7.8|7.5|0||306|AC|1 porción:85
+15165|Mejillones|choros,cholgas|pescado|172|23.8|7.4|4.5|0||369|AC|1 porción:85
+15159|Almejas||pescado|148|25.6|5.1|1.9|0||1202|AC|1 porción:85;20 unidades pequeñas:190
+15230|Pulpo||pescado|164|29.8|4.4|2.1|0|0|460|AC|1 porción:85
+15140|Cangrejo|jaiba|pescado|83|17.9|0|0.7|0|0|395|AC|1 taza:118
+15148|Langosta||pescado|89|19|0|0.9|0|0|486|AC|1 taza:145;1 porción:85
+15109|Palitos de cangrejo|surimi,kanikama|pescado|99|15.2|6.8|0.9|0|0|143|AHP|1 unidad:17;1 porción:85
+15181|Salmón en lata||pescado|139|19.8|0|6|0||75|AP|1 porción:85;1 lata:454
+15126|Atún blanco en agua|bonito en agua,atún albacora|pescado|128|23.6|0|3|0|0|377|AP|1 lata:120;1 porción:85
+15267|Abadejo|pollock,colín|pescado|80|19.4|0|0.3|||166|AP|1 porción:85
+15111|Pez espada|albacora|pescado|172|23.4|0|7.9|0|0|97|AP|1 porción:85;1 pieza:106
+15092|Lubina|róbalo,robalo,corvina negra|pescado|124|23.6|0|2.6|0||87|AP|1 filete:101;1 porción:85
+15194|Dorado|mahi mahi,lampuga|pescado|109|23.7|0|0.9|0||113|AP|1 porción:85;1 filete:159
+15235|Bagre|siluro|pescado|144|18.4|0|7.2|0|0|119|AP|1 filete:143;1 porción:85
+12061|Almendras||semilla|579|21.1|21.6|49.9|12.5|4.3|1|N|1 puñado:28;10 unidades:12;1 taza entera:143;1 taza en rodajas:92
+12063|Almendras tostadas||semilla|598|21|21|52.5|10.9|4.9|3|N|1 puñado:28;1 taza entera:138
+12155|Nueces|nuez de nogal|semilla|654|15.2|13.7|65.2|6.7|2.6|2|N|1 puñado:28;1 mitad:2;1 taza picada:117;1 taza molida:80
+12087|Castañas de cajú|anacardos,merey,nuez de la india|semilla|553|18.2|30.2|43.9|3.3|5.9|12|N|1 puñado:28
+12120|Avellanas||semilla|628|14.9|16.7|60.8|9.7|4.3|0|N|1 puñado:28;1 taza picada:115;1 taza molida:75
+12151|Pistachos|pistacho|semilla|560|20.2|27.2|45.3|10.6|7.7|1|N|1 puñado:28;1 taza:123
+12078|Nueces de Brasil|castañas de Pará|semilla|659|14.3|11.7|67.1|7.5|2.3|3|N|1 unidad:5;1 taza entera:133
+12142|Nueces pecanas|pecanas,nuez pecana|semilla|691|9.2|13.9|72|9.6|4|0|N|1 puñado:28;1 taza picada:109;1 taza en mitades:99
+12131|Macadamia||semilla|718|7.9|13.8|75.8|8.6|4.6|5|N|1 puñado:28;1 taza entera:134
+12167|Castañas|castañas asadas|semilla|245|3.2|53|2.2|5.1|10.6|2|N|1 unidad:8;1 taza:143
+12135|Mix de frutos secos|frutos secos surtidos,trail mix|semilla|607|19.5|22.4|53.5|6.4|5|4|MN|1 puñado:28;1 taza:131
+12006|Semillas de chía|chía|semilla|486|16.5|42.1|30.7|34.4||16||1 cucharada:12
+12220|Semillas de lino|linaza|semilla|534|18.3|28.9|42.2|27.3|1.6|30||1 cucharada:10;1 taza entera:168
+12036|Semillas de girasol|pipas,semillas de maravilla|semilla|584|20.8|20|51.5|8.6|2.6|9||1 cucharada:9;1 taza:46
+12014|Semillas de zapallo|pepitas,semillas de calabaza|semilla|559|30.2|10.7|49|6|1.4|7||1 cucharada:9;1 taza:129
+12023|Sésamo|ajonjolí|semilla|573|17.7|23.4|49.7|11.8|0.3|11|Z|1 cucharada:9;1 taza:144
+12166|Tahini|pasta de sésamo|semilla|595|17|21.2|53.8|9.3|0.5|115|Z|1 cucharada:15
+12195|Mantequilla de almendras|pasta de almendras|semilla|614|21|18.8|55.5|10.3|4.4|7|N|1 cucharada:16;1 taza:250
+12108|Coco rallado|coco seco|semilla|660|6.9|23.6|64.5|16.3|7.3|37||1 cucharada:5
+12118|Leche de coco|crema de coco|semilla|197|2|2.8|21.3|||13||1 cucharada:15;1 taza:226
+04053|Aceite de oliva|aceite de oliva extra virgen|grasa|884|0|0|100|0|0|2||1 cucharadita:4.5;1 cucharada:13.5;1 taza:216
+04060|Aceite de girasol|aceite vegetal|grasa|884|0|0|100|0|0|0||1 cucharadita:4.5;1 cucharada:13.6;1 taza:218
+44005|Aceite de maíz||grasa|884|0|0|100|0|0|0||1 cucharada:14
+04582|Aceite de canola|aceite de colza|grasa|884|0|0|100|0|0|0||1 cucharada:14;1 taza:218
+04044|Aceite de soja|aceite de soya|grasa|884|0|0|100|0|0|0||1 cucharada:13.6;1 taza:218
+04047|Aceite de coco||grasa|892|0|0|99.1|0|0|0||1 cucharada:13.6;1 taza:218
+04610|Margarina||grasa|717|0.2|0.7|80.7|0|0|751|LV|1 cucharadita:4.7;1 cucharada:14;1 taza:227
+04002|Grasa de cerdo|manteca de cerdo,lardo|grasa|902|0|0|100|0|0|0|A|1 cucharada:12.8;1 taza:205
+04025|Mayonesa|mahonesa|grasa|680|1|0.6|74.8|0|0.6|635|HV|1 cucharada:13.8;1 taza:220
+04641|Mayonesa light||grasa|238|0.4|9.2|22.2|0|3.6|827|HV|1 cucharada:15
+14411|Agua||bebida|0|0|0|0|0|0|4||1 vaso:240
+14209|Café negro|café,café colado,tinto|bebida|1|0.1|0|0|0|0|2||1 taza:237
+14210|Espresso|café expreso,cafecito,café cubano sin azúcar|bebida|9|0.1|1.7|0.2|0|0|14||1 tacita:30
+14215|Café instantáneo|café soluble|bebida|2|0.1|0.3|0|0|0|4||1 taza:240;1 porción:179
+14355|Té|té negro,infusión|bebida|1|0|0.3|0|0|0|3||1 taza:237
+14278|Té verde||bebida|1|0.2|0|0|0|0|1||1 taza:245
+14545|Infusión de hierbas|tisana,té de manzanilla,manzanilla|bebida|1|0|0.2|0|0|0|1||1 taza:237
+09206|Jugo de naranja natural|zumo de naranja,jugo de china|bebida|45|0.7|10.4|0.2|0.2|8.4|1||1 vaso:248
+09209|Jugo de naranja envasado|zumo de naranja de caja|bebida|49|0.7|11.5|0.1|0.3|8.3|2||1 vaso:249
+09016|Jugo de manzana|zumo de manzana|bebida|46|0.1|11.3|0.1|0.2|9.6|4||1 vaso:248
+09135|Jugo de uva|zumo de uva|bebida|60|0.4|14.8|0.1|0.2|14.2|5||1 vaso:253
+09273|Jugo de ananá|zumo de piña,jugo de piña|bebida|53|0.4|12.9|0.1|0.2|10|2||1 vaso:250
+11540|Jugo de tomate||bebida|17|0.8|3.5|0.3|0.4|2.6|253||1 vaso:243
+09251|Néctar de durazno|néctar de melocotón|bebida|54|0.3|13.9|0|0.6|13.3|7||1 vaso:249
+09435|Néctar de guayaba|jugo de guayaba|bebida|63|0.1|16.2|0.1|1|12.9|6||1 vaso:251
+14293|Limonada|agua de limón|bebida|40|0.1|10.4|0|0|10|4||1 vaso:248
+14148|Refresco cola|gaseosa cola,soda cola|bebida|42|0|10.4|0.2|0|9.9|3||1 lata:355;1 vaso:240
+14416|Refresco cola sin azúcar|cola light,cola zero|bebida|2|0.1|0.3|0|0|0|8||1 lata:355
+14144|Refresco de lima limón|gaseosa lima-limón|bebida|41|0.1|10.4|0|0|10.4|10||1 lata:368
+14150|Refresco de naranja|gaseosa naranja|bebida|48|0|12.3|0|0||12||1 lata:372
+14155|Agua tónica|tónica|bebida|34|0|8.8|0|0|8.8|12||1 vaso:244;1 botella:336
+14121|Soda|agua con gas,agua mineral con gas|bebida|0|0|0|0|0|0|21||1 vaso:237;1 lata:474
+14154|Bebida energética|energizante|bebida|43|0.5|10.2|0|0|10.2|39||1 lata:250;1 porción:369
+14003|Cerveza|chela,birra|bebida|43|0.5|3.5|0|0|0|4|G|1 lata:356;1 vaso:240
+14006|Cerveza light||bebida|29|0.2|1.6|0|0|0.1|4|G|1 lata:354
+14305|Cerveza sin alcohol|cerveza 0,0|bebida|37|0.2|8.1|0.1|0|8.1|13|G|1 lata:355;1 taza:237
+14096|Vino tinto||bebida|85|0.1|2.6|0|0|0.6|4||1 copa:147
+14106|Vino blanco||bebida|82|0.1|2.6|0|0|1|5||1 copa:147
+14253|Vino rosado||bebida|83|0.4|3.8|0|0|3.8|5||1 copa:147
+14037|Ron|aguardiente,whisky,vodka,ginebra,tequila,destilado|bebida|231|0|0|0|0|0|1||1 medida:42
+14058|Proteína de suero aislada|whey isolate,proteína aislada|suplemento|359|58.1|29.1|1.2|0|1.2|372|LV|1 scoop:29;3 medidas:86
+12119|Agua de coco||bebida|19|0.7|3.7|0.2|1.1|2.6|105||1 vaso:240;1 cucharada:15
+01105|Chocolate caliente|chocolatada caliente,cocoa caliente|bebida|77|3.5|10.7|2.3|1|9.7|44|LV|1 taza:250
+14638|Horchata||bebida|54|0.5|11.5|0.7|0|9.4|14||1 vaso:240;1 taza:228
+19165|Cacao en polvo|cocoa amarga|bebida|228|19.6|57.9|13.7|37|1.8|21||1 cucharada:5.4;1 taza:86
+14192|Cacao en polvo azucarado|cacao instantáneo,cocoa dulce|bebida|398|6.7|83.7|4|3.7|65.5|504|LV|1 cucharada:12;1 porción:28
+09152|Jugo de limón|zumo de limón|bebida|22|0.3|6.9|0.2|0.3|2.5|1||1 cucharada:15;1 taza:244
+11655|Jugo de zanahoria|zumo de zanahoria|bebida|40|0.9|9.3|0.1|0.8|3.9|66||1 vaso:236
+09128|Jugo de pomelo|jugo de toronja|bebida|39|0.5|9.2|0.1|0.1|9.1|1||1 vaso:247
+09442|Jugo de granada||bebida|54|0.1|13.1|0.3|0.1|12.7|9||1 vaso:249
+19335|Azúcar|azúcar blanca|dulce|387|0|100|0|0|99.8|1||1 cucharadita:4.2;1 cucharada:12.5;1 porción:2.8
+19334|Azúcar morena|azúcar rubia,azúcar mascabo,panela|dulce|380|0.1|98.1|0|0|97|28||1 cucharadita:4.6;1 taza compacta:220
+19296|Miel|miel de abeja|dulce|304|0.3|82.4|0|0.2|82.1|4|V|1 cucharadita:7;1 cucharada:21;1 taza:339
+19353|Jarabe de arce|miel de maple|dulce|260|0|67|0.1|0|60.5|12||1 cucharada:20;1 porción:83
+19297|Mermelada|dulce de fruta,confitura,jalea|dulce|278|0.4|68.9|0.1|1.1|48.5|32||1 cucharada:20;1 sobre:14
+43028|Mermelada light||dulce|132|0.3|53.4|0.3|2.5|37.8|0||1 cucharada:14;1 taza:224
+09143|Cajeta de guayaba|dulce de guayaba,bocadillo|dulce|36|0.3|9.5|0.1|3.6|5.9|4||1 taza:238
+19120|Chocolate con leche||dulce|535|7.7|59.4|29.7|3.4|51.5|79|LV|1 barra:44;1 cuadrito:7
+19904|Chocolate amargo|chocolate negro 70 %|dulce|598|7.8|45.9|42.6|10.9|24|20||1 cuadrito:10;1 barra:101
+19080|Chocolate semiamargo||dulce|480|4.2|63.9|30|5.9|54.5|11|LV|1 cuadrito:10;1 porción:14.5;1 taza:182
+19087|Chocolate blanco||dulce|539|5.9|59.2|32.1|0.2|59|90|LV|1 cuadrito:10;1 barra:85;1 cucharada:14
+19132|Bombones|chocolatines|dulce|526|9|53.4|34.4|6.2|43.9|74|LNV|1 unidad:12;1 barra:41
+18213|Galletitas dulces|galletas dulces,galletas maría|dulce|455|4.9|72.6|16.4|1.6|35.1|325|GHLV|1 unidad:6
+18166|Galletitas rellenas|galletas rellenas|dulce|464|5.2|71|19.1|2.9|40.7|388|G|1 unidad:12;3 unidades:36
+18159|Galletitas con chips de chocolate|galletas con chispas de chocolate|dulce|492|5.1|65.4|24.7|2|32.9|311|GHLV|1 unidad:10
+18133|Bizcochuelo|bizcocho,queque,ponqué,torta simple|dulce|290|5.4|61|2.7|0.5|36.7|623|GHLV|1 porción:38
+18096|Torta de chocolate|pastel de chocolate,tarta de chocolate|dulce|389|3.5|52.8|20.1|2.2|40|348|GHLV|1 porción:64;1 pieza:138;1 unidad:1660
+18147|Torta de queso|cheesecake,tarta de queso,pay de queso|dulce|321|5.5|25.5|22.5|0.4|21.8|438|GHLV|1 porción:80
+18120|Budín|panqué,pound cake|dulce|353|5|53.6|14|0.6|33.4|377|GHLV|1 rebanada:28;1 pieza:49
+18274|Muffin|magdalena,mantecada,panquecito|dulce|375|4.5|53|16.1|1.1|31.5|336|GHLV|1 unidad:57
+18255|Rosquilla|dona,donut,berlina,bola de fraile|dulce|421|6.1|47.9|22.7|2.1|22.8|316|GHLV|1 unidad:60
+18959|Pastelito de guayaba|pastelito,pastel de guayaba|dulce|379|5.5|47.8|18.5|2.2|17|231|GHLV|1 unidad:60;1 pieza:86
+18301|Pastel de manzana|tarta de manzana,pay de manzana|dulce|237|1.9|34|11|1.6|15.7|201|GLV|1 porción:125
+18151|Brownie||dulce|405|4.8|63.9|16.3|2.1|36.6|286|GHLV|1 unidad:56
+19107|Caramelos|golosinas,dulces|dulce|394|0|98|0.2|0|62.9|38||1 unidad:6
+19106|Gomitas|gomas,ositos de goma|dulce|396|0|98.9|0|0.1|59|44|A|1 unidad:4;1 taza:182
+19116|Malvaviscos|marshmallows,bombones de azúcar|dulce|318|1.8|81.3|0.2|0.1|57.6|80|A|1 unidad:7;1 taza:50
+19173|Gelatina|jalea de gelatina|dulce|62|1.2|14.2|0|0|13.5|75|A|1 porción:120;1/2 taza:135
+19176|Gelatina sin azúcar||dulce|20|0.8|4.2|0|0|0|48|A|1 porción:120
+43046|Turrón|turrón de maní|dulce|398|3.3|92.4|1.7|3.3|45|33|HNV|1 porción:30;1 pieza:14
+19015|Barra de cereal|barrita de cereal,granola bar|dulce|471|10.1|64.4|19.8|5.3|28.6|294|G|1 unidad:25;1 barra:21
+19125|Crema de avellanas||dulce|541|5.4|62.2|29.7|5.4|54|41|LNV|1 cucharada:19;1 porción:37
+19205|Leche asada|natilla horneada,flan de huevo|dulce|112|4.1|17.6|2.8|0|4.6|87|HLV|1/2 taza:141
+19217|Paleta helada de agua|helado de agua,polo|dulce|24|0.5|6.2|0.1|0||5||1 unidad:46;1 barra:51
+19129|Jarabe para panqueques|miel de panqueque|dulce|234|0|61.5|0|0|21.5|82||1 cucharada:20;1 taza:314
+19336|Azúcar impalpable|azúcar glas,azúcar en polvo|dulce|389|0|99.8|0|0|97.8|2||1 cucharada:8;1 taza:120
+19411|Papas fritas de paquete|papitas,chips,patatas fritas de bolsa|snack|532|6.4|53.8|34|3.1|0.3|527||1 bolsita:28
+19056|Nachos|totopos,chips de maíz|snack|472|7.1|67.8|20.7|5.4|0.8|328||1 porción:28
+19041|Chicharrón|chicharrones,cueritos fritos|snack|544|61.3|0|31.3|0|0|1818|A|1 porción:14
+19047|Palitos salados|pretzels|snack|384|10|80.4|2.9|3.4|2.2|1240|G|1 porción:28
+25027|Chifles|mariquitas,chips de plátano|snack|531|2.3|63.8|29.6|3.5|0.9|202||1 porción:28
+16089|Maní salado|cacahuates salados|snack|599|28|15.3|52.5|9.4|4.2|320|M|1 puñado:28;1 taza picada:144
+25014|Pochoclo con manteca|palomitas con mantequilla|snack|557|7.5|55.2|34|10|0.6|764|LV|1 taza:11
+18214|Galletas de queso|crackers de queso|snack|489|10.9|59.4|22.7|2.3|4.5|973|GLV|10 unidades:10;1 taza:62
+21224|Pizza de muzzarella|pizza de queso|preparado|268|10.4|29|12.3|2.2|3.6|447|GLV|1 porción:100
+22903|Pizza de pepperoni|pizza con salame|preparado|274|14.4|24.7|13.1|2|3.4|590|AGL|1 porción:100
+21107|Hamburguesa completa|hamburguesa con pan|preparado|297|16.5|31.5|12|1.7|4.9|331|AGSZ|1 unidad:90
+21089|Hamburguesa con queso|cheeseburger|preparado|308|16.5|28|14.7|2|4.9|515|AGLSZ|1 unidad:102
+21118|Pancho completo|perro caliente,hot dog,completo|preparado|247|10.6|18.4|14.8|||684|AG|1 unidad:98
+36041|Lasaña de carne|lasagna|preparado|185|10.8|11.4|10.7|1.5|3.1|466|AGHL|1 porción:250
+36046|Espaguetis con salsa de tomate|fideos con tuco,pasta pomodoro|preparado|104|3.9|17.8|1.9|1.7|1.8|191|G|1 plato:250;1 porción:510
+36630|Espaguetis con salsa de carne|fideos a la boloñesa,pasta boloñesa|preparado|121|5.8|16.4|3.6|1.6|1.8|230|AG|1 plato:250;1 porción:554
+22970|Macarrones con queso|mac and cheese|preparado|149|5.6|17.3|6.4|1.1|1.5|290|GLV|1 plato:200;1 taza:137
+36602|Arroz frito|arroz chaufa,arroz chino|preparado|174|4|32.8|3|1.1|0.6|387|HSV|1 plato:200;1 taza:137
+21060|Burrito de frijoles|burrito de porotos|preparado|206|6.5|32.9|6.2|||454|GLV|1 unidad:108;2 piezas:217
+21063|Burrito de carne y frijoles||preparado|191|11.5|19.5|7.5|3|2.2|570|AGL|1 unidad:116
+21486|Taco de carne|tacos|preparado|206|9.2|20.2|9.8|2.9|1.6|560|AGL|1 unidad:100
+36050|Enchiladas de queso||preparado|273|11.2|15.4|18.5|1.9|2.6|528|LV|1 unidad:163;1 porción:244
+36052|Quesadilla de queso|quesadillas|preparado|368|15.9|24.1|23.1|1.7|2.2|701|GLV|1 unidad:120;1 porción:205
+36411|Tamal de maíz|tamales,humita|preparado|186|3.5|26.7|7.2|3.2|7.4|277|LV|1 unidad:150;1 pieza:166
+36403|Empanada de carne|empanada criolla,pastelito de carne|preparado|335|11.3|31.2|18.4|2|1.8|440|AGH|1 unidad:120;1 pieza:89
+22971|Ensalada de papa|ensalada de papas,ensalada rusa,ensaladilla rusa,ensalada de patata|preparado|157|2|16.2|9.4|1.3|5|329|HV|1 porción:125
+06419|Sopa de pollo con fideos|caldo de pollo con fideos|preparado|24|1.2|3|0.8|0.5|0|335|AGH|1 plato:250
+06217|Sopa de verduras|caldo de verduras,sopa juliana|preparado|65|2.2|12.1|0.9|2.1|4.3|385||1 plato:250;1/2 taza:126
+06194|Caldo de pollo|consomé de pollo|preparado|6|0.6|0.4|0.2|0|0.4|371|A|1 taza:249
+06008|Caldo de carne|caldo de res,consomé|preparado|7|1.1|0|0.2|0|0|372|A|1 taza:240;1 lata:435
+22905|Guiso de carne|estofado de carne,carne guisada|preparado|99|4.4|7.8|5.5|0.9|1.8|388|AG|1 plato:250;1 taza:196
+22904|Chili con carne||preparado|107|5.8|13.1|3.5|3.3|1.9|449|A|1 plato:250
+36401|Arroz con pollo|pollo con arroz|preparado|174|12|20|5.1|1.2|0.6|518|A|1 plato:250;1 taza:141
+21518|Wrap de pollo|burrito de pollo|preparado|222|13.8|18.4|10.3|0.9|1.5|577|AGHL|1 unidad:180
+21138|Papas fritas de comida rápida||preparado|312|3.4|41.4|14.7|3.8|0.3|210||1 porción mediana:117;1 porción:71
+21401|Nuggets de comida rápida||preparado|271|19.2|17.2|13.9|1.2|0.4|769|AGH|1 unidad:16;1 tira:30;1 porción:184
+21519|Burrito de desayuno|burrito de huevo|preparado|277|11.1|23|15.6|1.2|2.6|744|AGHL|1 unidad:145
+22899|Ravioles|raviolis|preparado|77|2.5|13.6|1.4|1.3|3.7|306|GHLV|1 plato:250
+36407|Arroz con gandules|arroz con guandú,arroz con frijol de palo|cereal|182|3.5|30.8|5|1.4||583|A|1 porción:653;1 taza:115
+36417|Arroz rojo|arroz a la mexicana,arroz español|cereal|185|3.3|31.2|5.3|1.2|1.3|528||1 taza:116
+36418|Frijoles refritos de restaurante|frijoles refritos caseros|legumbre|156|6.9|16.8|6.8|8|0.8|376|A|1 taza:148
+36413|Sopa de frijoles negros|potaje de frijoles negros,sopa de porotos negros|preparado|103|5.1|14.8|2.6|4.9|0.9|311|A|1 plato:246
+36409|Pupusa de queso|pupusas|preparado|256|11.7|22.4|13.2|2.9|1.2|400|LV|1 unidad:120
+36408|Pupusa de frijoles||preparado|229|5.6|31.5|9|5.8|1.3|305||1 unidad:120
+36412|Tamal de cerdo|tamal de puerco|preparado|174|7.3|15.8|9|2.4|0.5|473|A|1 unidad:142
+36416|Buñuelos|buñuelo,sopaipilla|dulce|462|8|48.6|26.2|1.5|12.2|418|GHLV|1 unidad:70
+25050|Chips de mandioca|chips de yuca|snack|515|1.3|69.2|25.9|3.7|3.4|296||10 unidades:17
+36055|Ravioles con salsa de tomate|raviolis con tuco|preparado|154|7.1|18.5|5.7|1.2|4.5|306|GHLV|1 plato:300;1 porción:427
+36059|Pollo a la parmesana|milanesa napolitana de pollo|preparado|204|16.2|10.9|10.6|0.9|2.8|536|AGHL|1 porción:300
+36601|Arrollado primavera|rollito primavera,egg roll|preparado|250|8.3|27.3|11.9|2.6||468|AGHS|1 unidad:89
+36621|Pollo agridulce||preparado|250|10.1|23.9|12.7|1|11.5|246|AGHS|1 porción:200;3 piezas:55
+36603|Carne con verduras salteadas|salteado de carne,carne al wok|preparado|105|7.1|7.3|5.3|1.5|2.4|409|AGS|1 porción:250
+36625|Tallarines salteados con verduras|chow mein,lo mein|preparado|121|4.8|20.2|2.4|1.3|2.6|430|GHSV|1 porción:250;1 taza:136
+11370|Papas hash brown|papas ralladas fritas,rösti|verdura|265|3|35.1|12.5|3.2|1.5|342||1 taza:156
+14179|Bebida de café con leche|café con leche envasado|bebida|71|2|12.6|1.4|0|10.7|26|LV|1 vaso:240;1 taza:262
+06559|Sopa de tomate|crema de tomate|preparado|32|0.7|7.5|0.2|0.5|4|186||1 plato:250
+06968|Crema de champiñones|sopa crema de hongos|preparado|53|1|4.5|3.7|0.2|1.7|20|GL|1 plato:250;1 lata:305
+06037|Sopa de lentejas|guiso de lentejas|preparado|56|3.7|8.2|1.1|||532|A|1 plato:250;1 lata:567
+06449|Sopa de arvejas|crema de arvejas,sopa de chícharos|preparado|61|3.2|9.9|1.1|1.9|3.2|336|A|1 plato:250
+36414|Sopa de mondongo|menudo,sopa de pancita|preparado|74|8.6|4.1|2.6|||411|A|1 plato:250;1 taza:200
+02047|Sal||condimento|0|0|0|0|0|0|38758||1 pizca:0.4;1 cucharadita:6;1 cucharada:18
+11935|Ketchup|salsa de tomate dulce,cátsup|condimento|101|1|27.4|0.1|0.3|21.3|907||1 cucharada:17;1 sobre:9
+02046|Mostaza||condimento|60|3.7|5.8|3.3|4|0.9|1104||1 cucharadita:5;1 taza:249
+16123|Salsa de soja|salsa de soya|condimento|53|8.1|4.9|0.6|0.8|0.4|5493|GS|1 cucharada:16;1 cucharadita:5.3
+06931|Salsa de tomate para pasta|salsa pomodoro,salsa marinara|condimento|50|1.4|7.4|1.6|1.8|4.9|437||1/2 taza:125;1 porción:132
+06631|Salsa picante|salsa tabasco,salsa de chile|condimento|93|1.9|19.2|0.9|2.2|15.1|2124||1 cucharadita:6
+06164|Salsa mexicana|pico de gallo,salsa fresca|condimento|29|1.5|6.6|0.2|1.9|4|711||1 cucharada:16;2 cucharadas:36;1/2 taza:130
+06150|Salsa barbacoa|salsa bbq|condimento|172|0.8|40.8|0.6|0.9|33.2|1027||1 cucharada:17;1/2 taza:143
+43015|Aderezo César||condimento|542|2.2|3.3|57.9|0.5|2.8|1209|AHLP|1 cucharada:15;1 taza:235
+04639|Aderezo ranch||condimento|430|1.3|5.9|44.5|0|4.7|901|HLV|1 cucharada:15;1 porción:30
+04135|Vinagreta|aliño de aceite y vinagre|condimento|449|0|2.5|50.1|0|2.5|1||1 cucharada:16;1 taza:250
+02053|Vinagre||condimento|18|0|0|0|0|0|2||1 cucharada:15;1 taza:238
+02069|Vinagre balsámico|aceto balsámico|condimento|88|0.5|17|0||14.9|23||1 cucharada:16;1 taza:255
+06264|Salsa blanca|bechamel|condimento|72|4|8.3|2.6|0.1|5.3|184|GLV|1/4 taza:60
+06626|Pesto||condimento|418|9.8|10.1|37.6|1.8|6.3|603|LNV|1 cucharada:16;1/4 taza:63
+06981|Caldo en cubo|cubito de caldo|condimento|438|16.7|64.9|13.9|0.2|14.5|1067||1 cubo:10;1 cucharadita:2.6
+06930|Salsa de queso|queso fundido,dip de queso|condimento|174|6.7|6.8|13.3|0.5|0.4|828|LV|1 cucharada:16;1/4 taza:63
+06112|Salsa teriyaki||condimento|89|5.9|15.6|0|0.1|14.1|3833|GS|1 cucharada:18
+19918|Edulcorante|sacarina,stevia,sucralosa|condimento|0|0|100|0|0|0|0||1 sobre:1
+18375|Levadura de cerveza|levadura nutricional|condimento|325|40.4|41.2|7.6|26.9|0|51||1 cucharada:7;1 cucharadita:4
+02030|Pimienta||condimento|251|10.4|64|3.3|25.3|0.6|20||1 pizca:0.1;1 cucharadita molida:2.3;1 cucharada molida:6.9
+02027|Orégano||condimento|265|9|68.9|4.3|42.5|4.1|25||1 cucharadita:1;1 cucharadita molida:1.8
+02014|Comino||condimento|375|17.8|44.2|22.3|10.5|2.2|168||1 cucharadita:2;1 cucharada entera:6
+02010|Canela||condimento|247|4|80.6|1.2|53.1|2.2|10||1 cucharadita:2.6;1 cucharada:7.9
+02028|Pimentón|paprika,pimentón dulce|condimento|282|14.1|54|12.9|34.9|10.3|68||1 cucharadita:2.3;1 cucharada:6.8
+02043|Cúrcuma||condimento|312|9.7|67.1|3.2|22.7|3.2|27||1 cucharadita:3;1 cucharada:9.4
+02009|Ají molido|chile en polvo|condimento|282|13.5|49.7|14.3|34.8|7.2|2867||1 cucharadita:2.7;1 cucharada:8
+14066|Proteína de suero en polvo|whey,whey protein,proteína en polvo|suplemento|352|78.1|6.2|1.6|3.1|0|156|LV|1 scoop:30;1/3 taza:32
+14067|Proteína de soja en polvo|proteína vegetal en polvo|suplemento|388|55.6|28.9|5.6|6.7|22.2|733|S|1 scoop:30;1 medida:45
+14062|Batido sustituto de comida|batido nutricional,suplemento líquido|suplemento|105|3.8|16.9|2.5|0|9.7|84|LSV|1 botella:240
+19177|Colágeno en polvo|gelatina sin sabor|suplemento|335|85.6|0|0.1|0|0|196|A|1 cucharada:7
+`;
+const ALIM_CATS={fruta:'Frutas',verdura:'Verduras',legumbre:'Legumbres',cereal:'Cereales y panes',lacteo:'Lácteos',huevo:'Huevos',carne:'Carnes',ave:'Aves',pescado:'Pescados y mariscos',
+  semilla:'Frutos secos y semillas',grasa:'Aceites y grasas',bebida:'Bebidas',dulce:'Dulces y postres',snack:'Snacks',preparado:'Comidas preparadas',condimento:'Condimentos y salsas',suplemento:'Suplementos',propio:'Mis alimentos',receta:'Mis recetas'};
+const ALIM_FL={L:'leche',H:'huevo',G:'gluten',M:'maní',N:'frutos secos',S:'soja',P:'pescado',C:'mariscos',Z:'sésamo'};
+const MEALS=[['desayuno','Desayuno'],['almuerzo','Almuerzo'],['merienda','Merienda'],['cena','Cena'],['snack','Snacks']];
+const ALIM_FREE=10; // alimentos y recetas propios en la versión gratis
+const ALIM={};
+const anorm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+ALIM_RAW.trim().split('\n').forEach(l=>{ if(!l) return; const [id,n,syn,cat,k,p,c,g,f,a,na,fl,por]=l.split('|'); const num=v=>v===''||v==null?null:+v;
+  ALIM[id]={id,n,syn:syn?syn.split(','):[],cat,k:+k,p:+p,c:+c,g:+g,f:num(f),a:num(a),na:num(na),fl:fl||'',usda:true,
+    por:por?por.split(';').map(x=>{ const i=x.lastIndexOf(':'); return [x.slice(0,i),+x.slice(i+1)]; }).filter(x=>x[1]>0):[]};
+  ALIM[id].key=anorm(n+' '+ALIM[id].syn.join(' ')); });
+// Alimentos básicos que suben un poco en la búsqueda (lo que más se come)
+const ALIM_POP=new Set(['20045','18069','01123','01077','09040','09003','05064','23562','11367','16015','20038','04053','01228','01116','11529','11253','14209','09200','16070','16057','01026','15121','20121','05062','01129']);
+const ALIM_CAT_RANK={propio:0,receta:0,fruta:1,verdura:1,legumbre:1,cereal:2,lacteo:2,huevo:2,carne:2,ave:2,pescado:2,semilla:3,grasa:3,bebida:3,condimento:4,suplemento:4,dulce:4,snack:5,preparado:5};
+const MAC=['k','p','c','g','f','a','na'];
+let NUT_DAY=null; // día que se está viendo en el diario (null = hoy)
+const prem = () => typeof isPremium!=='function' || isPremium();
+const payFor = r => (typeof A.pfGo==='function' ? A.pfGo(r) : toast('Disponible con PandarIA Fit Premium'));
+function nd(){ const n=nut(); n.diario=n.diario||{}; n.alim=n.alim||[]; n.recetas=n.recetas||[]; n.comidas=n.comidas||[]; n.fav=n.fav||[];
+  n.prefs=n.prefs||{dieta:'todo',evitar:[]}; if(!Array.isArray(n.prefs.evitar)) n.prefs.evitar=[]; return n; }
+const habitos = () => !!(S.nutri && S.nutri.habitos);
+function recetaFood(r){
+  const tot={k:0,p:0,c:0,g:0,f:0,a:0,na:0}; let gt=0; const fl=new Set();
+  (r.items||[]).forEach(it=>{ const f=alimGet(it.f); if(!f||f.cat==='receta') return; gt+=+it.g||0; MAC.forEach(m=>tot[m]+=(f[m]||0)*(+it.g||0)/100); [...(f.fl||'')].forEach(x=>fl.add(x)); });
+  const per=gt?Object.fromEntries(MAC.map(m=>[m,tot[m]/gt*100])):Object.fromEntries(MAC.map(m=>[m,0]));
+  if (fl.has('A')) fl.delete('V');
+  const rac=Math.max(1,+r.rac||1);
+  return Object.assign({id:r.id,n:r.n,syn:[],cat:'receta',fl:[...fl].sort().join(''),por:gt?[['1 ración',Math.round(gt/rac)]]:[],key:anorm(r.n),receta:true,gt},per);
+}
+function alimGet(id){
+  if (ALIM[id]) return ALIM[id];
+  const n=nd(); const c=n.alim.find(x=>x.id===id);
+  if (c) return Object.assign({cat:'propio',syn:[],fl:'',por:[]},c,{key:anorm(c.n),propio:true});
+  const r=n.recetas.find(x=>x.id===id); if (r) return recetaFood(r);
+  return null;
+}
+function alimMac(f,g){ const o={}; MAC.forEach(m=>o[m]=f[m]==null?null:Math.round(f[m]*g/100*10)/10); o.k=Math.round(f.k*g/100); return o; }
+function dayKeyOf(){ return NUT_DAY||dayKey(); }
+function dayItems(k){ return nd().diario[k||dayKeyOf()]||[]; }
+function dayTotals(k){ const t={k:0,p:0,c:0,g:0,f:0,a:0,na:0}; dayItems(k).forEach(e=>MAC.forEach(m=>t[m]+=+e[m]||0)); MAC.forEach(m=>t[m]=Math.round(t[m]*10)/10); t.k=Math.round(t.k); return t; }
+function mealNow(){ const h=new Date().getHours(); return h<11?'desayuno':h<15?'almuerzo':h<19?'merienda':h<23?'cena':'snack'; }
+// Qué no encaja con tus preferencias
+function alimConflicts(f){
+  const P=nd().prefs, out=[]; const fl=f.fl||'';
+  (P.evitar||[]).forEach(x=>{ if (fl.includes(x)) out.push('Contiene '+ALIM_FL[x]); });
+  if (P.dieta==='vegetariano' && fl.includes('A')) out.push('No es vegetariano');
+  if (P.dieta==='vegano' && /[AVLH]/.test(fl)) out.push('No es vegano');
+  return out;
+}
+function alimSearch(q, opts){
+  opts=opts||{}; const n=nd();
+  const pool=[...n.alim.map(c=>alimGet(c.id)), ...n.recetas.map(r=>recetaFood(r)), ...Object.values(ALIM)].filter(Boolean);
+  const words=anorm(q).trim().split(/\s+/).filter(Boolean);
+  let res=pool;
+  if (opts.cat) res=res.filter(f=>f.cat===opts.cat);
+  if (words.length){
+    const qq=words.join(' ');
+    res=res.map(f=>{ const nm=anorm(f.n), nt=nm.split(/[\s,]+/), sy=f.syn.map(anorm), st=sy.join(' ').split(/[\s,]+/); let sc=0;
+      for (const w of words){ if (!f.key.includes(w)) return null;
+        sc+= nt.includes(w)?4 : nt.some(t=>t.startsWith(w))?3 : st.includes(w)?3 : st.some(t=>t.startsWith(w))?2 : 1; }
+      if (nm===qq) sc+=5; else if (sy.includes(qq)) sc+=4; else if (nm.startsWith(qq)) sc+=1;
+      if (ALIM_POP.has(f.id)) sc+=2; if (f.propio||f.receta) sc+=1;
+      return {f,sc}; }).filter(Boolean).sort((a,b)=>b.sc-a.sc||(ALIM_CAT_RANK[a.f.cat]??9)-(ALIM_CAT_RANK[b.f.cat]??9)||a.f.n.length-b.f.n.length).map(x=>x.f);
+  } else if (!opts.cat) res=[];
+  return res.slice(0, opts.limit||60);
+}
+function alimRecent(){ const n=nd(), seen=new Set(), out=[]; const days=Object.keys(n.diario).sort().reverse();
+  for (const d of days){ for (const e of n.diario[d].slice().reverse()){ if (!seen.has(e.fid)){ seen.add(e.fid); const f=alimGet(e.fid); if (f) out.push(f); if (out.length>=30) return out; } } } return out; }
+const fmtG = g => (Math.round(g*10)/10).toLocaleString('es')+' g';
+const fmtK = k => Math.round(k).toLocaleString('es')+' kcal';
+const porTxt = e => !e.por ? fmtG(e.gr) : (!e.q||e.q===1) ? `${e.por} · ${fmtG(e.gr)}` : `${fmtNum(e.q)} × ${/^1 /.test(e.por)?e.por.slice(2):e.por} · ${fmtG(e.gr)}`;
+
+/* ---------- Tarjeta del diario en Nutrición ---------- */
+function diarioCard(){
+  const n=nd(), k=dayKeyOf(), items=dayItems(k), T=dayTotals(k), hab=habitos();
+  const isToday=k===dayKey(), isY=k===dayKey(Date.now()-DAY);
+  const d=new Date(k+'T12:00'); const lbl=isToday?'Hoy':isY?'Ayer':`${DAYS_LONG[d.getDay()]} ${d.getDate()}`;
+  let h=`<div class="row" style="margin:20px 2px 8px"><span class="sec grow" style="margin:0">Diario de comidas</span><button class="ibtn" style="width:34px;height:34px" data-a="dPrefs" aria-label="Preferencias">${I('settings',18)}</button></div><div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px"><button class="ibtn" data-a="dDay" data-v="-1" aria-label="Día anterior">${I('back',20)}</button><b>${esc(lbl.charAt(0).toUpperCase()+lbl.slice(1))}</b><button class="ibtn" data-a="dDay" data-v="1" ${isToday?'disabled style="opacity:.3"':''} aria-label="Día siguiente"><span style="display:inline-flex;transform:scaleX(-1)">${I('back',20)}</span></button></div>`;
+  if (hab) h+=habitosResumen(k);
+  else {
+    h+=`<div class="row" style="align-items:flex-end;gap:10px"><div class="grow"><div style="font-size:28px;font-weight:900;line-height:1.1">${T.k.toLocaleString('es')} <span class="sm mut" style="font-weight:600">kcal</span></div></div>
+      <div class="xs" style="text-align:right;line-height:1.5"><span style="color:#ff7a1a">P ${fmtNum(T.p)} g</span> · <span style="color:#3f9cff">C ${fmtNum(T.c)} g</span> · <span style="color:#f5b82e">G ${fmtNum(T.g)} g</span></div></div>`;
+    const c=calcNutrition();
+    if (prem()){
+      if (c){ const pct=Math.min(100,Math.round(T.k/c.kcal*100)), left=c.kcal-T.k;
+        h+=`<div class="mac" style="margin-top:10px"><div class="mbar"><div style="width:${pct}%;background:${T.k>c.kcal*1.05?'var(--bad)':'var(--ok)'}"></div></div></div>
+        <div class="xs mut" style="margin-top:6px">${left>=0?`Te quedan ${fmtK(left)} de ${fmtK(c.kcal)}`:`${fmtK(-left)} por encima de tu objetivo de ${fmtK(c.kcal)}`}</div>
+        <div class="macros" style="margin-top:8px">${[['Proteína',T.p,c.prot,'#ff7a1a'],['Carbohidratos',T.c,c.carbs,'#3f9cff'],['Grasas',T.g,c.fat,'#f5b82e']].map(([l,v,t,col])=>`<div class="mac"><div class="mbar"><div style="width:${Math.min(100,Math.round(v/Math.max(1,t)*100))}%;background:${col}"></div></div><div class="row xs"><span class="grow">${l}</span><span>${fmtNum(v)} / ${t} g</span></div></div>`).join('')}</div>`;
+      } else h+=`<div class="xs mut" style="margin-top:8px">Completa tu perfil para comparar con tu objetivo.</div>`;
+    } else h+=`<button class="link xs" style="margin-top:8px" data-a="dPay">🔒 Compara con tu objetivo y mira tu semana · Premium</button>`;
+  }
+  MEALS.forEach(([m,ml])=>{
+    const es=items.filter(e=>e.m===m); const mk=Math.round(es.reduce((a,e)=>a+(+e.k||0),0));
+    h+=`<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px"><div class="row"><b class="grow">${ml}</b>${!hab&&es.length?`<span class="xs mut" style="margin-right:8px">${fmtK(mk)}</span>`:''}<button class="btn sm" data-a="dAdd" data-v="${m}" aria-label="Añadir a ${ml}">${I('plus',16)}</button></div>
+      ${es.map(e=>`<div class="row tap" data-a="dEdit" data-v="${e.id}" style="padding:7px 0;gap:10px"><div class="grow" style="min-width:0"><div class="sm ell">${esc(e.n)}</div><div class="xs mut">${esc(porTxt(e))}</div></div>${hab?'':`<span class="xs mut">${fmtK(e.k)}</span>`}</div>`).join('')}</div>`;
+  });
+  h+=`<div class="row" style="gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn sm grow" data-a="dCopy">${I('copy',16)} Copiar ${isToday?'ayer':'el día anterior'}</button><button class="btn sm grow" data-a="dSaveMeal">${I('pin',16)} Guardar comida</button></div>`;
+  if (!hab && prem() && calcNutrition()){ const days=[...Array(7).keys()].reverse().map(i=>dayKey(new Date(k+'T12:00').getTime()-i*DAY));
+    h+=`<div class="xs mut b" style="letter-spacing:1px;margin:16px 0 4px">ÚLTIMOS 7 DÍAS (KCAL)</div>${barChart(days.map(x=>dayTotals(x).k),days.map(x=>DAYS_SHORT[new Date(x+'T12:00').getDay()]),{fmt:v=>v?Math.round(v).toLocaleString('es'):''})}`; }
+  h+=`<div class="xs mut" style="margin-top:12px;line-height:1.4">Datos de alimentos: USDA, base de datos de nutrientes de referencia (dominio público). Revisa siempre la etiqueta de los productos envasados.</div></div>`;
+  return h;
+}
+function habitosResumen(k){
+  const it=dayItems(k), meals=new Set(it.map(e=>e.m)).size;
+  const fv=it.filter(e=>{ const f=alimGet(e.fid); return f&&['fruta','verdura'].includes(f.cat); }).length;
+  const prot=new Set(it.filter(e=>{ const f=alimGet(e.fid); return f&&['carne','ave','pescado','huevo','legumbre','lacteo'].includes(f.cat); }).map(e=>e.m)).size;
+  const row=(ic,t,v)=>`<div class="row" style="gap:10px;padding:4px 0"><span style="color:var(--ok)">${I(ic,18)}</span><span class="grow sm">${t}</span><b class="sm">${v}</b></div>`;
+  return `<div class="sm mut" style="line-height:1.45;margin-bottom:6px">Modo hábitos: registras lo que comes sin contar calorías.</div>${row('check','Comidas del día',meals)}${row('leaf','Frutas y verduras',fv)}${row('dumbbell','Comidas con proteína',prot)}`;
+}
+A.dDay=v=>{ const cur=new Date(dayKeyOf()+'T12:00').getTime()+(+v)*DAY; const k=dayKey(cur); NUT_DAY = k===dayKey()||cur>Date.now()?null:k; render.keep=true; render(); };
+A.dPay=()=>payFor('diario');
+A.dAdd=m=>openLayer('alimBuscar',{m:m||mealNow(),q:'',tab:'todo',cat:'',day:dayKeyOf()});
+A.dCopy=()=>{ const k=dayKeyOf(), prev=dayKey(new Date(k+'T12:00').getTime()-DAY); const src=dayItems(prev);
+  if (!src.length) return toast('No hay nada registrado el día anterior');
+  const n=nd(); n.diario[k]=(n.diario[k]||[]).concat(src.map(e=>Object.assign({},e,{id:uid(),t:Date.now()}))); save(); render.keep=true; render(); toast(`Copiados ${plural(src.length,'alimento','alimentos')}`); };
+A.dSaveMeal=()=>{ const k=dayKeyOf(); const opts=MEALS.filter(([m])=>dayItems(k).some(e=>e.m===m));
+  if (!opts.length) return toast('Registra algo primero');
+  sheet('¿Qué comida quieres guardar?',opts.map(([m,ml])=>({icon:'pin',label:ml,desc:dayItems(k).filter(e=>e.m===m).map(e=>e.n).slice(0,3).join(', '),fn:()=>promptBox({title:'Nombre de la comida',ph:'Por ejemplo: Mi desayuno',value:ml,okText:'Guardar',ok:v=>{ v=(v||'').trim()||ml;
+    nd().comidas.push({id:uid(),n:v.slice(0,40),items:dayItems(k).filter(e=>e.m===m).map(e=>({f:e.fid,gr:e.gr,por:e.por||null,q:e.q||null}))}); save(); toast('Comida guardada: la encontrarás al añadir'); }})}))); };
+function dEntry(id){ const k=dayKeyOf(); return dayItems(k).find(e=>e.id===id); }
+A.dEdit=id=>{ const e=dEntry(id); if(!e) return; const f=alimGet(e.fid);
+  if (!f) return sheet(e.n,[{icon:'trash',label:'Quitar del diario',fn:()=>dDel(id)}]);
+  amountModal(f,{edit:id,m:e.m,por:e.por,q:e.q,gr:e.gr}); };
+function dDel(id){ const n=nd(), k=dayKeyOf(); n.diario[k]=(n.diario[k]||[]).filter(e=>e.id!==id); if(!n.diario[k].length) delete n.diario[k]; save(); render.keep=true; render(); refreshTopSafe(); }
+const refreshTopSafe=()=>{ if (LAYERS.length) refreshTop(); };
+
+/* ---------- Buscador de alimentos ---------- */
+const alP = () => LAYERS[LAYERS.length-1].p;
+function alRow(f){
+  const fav=nd().fav.includes(f.id), cf=alimConflicts(f), hab=habitos();
+  const sub=hab? (f.por[0]?f.por[0][0]:'') : (f.por[0]?`${f.por[0][0]} · ${fmtK(f.k*f.por[0][1]/100)}`:`100 g · ${fmtK(f.k)}`);
+  return `<div class="row" style="gap:10px;padding:10px 0;border-bottom:1px solid var(--line)"><button class="grow" style="text-align:left;min-width:0" data-a="alPick" data-v="${esc(f.id)}"><div class="sm b ell">${esc(f.n)}</div>
+    <div class="xs mut ell">${esc(sub)}${f.propio?' · propio':f.receta?' · receta':''}</div>${cf.length?`<div class="xs" style="color:var(--bad);margin-top:2px">${esc(cf.join(' · '))}</div>`:''}</button>
+    <button class="ibtn" style="width:34px;height:34px;color:${fav?'var(--gold)':'var(--mut)'}" data-a="alFav" data-v="${esc(f.id)}" aria-label="Favorito">${fav?'★':'☆'}</button></div>`;
+}
+function alList(p){
+  const n=nd(); let list=[];
+  if (p.q) list=alimSearch(p.q);
+  else if (p.tab==='recientes') list=alimRecent();
+  else if (p.tab==='favoritos') list=n.fav.map(alimGet).filter(Boolean);
+  else if (p.tab==='propios') list=[...n.alim.map(c=>alimGet(c.id)),...n.recetas.map(recetaFood)].filter(Boolean);
+  else if (p.tab==='comidas') return n.comidas.length? n.comidas.map(c=>`<div class="row" style="gap:10px;padding:10px 0;border-bottom:1px solid var(--line)"><div class="grow" style="min-width:0"><div class="sm b">${esc(c.n)}</div><div class="xs mut ell">${esc(c.items.map(i=>(alimGet(i.f)||{n:'?'}).n).join(', '))}</div></div><button class="btn sm" data-a="alMealAdd" data-v="${c.id}">Añadir</button><button class="ibtn" style="width:34px;height:34px" data-a="alMealDel" data-v="${c.id}" aria-label="Borrar">${I('trash',16)}</button></div>`).join('') : `<p class="sm mut" style="line-height:1.5">Aún no guardaste comidas. En el diario, toca «Guardar comida» para repetir un desayuno o almuerzo con un toque.</p>`;
+  else if (p.cat) list=alimSearch('',{cat:p.cat,limit:200});
+  else return `<div class="xs mut b" style="letter-spacing:1px;margin:14px 0 8px">CATEGORÍAS</div><div class="chips">${Object.entries(ALIM_CATS).filter(([k])=>!['propio','receta'].includes(k)).map(([k,v])=>`<button class="chip" data-a="alCat" data-v="${k}">${esc(v)}</button>`).join('')}</div>`;
+  if (!list.length) return `<p class="sm mut" style="line-height:1.5">${p.q?'No encontré ese alimento. Prueba con otro nombre o créalo con «Crear alimento».':p.tab==='favoritos'?'Toca la estrella de un alimento para tenerlo aquí.':p.tab==='propios'?'Crea tus alimentos o recetas con los botones de abajo.':'Aún no registraste alimentos.'}</p>`;
+  return (p.cat&&!p.q?`<button class="link sm" style="margin:8px 0" data-a="alCat" data-v="">‹ Todas las categorías</button>`:'')+list.map(alRow).join('');
+}
+SCREENS.alimBuscar=p=>{
+  const ml=(MEALS.find(x=>x[0]===p.m)||[0,'Comida'])[1];
+  const tabs=[['todo','Buscar'],['recientes','Recientes'],['favoritos','Favoritos'],['propios','Mis alimentos'],['comidas','Comidas guardadas']];
+  return lhdr(p.receta?'Añadir ingrediente':'Añadir a '+ml.toLowerCase())+`<div class="lbody" style="padding-top:12px">
+    <div class="search">${I('search',20)}<input class="inp" placeholder="Buscar: palta, frijoles, pan…" value="${esc(p.q)}" data-in="alQ"></div>
+    ${p.receta?'':`<div class="chips scroll" style="margin-top:12px">${MEALS.map(([m,l])=>`<button class="chip ${p.m===m?'on':''}" data-a="alMeal" data-v="${m}">${l}</button>`).join('')}</div>`}
+    <div class="chips scroll" style="margin-top:8px">${tabs.filter(t=>!(p.receta&&t[0]==='comidas')).map(([k,l])=>`<button class="chip ${p.tab===k&&!p.q?'on':''}" data-a="alTab" data-v="${k}">${l}</button>`).join('')}</div>
+    <div id="allist" style="margin-top:6px">${alList(p)}</div></div>
+    ${p.receta?'':`<div class="lfoot" style="display:flex;gap:8px"><button class="btn grow" data-a="alNew">${I('plus',16)} Crear alimento</button><button class="btn grow" data-a="recNew">${I('list',16)} Crear receta</button></div>`}`;
+};
+IN.alQ=el=>{ const p=alP(); p.q=el.value; const box=$('#allist'); if(box) box.innerHTML=alList(p); };
+A.alTab=v=>{ const p=alP(); p.tab=v; p.q=''; p.cat=''; refreshTop(); };
+A.alCat=v=>{ const p=alP(); p.cat=v; p.tab='todo'; p.q=''; refreshTop(); };
+A.alMeal=v=>{ alP().m=v; refreshTop(); };
+A.alFav=id=>{ const n=nd(); const i=n.fav.indexOf(id); if(i>=0) n.fav.splice(i,1); else n.fav.unshift(id); save(); const p=alP(); const box=$('#allist'); if(box) box.innerHTML=alList(p); };
+A.alPick=id=>{ const f=alimGet(id); if(!f) return; const p=alP(); if (p.receta) return recAmount(f); amountModal(f,{m:p.m}); };
+A.alMealAdd=id=>{ const c=nd().comidas.find(x=>x.id===id); if(!c) return; const p=alP(), k=p.day||dayKeyOf(), n=nd();
+  const add=c.items.map(i=>{ const f=alimGet(i.f); if(!f) return null; return Object.assign(alimMac(f,i.gr),{id:uid(),fid:f.id,n:f.n,gr:i.gr,por:i.por,q:i.q,m:p.m,t:Date.now()}); }).filter(Boolean);
+  n.diario[k]=(n.diario[k]||[]).concat(add); save(); closeLayer(); render.keep=true; render(); toast(`${c.n}: ${plural(add.length,'alimento añadido','alimentos añadidos')}`); };
+A.alMealDel=id=>confirmBox({title:'¿Borrar esta comida guardada?',text:'Tu diario no cambia.',danger:true,okText:'Borrar',ok:()=>{ const n=nd(); n.comidas=n.comidas.filter(x=>x.id!==id); save(); refreshTop(); }});
+
+/* ---------- Cantidad ---------- */
+let AQ=null;
+function aqGrams(){ if (!AQ) return 0; const f=AQ.f; if (AQ.pi<0) return Math.max(0,+AQ.gr||0); const P=aqPors(f)[AQ.pi]; return Math.max(0,(+AQ.q||0)*P[1]); }
+const aqPors = f => f.por.concat([['100 g',100]]);
+function aqPreview(){ const g=aqGrams(), M=alimMac(AQ.f,g);
+  return habitos()?`<span class="mut">${fmtG(g)}</span>`:`<b>${fmtK(M.k)}</b> <span class="mut">· ${fmtG(g)} · P ${fmtNum(M.p)} · C ${fmtNum(M.c)} · G ${fmtNum(M.g)}</span>`; }
+function amountModal(f, o){
+  o=o||{}; const P=aqPors(f);
+  let pi=o.por!=null?P.findIndex(x=>x[0]===o.por):(o.edit?-1:0); if (o.edit && o.por==null) pi=-1; if (pi<-1) pi=0;
+  AQ={f, pi, q:o.q||1, gr:o.gr||(P[0]?P[0][1]:100), m:o.m||mealNow(), edit:o.edit||null};
+  const cf=alimConflicts(f);
+  const paint=()=>{ const el=$('#aqprev'); if(el) el.innerHTML=aqPreview(); };
+  A.aqPor=v=>{ AQ.pi=+v; document.querySelectorAll('[data-a=aqPor]').forEach(b=>b.classList.toggle('on',+b.dataset.v===AQ.pi));
+    const qb=$('#aqqbox'), gb=$('#aqgbox'); if(qb) qb.style.display=AQ.pi<0?'none':''; if(gb) gb.style.display=AQ.pi<0?'':'none'; paint(); };
+  A.aqMeal=v=>{ AQ.m=v; document.querySelectorAll('[data-a=aqMeal]').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); };
+  A.aqStep=v=>{ AQ.q=Math.max(0.25,Math.round(((+AQ.q||0)+(+v))*4)/4); const el=$('#aqq'); if(el) el.value=AQ.q; paint(); };
+  IN.aqQ=el=>{ AQ.q=el.value===''?0:+el.value.replace(',','.'); paint(); };
+  IN.aqG=el=>{ AQ.gr=el.value===''?0:+el.value.replace(',','.'); paint(); };
+  const ok=cb(()=>{ const g=aqGrams(); if (!(g>0)) return toast('Indica una cantidad');
+    const n=nd(), k=dayKeyOf(); const P2=aqPors(f); const por=AQ.pi>=0?P2[AQ.pi][0]:null;
+    const e=Object.assign(alimMac(f,g),{id:AQ.edit||uid(),fid:f.id,n:f.n,gr:Math.round(g*10)/10,por:por==='100 g'?null:por,q:AQ.pi>=0&&por!=='100 g'?AQ.q:null,m:AQ.m,t:Date.now()});
+    if (por==='100 g'){ e.por=null; e.q=null; }
+    const arr=n.diario[k]=n.diario[k]||[]; const i=arr.findIndex(x=>x.id===e.id); if (i>=0) arr[i]=e; else arr.push(e);
+    save(); if (!AQ.edit && LAYERS.length && LAYERS[LAYERS.length-1].t==='alimBuscar') closeLayer(); render.keep=true; render(); if(!AQ.edit) toast(`${f.n} añadido`); vibrate(15); });
+  const del=o.edit?cb(()=>dDel(o.edit)):null;
+  openModal(`<div class="sheet"><div class="grab"></div><h3 style="margin-bottom:4px">${esc(f.n)}</h3>
+    ${f.syn.length?`<div class="xs mut" style="margin:0 4px 10px">También: ${esc(f.syn.slice(0,4).join(', '))}</div>`:''}
+    ${cf.length?`<div class="banner" style="border-color:var(--bad);margin-bottom:10px"><span class="ic" style="color:var(--bad)">${I('alert',18)}</span><div class="grow sm">${esc(cf.join(' · '))}. Revisa la etiqueta si es un producto envasado.</div></div>`:''}
+    <div class="chips" style="margin-bottom:10px">${P.map((x,i)=>`<button class="chip ${AQ.pi===i?'on':''}" data-a="aqPor" data-v="${i}">${esc(x[0])}</button>`).join('')}<button class="chip ${AQ.pi<0?'on':''}" data-a="aqPor" data-v="-1">Gramos</button></div>
+    <div id="aqqbox" class="row" style="gap:8px;margin-bottom:10px;${AQ.pi<0?'display:none':''}"><span class="sm grow">Cantidad</span><button class="btn sm" data-a="aqStep" data-v="-0.5">−</button><input id="aqq" class="inp" style="width:80px;text-align:center" type="number" inputmode="decimal" step="0.25" min="0" value="${AQ.q}" data-in="aqQ"><button class="btn sm" data-a="aqStep" data-v="0.5">+</button></div>
+    <div id="aqgbox" class="row" style="gap:8px;margin-bottom:10px;${AQ.pi<0?'':'display:none'}"><span class="sm grow">Gramos</span><input id="aqg" class="inp" style="width:110px;text-align:center" type="number" inputmode="decimal" min="0" value="${Math.round(AQ.gr)}" data-in="aqG"></div>
+    <div id="aqprev" class="sm" style="margin:4px 4px 12px">${aqPreview()}</div>
+    <div class="chips" style="margin-bottom:12px">${MEALS.map(([m,l])=>`<button class="chip ${AQ.m===m?'on':''}" data-a="aqMeal" data-v="${m}">${l}</button>`).join('')}</div>
+    <button class="btn pri big" data-a="cbm" data-v="${ok}">${o.edit?'Guardar cambios':'Añadir'}</button>
+    ${del?`<button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="cbm" data-v="${del}">Quitar del diario</button>`:''}
+    ${f.usda?`<div class="xs mut" style="margin:10px 4px 0">Fuente: USDA, base de datos de nutrientes de referencia.</div>`:''}</div>`);
+}
+
+/* ---------- Alimentos propios ---------- */
+const alimRoom = () => prem() || nd().alim.length+nd().recetas.length < ALIM_FREE;
+A.alNew=()=>{ if (!alimRoom()) return payFor('alimProp'); openLayer('alimNuevo',{d:{n:'',porl:'1 porción',porg:100,k:'',p:'',c:'',g:'',f:'',a:'',na:'',fl:'',animal:false}}); };
+SCREENS.alimNuevo=p=>{ const d=p.d; const fld=(k,l,ph,mode)=>`<div class="field grow"><label>${l}</label><input id="an_${k}" class="inp" type="${mode||'number'}" inputmode="decimal" value="${esc(d[k])}" placeholder="${ph||''}" data-in="anF" data-k="${k}"></div>`;
+  return lhdr('Crear alimento')+`<div class="lbody"><p class="sm mut" style="margin-top:0;line-height:1.45">Copia los datos de la etiqueta. Si la etiqueta da los valores por porción, escribe cuántos gramos tiene esa porción.</p>
+    ${fld('n','Nombre','Ej.: Barrita de avena de mi marca','text')}
+    <div class="row" style="gap:10px">${fld('porl','Porción','1 porción','text')}${fld('porg','Gramos de esa porción','100')}</div>
+    <div class="xs mut b" style="letter-spacing:1px;margin:6px 0 8px">POR PORCIÓN</div>
+    <div class="row" style="gap:10px">${fld('k','Calorías (kcal)')}${fld('p','Proteína (g)')}</div>
+    <div class="row" style="gap:10px">${fld('c','Carbohidratos (g)')}${fld('g','Grasas (g)')}</div>
+    <div class="row" style="gap:10px">${fld('f','Fibra (g)','opcional')}${fld('a','Azúcares (g)','opcional')}${fld('na','Sodio (mg)','opcional')}</div>
+    <div class="field"><label>Contiene</label><div class="chips">${Object.entries(ALIM_FL).map(([k,v])=>`<button class="chip ${d.fl.includes(k)?'on':''}" data-a="anFl" data-v="${k}">${esc(v)}</button>`).join('')}</div></div>
+    <button class="row" style="width:100%;margin:4px 0" data-a="anAnimal"><span class="toggle ${d.animal?'on':''}" style="transform:scale(.85)"></span><span class="sm">Lleva carne, pollo, pescado o marisco</span></button>
+    <div class="xs mut" style="margin-top:6px">${nd().alim.length+nd().recetas.length} propios${prem()?'':` de ${ALIM_FREE} en la versión gratis`}</div></div>
+    <div class="lfoot"><button class="btn pri big" data-a="anSave">Guardar alimento</button></div>`; };
+IN.anF=el=>{ alP().d[el.dataset.k]=el.value; };
+A.anFl=k=>{ const d=alP().d; d.fl=d.fl.includes(k)?d.fl.replace(k,''):d.fl+k; refreshTop(); };
+A.anAnimal=()=>{ const d=alP().d; d.animal=!d.animal; refreshTop(); };
+A.anSave=()=>{ const d=alP().d; const num=v=>{ const x=parseFloat(String(v).replace(',','.')); return isFinite(x)?x:null; };
+  const n=(d.n||'').trim(), pg=num(d.porg);
+  if (!n) return toast('Ponle un nombre'); if (!(pg>0)) return toast('Indica los gramos de la porción'); if (num(d.k)==null) return toast('Indica las calorías');
+  const per=v=>v==null?null:Math.round(v/pg*100*10)/10;
+  let fl=d.fl; if (d.animal) fl+='A'; else if (/[LH]/.test(fl)) fl+='V';
+  const food={id:'p'+uid(),n:n.slice(0,50),k:per(num(d.k)),p:per(num(d.p))||0,c:per(num(d.c))||0,g:per(num(d.g))||0,f:per(num(d.f)),a:per(num(d.a)),na:per(num(d.na)),fl:[...new Set(fl)].sort().join(''),por:[[(d.porl||'1 porción').slice(0,30),pg]]};
+  if (!alimRoom()) return payFor('alimProp');
+  nd().alim.push(food); save(); closeLayer(); toast('Alimento creado'); const t=LAYERS[LAYERS.length-1]; if (t&&t.t==='alimBuscar'){ t.p.tab='propios'; t.p.q=''; refreshTop(); } };
+
+/* ---------- Recetas ---------- */
+A.recNew=()=>{ if (!alimRoom()) return payFor('alimProp'); openLayer('receta',{r:{id:'r'+uid(),n:'',rac:2,items:[]},isNew:true}); };
+SCREENS.receta=p=>{ const r=p.r, F=recetaFood(r), hab=habitos();
+  return lhdr(p.isNew?'Crear receta':'Editar receta')+`<div class="lbody">
+    <div class="field"><label>Nombre</label><input class="inp" value="${esc(r.n)}" placeholder="Ej.: Guiso de lentejas de mamá" data-in="recN" maxlength="50"></div>
+    <div class="row" style="gap:10px;align-items:center"><span class="sm grow">Raciones que salen</span><button class="btn sm" data-a="recRac" data-v="-1">−</button><b style="min-width:28px;text-align:center">${r.rac}</b><button class="btn sm" data-a="recRac" data-v="1">+</button></div>
+    <div class="sec">Ingredientes</div><div class="card" style="padding:4px 14px">${r.items.length?r.items.map((it,i)=>{ const f=alimGet(it.f); return `<div class="row" style="gap:10px;padding:8px 0;border-bottom:1px solid var(--line)"><div class="grow" style="min-width:0"><div class="sm ell">${esc(f?f.n:'Alimento borrado')}</div><div class="xs mut">${fmtG(it.g)}${f&&!hab?' · '+fmtK(f.k*it.g/100):''}</div></div><button class="ibtn" style="width:34px;height:34px" data-a="recDel" data-v="${i}" aria-label="Quitar">${I('trash',16)}</button></div>`; }).join(''):'<p class="sm mut">Añade los ingredientes con sus gramos.</p>'}</div>
+    <button class="btn wide" style="margin-top:10px" data-a="recAdd">${I('plus',16)} Añadir ingrediente</button>
+    ${r.items.length&&!hab?`<div class="card" style="margin-top:12px"><div class="sm">Total ${fmtG(F.gt)} · cada ración ${fmtG(F.gt/r.rac)} ≈ <b>${fmtK(F.k*F.gt/r.rac/100)}</b></div></div>`:''}
+    ${!p.isNew?`<button class="btn ghost wide" style="margin-top:10px;color:var(--bad)" data-a="recRemove">Borrar receta</button>`:''}</div>
+    <div class="lfoot"><button class="btn pri big" data-a="recSave">Guardar receta</button></div>`; };
+const recP = () => { for (let i=LAYERS.length-1;i>=0;i--) if (LAYERS[i].t==='receta') return LAYERS[i].p; return null; };
+IN.recN=el=>{ recP().r.n=el.value; };
+A.recRac=v=>{ const r=recP().r; r.rac=Math.max(1,Math.min(50,r.rac+(+v))); refreshTop(); };
+A.recDel=i=>{ recP().r.items.splice(+i,1); refreshTop(); };
+A.recAdd=()=>openLayer('alimBuscar',{receta:true,q:'',tab:'todo',cat:''});
+function recAmount(f){ const P=f.por.concat([['100 g',100]]);
+  const ok=cb(()=>{ const g=parseFloat(String(MV.rcg||'').replace(',','.')); if(!(g>0)) return toast('Indica los gramos'); closeLayer(); const p=recP(); if(p){ p.r.items.push({f:f.id,g:Math.round(g)}); refreshTop(); } });
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${esc(f.n)}</h3><div class="chips" style="margin-bottom:10px">${P.map(x=>`<button class="chip" data-a="rcPor" data-v="${x[1]}">${esc(x[0])}</button>`).join('')}</div>
+    <div class="field"><label>Gramos en la receta</label><input id="rcg" class="inp" type="number" inputmode="decimal" value="${Math.round(P[0][1])}"></div>
+    <button class="btn pri big" data-a="cbm" data-v="${ok}">Añadir ingrediente</button></div>`);
+  A.rcPor=v=>{ const el=$('#rcg'); if(el) el.value=Math.round(+v); }; }
+A.recSave=()=>{ const p=recP(), r=p.r; if (!(r.n||'').trim()) return toast('Ponle un nombre'); if (!r.items.length) return toast('Añade al menos un ingrediente');
+  const n=nd(); const i=n.recetas.findIndex(x=>x.id===r.id); r.n=r.n.trim().slice(0,50);
+  if (i>=0) n.recetas[i]=r; else { if (!alimRoom()) return payFor('alimProp'); n.recetas.push(r); }
+  save(); closeLayer(); toast('Receta guardada'); const t=LAYERS[LAYERS.length-1]; if (t&&t.t==='alimBuscar'){ t.p.tab='propios'; refreshTop(); } };
+A.recRemove=()=>confirmBox({title:'¿Borrar la receta?',text:'Lo que ya registraste en tu diario no cambia.',danger:true,okText:'Borrar',ok:()=>{ const p=recP(); const n=nd(); n.recetas=n.recetas.filter(x=>x.id!==p.r.id); save(); closeLayer(); }});
+
+/* ---------- Preferencias ---------- */
+A.dPrefs=()=>{ const P=nd().prefs, hab=habitos();
+  openModal(`<div class="sheet"><div class="grab"></div><h3>Preferencias de comida</h3>
+    <div class="field"><label>Alimentación</label><div class="seg">${[['todo','Como de todo'],['vegetariano','Vegetariana'],['vegano','Vegana']].map(([k,l])=>`<button class="${P.dieta===k?'on':''}" data-a="dpDieta" data-v="${k}">${l}</button>`).join('')}</div></div>
+    <div class="field"><label>Alergias o alimentos que evito</label><div class="chips">${Object.entries(ALIM_FL).map(([k,v])=>`<button class="chip ${P.evitar.includes(k)?'on':''}" data-a="dpEv" data-v="${k}">${esc(v)}</button>`).join('')}</div>
+      <div class="xs mut" style="margin-top:8px;line-height:1.4">PandarIA te avisa cuando un alimento los contiene. Es una ayuda, no una garantía: en productos envasados revisa siempre la etiqueta.</div></div>
+    <button class="srow" data-a="dpHab"><span class="toggle ${hab?'on':''}" style="transform:scale(.85)"></span><span class="grow"><span class="b sm">Modo hábitos</span><br><span class="xs mut">Registra lo que comes sin ver calorías ni números.</span></span></button>
+    <button class="btn pri big" style="margin-top:12px" data-a="cbm" data-v="${cb(()=>{})}">Listo</button></div>`); };
+const dpRepaint = () => { closeModal(); A.dPrefs(); render.keep=true; render(); };
+A.dpDieta=v=>{ nd().prefs.dieta=v; save(); dpRepaint(); };
+A.dpEv=k=>{ const e=nd().prefs.evitar; const i=e.indexOf(k); if(i>=0) e.splice(i,1); else e.push(k); save(); dpRepaint(); };
+A.dpHab=()=>{ nut().habitos=!habitos(); save(); dpRepaint(); };
 
 /* ---------- Ayuno ---------- */
 function fastCard(){
@@ -6998,7 +7883,7 @@ A.fastScreen=()=>{
   A.fsTog=k=>{ if(sel.has(k)) sel.delete(k); else sel.add(k); document.querySelectorAll('[data-a=fsTog]').forEach(b=>{ const on=sel.has(b.dataset.v); b.querySelector('.check').classList.toggle('on',on); b.querySelector('.check').innerHTML=on?I('check',16):''; }); };
   openModal(`<div class="sheet"><div class="grab"></div><h3>Antes de empezar</h3><p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">Marca lo que corresponda. Tus respuestas solo se usan para decidir si el ayuno es adecuado y no se comparten.</p>
     ${items.map(([k,l])=>`<button class="srow" data-a="fsTog" data-v="${k}"><span class="check"></span><span class="grow sm">${l}</span></button>`).join('')}
-    <button class="btn pri big" style="margin-top:14px" data-a="cbm" data-v="${cb(()=>{ const f=nut().fast; f.screened=true; f.blocked=sel.size>0; save(); render.keep=true; render(); toast(f.blocked?'El ayuno no es recomendable para ti sin supervisión':'¡Listo! Elige tu plan de ayuno'); })}">Continuar</button></div>`);
+    <button class="btn pri big" style="margin-top:14px" data-a="cbm" data-v="${cb(()=>{ const f=nut().fast; f.screened=true; f.blocked=sel.size>0; if (sel.has('tca')) nut().habitos=true; save(); render.keep=true; render(); toast(f.blocked?'El ayuno no es recomendable para ti sin supervisión':'¡Listo! Elige tu plan de ayuno'); })}">Continuar</button></div>`);
 };
 A.fastPlan=v=>{ nut().fast.plan=v; save(); render.keep=true; render(); };
 A.fast52=d=>{ const a=nut().fast.days52; d=+d; const i=a.indexOf(d); if(i>=0) a.splice(i,1); else { if(a.length>=2) a.shift(); a.push(d); } save(); render.keep=true; render(); };
@@ -7193,7 +8078,7 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='0.8';
 const CHANGELOG=[
- {v:'0.8',t:'Nutrición completa y PandarIA con evidencia (en desarrollo)',items:['Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
+ {v:'0.8',t:'Nutrición completa y PandarIA con evidencia (en desarrollo)',items:['Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
  {v:'0.5.1',t:'Mejoras de testers',items:['Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata','Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez']},
@@ -7224,7 +8109,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["Etapa 2 de 5: Biblioteca de evidencia. Cada número que usa PandarIA tiene ahora su fuente y su nivel de evidencia", "Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de", "Toca el porqué de una sugerencia o «Ver fuente» en un consejo para ver de dónde sale", "Corregido el texto de la proteína en Nutrición: la ISSN recomienda 1,4–2,0 g/kg si entrenas", "No cambia ningún cálculo: rutinas, pesos, descansos y calorías dan lo mismo que antes"];
+const NOTAS_VERSION=["Etapa 3 de 5: diario de comidas en Nutrición, con 597 alimentos que funcionan sin internet", "Porciones caseras o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas", "Crea tus alimentos con la etiqueta y tus recetas por raciones", "Preferencias vegetariana o vegana y alergias: PandarIA avisa cuando algo no encaja", "Modo hábitos para registrar sin ver calorías ni números", "Registrar es gratis; con Premium comparas el día con tu objetivo y ves tu semana"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
