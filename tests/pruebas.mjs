@@ -258,6 +258,23 @@ if (fs.existsSync(COPIA07)) {
 } else fallos.push('falta tests/copia-0.7.json');
 
 
+/* ---------- Copia en Google Drive: el contenido de la copia y la bienvenida sin cuenta ---------- */
+if (fs.existsSync(COPIA07)) {
+  const a = abrir({ 'pandaria-fit-v1': fs.readFileSync(COPIA07, 'utf8') });
+  await espera(900);
+  const r = JSON.parse(a.w.eval(`(()=>{ S.settings.cloud={sub:'123',email:'a@b.c',name:'A',at:1}; const env=cloudEnvelope(); const antes=JSON.stringify({r:S.routines,s:S.sessions,m:S.measures,p:S.profile,n:S.nutri});
+    const env2=JSON.parse(JSON.stringify(env)); S.routines=[]; S.sessions=[]; cloudApply(env2,'f1');
+    const despues=JSON.stringify({r:S.routines,s:S.sessions,m:S.measures,p:S.profile,n:S.nutri});
+    return JSON.stringify({sinCuenta: env.data.settings.cloud===undefined, app: env.app, igual: antes===despues, sigue: S.settings.cloud.sub==='123' && S.settings.cloud.fileId==='f1', resumen: env.resumen.entrenos===env.data.sessions.length,
+      pasos: obPasos({}).join(',') }); })()`));
+  comprobar('copia de Drive: no incluye los datos de la cuenta', r.sinCuenta && r.app === 'PandarIA Fit');
+  comprobar('copia de Drive: guardar y recuperar devuelve los mismos datos', r.igual, 'los datos cambiaron');
+  comprobar('copia de Drive: al recuperar sigue conectada la misma cuenta', r.sigue);
+  comprobar('copia de Drive: el resumen cuenta bien los entrenos', r.resumen);
+  comprobar('bienvenida sin Google: no muestra el paso de la cuenta', !r.pasos.includes('cuenta') && r.pasos.startsWith('hola,nombre,perfil,equipo'), r.pasos);
+  a.cerrar();
+}
+
 /* ---------- Recorrido de pantallas: toca los botones de cada pestaña en español y en inglés ---------- */
 // Cada pestaña se abre en un navegador simulado nuevo; en español también se tocan los botones de lo que se abre.
 if (fs.existsSync(COPIA07)) {
