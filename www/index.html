@@ -4743,8 +4743,30 @@ function animIssues(ex){
 
 /* ============ PandarIA Fit · NÚCLEO ============ */
 const KEY='pandaria-fit-v1';
+/* ---------- Versión de los datos y migraciones ----------
+   S.v indica con qué versión de la app se guardaron los datos. Al abrir datos más antiguos:
+   1) se guarda una copia exacta de cómo estaban (localStorage y, en Android, un archivo),
+   2) se aplican las migraciones en orden, que SOLO añaden campos: nunca borran ni cambian lo que ya existe. */
+const DATA_VER=2;
+const PREMIG_MAX=1.5e6; // copias más grandes solo van al archivo de Android, para no llenar la memoria del navegador
+const PREMIG_DAYS=60;   // la copia del navegador se borra sola pasado este tiempo
+const MIGRATIONS={
+  2: d=>{ /* 0.8.0: la estructura no cambia; solo queda registrada la versión */ }
+};
+const premigKey = v => 'pandaria-fit-antes-v'+v;
+function migrateData(d, raw){
+  const from=+d.v||1; if (from>=DATA_VER) return false;
+  if (raw){
+    window.PF_PREMIG={from, raw};
+    try{ if (raw.length<=PREMIG_MAX && !localStorage.getItem(premigKey(from))){ localStorage.setItem(premigKey(from), raw); localStorage.setItem(premigKey(from)+'-fecha', String(Date.now())); } }catch(e){}
+  }
+  for (let v=from+1; v<=DATA_VER; v++) if (MIGRATIONS[v]) MIGRATIONS[v](d);
+  d.v=DATA_VER; return true;
+}
+function premigList(){ const out=[]; for (let v=1; v<DATA_VER; v++){ try{ const raw=localStorage.getItem(premigKey(v)); if (raw) out.push({v, date:+localStorage.getItem(premigKey(v)+'-fecha')||null, size:raw.length}); }catch(e){} } return out; }
+function premigCleanup(){ premigList().forEach(p=>{ if (p.date && Date.now()-p.date>PREMIG_DAYS*DAY){ try{ localStorage.removeItem(premigKey(p.v)); localStorage.removeItem(premigKey(p.v)+'-fecha'); }catch(e){} } }); }
 const DEF = () => ({
-  v:1,
+  v:DATA_VER,
   settings:{equip:EQUIP_DEFAULT.slice(), level:'principiante', unit:'kg', rest:90, restSmart:true, sound:true, voice:false, vibrate:true,
     theme:'dark', minPlate:1.25, rir:false, bigRest:true, awake:true, checkin:true, period:true, report:true, tips:true, bigText:false, contrast:false, lang:'es', barKg:20, avoid:{}, reminders:{days:[],time:'18:00'}, onboarded:false},
   customEx:[], routines:[], sessions:[], measures:[], achievements:{}, active:null, applied:0,
@@ -4752,11 +4774,14 @@ const DEF = () => ({
 });
 let S;
 function load(){
-  try { const raw=localStorage.getItem(KEY); S = raw ? Object.assign(DEF(), JSON.parse(raw)) : DEF(); }
+  let migrated=false;
+  try { const raw=localStorage.getItem(KEY); if (raw){ const d=JSON.parse(raw); migrated=migrateData(d, raw); S=Object.assign(DEF(), d); } else S=DEF(); }
   catch(e){ S = DEF(); }
+  premigCleanup();
   S.settings = Object.assign(DEF().settings, S.settings||{});
   loadExercises(S.customEx);
   try{ animRedo(); }catch(e){}
+  if (migrated) save(true);
 }
 let saveT=null;
 function save(now){
@@ -5068,7 +5093,7 @@ A.importData=()=>sheet('Importar copia de seguridad',[
   {icon:'copy',label:'Pegar texto de la copia',desc:'Si copiaste la copia al portapapeles.',fn:()=>promptBox({title:'Pegar copia',area:true,ph:'Pega aquí el texto de la copia',okText:'Importar',ok:v=>importText(v)})}
 ]);
 function importText(txt){
-  try{ const d=JSON.parse(txt); if(!d.routines||!d.sessions) throw 0;
+  try{ const d=JSON.parse(txt); if(!d.routines||!d.sessions) throw 0; migrateData(d, null);
     confirmBox({title:'¿Importar copia?',text:`Contiene ${plural(d.routines.length,'rutina','rutinas')} y ${plural(d.sessions.length,'entreno','entrenos')}. Reemplazará los datos actuales.`,okText:'Importar',ok:()=>{ S=Object.assign(DEF(),d); S.settings=Object.assign(DEF().settings,d.settings||{}); loadExercises(S.customEx); applyTheme(); save(true); render(); toast('Datos importados'); }});
   }catch(e){ toast('El texto no es una copia válida'); }
 }
@@ -6989,8 +7014,9 @@ A.importCode=()=>promptBox({title:'Importar con código',text:'Pega el código q
 
 
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='0.7';
+const APP_VERSION='0.8';
 const CHANGELOG=[
+ {v:'0.8',t:'Nutrición completa y PandarIA con evidencia (en desarrollo)',items:['Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
  {v:'0.5.1',t:'Mejoras de testers',items:['Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata','Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez']},
@@ -7021,7 +7047,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["Avisos de versión nueva: una tarjeta en Mis rutinas te avisa cuando hay una versión más reciente, con los cambios y un botón para descargarla","En Ajustes verás el número exacto de tu versión y un botón para buscar actualizaciones a mano","Versión gratis: hasta 3 rutinas a la vez contando las archivadas"];
+const NOTAS_VERSION=["Comienza la 0.8 (etapa 1 de 5): pruebas automáticas que revisan los cálculos de PandarIA antes de cada versión", "Antes de actualizar tus datos, la app guarda una copia exacta de cómo estaban", "Nuevo en Ajustes › Tus datos: volver a los datos de antes de actualizar, o borrar esa copia", "No cambia ningún cálculo: rutinas, pesos, descansos y calorías dan lo mismo que en la 0.7"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
@@ -7193,6 +7219,7 @@ function viewAjustes(){
     ${nav('exportData','download','Exportar copia de seguridad')}
     ${nav('importData','upload','Importar copia de seguridad')}
     ${nav('exportCSV','list','Exportar entrenos a Excel (CSV)')}
+    ${premigList().length?nav('premigOpen','history','Datos de antes de actualizar'):''}
     <button class="srow" data-a="wipeData"><span class="si" style="color:var(--bad)">${I('trash',20)}</span><span class="grow b" style="color:var(--bad)">Borrar todos los datos</span></button>
   </div>
   <div class="sec">Acerca de</div><div class="card sm mut" style="line-height:1.5">PandarIA basa sus recomendaciones en guías del American College of Sports Medicine (ACSM) y la National Strength and Conditioning Association (NSCA) para fuerza, la Organización Mundial de la Salud (OMS) para actividad física y la International Society of Sports Nutrition (ISSN) para nutrición. No reemplaza a un profesional de la salud.</div>
@@ -7200,6 +7227,11 @@ function viewAjustes(){
   <div class="mut xs" style="text-align:center;margin:16px 0 8px">Tus datos se guardan solo en este dispositivo.</div>
   <input type="file" id="impfile" accept="application/json,.json" class="hide" data-ch="importFile">`;
 }
+A.premigOpen=()=>{ const L=premigList(); if(!L.length) return; const p=L[L.length-1];
+  sheet('Datos de antes de actualizar',[
+    {icon:'history',label:'Volver a esos datos',desc:`Copia guardada ${p.date?fmtDate(p.date):''} al actualizar la app. Reemplaza tus datos actuales.`,fn:()=>confirmBox({title:'¿Volver a los datos anteriores?',text:'Perderás lo que hayas registrado después de actualizar. Te recomendamos exportar una copia antes.',danger:true,okText:'Volver',ok:()=>{ try{ const d=JSON.parse(localStorage.getItem(premigKey(p.v))); migrateData(d,null); S=Object.assign(DEF(),d); S.settings=Object.assign(DEF().settings,d.settings||{}); loadExercises(S.customEx); applyTheme(); save(true); render(); toast('Datos anteriores recuperados'); }catch(e){ toast('No se pudo leer la copia'); } }})},
+    {icon:'trash',label:'Borrar esta copia',desc:`Libera espacio. Se borra sola a los ${PREMIG_DAYS} días.`,fn:()=>{ try{ localStorage.removeItem(premigKey(p.v)); localStorage.removeItem(premigKey(p.v)+'-fecha'); }catch(e){} render(); toast('Copia borrada'); }}
+  ]); };
 A.setLang=v=>{ S.settings.lang=v; save(); applyLang(); render.keep=true; render(); };
 
 /* ================= Sonidos y animaciones ================= */

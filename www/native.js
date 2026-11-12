@@ -876,6 +876,9 @@
     setTimeout(() => safe(() => Splash.hide({fadeOutDuration: 250})), 150);
     if (sessionStorage.getItem('pf-restored')){ sessionStorage.removeItem('pf-restored'); setTimeout(() => toast('Recuperamos tus datos de la copia interna'), 800); }
     setTimeout(writeBackup, 4000);
+    // Copia exacta de los datos de antes de una actualización (la crea load() al migrar). No se sobrescribe nunca.
+    if (window.PF_PREMIG){ const p = window.PF_PREMIG, path = 'pandaria-antes-v' + p.from + '.json';
+      FS.stat({path, directory:'DATA'}).catch(() => FS.writeFile({path, directory:'DATA', encoding:'utf8', data:p.raw})).catch(()=>{}); }
   }
   // Espera a que la app termine de arrancar (S cargado) antes de conectar lo nativo
   const whenReady = () => new Promise(res => { const go = () => (typeof S !== 'undefined' && S) ? res() : setTimeout(go, 50);
