@@ -1,6 +1,6 @@
 {
   "name": "pandaria-fit",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "private": true,
   "description": "PandarIA Fit para Android",
   "dependencies": {
@@ -17,7 +17,8 @@
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.4",
     "@capgo/capacitor-health": "8.12.1",
-    "@capgo/capacitor-social-login": "8.7.5"
+    "@capgo/capacitor-social-login": "8.7.5",
+    "@capgo/native-purchases": "8.9.6"
   },
   "devDependencies": {
     "@capacitor/assets": "^4.0.0",
