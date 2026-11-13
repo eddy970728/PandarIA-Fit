@@ -289,7 +289,7 @@ if (fs.existsSync(COPIA07)) {
       let ultimo = null; w.addEventListener('error', e => { ultimo = e.message || String(e.error); });
       // en inglés se apunta todo texto que, después de traducir, sigue pareciendo español
       if (lang === 'en') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
-        if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
+        if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán|Jesús/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
       const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); TAB=${JSON.stringify(t)}; render();`);
       const botones = () => [...w.document.querySelectorAll('[data-a]')].map(e => [e.dataset.a, e.dataset.v || '']).filter(([x]) => !PELIGRO.test(x) && x !== 'tab');
@@ -315,6 +315,40 @@ if (fs.existsSync(COPIA07)) {
     if (lang === 'en') comprobar(`en inglés no queda texto en español (${sinTraducir.size} encontrados)`, !sinTraducir.size, [...sinTraducir].slice(0, 8).join(' | '));
     comprobar(`recorrido de pantallas en ${lang === 'es' ? 'español' : 'inglés'} sin errores (${toques} botones)`, !fallosR.length && toques > 150, fallosR.slice(0, 5).join(' | ') || `solo ${toques} botones`);
   }
+}
+
+/* ---------- Métodos especiales y zonas sensibles (1.0) ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE, {level:'intermedio'}); const out={};
+    const mk=()=>({id:'rm',name:'M',pandaria:true,goal:'musculo',items:[buildItem('press_banca','musculo',2),buildItem('sentadilla','musculo',2),buildItem('curl_man','musculo',2),buildItem('remo_man','musculo',2)]});
+    const ref=JSON.stringify(mk().items.map(i=>i.sets));
+    for (const k of Object.keys(METODOS)){ const x=mk(); x.method=k; const n=applyMethod(x); const marcas=x.items.map(it=>it.sets.map(s=>s.m||s.t).join(','));
+      const sentadilla=x.items[1].sets.some(s=>s.m==='drop'||s.m==='mini');
+      x.method=null; applyMethod(x); out[k]={n, marcas, vuelve: JSON.stringify(x.items.map(i=>i.sets))===ref, sentadilla}; }
+    S.settings.level='principiante'; const b=mk(); b.method='descendentes'; out.principiante=applyMethod(b); S.settings.level='intermedio';
+    const d=mk(); d.method='descendentes'; applyMethod(d); const it=d.items[0]; const k0=it.sets.findIndex(s=>s.m==='drop');
+    out.bajada=[suggestSet(d,it,k0-1).kg, suggestSet(d,it,k0).kg];
+    const bb=mk(); bb.method='bilbo'; applyMethod(bb); const ib=bb.items[0], kb0=ib.sets.findIndex(s=>s.m==='bilbo');
+    S.sessions.push({id:'sb',routineId:'rm',start:__NOW-90000000,end:__NOW-86400000,items:[{exId:ib.exId,sets:[{t:'n',m:'bilbo',kg:40,reps:22,done:true}]}]});
+    out.bilboSube=suggestSet(bb,ib,kb0).kg;
+    S.sessions[S.sessions.length-1].items[0].sets[0].reps=12; out.bilboReinicia=suggestSet(bb,ib,kb0).kg;
+    S.profile.injuries=['codo']; out.codo=['fondos_pecho','press_frances','curl_predicador'].map(id=>profileBlocks(id)); out.codoCurl=buildItem('curl_man','musculo',2).sets[0].t;
+    S.profile.injuries=['cadera']; out.cadera=['sentadilla_sumo','box_jump'].map(id=>profileBlocks(id));
+    out.etiqueta=/No comprobado que sea mejor/.test(metodoCard({method:'bilbo'},''))&&/Evidencia limitada/.test(metodoCard({method:'bilbo'},''));
+    return JSON.stringify(out); })()`));
+  const metodos = ['superseries', 'descendentes', 'restpause', 'myoreps', 'piramide', 'cluster', 'gvt', 'bilbo'];
+  comprobar('métodos: cada método cambia la rutina y se puede quitar sin dejar rastro', metodos.every(k => r[k] && r[k].n > 0 && r[k].vuelve), metodos.filter(k => !r[k] || !(r[k].n > 0) || !r[k].vuelve).join(', '));
+  comprobar('métodos: los que llegan cerca del fallo no tocan la sentadilla con barra', !['descendentes', 'restpause', 'myoreps'].some(k => r[k].sentadilla));
+  comprobar('métodos: los que llegan cerca del fallo no se aplican a principiantes', r.principiante === -1, `devolvió ${r.principiante}`);
+  comprobar('métodos: cada bajada de las series descendentes quita un 20 %', r.bajada[1] < r.bajada[0] && r.bajada[1] >= r.bajada[0] * 0.7, r.bajada.join(' → '));
+  comprobar('método Bilbo: con 15 o más repeticiones sube 2,5 kg; con menos vuelve al 50 %', r.bilboSube === 42.5 && r.bilboReinicia < 40, `${r.bilboSube} / ${r.bilboReinicia}`);
+  comprobar('métodos: llevan la etiqueta de que no está comprobado que sean mejores', r.etiqueta);
+  comprobar('codo: PandarIA evita fondos, press francés y curl predicador, y añade calentamiento en brazos', r.codo.every(Boolean) && r.codoCurl === 'c', JSON.stringify(r.codo) + ' ' + r.codoCurl);
+  comprobar('cadera: PandarIA evita sentadilla sumo y saltos', r.cadera.every(Boolean));
+  a.cerrar();
 }
 
 /* ---------- Base de alimentos ---------- */
