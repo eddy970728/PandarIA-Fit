@@ -36,7 +36,7 @@ jobs:
 
       - name: Conectar el codigo nativo al HTML
         run: |
-          grep -q 'premium.js' www/index.html || sed -i 's#</body>#<script src="native.js"></script><script src="premium.js"></script></body>#' www/index.html
+          grep -q '<script src="premium.js">' www/index.html || sed -i 's#</body>#<script src="native.js"></script><script src="premium.js"></script></body>#' www/index.html
           sed -i '0,/<head>/s##<head><script>window.PF_BUILD=${{ github.run_number }}</script>#' www/index.html
           node -e "const h=require('fs').readFileSync('www/index.html','utf8');const m=h.match(/const NOTAS_VERSION=(\[[^\n]*\]);/);const n=m?JSON.parse(m[1]):[];require('fs').writeFileSync('notas.md','Versión ${{ env.VER }}.${{ github.run_number }}. PandarIA-Fit.apk se instala encima de la anterior; PandarIA-Fit.aab es el paquete para Google Play.\n\n'+n.map(x=>'- '+x).join('\n')+'\n')"
           cat notas.md
