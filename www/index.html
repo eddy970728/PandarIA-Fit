@@ -907,11 +907,12 @@ const ACHIEVEMENTS = [
      consejo → cualquier otra fuente: solo tomamos el consejo, con nuestras palabras, y la citamos.
      propio  → criterio de PandarIA, cuando no hay una fuente que dé el número exacto.
    Evidencia: solida · moderada · limitada · contradictoria.  'rev' = revisar antes de esa fecha. */
-const KB_VER='1.2';
+const KB_VER='1.3';
 const KB_LOG=[
   {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'},
   {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'},
-  {v:'1.2', d:'2026-11-12', app:'0.8.4', t:'Suplementos (creatina, cafeína, beta-alanina y proteína en polvo) con su dosis, su evidencia y para quién no son; calidad de la dieta (fibra, sodio y proteína por comida); ejemplos de menú; bebidas y cafeína en el agua del día; más agua en los entrenos largos; ayuno conectado con el diario y modo viaje sin equipo.'}
+  {v:'1.2', d:'2026-11-12', app:'0.8.4', t:'Suplementos (creatina, cafeína, beta-alanina y proteína en polvo) con su dosis, su evidencia y para quién no son; calidad de la dieta (fibra, sodio y proteína por comida); ejemplos de menú; bebidas y cafeína en el agua del día; más agua en los entrenos largos; ayuno conectado con el diario y modo viaje sin equipo.'},
+  {v:'1.3', d:'2026-11-12', app:'1.0', t:'Métodos especiales (superseries, series descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y método Bilbo), cada uno con su evidencia y la aclaración de que no está comprobado que sea mejor; codo y cadera como zonas sensibles.'},
 ];
 const KB_LIC={pd:'Dominio público, con crédito', consejo:'Consejo de la fuente, con nuestras palabras', propio:'Criterio propio de PandarIA'};
 const KB_EV={solida:'Evidencia sólida', moderada:'Evidencia moderada', limitada:'Evidencia limitada', contradictoria:'Evidencia contradictoria'};
@@ -936,6 +937,12 @@ const KB_SRC={
   efsa_fibra2010:{n:'Valores dietéticos de referencia: hidratos de carbono y fibra alimentaria', a:'Autoridad Europea de Seguridad Alimentaria (EFSA)', y:2010, pub:'EFSA Journal 8(3):1462', url:'https://doi.org/10.2903/j.efsa.2010.1462', lic:'consejo'},
   who_sodio2012:{n:'Guideline: sodium intake for adults and children', a:'Organización Mundial de la Salud', y:2012, pub:'OMS', url:'https://www.who.int/news-room/fact-sheets/detail/salt-reduction', lic:'consejo'},
   acsm2007:{n:'Exercise and fluid replacement (posicionamiento del ACSM)', a:'Sawka y col.', y:2007, pub:'Med Sci Sports Exerc 39(2):377–390', url:'https://pubmed.ncbi.nlm.nih.gov/17277604/', lic:'consejo'},
+  fonseca2023:{n:'Comparison of traditional and advanced resistance training paradigms on muscle hypertrophy in trained individuals (metaanálisis)', a:'Fonseca y col.', y:2023, pub:'Transl Sports Med 2023:9507977', url:'https://pmc.ncbi.nlm.nih.gov/articles/PMC11022786/', lic:'consejo'},
+  krzysztofik2019:{n:'Maximizing muscle hypertrophy: a systematic review of advanced resistance training techniques and methods', a:'Krzysztofik y col.', y:2019, pub:'Int J Environ Res Public Health 16(24):4897', url:'https://pubmed.ncbi.nlm.nih.gov/31817252/', lic:'consejo'},
+  tufano2017:{n:'Theoretical and practical aspects of different cluster set structures: a systematic review', a:'Tufano, Brown y Haff', y:2017, pub:'J Strength Cond Res 31(3):848–867', url:'https://pubmed.ncbi.nlm.nih.gov/27465625/', lic:'consejo'},
+  amirthalingam2017:{n:'Effects of a modified German volume training program on muscular hypertrophy and strength', a:'Amirthalingam y col.', y:2017, pub:'J Strength Cond Res 31(11):3109–3119', url:'https://pubmed.ncbi.nlm.nih.gov/27941492/', lic:'consejo'},
+  bilbo:{n:'Qué es el método Bilbo (descripción del creador, sin estudios propios)', a:'Jesús Varela (Bilbo)', y:2024, pub:'bilboteam.com', url:'https://bilboteam.com/en/what-is-the-bilbo-method/', lic:'consejo'},
+  raman2012:{n:'Effectiveness of different methods of resistance exercises in lateral epicondylosis (revisión sistemática)', a:'Raman, MacDermid y Grewal', y:2012, pub:'J Hand Ther 25(1):5–26', url:'https://pubmed.ncbi.nlm.nih.gov/22075055/', lic:'consejo'},
   pandaria:{n:'Criterio propio de PandarIA', a:'PandarIA Fit', y:2026, pub:'', url:'', lic:'propio'}
 };
 // v = el valor que usan los algoritmos. t = qué dice, con nuestras palabras. usa = dónde lo usa la app.
@@ -1051,7 +1058,32 @@ const KB_RULES=[
   {id:'seguridad.mayores', area:'seguridad', n:'Más descanso desde los 50', v:{edad:50, s:15}, src:['acsm2009','pandaria'], lic:'propio', ev:'limitada', pob:'Desde 50 años',
     t:'En adultos mayores se recomiendan descansos de 1 a 3 minutos. PandarIA suma 15 segundos al descanso desde los 50 años.', usa:'Descansos', rev:'2027-11-01', desde:'0.8.1'},
   {id:'seguridad.sedentario', area:'seguridad', n:'Empezar desde cero', v:{series:-1}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Personas sedentarias',
-    t:'Si marcaste que eres sedentario, PandarIA quita una serie por ejercicio al principio para que la adaptación sea más cómoda.', usa:'Series por ejercicio', rev:'2027-11-01', desde:'0.8.1'}
+    t:'Si marcaste que eres sedentario, PandarIA quita una serie por ejercicio al principio para que la adaptación sea más cómoda.', usa:'Series por ejercicio', rev:'2027-11-01', desde:'0.8.1'},
+  // ---------- Métodos especiales y lesiones (1.0 · Biblioteca 1.3) ----------
+  {id:'metodo.avanzados', area:'entreno', n:'Métodos especiales: qué esperar', v:{mejor:false}, src:['fonseca2023','krzysztofik2019'], lic:'consejo', ev:'moderada', pob:'Personas que ya entrenan',
+    t:'Los métodos especiales (series descendentes, rest-pause, pirámide, volumen alemán…) no dan más músculo que las series normales con el mismo esfuerzo. Sirven para ahorrar tiempo o variar. PandarIA los ofrece como opción, nunca como una mejora comprobada.', usa:'Etiqueta y explicación de cada método especial', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.seguridad', area:'seguridad', n:'Métodos cerca del fallo: para quién', v:{nivel:2}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'Los métodos que llegan cerca del fallo (series descendentes, rest-pause y myo-reps) son para nivel intermedio o avanzado. PandarIA no los aplica a la sentadilla ni al peso muerto con barra, ni a ejercicios que carguen una zona sensible.', usa:'Qué ejercicios cambia cada método', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.superseries', area:'entreno', n:'Superseries', v:{rest:15}, src:['krzysztofik2019'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
+    t:'Dos ejercicios seguidos, sin descanso entre ellos, y el descanso al terminar el par. Hacen el mismo trabajo en menos tiempo.', usa:'Método Superseries', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.descendentes', area:'entreno', n:'Series descendentes', v:{bajadas:2, f:0.8}, src:['krzysztofik2019','fonseca2023'], lic:'consejo', ev:'moderada', pob:'Personas que ya entrenan',
+    t:'Al terminar la última serie, cerca del fallo, se baja el peso un 20 % y se sigue sin descanso; dos veces. Mismo músculo que las series normales en menos tiempo.', usa:'Método Series descendentes', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.restpause', area:'entreno', n:'Rest-pause', v:{pausa:20, mini:2, frac:0.34}, src:['krzysztofik2019','fonseca2023'], lic:'consejo', ev:'moderada', pob:'Personas que ya entrenan',
+    t:'La última serie se hace cerca del fallo; tras 15 a 20 segundos de pausa se hacen unas pocas repeticiones más con el mismo peso, dos veces.', usa:'Método Rest-pause', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.myoreps', area:'entreno', n:'Myo-reps', v:{act:[12,15], mini:4, reps:4, pausa:15}, src:['krzysztofik2019','pandaria'], lic:'consejo', ev:'limitada', pob:'Personas que ya entrenan',
+    t:'Una serie de activación de 12 a 15 repeticiones y después mini series de 3 a 5 con pausas de 3 a 5 respiraciones. Es una variante del rest-pause casi sin estudios propios.', usa:'Método Myo-reps', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.piramide', area:'entreno', n:'Pirámide', v:{reps:[12,10,8,6]}, src:['krzysztofik2019','fonseca2023'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
+    t:'Cada serie con más peso y menos repeticiones (12, 10, 8 y 6). Da el mismo músculo que las series iguales.', usa:'Método Pirámide', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.cluster', area:'entreno', n:'Series en clúster', v:{pausa:20, partes:2}, src:['tufano2017'], lic:'consejo', ev:'moderada', pob:'Personas que ya entrenan',
+    t:'Cada serie se parte en dos con 15 a 30 segundos de pausa en medio. Ayuda a mantener la velocidad y la técnica con pesos altos; útil para fuerza y potencia.', usa:'Método Series en clúster', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.gvt', area:'entreno', n:'Volumen alemán (10 × 10)', v:{series:10, reps:10, rest:90, ej:2}, src:['amirthalingam2017'], lic:'consejo', ev:'moderada', pob:'Personas que ya entrenan',
+    t:'Diez series de diez repeticiones con alrededor del 60 % de tu máximo en los dos primeros ejercicios. En un estudio no dio más músculo que cinco series de diez.', usa:'Método Volumen alemán', rev:'2028-11-12', desde:'1.0'},
+  {id:'metodo.bilbo', area:'entreno', n:'Método Bilbo', v:{pct:0.5, min:15, max:50, sube:2.5}, src:['bilbo'], lic:'consejo', ev:'limitada', pob:'Personas que ya entrenan',
+    t:'Una serie explosiva con el 50 % de tu máximo, de 15 a 50 repeticiones, parando 1 a 3 antes del fallo; cada sesión se suben 2,5 kg mientras pases de 15 repeticiones. Al no llegar a 15, el ciclo vuelve a empezar. Lo creó el campeón de press de banca Jesús Varela; no hay estudios que lo comparen con otros métodos.', usa:'Método Bilbo', rev:'2028-11-12', desde:'1.0'},
+  {id:'lesion.codo', area:'seguridad', n:'Codo sensible', v:{paso:1}, src:['raman2012','pandaria'], lic:'consejo', ev:'limitada', pob:'Personas con molestias en el codo',
+    t:'Con dolor de codo se puede seguir entrenando con cargas que no lo empeoren. PandarIA evita los ejercicios que más lo cargan, sube el peso de brazos de a un disco, añade calentamiento y no lleva al fallo. Si el dolor pasa de leve o dura al día siguiente, consulta a un profesional de la salud.', usa:'Lesiones del perfil: codo', rev:'2028-11-12', desde:'1.0'},
+  {id:'lesion.cadera', area:'seguridad', n:'Cadera sensible', v:{impacto:false}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Personas con molestias en la cadera',
+    t:'Con molestias en la cadera, PandarIA evita los saltos y los ejercicios con mucha apertura o rotación de cadera. Si el dolor pasa de leve o dura al día siguiente, consulta a un profesional de la salud.', usa:'Lesiones del perfil: cadera', rev:'2028-11-12', desde:'1.0'}
 ];
 const KB={};
 (function(){ const deep=o=>{ if (o && typeof o==='object'){ Object.values(o).forEach(deep); Object.freeze(o); } return o; };
@@ -1067,6 +1099,18 @@ const KB_WHY=[
 const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sueno.adultos'};
 // Textos de las reglas en inglés (pantalla Ciencia en inglés)
 const KB_EN_T={
+ 'metodo.avanzados':'Special methods (drop sets, rest-pause, pyramids, German volume training…) do not build more muscle than normal sets with the same effort. They save time or add variety. PandarIA offers them as an option, never as a proven improvement.',
+ 'metodo.seguridad':'Methods that go close to failure (drop sets, rest-pause and myo-reps) are for intermediate or advanced lifters. PandarIA does not apply them to barbell squats or deadlifts, or to exercises that load a sensitive area.',
+ 'metodo.superseries':'Two exercises back to back with no rest between them, and the rest after the pair. Same work in less time.',
+ 'metodo.descendentes':'After the last set, close to failure, drop the weight by 20 % and keep going without rest; twice. Same muscle as normal sets in less time.',
+ 'metodo.restpause':'The last set goes close to failure; after a 15 to 20 second pause you do a few more reps with the same weight, twice.',
+ 'metodo.myoreps':'One activation set of 12 to 15 reps, then mini sets of 3 to 5 reps with 3 to 5 breaths of rest. A rest-pause variant with almost no studies of its own.',
+ 'metodo.piramide':'Each set with more weight and fewer reps (12, 10, 8 and 6). It builds the same muscle as equal sets.',
+ 'metodo.cluster':'Each set is split in two with a 15 to 30 second pause in the middle. It helps keep speed and technique with heavy weights; useful for strength and power.',
+ 'metodo.gvt':'Ten sets of ten reps with about 60 % of your max on the first two exercises. In a study it did not build more muscle than five sets of ten.',
+ 'metodo.bilbo':'One explosive set with 50 % of your max, 15 to 50 reps, stopping 1 to 3 short of failure; add 2.5 kg each session while you get past 15 reps. When you can no longer reach 15, the cycle starts again. Created by bench press champion Jesús Varela; no studies compare it with other methods.',
+ 'lesion.codo':'With elbow pain you can keep training with loads that do not make it worse. PandarIA avoids the exercises that load it most, raises arm weights one plate at a time, adds a warm-up and does not go to failure. If the pain is more than mild or lasts until the next day, see a health professional.',
+ 'lesion.cadera':'With hip discomfort, PandarIA avoids jumps and exercises with a lot of hip opening or rotation. If the pain is more than mild or lasts until the next day, see a health professional.',
  'obj.fuerza':'To build strength, train with heavy loads (up to 6 reps) and rest at least 3 minutes between sets of the main lifts.',
  'obj.musculo':'To build muscle, sets of 6 to 12 reps are recommended above all, with 1 to 2 minutes of rest.',
  'obj.resistencia':'For muscular endurance, use light loads with many reps (15 or more) and short rests.',
@@ -1228,6 +1272,7 @@ function buildItem(exId, goal, level, opts){
   const ex=getEx(exId), p=prescribe(ex,goal,level);
   const kg = ex.mode==='p' ? estimateKg(exId, p.range[0]) : null;
   const sets=[];
+  if (ex.mode==='p' && typeof codoSensible==='function' && codoSensible() && ['curl','extension'].includes(ex.pat)) sets.push({t:'c', reps:12, kg:kg?roundTo(kg*0.5,incFor(ex)):null, time:null}); // codo sensible: calentamiento
   for (let i=0;i<p.sets;i++) sets.push({t:'n', reps: ex.mode==='t'?null:p.range[0], kg: kg, time:p.time});
   return Object.assign({uid:uid(), exId, sets, rest:p.rest, range: ex.mode==='t'?null:p.range, superset:null, note:'', sticky:''}, opts||{});
 }
@@ -1285,6 +1330,24 @@ function suggestSet(routine, item, idx){
   const normal=hist0.filter(h=>!inDeloadWindow(h.date));
   const hist=(normal.length?normal:hist0).slice(0,3);
   const res={kg:set.kg, reps:set.reps, time:set.time, why:''};
+  // partes de un método especial: mismo peso que la serie principal (−20 % en cada bajada)
+  if (set.m==='drop'||set.m==='mini'||set.m==='cl'){
+    let k=idx-1; while (k>=0 && ['drop','mini','cl'].includes(item.sets[k].m)) k--;
+    const main=k>=0?suggestSet(routine,item,k):{kg:set.kg}, d=idx-k, f=set.m==='drop'?Math.pow(kb('metodo.descendentes').f,d):1;
+    return {kg: main.kg?roundTo(main.kg*f,incFor(ex)):set.kg, reps:set.reps, time:set.time, why: set.m==='drop'?`Bajada ${d}: −${Math.round((1-f)*100)} % y sin descanso`:set.m==='cl'?'Segunda mitad de la serie tras la pausa':'Mini serie tras la pausa'};
+  }
+  if (set.m==='bilbo'){ const K=kb('metodo.bilbo'), base=metKg(item,30)||set.kg;
+    const lastB=hist0.map(h=>h.sets.find(x=>x.m==='bilbo')).find(Boolean);
+    if (!lastB) return {kg:set.kg||base, reps:K.min, time:null, why:'Serie Bilbo: todas las repeticiones que puedas (mínimo 15), parando 1 a 3 antes del fallo'};
+    if (!routine||!routine.pandaria) return {kg:lastB.kg, reps:K.min, time:null, why:'Lo de la última vez'};
+    if ((+lastB.reps||0)>=K.min) return {kg:roundTo((+lastB.kg||0)+K.sube,incFor(ex)), reps:K.min, time:null, why:'Pasaste de 15 repeticiones: +2,5 kg'};
+    return {kg:roundTo(base,incFor(ex)), reps:K.min, time:null, why:'No llegaste a 15: el ciclo vuelve a empezar al 50 %'};
+  }
+  if (set.m==='pyr'){ const last0=hist0[0], ref0=last0&&last0.sets[idx];
+    if (!ref0||!ref0.kg) return {kg:set.kg||metKg(item,+set.reps||10), reps:set.reps, time:null, why:'Pirámide: más peso y menos repeticiones en cada serie'};
+    if (routine&&routine.pandaria&&(+ref0.reps||0)>=(+set.reps||0)) return {kg:roundTo(+ref0.kg+incFor(ex),incFor(ex)), reps:set.reps, time:null, why:'Completaste esta serie de la pirámide: sube el peso'};
+    return {kg:+ref0.kg, reps:set.reps, time:null, why:'Mismo peso: busca las repeticiones de esta serie'};
+  }
   if (set.t==='c'){ // calentamiento: % del peso de trabajo
     const target = suggestSet(routine,item,item.sets.indexOf(work[0]||set));
     const wu=item.sets.filter(x=>x.t==='c'); const k=wu.indexOf(set);
@@ -1299,8 +1362,9 @@ function suggestSet(routine, item, idx){
   if (!routine || !routine.pandaria){ return {kg:ref.kg, reps:ref.reps, time:ref.time, why:'Lo de la última vez'}; }
   const days=(Date.now()-last.date)/DAY;
   if (ex.mode==='p'){
-    const allTop=last.sets.every(x=>(+x.reps||0)>=range[1]);
-    const fails = h => h && h.sets.some(x=>(+x.reps||0)<range[0]);
+    const mainS = h => h.sets.filter(x=>!x.m);
+    const allTop=mainS(last).every(x=>(+x.reps||0)>=range[1]);
+    const fails = h => h && mainS(h).some(x=>(+x.reps||0)<range[0]);
     const twoFails = fails(hist[0]) && fails(hist[1]);
     let kg=+ref.kg||0, reps=+ref.reps||range[0];
     const RPE=kb('carga.esfuerzo').rpe;
@@ -1309,6 +1373,7 @@ function suggestSet(routine, item, idx){
       let inc=Math.max(incFor(ex), kg*pct); if (last.intensity<=4) inc*=2;
       const rirs=last.sets.map(x=>x.rir).filter(x=>x!=null); const rirAvg=rirs.length?rirs.reduce((a,b)=>a+b,0)/rirs.length:null;
       if (rirAvg!=null && rirAvg>=3) inc*=1.5;
+      if (codoSensible() && ['curl','extension'].includes(ex.pat)) inc=incFor(ex)*kb('lesion.codo').paso; // codo sensible: de a un disco
       kg=roundTo(kg+inc, incFor(ex)); reps=range[0]; res.why='Completaste todas las series: sube el peso';
     } else if (twoFails){
       kg=roundTo(kg*kb('carga.bajada').f, incFor(ex)); reps=range[0]; res.why='Dos sesiones sin llegar: bajamos 10 % para consolidar';
@@ -5573,6 +5638,105 @@ function deleteRoutine(id){
 }
 
 /* ---------- Editor de rutina ---------- */
+/* ========== Métodos especiales (1.0) ==========
+   Se eligen por rutina en el editor. Elegir y seguir la guía es gratis; con Premium, PandarIA arma las series del método.
+   Ninguno está comprobado como mejor que las series normales (regla metodo.avanzados): se muestra siempre esa etiqueta. */
+const METODOS={
+  superseries:{n:'Superseries',en:'Supersets',kb:'metodo.superseries',cerca:false,
+    g:'Haz los dos ejercicios del par seguidos, sin descanso entre ellos; descansa al terminar el par.',gen:'Do both exercises of the pair back to back with no rest between them; rest after the pair.'},
+  descendentes:{n:'Series descendentes',en:'Drop sets',kb:'metodo.descendentes',cerca:true,
+    g:'En la última serie, al quedar cerca del fallo, baja el peso un 20 % y sigue sin descanso, dos veces.',gen:'On the last set, when you get close to failure, drop the weight by 20 % and keep going without rest, twice.'},
+  restpause:{n:'Rest-pause',en:'Rest-pause',kb:'metodo.restpause',cerca:true,
+    g:'Lleva la última serie cerca del fallo, descansa 15 a 20 segundos y saca unas repeticiones más con el mismo peso, dos veces.',gen:'Take the last set close to failure, rest 15 to 20 seconds and squeeze out a few more reps with the same weight, twice.'},
+  myoreps:{n:'Myo-reps',en:'Myo-reps',kb:'metodo.myoreps',cerca:true,limitada:true,
+    g:'Una serie de activación de 12 a 15 repeticiones y luego mini series de 3 a 5 con 3 a 5 respiraciones de pausa.',gen:'One activation set of 12 to 15 reps, then mini sets of 3 to 5 reps with 3 to 5 breaths of rest.'},
+  piramide:{n:'Pirámide',en:'Pyramid',kb:'metodo.piramide',cerca:false,
+    g:'Cada serie con más peso y menos repeticiones: 12, 10, 8 y 6.',gen:'Each set with more weight and fewer reps: 12, 10, 8 and 6.'},
+  cluster:{n:'Series en clúster',en:'Cluster sets',kb:'metodo.cluster',cerca:false,
+    g:'Cada serie se parte en dos con 15 a 30 segundos de pausa en medio. Mueve el peso rápido y limpio.',gen:'Each set is split in two with a 15 to 30 second pause in the middle. Move the weight fast and clean.'},
+  gvt:{n:'Volumen alemán (10 × 10)',en:'German volume training (10 × 10)',kb:'metodo.gvt',cerca:false,
+    g:'Diez series de diez con alrededor del 60 % de tu máximo en los dos primeros ejercicios, con 90 segundos de descanso.',gen:'Ten sets of ten with about 60 % of your max on the first two exercises, with 90 seconds of rest.'},
+  bilbo:{n:'Método Bilbo',en:'Bilbo method',kb:'metodo.bilbo',cerca:false,limitada:true,
+    g:'Primero, una serie explosiva con el 50 % de tu máximo: todas las repeticiones que puedas (mínimo 15), parando 1 a 3 antes del fallo. Después, tus series normales.',gen:'First, one explosive set with 50 % of your max: as many reps as you can (at least 15), stopping 1 to 3 short of failure. Then your normal sets.'}
+};
+const metName = k => METODOS[k] ? tx(METODOS[k].n, METODOS[k].en) : '';
+const codoSensible = () => ((S.profile||{}).injuries||[]).includes('codo');
+// ¿Este ejercicio admite el método? (seguridad: regla metodo.seguridad)
+function metodoOk(it, cerca, soloPeso){
+  const ex=getEx(it.exId); if (it.warm||it.cool||ex.missing) return false;
+  if (soloPeso ? ex.mode!=='p' : (ex.mode!=='p' && ex.mode!=='r')) return false;
+  if (typeof profileBlocks==='function' && profileBlocks(it.exId)) return false;
+  if (cerca){ if (ex.eq.includes('bar') && (ex.pat==='sentadilla'||ex.pat==='bisagra')) return false; if (codoSensible() && ['curl','extension'].includes(ex.pat)) return false; }
+  return true;
+}
+const metWork = it => it.sets.filter(s=>s.t!=='c');
+// peso para otras repeticiones a partir de la serie de trabajo actual (fórmula de Epley)
+const metKg = (it,reps) => { const ex=getEx(it.exId); const w=metWork(it).find(s=>+s.kg>0); let kg0=w?+w.kg:estimateKg(it.exId,10), r0=w?(+w.reps||10):10; if (!kg0) return null;
+  return roundTo(kg0*(1+r0/30)/(1+reps/30), incFor(ex)); };
+// Aplica el método a la rutina. Devuelve cuántos ejercicios cambió, o −1 si es para un nivel más alto.
+function applyMethod(r){
+  (r.items||[]).forEach(it=>{ if (it.base){ it.sets=clone(it.base.sets); it.rest=it.base.rest; it.range=it.base.range?it.base.range.slice():it.range; delete it.base; } if (it.supM){ it.superset=null; delete it.supM; } });
+  const m=METODOS[r.method]; if (!m) return 0;
+  if (m.cerca && userLevel()<kb('metodo.seguridad').nivel) return -1;
+  const keep=it=>{ it.base={sets:clone(it.sets),rest:it.rest,range:it.range?it.range.slice():null}; };
+  const warm=it=>it.sets.filter(s=>s.t==='c');
+  let n=0;
+  if (r.method==='superseries'){ const K=kb('metodo.superseries');
+    for (let k=0;k+1<r.items.length;k++){ const a=r.items[k], b=r.items[k+1];
+      if (a.superset||b.superset||!metodoOk(a,false)||!metodoOk(b,false)) continue;
+      keep(a); keep(b); const g=uid(); a.superset=b.superset=g; a.supM=b.supM=true; a.rest=K.rest; n+=2; k++; }
+    return n; }
+  r.items.forEach(it=>{
+    const ex=getEx(it.exId), W=metWork(it); if (!W.length) return;
+    if (r.method==='descendentes'){ if (!metodoOk(it,true,true)) return; const K=kb('metodo.descendentes'); keep(it);
+      const last=W[W.length-1]; last.rest=0; let kg=last.kg;
+      for (let d=0; d<K.bajadas; d++){ kg=kg?roundTo(kg*K.f,incFor(ex)):null; const s={t:'d',m:'drop',reps:last.reps,kg,time:null}; if (d<K.bajadas-1) s.rest=0; it.sets.push(s); }
+      n++; }
+    else if (r.method==='restpause'){ if (!metodoOk(it,true)) return; const K=kb('metodo.restpause'); keep(it);
+      const last=W[W.length-1]; last.rest=K.pausa;
+      for (let d=0; d<K.mini; d++){ const s={t:'n',m:'mini',reps:Math.max(2,Math.round((+last.reps||8)*K.frac)),kg:last.kg,time:null}; if (d<K.mini-1) s.rest=K.pausa; it.sets.push(s); }
+      n++; }
+    else if (r.method==='myoreps'){ if (!metodoOk(it,true)) return; const K=kb('metodo.myoreps'); keep(it);
+      const kg=ex.mode==='p'?(metKg(it,K.act[1])||W[0].kg):null;
+      const sets=warm(it).concat([{t:'n',reps:K.act[0],kg,time:null,rest:K.pausa}]);
+      for (let d=0; d<K.mini; d++){ const s={t:'n',m:'mini',reps:K.reps,kg,time:null}; if (d<K.mini-1) s.rest=K.pausa; sets.push(s); }
+      it.sets=sets; it.range=K.act.slice(); n++; }
+    else if (r.method==='piramide'){ if (!metodoOk(it,false,true)) return; const K=kb('metodo.piramide'); keep(it);
+      const reps=K.reps.slice(0,Math.max(3,Math.min(K.reps.length,W.length)));
+      it.sets=warm(it).concat(reps.map(rp=>({t:'n',m:'pyr',reps:rp,kg:metKg(it,rp)||W[0].kg,time:null}))); it.range=[reps[reps.length-1],reps[0]]; n++; }
+    else if (r.method==='cluster'){ if (ex.kind!=='c'||!metodoOk(it,false,true)) return; const K=kb('metodo.cluster'); keep(it);
+      const sets=warm(it); W.forEach(s=>{ const R=+s.reps||6; const a=Object.assign({},s,{reps:Math.ceil(R/2),rest:K.pausa}); delete a.m; const b={t:s.t==='f'?'n':s.t,m:'cl',reps:Math.floor(R/2)||1,kg:s.kg,time:null}; if (s.rest!=null) b.rest=s.rest; sets.push(a,b); });
+      it.sets=sets; n++; }
+  });
+  if (r.method==='gvt'){ const K=kb('metodo.gvt'); let c=0;
+    for (const it of r.items){ const ex=getEx(it.exId); if (c>=K.ej) break; if (ex.kind!=='c'||!metodoOk(it,false,true)) continue; keep(it);
+      const kg=metKg(it,20)||metWork(it)[0].kg; it.sets=warm(it).concat(Array.from({length:K.series},()=>({t:'n',reps:K.reps,kg,time:null}))); it.rest=K.rest; it.range=[K.reps,K.reps]; c++; n++; } }
+  if (r.method==='bilbo'){ const K=kb('metodo.bilbo');
+    const it=r.items.find(x=>{ const ex=getEx(x.exId); return ex.kind==='c' && ex.pat!=='bisagra' && metodoOk(x,false,true); });
+    if (it){ keep(it); const w=warm(it); it.sets=w.concat([{t:'n',m:'bilbo',reps:K.min,kg:metKg(it,30),time:null,rest:180}]).concat(metWork(it)); n++; } } // 30 repeticiones ≈ 50 % del máximo
+  return n;
+}
+// Tarjeta del método en el editor y aviso en el entreno
+function metodoCard(r, estado){
+  const m=METODOS[r.method]; if (!m) return '';
+  const tags=`<span class="tag">${tx('No comprobado que sea mejor que el entrenamiento normal','Not proven to be better than normal training')}</span>${m.limitada?` <span class="tag">${tx('Evidencia limitada','Limited evidence')}</span>`:''}${kbLink('metodo.avanzados',tx('¿Por qué?','Why?'))}`;
+  return `<div class="card" style="margin:-4px 0 14px"><div class="b">${esc(metName(r.method))}</div><div class="row" style="flex-wrap:wrap;gap:6px;margin:6px 0">${tags}</div>
+    <div class="sm" style="line-height:1.45">${esc(tx(m.g,m.gen))}${kbLink(m.kb)}</div>${estado?`<div class="xs mut" style="margin-top:8px;line-height:1.4">${estado}</div>`:''}</div>`;
+}
+function metodoEstado(p){
+  const r=p.draft; if (!METODOS[r.method]) return '';
+  const prem=typeof isPremium!=='function'||isPremium(), res=p.metRes;
+  if (!prem) return tx('Con Premium, PandarIA arma las series del método por ti. Mientras tanto, sigue la guía en el entreno.','With Premium, PandarIA builds the method sets for you. Meanwhile, follow the guide during the workout.');
+  if (res===-1) return tx('Este método es para nivel intermedio o avanzado: PandarIA no cambió tus series.','This method is for intermediate or advanced lifters: PandarIA did not change your sets.');
+  if (res===0) return tx('Ningún ejercicio de esta rutina encaja con el método.','No exercise in this routine fits the method.');
+  if (res>0) return tx(`PandarIA ajustó ${plural(res,'ejercicio','ejercicios')} para este método.`,`PandarIA adjusted ${plural(res,'exercise','exercises')} for this method.`);
+  return '';
+}
+A.edMethod=v=>{ const p=edP(), d=p.draft; d.method=METODOS[v]?v:null; const prem=typeof isPremium!=='function'||isPremium();
+  if (prem) p.metRes=applyMethod(d); else { const k=d.method; d.method=null; applyMethod(d); d.method=k; p.metRes=null; }
+  edDirty(); refreshTop(); };
+function metodoBanner(r){ const m=r&&METODOS[r.method]; if (!m) return '';
+  return `<div class="banner"><span class="ic">${I('layers',20)}</span><div class="grow sm"><b>${esc(metName(r.method))}</b> · ${esc(tx(m.g,m.gen))}</div></div>`; }
 function openEditor(draft,isNew){ openLayer('editor',{draft,isNew,dirty:isNew?false:false,key:draft.id}); }
 function edP(){ return LAYERS[LAYERS.length-1].p; }
 function edDirty(){ edP().dirty=true; }
@@ -5580,7 +5744,9 @@ SCREENS.editor = p => {
   const r=p.draft;
   let b=`<div class="field"><label>Nombre de la rutina</label><input class="inp" value="${esc(r.name)}" data-in="edName" maxlength="60"></div>
   <button class="srow card" style="padding:14px;margin-bottom:12px" data-a="edTogP"><span class="si">${I('spark',20)}</span><span class="grow"><div class="b">PandarIA ${r.pandaria?'activada':'desactivada'}</div><div class="xs mut">${r.pandaria?'Sugiere pesos y repeticiones y propone mejoras con tu progreso.':'No sugerirá cambios; verás lo que hiciste la última vez.'}</div></span><span class="toggle ${r.pandaria?'on':''}"></span></button>`;
+  const metChips=`<div class="field"><label>Métodos especiales</label><div class="chips"><button class="chip ${!METODOS[r.method]?'on':''}" data-a="edMethod" data-v="none">Ninguno</button>${Object.keys(METODOS).map(k=>`<button class="chip ${r.method===k?'on':''}" data-a="edMethod" data-v="${k}">${esc(metName(k))}</button>`).join('')}</div></div>${metodoCard(r,metodoEstado(p))}`;
   if (r.pandaria) b+=`<div class="field"><label>Objetivo de la rutina</label><div class="chips">${Object.entries(GOALS).map(([k,g])=>`<button class="chip ${r.goal===k?'on':''}" data-a="edGoal" data-v="${k}">${g.n}</button>`).join('')}</div></div>`;
+  b+=metChips;
   b+=`<div class="sec">Ejercicios (${r.items.length})</div>`;
   r.items.forEach((it,idx)=>{
     const ex=getEx(it.exId), sup=!!it.superset;
@@ -5967,7 +6133,7 @@ function activeItemFrom(tplItem, r){
   const it=clone(tplItem);
   it.sets=tplItem.sets.map((s,i)=>{
     const g=suggestSet(r,tplItem,i);
-    const o={t:s.t||'n', kg:null, reps:null, time:null, done:false, sk:g.kg, sr:g.reps, st:g.time, why:g.why, tk:s.kg, tr:s.reps, tt:s.time};
+    const o={t:s.t||'n', kg:null, reps:null, time:null, done:false, sk:g.kg, sr:g.reps, st:g.time, why:g.why, tk:s.kg, tr:s.reps, tt:s.time}; if (s.m) o.m=s.m;
     if (s.rest!=null) o.rest=+s.rest;
     else if (o.t==='c' && restSmart(r) && (+tplItem.rest||0)>=45){ o.rest=Math.max(30,Math.round((+tplItem.rest)/2/15)*15); o.rsug=true; }
     return o;
@@ -6028,6 +6194,7 @@ SCREENS.workout = () => {
   const r=findR(a.routineId);
   let b=`<div style="padding:4px 0 10px"><div style="font-size:22px;font-weight:800">${esc(a.name)}</div><div class="xs mut" style="margin-top:4px">${fmtDateL(a.start)}${r&&r.pandaria?` · <span style="color:var(--ac)">PandarIA sugiere en gris</span>`:''}</div></div>`;
   if (deloadActive()) b+=`<div class="banner blue"><span class="ic">${I('refresh',20)}</span><div class="grow sm">Semana de descarga: pesos un 15 % más livianos y concéntrate en la técnica.</div></div>`;
+  b+=metodoBanner(r);
   if (a.rest && !a.rest.uid) b+=restBarHtml();
   let prevSup=null;
   a.items.forEach((it,idx)=>{
@@ -6318,7 +6485,7 @@ function finishWorkout(mode){
   const a=S.active, end=Date.now();
   const r=findR(a.routineId);
   const session={id:uid(), routineId:a.routineId, routineName:a.name, start:a.start, end, intensity:a.intensity||6, checkin:a.checkin||null,
-    items:a.items.map(it=>({exId:it.exId, note:it.note||'', sets:it.sets.filter(s=>s.done).map(s=>{ const o={t:s.t,kg:s.kg,reps:s.reps,time:s.time,done:true,pr:!!s.pr,rir:s.rir??null}; if(s.rd!=null) o.rd=s.rd; return o; })})).filter(x=>x.sets.length)};
+    items:a.items.map(it=>({exId:it.exId, note:it.note||'', sets:it.sets.filter(s=>s.done).map(s=>{ const o={t:s.t,kg:s.kg,reps:s.reps,time:s.time,done:true,pr:!!s.pr,rir:s.rir??null}; if(s.rd!=null) o.rd=s.rd; if(s.m) o.m=s.m; return o; })})).filter(x=>x.sets.length)};
   session.vol=sessionVolume(session);
   session.prs=[]; session.items.forEach(it=>it.sets.forEach(s=>{ if(s.pr) session.prs.push({exId:it.exId,kg:s.kg,reps:s.reps,time:s.time}); }));
   S.sessions.push(session); S.firstSession=S.firstSession||end; S.periodStart=S.periodStart||end;
@@ -6807,6 +6974,8 @@ const INJURIES = {
   hombro:{n:'Hombro',ex:['press_militar','handstand_pushup','fondos_pecho','fondos_triceps','pike_pushup','remo_menton','kb_snatch','flexiones_pliometricas','press_frances','pullover_man','pullover_polea','fondos_banco','yoga_cuervo','kb_turkish','muscle_up','fondos_anillas','fondos_maquina_asistidos','push_press','press_z','menton_polea','press_jm','pullover_maq','smith_hombro','press_cubano']},
   muneca:{n:'Muñeca',ex:['flexiones','flexiones_diamante','flexiones_archer','flexiones_pliometricas','flexiones_declinadas','burpees','plancha_toques','mountain_climbers','bear_crawl','yoga_cuervo','handstand_pushup','pike_pushup','curl_muneca','l_sit','flexiones_anillas','curl_muneca_barra','ext_muneca','rodillo_muneca','press_jm','rollout_barra','fondos_anillas']},
   tobillo:{n:'Tobillo',ex:['sentadilla_salto','box_jump','skater','burpees','jumping_jacks','sprint','saltar_comba','skipping','correr_cinta','trineo_empuje','cinta_curva','wall_ball']},
+  codo:{n:'Codo',kb:'lesion.codo',ex:['fondos_pecho','fondos_triceps','fondos_banco','fondos_anillas','press_frances','press_frances_z','press_frances_man','ext_triceps_man','ext_polea_cabeza','press_cerrado','press_jm','press_tate','curl_predicador','curl_predicador_z','curl_predicador_man','curl_barra','flexiones_diamante','flexiones_pliometricas','muscle_up','handstand_pushup','ext_muneca','curl_muneca','curl_muneca_barra','rodillo_muneca']},
+  cadera:{n:'Cadera',kb:'lesion.cadera',ex:['sentadilla_pistol','sentadilla_sumo','sentadilla_cosaca','zancada_lateral','copenhague','aduccion_maq','aduccion_polea','aduccion_multicadera','peso_muerto_sumo','box_jump','sentadilla_salto','skater','sprint','yoga_paloma','cadera_9090','fire_hydrant','abduccion_banda','monster_walk']},
   cuello:{n:'Cuello',ex:['handstand_pushup','crunch','v_ups','encogimientos','encogimientos_barra','pil_roll_up','pil_hundred','cuello_maq','encog_maq','encog_smith','encog_polea','crunch_declinado']}
 };
 const HIGH_IMPACT=['burpees','box_jump','sentadilla_salto','skater','sprint','saltar_comba','jumping_jacks','flexiones_pliometricas','skipping','sentadilla_pistol','wall_ball','cinta_curva','cuerdas_golpes','balon_suelo','muscle_up'];
@@ -6842,7 +7011,7 @@ function profileForm(p, prefix){
   <div class="field"><label>Sexo</label><div class="seg">${Object.entries(SEXES).map(([k,n])=>`<button class="${p.sex===k?'on':''}" data-a="pfSet" data-v="sex|${k}">${n}</button>`).join('')}</div></div>
   <div class="field"><label>Condición física actual</label><div class="seg">${Object.entries(FITNESS).map(([k,n])=>`<button class="${p.fitness===k?'on':''}" data-a="pfSet" data-v="fitness|${k}">${n}</button>`).join('')}</div></div>
   <div class="field"><label>Lesiones o zonas sensibles</label><div class="chips">${Object.entries(INJURIES).map(([k,v])=>`<button class="chip ${(p.injuries||[]).includes(k)?'on':''}" data-a="pfInj" data-v="${k}">${v.n}</button>`).join('')}</div>
-  <div class="xs mut" style="margin-top:8px;line-height:1.4">PandarIA evitará los ejercicios que cargan esas zonas. Si tienes dolor, consulta a un profesional de la salud.</div></div>`;
+  <div class="xs mut" style="margin-top:8px;line-height:1.4">PandarIA evitará los ejercicios que cargan esas zonas. Si tienes dolor, consulta a un profesional de la salud.${(p.injuries||[]).filter(k=>INJURIES[k]&&INJURIES[k].kb).map(k=>kbLink(INJURIES[k].kb,tx(`Qué hace con ${INJURIES[k].n.toLowerCase()}`,`What it does for the ${({codo:'elbow',cadera:'hip'})[k]||k}`))).join('')}</div></div>`;
 }
 // Valores posibles: un error de tecleo (800 kg, 2 años) no puede llegar a los cálculos
 const LIMITES={age:[12,100,'La edad','años'], height:[100,230,'La altura','cm'], weight:[30,300,'El peso','kg'], peso:[30,300,'El peso','kg'], grasa:[3,60,'La grasa corporal','%'],
@@ -8695,8 +8864,9 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='0.9';
+const APP_VERSION='1.0';
 const CHANGELOG=[
+ {v:'1.0',t:'Lista para Google Play (en desarrollo)',items:['Métodos especiales en el editor de rutinas: superseries, series descendentes, rest-pause, myo-reps, pirámide, series en clúster, volumen alemán (10 × 10) y método Bilbo. Elegirlos es gratis; con Premium, PandarIA arma las series por ti','Cada método explica cómo se hace, lleva la etiqueta «No comprobado que sea mejor que el entrenamiento normal» y su fuente en Ciencia de PandarIA; el método Bilbo y las myo-reps, además, «Evidencia limitada»','Seguridad: los métodos que llegan cerca del fallo son para nivel intermedio o avanzado y no se aplican a la sentadilla ni al peso muerto con barra ni a ejercicios que carguen una zona sensible','Codo y cadera como zonas sensibles: PandarIA evita los ejercicios que más las cargan y, con el codo, sube el peso de brazos de a un disco y añade calentamiento','Premium con suscripción de Google Play: mensual o trimestral, con 3 días gratis; «Restaurar compras» y «Administrar suscripción»','Pedir Premium gratis: si no puedes pagarlo, envía tu código y el motivo; los códigos quedan solo como regalo','Biblioteca de evidencia 1.3: 12 reglas nuevas']},
  {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y recetas típicas',items:['Etapa 4 · Ajustes ordenados: la pantalla principal queda corta, con tu perfil, Premium y 8 grupos (Tu cuenta y tus datos, Entrenamiento, PandarIA, Nutrición y ayuno, Avisos y sonido, Pantalla e idioma, Salud y Acerca de) que abren su propia pantalla','«Borrar todos los datos» queda aparte, al final de Tu cuenta y tus datos','La política de privacidad se puede abrir desde Ajustes › Acerca de','40 recetas típicas de Uruguay, Argentina, Cuba, México y España en el diario (milanesas, chivito, choripán, tortilla de papas, pascualina, ropa vieja, picadillo, chilaquiles, tacos al pastor, paella, gazpacho, fabada y más), calculadas con ingredientes del USDA y con sus alérgenos; la ficha muestra qué lleva cada una','Nuevo nombre del estudio: LunaDoggyBru Studios','La revisión de animaciones se apaga para la versión final (los votos ya enviados se guardan)','Arreglo: algunas metas guardadas con un formato antiguo mostraban «Invalid Date» y la barra de progreso vacía','Etapa 3 · Inglés completo: toda la app en inglés, también los 386 consejos de ejercicio, la técnica paso a paso, Explorar, el historial de cambios, los logros y los avisos del teléfono','La voz de los entrenos, los avisos del teléfono, la notificación del entreno en curso y los widgets hablan en el idioma que elijas','En inglés los números y las fechas van al estilo inglés (1,910 kcal · 80.6 kg · November 12)','Nueva prueba automática: en inglés, si queda algún texto en español en las pantallas, la versión no sale','Arreglo: más espacio arriba para la cámara y la barra de estado (notch) en todas las pantallas','Arreglo: al tocar «Buscar actualizaciones» se abre directamente la versión nueva, aunque antes hubieras elegido «Más tarde» o «Saltar esta versión»; el aviso también aparece en Ajustes','Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
  {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
@@ -8729,7 +8899,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["0.9 · Versión completa: 0.9 cerrada", "Ajustes ordenados en 8 grupos", "40 recetas típicas de Uruguay, Argentina, Cuba, México y España", "Nuevo nombre: LunaDoggyBru Studios", "Política de privacidad en Ajustes › Acerca de", "Revisión de animaciones apagada para la versión final"];
+const NOTAS_VERSION=["1.0 · Primera entrega para Google Play", "Métodos especiales en el editor de rutinas (superseries, descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y Bilbo)", "Codo y cadera como zonas sensibles", "Premium con suscripción de Google Play y 3 días gratis", "Pedir Premium gratis si no puedes pagarlo"];
 const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
@@ -11084,6 +11254,7 @@ Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.|Sets
 Rosé wine|Rosé wine`;
 const KB_LOG_EN={'1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
  '1.1':'Rules that change results: 2 minutes of rest on weighted compound lifts for muscle; weight-loss pace of 0.5 to 1 % of body weight per week instead of a fixed 15 %; a calorie target that adjusts with your diary and weight; a lighter load if you arrive poorly rested; water goal recalibrated with the EFSA reference; alternatives of similar difficulty.',
+ '1.3':'Special methods (supersets, drop sets, rest-pause, myo-reps, pyramids, clusters, German volume training and the Bilbo method), each with its evidence and a note that it is not proven to be better; elbow and hip as sensitive areas.',
  '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
 const EN_08_RX=[
   [/^Te quedan ([\d.,]+) kcal de ([\d.,]+) kcal$/,'$1 kcal left of $2 kcal'],[/^([\d.,]+) kcal por encima de tu objetivo de ([\d.,]+) kcal$/,'$1 kcal over your goal of $2 kcal'],
@@ -12356,7 +12527,67 @@ Revisión de animaciones apagada para la versión final|Animation review switche
 Tu cuenta y tus datos|Your account and data
 Política de privacidad|Privacy policy
 Etapa 4 · Ajustes ordenados|Stage 4 · Settings tidied up
-Perfil guardado|Profile saved`;
+Perfil guardado|Profile saved
+Lista para Google Play (en desarrollo)|Ready for Google Play (in development)
+Métodos especiales en el editor de rutinas: superseries, series descendentes, rest-pause, myo-reps, pirámide, series en clúster, volumen alemán (10 × 10) y método Bilbo. Elegirlos es gratis; con Premium, PandarIA arma las series por ti|Special methods in the routine editor: supersets, drop sets, rest-pause, myo-reps, pyramid, cluster sets, German volume training (10 × 10) and the Bilbo method. Choosing them is free; with Premium, PandarIA builds the sets for you
+Cada método explica cómo se hace, lleva la etiqueta «No comprobado que sea mejor que el entrenamiento normal» y su fuente en Ciencia de PandarIA; el método Bilbo y las myo-reps, además, «Evidencia limitada»|Each method explains how to do it, carries the label «Not proven to be better than normal training» and its source in PandarIA science; the Bilbo method and myo-reps also «Limited evidence»
+Seguridad: los métodos que llegan cerca del fallo son para nivel intermedio o avanzado y no se aplican a la sentadilla ni al peso muerto con barra ni a ejercicios que carguen una zona sensible|Safety: methods that go close to failure are for intermediate or advanced lifters and are not applied to barbell squats or deadlifts or to exercises that load a sensitive area
+Codo y cadera como zonas sensibles: PandarIA evita los ejercicios que más las cargan y, con el codo, sube el peso de brazos de a un disco y añade calentamiento|Elbow and hip as sensitive areas: PandarIA avoids the exercises that load them most and, for the elbow, raises arm weights one plate at a time and adds a warm-up
+Premium con suscripción de Google Play: mensual o trimestral, con 3 días gratis; «Restaurar compras» y «Administrar suscripción»|Premium with a Google Play subscription: monthly or quarterly, with 3 free days; «Restore purchases» and «Manage subscription»
+Pedir Premium gratis: si no puedes pagarlo, envía tu código y el motivo; los códigos quedan solo como regalo|Ask for free Premium: if you can't pay, send your code and the reason; codes are now gifts only
+Biblioteca de evidencia 1.3: 12 reglas nuevas|Evidence library 1.3: 12 new rules
+1.0 · Primera entrega para Google Play|1.0 · First delivery for Google Play
+Métodos especiales en el editor de rutinas (superseries, descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y Bilbo)|Special methods in the routine editor (supersets, drop sets, rest-pause, myo-reps, pyramid, clusters, German volume and Bilbo)
+Codo y cadera como zonas sensibles|Elbow and hip as sensitive areas
+Premium con suscripción de Google Play y 3 días gratis|Premium with a Google Play subscription and 3 free days
+Pedir Premium gratis si no puedes pagarlo|Ask for free Premium if you can't pay
+Métodos especiales|Special methods
+Ninguno|None
+Codo|Elbow
+Cadera|Hip
+Mini serie tras la pausa|Mini set after the pause
+Segunda mitad de la serie tras la pausa|Second half of the set after the pause
+Serie Bilbo: todas las repeticiones que puedas (mínimo 15), parando 1 a 3 antes del fallo|Bilbo set: as many reps as you can (at least 15), stopping 1 to 3 short of failure
+Pasaste de 15 repeticiones: +2,5 kg|You got past 15 reps: +2.5 kg
+No llegaste a 15: el ciclo vuelve a empezar al 50 %|You didn't reach 15: the cycle starts again at 50 %
+Pirámide: más peso y menos repeticiones en cada serie|Pyramid: more weight and fewer reps on each set
+Completaste esta serie de la pirámide: sube el peso|You completed this pyramid set: raise the weight
+Mismo peso: busca las repeticiones de esta serie|Same weight: aim for this set's reps
+Métodos especiales: qué esperar|Special methods: what to expect
+Métodos cerca del fallo: para quién|Methods close to failure: who they are for
+Superseries|Supersets
+Series descendentes|Drop sets
+Pirámide|Pyramid
+Series en clúster|Cluster sets
+Volumen alemán (10 × 10)|German volume training (10 × 10)
+Método Bilbo|Bilbo method
+Codo sensible|Sensitive elbow
+Cadera sensible|Sensitive hip
+Personas que ya entrenan|People who already train
+Personas con molestias en el codo|People with elbow discomfort
+Personas con molestias en la cadera|People with hip discomfort
+Etiqueta y explicación de cada método especial|Label and explanation of each special method
+Qué ejercicios cambia cada método|Which exercises each method changes
+Método Superseries|Supersets method
+Método Series descendentes|Drop sets method
+Método Rest-pause|Rest-pause method
+Método Myo-reps|Myo-reps method
+Método Pirámide|Pyramid method
+Método Series en clúster|Cluster sets method
+Método Volumen alemán|German volume method
+Lesiones del perfil: codo|Profile injuries: elbow
+Lesiones del perfil: cadera|Profile injuries: hip
+Comparison of traditional and advanced resistance training paradigms on muscle hypertrophy in trained individuals (metaanálisis)|Comparison of traditional and advanced resistance training paradigms on muscle hypertrophy in trained individuals (meta-analysis)
+Qué es el método Bilbo (descripción del creador, sin estudios propios)|What is the Bilbo method (the creator's description, no studies of its own)
+Effectiveness of different methods of resistance exercises in lateral epicondylosis (revisión sistemática)|Effectiveness of different methods of resistance exercises in lateral epicondylosis (systematic review)
+Sugiere pesos y repeticiones y propone mejoras con tu progreso.|Suggests weights and reps and proposes improvements as you progress.
+No sugerirá cambios; verás lo que hiciste la última vez.|It won't suggest changes; you'll see what you did last time.
+Tufano, Brown y Haff|Tufano, Brown and Haff
+Raman, MacDermid y Grewal|Raman, MacDermid and Grewal
+Sugerencias de PandarIA|PandarIA suggestions
+Día|Day
+Activo|Active
+Premium activo|Premium active`;
 const enN=x=>{ x=String(x).trim(); const r=EN_MAP.get(x); if(r) return r; const t=trText(x); return t==null?x:t.trim(); };
 const enList=x=>x.split(/, | y /).map(enN).join(', ');
 const EN_MED={Peso:'Weight',Cintura:'Waist',Cadera:'Hips',Pecho:'Chest',Brazo:'Arm',Muslo:'Thigh',Cuello:'Neck',Hombros:'Shoulders',Pantorrilla:'Calf',Grasa:'Body fat',Glúteo:'Glutes',Antebrazo:'Forearm'};
@@ -12390,6 +12621,8 @@ const EN_09_RX = [
   [/^Igual que el ejercicio \((.+)\)(.*)$/,(m,a,b)=>'Same as the exercise ('+a.replace('sin descanso','no rest')+')'+b],
   [/^(\d+) de (\d+) series$/,'$1 of $2 sets'],
   [/^([\d.]+) · Etapa (\d) de (\d): (.+)$/,(m,v,a,b,c)=>`${v} · Stage ${a} of ${b}: ${enN(c)}`],[/^Etapa (\d) de (\d): (.+)$/,(m,a,b,c)=>`Stage ${a} of ${b}: ${enN(c)}`],
+  [/^Bajada (\d+): −(\d+) % y sin descanso$/,'Drop $1: −$2 % and no rest'],[/^Qué hace con (codo|cadera)$/,(m,a)=>'What it does for the '+(a==='codo'?'elbow':'hip')],
+  [/^\((\d{4})\)\. (.+?)\.$/,(m,y,t)=>{ const r=enN(t); return r===t?m:`(${y}). ${r}.`; }],
   [/^Como: (.+)$/,(m,a)=>'e.g. '+enN(a)],
   [/^Cambié (\d+) ejercicios? por alternativas que puedes hacer con tu equipo o preferencias\.$/,(m,n)=>`I swapped ${n} exercise${n==='1'?'':'s'} for alternatives you can do with your equipment or preferences.`],
   [/^Semana del (.+)$/,'Week of $1'],
