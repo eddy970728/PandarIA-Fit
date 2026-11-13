@@ -1,0 +1,52 @@
+name: Preparar la llave para Google Play
+
+# Se ejecuta a mano una sola vez, al activar la firma de Google Play con tu propia llave.
+# Play Console te da una «clave pública de cifrado» (archivo encryption_public_key.pem):
+# copia su texto completo y pégalo en el campo de abajo al ejecutar esta acción.
+# El resultado (llave-para-play.zip) va cifrado: solo Google puede abrirlo. Súbelo en Play Console.
+on:
+  workflow_dispatch:
+    inputs:
+      clave_cifrado:
+        description: 'Texto de encryption_public_key.pem (de Play Console)'
+        required: true
+      pepk_url:
+        description: 'Enlace de la herramienta PEPK (déjalo así salvo que Play Console muestre otro)'
+        required: false
+        default: 'https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk.jar'
+
+jobs:
+  llave:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Cifrar la llave con la clave de Google Play
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          CLAVE: ${{ github.event.inputs.clave_cifrado }}
+          PEPK_URL: ${{ github.event.inputs.pepk_url }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then echo "Falta el secreto KEYSTORE_BASE64"; exit 1; fi
+          echo "$KEYSTORE_BASE64" | base64 -d > firma.jks
+          # la clave puede llegar pegada en una sola línea: se rearma el archivo .pem
+          CUERPO=$(echo "$CLAVE" | sed 's/-----[A-Z ]*-----//g' | tr -d ' \r\n\t')
+          { echo "-----BEGIN PUBLIC KEY-----"; echo "$CUERPO" | fold -w 64; echo "-----END PUBLIC KEY-----"; } > clave.pem
+          openssl pkey -pubin -in clave.pem -noout || { echo "La clave pegada no es válida. Cópiala completa desde Play Console."; exit 1; }
+          curl -fsSL "$PEPK_URL" -o pepk.jar
+          java -jar pepk.jar --keystore=firma.jks --alias="$KEY_ALIAS" \
+            --keystore-pass="pass:$KEYSTORE_PASSWORD" --key-pass="pass:$KEYSTORE_PASSWORD" \
+            --output=llave-para-play.zip --include-cert --rsa-aes-encryption --encryption-key-path=clave.pem
+          rm firma.jks
+          ls -la llave-para-play.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: llave-para-play
+          path: llave-para-play.zip
+          retention-days: 7
