@@ -344,6 +344,9 @@ html[data-fx=off] *,html[data-fx=off] *::before{animation:none!important;transit
 <body>
 <div id="app"></div>
 <script>
+// Seguridad: si la app instalada arranca sin el archivo de Premium, nada queda gratis por error (el archivo de Premium reemplaza esta función).
+window.isPremium = () => !(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+
 /* ============ PandarIA Fit · DATOS ============ */
 const MUSCLES = {
   pecho:'Pecho', hombros:'Hombros', biceps:'Bíceps', triceps:'Tríceps', antebrazos:'Antebrazos',
