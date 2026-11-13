@@ -3,13 +3,42 @@
    (ECDSA P-256) y candados de las funciones Premium. Funciona sin internet. */
 (function(){
   const PUB = 'BJpnO5SDxv3Z8ECzomAf5EsWoD0a2WNwi4bqS15vicZmftuV/hBwsjrpJ27o2Tc2wjxscWV5cYfqFQ+W6NXdncU=';
-  const MAIL = 'eddy970728@gmail.com';
-  const PRICE_ONCE = '5,99 USD', PRICE_MONTH = '0,49 USD';
+  const MAIL = 'lunadoggybrustudios@gmail.com';
   const AB = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // sin 0, 1, I ni O
   const EPOCH = Date.UTC(2026, 0, 1), DAYMS = 86400000;
   const C = window.Capacitor, native = !!(C && C.isNativePlatform && C.isNativePlatform());
   const P = n => native ? ((C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null)) : null;
-  const FS = P('Filesystem'), Device = P('Device'), Share = P('Share');
+  const FS = P('Filesystem'), Device = P('Device'), Share = P('Share'), NP = P('NativePurchases');
+  /* ---------- Suscripción de Google Play (1.0) ----------
+     Producto «premium» con dos planes base: «mensual» y «trimestral» (con prueba de 3 días configurada en Play Console).
+     Sin servidor: se mira en el teléfono si la suscripción está activa y se recuerda por si no hay internet. */
+  const SUB_ID = 'premium', PLANS = ['mensual', 'trimestral'], LSS = 'pf-suscripcion';
+  let SUB = null; try{ SUB = JSON.parse(localStorage.getItem(LSS) || 'null'); }catch(e){}
+  let PRODS = null, BUSY = false;
+  const saveSub = () => { try{ localStorage.setItem(LSS, JSON.stringify(SUB)); }catch(e){} };
+  async function subRefresh(){
+    if (!NP) return;
+    try{
+      const r = await NP.getPurchases({productType:'subs'});
+      const p = (r.purchases || []).find(x => x.productIdentifier === SUB_ID && String(x.purchaseState) === '1');
+      const was = !!(SUB && SUB.active);
+      SUB = {active: !!p, at: Date.now()}; saveSub();
+      if (was !== SUB.active && typeof render === 'function'){ render.keep = true; render(); if (LAYERS.length) refreshTop(); if (typeof scheduleNotifs === 'function') scheduleNotifs(); }
+    }catch(e){}
+  }
+  async function loadProducts(){
+    if (!NP) return;
+    try{
+      const r = await NP.getProducts({productIdentifiers:[SUB_ID], productType:'subs'});
+      const L = r.products || [], out = {};
+      PLANS.forEach(pl => { const os = L.filter(x => x.identifier === pl); if (!os.length) return;
+        const o = os.find(x => x.introductoryPrice) || os.find(x => !x.offerId) || os[0];
+        out[pl] = {plan: pl, price: o.price, priceString: o.priceString, offerToken: o.offerToken, trial: !!o.introductoryPrice}; });
+      PRODS = out;
+    }catch(e){ PRODS = {}; }
+    const t = LAYERS[LAYERS.length - 1]; if (t && t.t === 'premium') refreshTop();
+  }
+  window.pfSubActive = () => !!(SUB && SUB.active);
   const subtle = window.crypto && crypto.subtle;
   const enc = s => new TextEncoder().encode(s);
   const b64bytes = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
@@ -73,7 +102,8 @@
     }catch(e){ return null; }
   }
   const expired = l => l && l.exp !== 'P' && new Date().toISOString().slice(0, 10) > l.exp;
-  window.isPremium = () => !!(PREM && !expired(PREM) && (PREM.kind !== 'acct' || PREM.acc === ACC));
+  const licOk = () => !!(PREM && !expired(PREM) && (PREM.kind !== 'acct' || PREM.acc === ACC));
+  window.isPremium = () => licOk() || !!(SUB && SUB.active);
   window.premiumInfo = () => PREM;
   async function loadLicense(){
     let raw = FS ? await readFile('pf-license.json') : null;
@@ -132,36 +162,67 @@
     const on = isPremium();
     let b = `<div style="text-align:center;padding:8px 0 4px"><div style="width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('trophy',40)}</div>
       <div style="font-size:26px;font-weight:900;margin-top:14px">PandarIA Fit <span style="color:var(--ac)">Premium</span></div>
-      <p class="mut sm" style="margin:6px 12px 0;line-height:1.5">${on ? `Premium activo · ${fmtExp(PREM.exp)}. ¡Gracias por apoyar el proyecto!` : 'Sin anuncios, nunca. Entrenar, la biblioteca de ejercicios, el agua y el ayuno son gratis para siempre.'}</p></div>`;
+      <p class="mut sm" style="margin:6px 12px 0;line-height:1.5">${on ? (licOk() ? `Premium activo · ${fmtExp(PREM.exp)}. ¡Gracias por apoyar el proyecto!` : tx('Premium activo con tu suscripción de Google Play. ¡Gracias por apoyar el proyecto!','Premium active with your Google Play subscription. Thanks for supporting the project!')) : 'Sin anuncios, nunca. Entrenar, la biblioteca de ejercicios, el agua y el ayuno son gratis para siempre.'}</p></div>`;
     if (p.reason && !on) b += `<div class="banner" style="margin-top:14px"><span class="ic">${I('info',20)}</span><div class="grow sm">${esc(REASONS[p.reason] || '')}</div></div>`;
     b += `<div class="sec">Qué incluye</div><div class="card" style="padding:4px 14px">${BENEFITS.map(([ic, t, d], i) => `<div class="row" style="align-items:flex-start;gap:12px;padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''}"><span style="color:var(--ac)">${I(ic,20)}</span><div class="grow"><div class="b">${t}</div><div class="xs mut" style="line-height:1.4;margin-top:2px">${d}</div></div>${on ? `<span style="color:var(--ok)">${I('check',18)}</span>` : ''}</div>`).join('')}</div>`;
     if (!on){
-      b += `<div class="sec">Comprar</div><div class="card"><button class="btn pri wide" disabled style="opacity:.55">Pago único · ${PRICE_ONCE}</button><button class="btn wide" disabled style="opacity:.55;margin-top:8px">Suscripción · ${PRICE_MONTH} al mes</button>
-        <div class="xs mut" style="text-align:center;margin-top:10px"><b>Próximamente.</b> Pago una sola vez con las mejoras futuras incluidas, o una suscripción mensual.</div></div>`;
-      b += `<div class="sec">¿No puedes pagarlo? Pídeselo al creador</div><div class="card">
-        ${ACC ? `<p class="sm" style="margin:0 0 12px;line-height:1.5">PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Con tu cuenta de Google, el desbloqueo funciona en cualquier teléfono donde inicies sesión.</p>
-        <div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">TU CÓDIGO DE CUENTA</div>
-        <div class="codebox" style="font-size:19px">${fmtAcc(ACC)}</div>` : `<p class="sm" style="margin:0 0 12px;line-height:1.5">PandarIA Fit es un proyecto personal. Si no puedes pagar, escríbeme y te lo regalo. Solo funcionará en este teléfono; si borras la app tendrás que pedirlo de nuevo.${typeof cloudAvail === 'function' && cloudAvail() ? ' Si inicias sesión con Google en Ajustes › Tu cuenta y tus datos, funcionará en cualquier teléfono con tu cuenta.' : ''}</p>
-        <div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">TU CÓDIGO DE TELÉFONO</div>
-        <div class="codebox" style="font-size:19px">${fmtDev(DEV)}</div>`}
-        <div class="row" style="gap:8px;margin-top:10px"><button class="btn grow sm" data-a="pfCopyDev">${I('copy',16)} Copiar</button><button class="btn grow sm" data-a="pfShareDev">${I('upload',16)} Compartir</button></div>
-        <button class="btn pri wide" style="margin-top:8px" data-a="pfMail">${I('note',18)} Enviar correo al creador</button>
-        <div class="xs mut b" style="letter-spacing:1px;margin:18px 0 6px">CÓDIGO DE DESBLOQUEO</div>
-        <textarea id="pfcode" class="inp" rows="3" placeholder="Pega aquí el código que te enviaron (empieza por PFU-)" style="font-family:ui-monospace,Menlo,monospace;font-size:13px"></textarea>
-        <button class="btn ok wide" style="margin-top:10px" data-a="pfActivate">${I('check',18)} Activar Premium</button></div>`;
+      b += `<div class="sec">${tx('Suscripción','Subscription')}</div><div class="card">`;
+      if (!NP) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción se compra en la app instalada desde Google Play.','The subscription is bought in the app installed from Google Play.')}</p>`;
+      else if (!PRODS) b += `<p class="sm mut" style="margin:0">${tx('Cargando precios…','Loading prices…')}</p>`;
+      else if (!Object.keys(PRODS).length) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción no está disponible ahora. Revisa tu conexión y vuelve a intentarlo.','The subscription is not available right now. Check your connection and try again.')}</p>`;
+      else {
+        const m = PRODS.mensual, q = PRODS.trimestral;
+        const ahorro = m && q && m.price > 0 ? Math.round((1 - q.price / (m.price * 3)) * 100) : 0;
+        if (q) b += `<button class="btn pri wide" data-a="pfBuy" data-v="trimestral"${BUSY ? ' disabled' : ''}>${tx('Trimestral','Quarterly')} · ${esc(q.priceString)} ${tx('cada 3 meses','every 3 months')}${ahorro > 0 ? ` · ${tx('ahorras','save')} ${ahorro} %` : ''}</button>`;
+        if (m) b += `<button class="btn wide" style="margin-top:8px" data-a="pfBuy" data-v="mensual"${BUSY ? ' disabled' : ''}>${tx('Mensual','Monthly')} · ${esc(m.priceString)} ${tx('al mes','a month')}</button>`;
+        if ((m && m.trial) || (q && q.trial)) b += `<div class="sm" style="text-align:center;margin-top:10px;color:var(--ok)"><b>${tx('Empieza con 3 días gratis.','Start with 3 free days.')}</b> ${tx('Si cancelas antes, no se te cobra.','Cancel before they end and you are not charged.')}</div>`;
+        b += `<div class="xs mut" style="text-align:center;margin-top:10px;line-height:1.45">${tx('Se renueva sola hasta que la canceles en Google Play. Puedes cancelar cuando quieras y sigues con Premium hasta el final del período pagado.','It renews automatically until you cancel it in Google Play. You can cancel any time and keep Premium until the end of the paid period.')}</div>`;
+      }
+      if (NP) b += `<button class="btn ghost wide sm" style="margin-top:8px" data-a="pfRestore">${tx('Restaurar compras','Restore purchases')}</button>`;
+      b += `</div><button class="link sm" style="display:block;margin:14px auto 0" data-a="pfRegalo">${tx('¿No puedes pagarlo?','Can\'t afford it?')}</button>`;
+    } else if (!licOk() && SUB && SUB.active){
+      b += `<div class="sec">${tx('Tu suscripción','Your subscription')}</div><div class="card"><div class="kv"><span class="mut">${tx('Estado','Status')}</span><b style="color:var(--ok)">${tx('Activa en Google Play','Active in Google Play')}</b></div><button class="btn wide" style="margin-top:10px" data-a="pfManage">${tx('Administrar suscripción','Manage subscription')}</button></div>`;
     } else {
       b += `<div class="sec">Tu licencia</div><div class="card" style="padding:4px 14px"><div class="kv"><span class="mut">Estado</span><b style="color:var(--ok)">Activa</b></div><div class="kv"><span class="mut">Duración</span><b>${cap1(fmtExp(PREM.exp))}</b></div><div class="kv"><span class="mut">Activada</span><b>${fmtDate(PREM.at)}</b></div>${PREM.kind === 'acct' ? `<div class="kv"><span class="mut">Cuenta</span><b style="font-size:13px">${esc((S.settings.cloud && S.settings.cloud.email) || fmtAcc(PREM.acc))}</b></div>` : `<div class="kv"><span class="mut">Teléfono</span><b style="font-family:ui-monospace,Menlo,monospace;font-size:13px">${fmtDev(DEV)}</b></div>`}</div>`;
     }
     return lhdr('Premium') + `<div class="lbody">${b}<p class="xs mut" style="text-align:center;margin:18px 8px 0;line-height:1.5">Tus datos siempre son tuyos: exportar, copias de seguridad, accesibilidad y seguridad nunca se bloquean.</p></div>`;
   };
+  SCREENS.premiumRegalo = () => {
+    let b = `<p class="sm" style="line-height:1.5;margin-top:0">${tx('Envíale un mensaje al desarrollador con tu código y el motivo por el que no puedes pagarlo. Analizaremos tu petición y te diremos si podemos regalarte un tiempo de Premium.','Send the developer a message with your code and the reason you can\'t pay. We will review your request and let you know if we can give you some Premium time.')}</p>`;
+    b += `<div class="card"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">${ACC ? tx('TU CÓDIGO DE CUENTA','YOUR ACCOUNT CODE') : tx('TU CÓDIGO DE TELÉFONO','YOUR PHONE CODE')}</div>
+      <div class="codebox" style="font-size:19px">${ACC ? fmtAcc(ACC) : fmtDev(DEV)}</div>
+      <div class="row" style="gap:8px;margin-top:10px"><button class="btn grow sm" data-a="pfCopyDev">${I('copy',16)} ${tx('Copiar','Copy')}</button><button class="btn grow sm" data-a="pfShareDev">${I('upload',16)} ${tx('Compartir','Share')}</button></div>
+      <button class="btn pri wide" style="margin-top:8px" data-a="pfMail">${I('note',18)} ${tx('Escribir al desarrollador','Write to the developer')}</button>
+      ${ACC ? '' : `<p class="xs mut" style="margin:10px 0 0;line-height:1.45">${tx('Sin cuenta, el regalo solo funciona en este teléfono. Con tu cuenta de Google (Ajustes › Tu cuenta y tus datos), funciona en cualquier teléfono.','Without an account, the gift only works on this phone. With your Google account (Settings › Your account and data), it works on any phone.')}</p>`}</div>`;
+    b += `<div class="sec">${tx('Código de regalo','Gift code')}</div><div class="card"><textarea id="pfcode" class="inp" rows="3" placeholder="${tx('Pega aquí el código que te enviaron','Paste the code you received here')}" style="font-family:ui-monospace,Menlo,monospace;font-size:13px"></textarea>
+      <button class="btn ok wide" style="margin-top:10px" data-a="pfActivate">${I('check',18)} ${tx('Activar Premium','Activate Premium')}</button></div>`;
+    return lhdr(tx('Pedir Premium','Ask for Premium')) + `<div class="lbody">${b}</div>`;
+  };
+  A.pfRegalo = () => openLayer('premiumRegalo', {});
+  A.pfBuy = async plan => {
+    const o = PRODS && PRODS[plan]; if (!NP || !o || BUSY) return;
+    BUSY = true; refreshTop();
+    try{
+      await NP.purchaseProduct({productIdentifier: SUB_ID, planIdentifier: plan, offerToken: o.offerToken, productType: 'subs'});
+      await subRefresh();
+      if (SUB && SUB.active){ if (typeof sfx === 'function') sfx('finish'); if (typeof confetti === 'function') confetti({n:150}); toast(tx('🎉 ¡Premium activado! Gracias por apoyar el proyecto','🎉 Premium activated! Thanks for supporting the project')); }
+    }catch(e){ const m = String(e && (e.message || e)); if (!/cancel/i.test(m)) toast(tx('No se pudo completar la compra.','The purchase could not be completed.')); }
+    BUSY = false; render.keep = true; render(); if (LAYERS.length) refreshTop();
+  };
+  A.pfRestore = async () => {
+    if (!NP) return; toast(tx('Buscando tus compras…','Looking for your purchases…'));
+    try{ await NP.restorePurchases(); }catch(e){}
+    await subRefresh(); toast(SUB && SUB.active ? tx('Premium restaurado','Premium restored') : tx('No encontramos una suscripción activa en esta cuenta de Google Play','We found no active subscription on this Google Play account'));
+  };
+  A.pfManage = () => { if (NP) NP.manageSubscriptions().catch(() => {}); };
   const cap1 = s => s.charAt(0).toUpperCase() + s.slice(1);
-  const pay = reason => openLayer('premium', {reason});
+  const pay = reason => { openLayer('premium', {reason}); loadProducts(); subRefresh(); };
   window.pfPay = pay;
   A.pfPay = () => pay('notif');
-  A.openPremium = () => openLayer('premium', {});
+  A.openPremium = () => { openLayer('premium', {}); loadProducts(); subRefresh(); };
   const copyText = t => { try{ navigator.clipboard.writeText(t).then(() => toast('Copiado'), () => fallbackCopy(t)); }catch(e){ fallbackCopy(t); } };
   A.pfCopyDev = () => copyText(ACC ? fmtAcc(ACC) : fmtDev(DEV));
-  const mailBody = () => ACC ? `Hola, quiero usar PandarIA Fit Premium.\n\nMi código de cuenta: ${fmtAcc(ACC)}\nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!` : `Hola, quiero usar PandarIA Fit Premium.\n\nMi código de teléfono: ${fmtDev(DEV)}\nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!`;
+  const mailBody = () => ACC ? `Hola, quiero pedir PandarIA Fit Premium.\n\nMi código de cuenta: ${fmtAcc(ACC)}\nMotivo por el que no puedo pagarlo: \nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!` : `Hola, quiero pedir PandarIA Fit Premium.\n\nMi código de teléfono: ${fmtDev(DEV)}\nMotivo por el que no puedo pagarlo: \nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!`;
   A.pfShareDev = () => {
     const text = mailBody();
     if (Share) Share.share({title:'Desbloqueo PandarIA Fit', text, dialogTitle:'Enviar código'}).catch(() => {});
@@ -291,7 +352,7 @@
   const _va = viewAjustes;
   viewAjustes = function(){
     const on = isPremium();
-    const row = `<div class="card row tap" data-a="openPremium" style="cursor:pointer;gap:14px;${on ? '' : 'border-color:rgba(255,122,26,.45);background:var(--acs)'}"><span style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;color:#1a0702;flex:0 0 auto">${I('trophy',22)}</span><div class="grow"><div class="b">PandarIA Fit Premium</div><div class="sm mut">${on ? `Activo · ${fmtExp(PREM.exp)}` : 'Desbloquea PandarIA completo y más'}</div></div>${I('right',18)}</div>`;
+    const row = `<div class="card row tap" data-a="openPremium" style="cursor:pointer;gap:14px;${on ? '' : 'border-color:rgba(255,122,26,.45);background:var(--acs)'}"><span style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;color:#1a0702;flex:0 0 auto">${I('trophy',22)}</span><div class="grow"><div class="b">PandarIA Fit Premium</div><div class="sm mut">${on ? (licOk() ? `Activo · ${fmtExp(PREM.exp)}` : tx('Activo · suscripción de Google Play','Active · Google Play subscription')) : 'Desbloquea PandarIA completo y más'}</div></div>${I('right',18)}</div>`;
     return _va.apply(this, arguments).replace('<div class="sec">Entrenamiento</div>', row + '<div class="sec">Entrenamiento</div>');
   };
 
@@ -302,6 +363,7 @@
     const esperaS = () => new Promise(r => { const t = () => (typeof S !== 'undefined' && S && S.settings) ? r() : setTimeout(t, 40); t(); });
     await esperaS(); try{ ACC = await accountCode(); }catch(e){}
     await loadLicense();
+    subRefresh();
     const go = () => { if (typeof S === 'undefined' || !S) return setTimeout(go, 60); render.keep = true; render(); if (LAYERS.length) refreshTop(); if (typeof scheduleNotifs === 'function') scheduleNotifs(); };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
   })();
