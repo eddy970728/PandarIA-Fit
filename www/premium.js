@@ -263,7 +263,10 @@
     if (locked() && title === 'Nueva rutina') items = items.map(it => /grupo muscular|Confía en PandarIA/.test(it.label || '') ? Object.assign({}, it, {label: it.label + ' 🔒'}) : it);
     return _sheet.call(this, title, items);
   };
-  // PandarIA completo: sin Premium, solo "lo de la última vez" y peso inicial estimado
+  // PandarIA completo: sin Premium, solo "lo de la última vez" (ni pesos estimados ni ajustes: todo lo de PandarIA es Premium)
+  const _ek = estimateKg; estimateKg = function(){ return locked() ? null : _ek.apply(this, arguments); };
+  // Ajustes de PandarIA (descansos, check-in, bloques e informe semanal): Premium
+  const _ts = A.toggleSet; A.toggleSet = k => { if (locked() && typeof PREM_SET !== 'undefined' && PREM_SET.includes(k)) return pay('pandaria'); return _ts(k); };
   const _suggest = suggestSet;
   suggestSet = function(r, it, idx){ if (locked() && r && r.pandaria) r = Object.assign({}, r, {pandaria:false}); return _suggest.call(this, r, it, idx); };
   const _after = afterSession;

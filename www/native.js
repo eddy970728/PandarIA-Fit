@@ -815,9 +815,13 @@
       }
     }catch(e){}
     if (s.hr) try{
-      let r = await HC.readSamples({dataType:'restingHeartRate', startDate: iso(now - 14 * 86400000), endDate: iso(now), limit: 5});
-      let x = (r.samples || []).sort((a, b) => Date.parse(b.startDate) - Date.parse(a.startDate))[0];
-      if (x){ HD.hr = Math.round(x.value); HD.hrKind = 'en reposo'; }
+      let r = await HC.readSamples({dataType:'restingHeartRate', startDate: iso(now - 28 * 86400000), endDate: iso(now), limit: 40});
+      const L = (r.samples || []).filter(y => +y.value > 25 && +y.value < 150).sort((a, b) => Date.parse(b.startDate) - Date.parse(a.startDate));
+      let x = L[0];
+      if (x){ HD.hr = Math.round(x.value); HD.hrKind = 'en reposo';
+        // 1.0.1: PandarIA compara el pulso en reposo de hoy con tu media (señal de cansancio, Premium)
+        const prev = L.slice(1), at = Date.parse(x.startDate);
+        window.PF_RHR = prev.length && now - at < 36 * 3600000 ? {last: Math.round(+x.value), avg: Math.round(prev.reduce((a, y) => a + (+y.value), 0) / prev.length), n: prev.length, at} : null; }
       else { r = await HC.readSamples({dataType:'heartRate', startDate: iso(now - 86400000), endDate: iso(now), limit: 1}); x = (r.samples || [])[0]; if (x){ HD.hr = Math.round(x.value); HD.hrKind = 'última medida'; } }
     }catch(e){}
   }
