@@ -910,12 +910,13 @@ const ACHIEVEMENTS = [
      consejo → cualquier otra fuente: solo tomamos el consejo, con nuestras palabras, y la citamos.
      propio  → criterio de PandarIA, cuando no hay una fuente que dé el número exacto.
    Evidencia: solida · moderada · limitada · contradictoria.  'rev' = revisar antes de esa fecha. */
-const KB_VER='1.3';
+const KB_VER='1.4';
 const KB_LOG=[
   {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'},
   {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'},
   {v:'1.2', d:'2026-11-12', app:'0.8.4', t:'Suplementos (creatina, cafeína, beta-alanina y proteína en polvo) con su dosis, su evidencia y para quién no son; calidad de la dieta (fibra, sodio y proteína por comida); ejemplos de menú; bebidas y cafeína en el agua del día; más agua en los entrenos largos; ayuno conectado con el diario y modo viaje sin equipo.'},
   {v:'1.3', d:'2026-11-12', app:'1.0', t:'Métodos especiales (superseries, series descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y método Bilbo), cada uno con su evidencia y la aclaración de que no está comprobado que sea mejor; codo y cadera como zonas sensibles.'},
+  {v:'1.4', d:'2026-11-13', app:'1.0.1', t:'PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína que queda corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación; el informe semanal suma agua, ayuno y proteína.'},
 ];
 const KB_LIC={pd:'Dominio público, con crédito', consejo:'Consejo de la fuente, con nuestras palabras', propio:'Criterio propio de PandarIA'};
 const KB_EV={solida:'Evidencia sólida', moderada:'Evidencia moderada', limitada:'Evidencia limitada', contradictoria:'Evidencia contradictoria'};
@@ -923,6 +924,8 @@ const KB_AREAS={entreno:'Entrenamiento', recuperacion:'Recuperación', nutricion
 const KB_SRC={
   acsm2009:{n:'Progression models in resistance training for healthy adults (posicionamiento del ACSM)', a:'Ratamess y col.', y:2009, pub:'Med Sci Sports Exerc 41(3):687–708', url:'https://pubmed.ncbi.nlm.nih.gov/19204579/', lic:'consejo'},
   schoenfeld2017:{n:'Dose-response relationship between weekly resistance training volume and increases in muscle mass', a:'Schoenfeld, Ogborn y Krieger', y:2017, pub:'J Sports Sci 35(11):1073–1082', url:'https://pubmed.ncbi.nlm.nih.gov/27433992/', lic:'consejo'},
+  aird2018:{n:'Effects of fasted vs fed-state exercise on performance and post-exercise metabolism: a systematic review and meta-analysis', a:'Aird, Davies y Carson', y:2018, pub:'Scand J Med Sci Sports 28:1476-1493', url:'https://pubmed.ncbi.nlm.nih.gov/29315892/', lic:'consejo'},
+  buchheit2014:{n:'Monitoring training status with HR measures: do all roads lead to Rome?', a:'Buchheit', y:2014, pub:'Front Physiol 5:73', url:'https://pubmed.ncbi.nlm.nih.gov/24578692/', lic:'consejo'},
   issn2017:{n:'ISSN Position Stand: protein and exercise', a:'Jäger y col.', y:2017, pub:'J Int Soc Sports Nutr 14:20', url:'https://pubmed.ncbi.nlm.nih.gov/28642676/', lic:'consejo'},
   morton2018:{n:'Effect of protein supplementation on resistance training-induced gains in muscle mass and strength (metaanálisis)', a:'Morton y col.', y:2018, pub:'Br J Sports Med 52:376–384', url:'https://doi.org/10.1136/bjsports-2017-097608', lic:'consejo'},
   helms2014:{n:'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation', a:'Helms, Aragon y Fitschen', y:2014, pub:'J Int Soc Sports Nutr 11:20', url:'https://doi.org/10.1186/1550-2783-11-20', lic:'consejo'},
@@ -1086,7 +1089,13 @@ const KB_RULES=[
   {id:'lesion.codo', area:'seguridad', n:'Codo sensible', v:{paso:1}, src:['raman2012','pandaria'], lic:'consejo', ev:'limitada', pob:'Personas con molestias en el codo',
     t:'Con dolor de codo se puede seguir entrenando con cargas que no lo empeoren. PandarIA evita los ejercicios que más lo cargan, sube el peso de brazos de a un disco, añade calentamiento y no lleva al fallo. Si el dolor pasa de leve o dura al día siguiente, consulta a un profesional de la salud.', usa:'Lesiones del perfil: codo', rev:'2028-11-12', desde:'1.0'},
   {id:'lesion.cadera', area:'seguridad', n:'Cadera sensible', v:{impacto:false}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Personas con molestias en la cadera',
-    t:'Con molestias en la cadera, PandarIA evita los saltos y los ejercicios con mucha apertura o rotación de cadera. Si el dolor pasa de leve o dura al día siguiente, consulta a un profesional de la salud.', usa:'Lesiones del perfil: cadera', rev:'2028-11-12', desde:'1.0'}
+    t:'Con molestias en la cadera, PandarIA evita los saltos y los ejercicios con mucha apertura o rotación de cadera. Si el dolor pasa de leve o dura al día siguiente, consulta a un profesional de la salud.', usa:'Lesiones del perfil: cadera', rev:'2028-11-12', desde:'1.0'},
+  {id:'conexion.ayuno', area:'recuperacion', n:'Ayuno largo o pocas calorías antes de entrenar', v:{horas:18, kcal:0.6}, src:['aird2018','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
+    t:'Entrenar en ayunas no empeora las sesiones cortas, pero en las largas rinde más quien comió antes. Por eso, si llevas 18 horas o más de ayuno, o ayer comiste menos del 60 % de tu objetivo, «Hoy toca» te propone empezar suave.', usa:'«Hoy toca» y recuperación', rev:'2028-11-01', desde:'1.0.1'},
+  {id:'conexion.proteina', area:'nutricion', n:'Proteína corta varios días', v:{dias:3, min:2, f:0.7, ok:0.9}, src:['issn2017','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos que entrenan',
+    t:'La proteína diaria ayuda a recuperarte y a ganar músculo con el entreno. Si en 2 de tus últimos 3 días con diario quedaste por debajo del 70 % de tu meta, PandarIA te lo avisa junto a tus entrenos. En el informe semanal, un día cuenta como cumplido desde el 90 % de la meta.', usa:'«Hoy toca», resumen del entreno e informe semanal', rev:'2028-11-01', desde:'1.0.1'},
+  {id:'conexion.pulso', area:'recuperacion', n:'Pulso en reposo más alto de lo normal', v:{min:4, lpm:7}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos con Health Connect',
+    t:'Un pulso en reposo claramente más alto que tu media puede ser una señal de cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si el de hoy está 7 latidos o más por encima de tu media (con al menos 4 medidas anteriores), PandarIA lo cuenta como una señal más, igual que el check-in.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.0.1'},
 ];
 const KB={};
 (function(){ const deep=o=>{ if (o && typeof o==='object'){ Object.values(o).forEach(deep); Object.freeze(o); } return o; };
@@ -1102,6 +1111,9 @@ const KB_WHY=[
 const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sueno.adultos'};
 // Textos de las reglas en inglés (pantalla Ciencia en inglés)
 const KB_EN_T={
+ 'conexion.ayuno':'Training fasted does not hurt short sessions, but in long ones people who ate beforehand perform better. So if you have been fasting for 18 hours or more, or ate less than 60 % of your target yesterday, “Up next” suggests starting easy.',
+ 'conexion.proteina':'Daily protein helps you recover and build muscle with training. If on 2 of your last 3 days with a food diary you stayed below 70 % of your goal, PandarIA tells you next to your workouts. In the weekly report, a day counts as met from 90 % of the goal.',
+ 'conexion.pulso':'A resting heart rate clearly above your average can be a sign of fatigue, although it also changes with sleep, stress or illness. If today’s is 7 beats or more above your average (with at least 4 earlier readings), PandarIA counts it as one more signal, just like the check-in.',
  'metodo.avanzados':'Special methods (drop sets, rest-pause, pyramids, German volume training…) do not build more muscle than normal sets with the same effort. They save time or add variety. PandarIA offers them as an option, never as a proven improvement.',
  'metodo.seguridad':'Methods that go close to failure (drop sets, rest-pause and myo-reps) are for intermediate or advanced lifters. PandarIA does not apply them to barbell squats or deadlifts, or to exercises that load a sensitive area.',
  'metodo.superseries':'Two exercises back to back with no rest between them, and the rest after the pair. Same work in less time.',
@@ -1318,7 +1330,7 @@ function estimateKg(exId, reps){
 }
 
 /* ---------- Sugerencia en vivo para cada serie ---------- */
-function deloadActive(){ return S.deload && S.deload.until>Date.now(); }
+function deloadActive(){ return premOK() && !!S.deload && S.deload.until>Date.now(); }
 function phaseAt(ts){ const st=S.periodStart||S.firstSession; if(!st||S.settings.period===false||ts<st) return null; const B=kb('bloque'), w=Math.floor((ts-st)/(7*DAY))%(B.vol+B.int+B.des); return w<B.vol?'volumen':w<B.vol+B.int?'intensidad':'descarga'; }
 function inDeloadWindow(ts){ return !!((S.deload && ts>=S.deload.start && ts<=S.deload.until) || phaseAt(ts)==='descarga'); }
 function suggestSet(routine, item, idx){
@@ -1629,7 +1641,7 @@ function templateItems(tpl, goal){
   const L=userLevel();
   return tpl.ex.filter(id=>EX[id]).map(id=>{
     let use=id;
-    if (!hasEquip(EX[id])||avoided(id)){ const a=alternatives(id)[0]; if (a) use=a; }
+    if (premOK() && (!hasEquip(EX[id])||avoided(id))){ const a=alternatives(id)[0]; if (a) use=a; }
     const it=buildItem(use, goal||tpl.g, L);
     if (tpl.g==='grasa' && getEx(use).mode==='t'){ it.sets.forEach(s=>s.time=30); it.rest=20; }
     return it;
@@ -5380,7 +5392,7 @@ function render(){
   renderNav(); renderMini(); startAnims();
 }
 function renderNav(){
-  const anySugg=S.routines.some(r=>!r.archived && (r.sugg||[]).length);
+  const anySugg=premOK() && S.routines.some(r=>!r.archived && (r.sugg||[]).length);
   const tabs=[['rutinas','Mis rutinas','dumbbell'],['explorar','Explorar','compass'],['nutricion','Nutrición','leaf'],['historial','Mi historial','history'],['ajustes','Ajustes','settings']];
   $('#nav').innerHTML=tabs.map(([k,n,ic])=>`<button class="${TAB===k?'on':''}" data-a="tab" data-v="${k}"><span class="pill">${I(ic,22)}</span>${n}${k==='rutinas'&&anySugg?'<span class="dot"></span>':''}</button>`).join('');
 }
@@ -5461,10 +5473,10 @@ function viewRutinas(){
 }
 function routineCard(r){
   const ex=r.items.filter(i=>!i.warm&&!i.cool).map(i=>getEx(i.exId).n);
-  const ns=(r.sugg||[]).length;
+  const ns=premOK()?(r.sugg||[]).length:0;
   return `<div class="card tap rcard" data-a="openRoutine" data-v="${r.id}">
     <div class="row"><div class="grow"><div class="ttl ell">${esc(r.name)}</div>
-    <div class="row xs mut" style="gap:8px;margin-top:5px;flex-wrap:wrap">${r.pandaria?`<span class="tag ac">${I('spark',12)} PandarIA</span>`:''}<span>${plural(ex.length,'ejercicio','ejercicios')}</span><span>· ~${routineMinutes(r)} min</span><span>· ${ago(r.lastDone)}</span></div></div>
+    <div class="row xs mut" style="gap:8px;margin-top:5px;flex-wrap:wrap">${pIA(r)?`<span class="tag ac">${I('spark',12)} PandarIA</span>`:''}<span>${plural(ex.length,'ejercicio','ejercicios')}</span><span>· ~${routineMinutes(r)} min</span><span>· ${ago(r.lastDone)}</span></div></div>
     ${ns?`<span class="tag ac"><span class="ndot"></span> ${ns}</span>`:''}${I('right',20)}</div>
     <div class="exs">${esc(ex.join(' · '))||'Sin ejercicios'}</div></div>`;
 }
@@ -5477,8 +5489,8 @@ function banners(){
   if (rem.days.includes(today.getDay()) && !S.sessions.some(s=>new Date(s.end).toDateString()===today.toDateString()) && !S.dismissed['rem-'+today.toDateString()])
     h+=`<div class="banner"><span class="ic">${I('bell',22)}</span><div class="grow"><div class="b">Hoy toca entrenar</div><div class="sm mut">Elige una rutina y dale. Unos minutos ya cuentan.</div></div><button class="ibtn" data-a="dismiss" data-v="rem-${today.toDateString()}">${I('x',18)}</button></div>`;
   const ld=lastTrainedDays();
-  if (ld!==null && ld>=14) h+=`<div class="banner blue"><span class="ic">${I('info',22)}</span><div class="grow"><div class="b">¡Qué bueno verte de vuelta!</div><div class="sm mut">Pasaron ${Math.round(ld)} días. PandarIA ajustará los pesos para que retomes sin riesgo.</div></div></div>`;
-  const lag=laggingMuscles(); const lk='lag-'+weekKey(Date.now());
+  if (ld!==null && ld>=14 && premOK()) h+=`<div class="banner blue"><span class="ic">${I('info',22)}</span><div class="grow"><div class="b">¡Qué bueno verte de vuelta!</div><div class="sm mut">Pasaron ${Math.round(ld)} días. PandarIA ajustará los pesos para que retomes sin riesgo.</div></div></div>`;
+  const lag=premOK()?laggingMuscles():[]; const lk='lag-'+weekKey(Date.now());
   if (lag.length && !S.dismissed[lk]) h+=`<div class="banner ok"><span class="ic">${I('target',22)}</span><div class="grow"><div class="b">Músculos pendientes esta semana</div><div class="sm mut">${esc(lag.map(m=>MUSCLES[m]).join(', '))}. Una rutina que los incluya equilibra tu semana.</div>
     <button class="link sm" style="margin-top:8px" data-a="lagRoutine" data-v="${lag.join(',')}">Crear rutina para estos músculos</button></div><button class="ibtn" data-a="dismiss" data-v="${lk}">${I('x',18)}</button></div>`;
   return h;
@@ -5589,14 +5601,14 @@ function exRow(it, act, v, right){
 SCREENS.routine = p => {
   const r=findR(p.id);
   if (!r) return lhdr('Rutina')+'<div class="empty">Esta rutina ya no existe.</div>';
-  const rec=recoveryWarning(r);
+  const rec=premOK()?recoveryWarning(r):[];
   let b=`<div style="margin-bottom:14px"><div style="font-size:24px;font-weight:800;line-height:1.2">${esc(r.name)}</div>
     <div class="row xs" style="gap:6px;margin-top:10px;flex-wrap:wrap">
-      ${r.pandaria?`<span class="tag ac">${I('spark',12)} PandarIA activada</span>`:`<span class="tag">PandarIA desactivada</span>`}
-      ${r.pandaria&&r.goal?`<span class="tag">${esc(GOALS[r.goal]?GOALS[r.goal].n:'')}</span>`:''}
+      ${!premOK()?`<span class="tag" data-a="pfGo" data-v="pandaria" style="cursor:pointer">PandarIA · Premium 🔒</span>`:r.pandaria?`<span class="tag ac">${I('spark',12)} PandarIA activada</span>`:`<span class="tag">PandarIA desactivada</span>`}
+      ${pIA(r)&&r.goal?`<span class="tag">${esc(GOALS[r.goal]?GOALS[r.goal].n:'')}</span>`:''}
       <span class="tag">~${routineMinutes(r)} min</span><span class="tag">${plural(r.completions||0,'vez','veces')}</span>
       ${r.lastDone?`<span class="tag">Última: ${ago(r.lastDone).toLowerCase()}</span>`:''}</div></div>`;
-  (r.sugg||[]).forEach(s=>{
+  (premOK()?(r.sugg||[]):[]).forEach(s=>{
     b+=`<div class="sugg"><div class="row" style="gap:8px;align-items:flex-start"><span style="color:var(--ac)">${I('spark',20)}</span><div class="grow">
       <div class="b">${esc(s.title)}</div><div class="sm" style="margin-top:4px;line-height:1.45">${esc(s.text)}</div>
       ${s.why?`<div class="why">${esc(s.why)}${kbLink(KB_SUGG[s.kind]||kbWhy(s.why),'Por qué')}</div>`:''}
@@ -5618,7 +5630,7 @@ SCREENS.routine = p => {
     `<div class="lbody">${b}</div><div class="lfoot"><button class="btn pri big" data-a="startWorkout" data-v="${r.id}">${I('play',20)} ${S.active&&S.active.routineId===r.id?'Continuar entreno':'Empezar'}</button>
     <button class="btn ghost wide" style="margin-top:6px;height:40px" data-a="editRoutine" data-v="${r.id}">${I('edit',18)} Editar rutina</button></div>`;
 };
-A.applySugg=v=>{ const [rid,sid]=v.split('|'); const r=findR(rid), s=r&&(r.sugg||[]).find(x=>x.id===sid); if(!s) return; applySuggestion(r,s); save(); refreshTop(); toast('Sugerencia aplicada'); checkAch(); };
+A.applySugg=v=>{ if (!premOK()) return window.pfPay&&pfPay('pandaria'); const [rid,sid]=v.split('|'); const r=findR(rid), s=r&&(r.sugg||[]).find(x=>x.id===sid); if(!s) return; applySuggestion(r,s); save(); refreshTop(); toast('Sugerencia aplicada'); checkAch(); };
 A.ignoreSugg=v=>{ const [rid,sid]=v.split('|'); const r=findR(rid); r.sugg=(r.sugg||[]).filter(x=>x.id!==sid); save(); refreshTop(); };
 A.editRoutine=id=>openEditor(clone(findR(id)),false);
 A.routineMenu=id=>{ const r=findR(id); sheet(r.name,[
@@ -5746,11 +5758,11 @@ function edDirty(){ edP().dirty=true; }
 SCREENS.editor = p => {
   const r=p.draft;
   let b=`<div class="field"><label>Nombre de la rutina</label><input class="inp" value="${esc(r.name)}" data-in="edName" maxlength="60"></div>
-  <button class="srow card" style="padding:14px;margin-bottom:12px" data-a="edTogP"><span class="si">${I('spark',20)}</span><span class="grow"><div class="b">PandarIA ${r.pandaria?'activada':'desactivada'}</div><div class="xs mut">${r.pandaria?'Sugiere pesos y repeticiones y propone mejoras con tu progreso.':'No sugerirá cambios; verás lo que hiciste la última vez.'}</div></span><span class="toggle ${r.pandaria?'on':''}"></span></button>`;
+  ${premOK()?`<button class="srow card" style="padding:14px;margin-bottom:12px" data-a="edTogP"><span class="si">${I('spark',20)}</span><span class="grow"><div class="b">PandarIA ${r.pandaria?'activada':'desactivada'}</div><div class="xs mut">${r.pandaria?'Sugiere pesos y repeticiones y propone mejoras con tu progreso.':'No sugerirá cambios; verás lo que hiciste la última vez.'}</div></span><span class="toggle ${r.pandaria?'on':''}"></span></button>`:`<button class="srow card" style="padding:14px;margin-bottom:12px" data-a="pfGo" data-v="pandaria"><span class="si">${I('spark',20)}</span><span class="grow"><div class="b">PandarIA · Premium 🔒</div><div class="xs mut">Con Premium, PandarIA sugiere pesos y repeticiones y ajusta tu rutina con tu progreso. Gratis ves lo que hiciste la última vez.</div></span><span class="toggle"></span></button>`}`;
   const metChips=`<div class="field"><label>Métodos especiales</label><div class="chips"><button class="chip ${!METODOS[r.method]?'on':''}" data-a="edMethod" data-v="none">Ninguno</button>${Object.keys(METODOS).map(k=>`<button class="chip ${r.method===k?'on':''}" data-a="edMethod" data-v="${k}">${esc(metName(k))}</button>`).join('')}</div></div>${metodoCard(r,metodoEstado(p))}`;
-  if (r.pandaria) b+=`<div class="field"><label>Objetivo de la rutina</label><div class="chips">${Object.entries(GOALS).map(([k,g])=>`<button class="chip ${r.goal===k?'on':''}" data-a="edGoal" data-v="${k}">${g.n}</button>`).join('')}</div></div>`;
+  if (pIA(r)) b+=`<div class="field"><label>Objetivo de la rutina</label><div class="chips">${Object.entries(GOALS).map(([k,g])=>`<button class="chip ${r.goal===k?'on':''}" data-a="edGoal" data-v="${k}">${g.n}</button>`).join('')}</div></div>`;
   b+=metChips;
-  b+=`<div class="sec">Ejercicios (${r.items.length})</div>`;
+  b+=`<div class="sec">${tx('Ejercicios','Exercises')} (${r.items.length})</div>`;
   r.items.forEach((it,idx)=>{
     const ex=getEx(it.exId), sup=!!it.superset;
     const supNext = sup && r.items[idx+1] && r.items[idx+1].superset===it.superset;
@@ -5774,7 +5786,7 @@ function confirmDiscardEditor(){ confirmBox({title:'¿Salir sin guardar?',text:'
 const edItem = u => edP().draft.items.find(x=>x.uid===u);
 IN.edName=el=>{ edP().draft.name=el.value; edDirty(); };
 IN.edSet=el=>{ const it=edItem(el.dataset.u); const s=it.sets[+el.dataset.i]; const f=el.dataset.f; s[f]= f==='kg'?fromUnit(el.value): (el.value===''?null:+el.value); edDirty(); };
-A.edTogP=()=>{ const d=edP().draft; d.pandaria=!d.pandaria; edDirty(); refreshTop(); };
+A.edTogP=()=>{ if (!premOK()) return window.pfPay&&pfPay('pandaria'); const d=edP().draft; d.pandaria=!d.pandaria; edDirty(); refreshTop(); };
 A.edGoal=v=>{ edP().draft.goal=v; edDirty(); refreshTop(); };
 A.edSetType=v=>{ const [u,i]=v.split('|'); const it=edItem(u), s=it.sets[+i];
   sheet('Tipo de serie',[['n','Normal'],['c','Calentamiento'],['f','Al fallo'],['d','Drop set']].map(([t,l])=>({icon:'list',label:l+(s.t===t?'  ✓':''),fn:()=>{s.t=t; edDirty(); refreshTop();}})).concat([{icon:'trash',label:'Eliminar serie',danger:true,fn:()=>{it.sets.splice(+i,1);edDirty();refreshTop();}}])); };
@@ -5840,7 +5852,7 @@ function pkList(p){
     return true;
   }).sort((a,b)=>a.n.localeCompare(b.n,'es'));
   let h='';
-  if (p.mode==='replace' && !q && !p.m){
+  if (p.mode==='replace' && !q && !p.m && premOK()){
     const alts=alternatives(p.from).slice(0,6);
     if (alts.length){ h+=`<div class="sec">Recomendados por PandarIA</div>`; alts.forEach(id=>h+=pkRow(getEx(id),p)); h+=`<div class="sec">Todos</div>`; }
   }
@@ -5962,7 +5974,7 @@ A.animFbSend=()=>{ const R=S.animRev||{}; const ids=Object.keys(R).filter(k=>EX[
   const lines=REV_GROUPS.map(([g,n])=>{ const mine=ids.filter(k=>revGroup(EX[k])===g); if(!mine.length) return ''; return `== ${n} ==\n`+mine.map(k=>`${R[k].v==='ok'?'OK':'MAL'} ${k} (${EX[k].n})${R[k].n?' - '+R[k].n:''}`).join('\n'); }).filter(Boolean);
   const body=`Revisión de animaciones · versión ${APP_VERSION}\n${ids.filter(k=>R[k].v==='ok').length} correctas, ${ids.filter(k=>R[k].v==='bad').length} incorrectas\n\n${lines.join('\n\n')||'Sin votos todavía'}`;
   openModal(`<div class="modal"><h3>Tus votos de animaciones</h3><p class="sm mut" style="line-height:1.45">Envía esta lista al creador (o cópiala y pégala en el chat) para aprobar las correctas y arreglar las demás.</p><textarea class="inp" id="fbt" rows="7" style="width:100%;font-size:13px">${esc(body)}</textarea>
-    <p class="xs mut">Correo: eddy970728@gmail.com</p><div class="row" style="gap:8px;margin-top:10px"><button class="btn grow" data-a="closeModal">Cerrar</button><button class="btn grow" data-a="fbCopy">Copiar</button><a class="btn pri grow" style="text-align:center;text-decoration:none" href="mailto:eddy970728@gmail.com?subject=${encodeURIComponent('PandarIA Fit · animaciones')}&body=${encodeURIComponent(body)}">Enviar</a></div></div>`,{center:true}); };
+    <p class="xs mut">Correo: lunadoggybrustudios@gmail.com</p><div class="row" style="gap:8px;margin-top:10px"><button class="btn grow" data-a="closeModal">Cerrar</button><button class="btn grow" data-a="fbCopy">Copiar</button><a class="btn pri grow" style="text-align:center;text-decoration:none" href="mailto:lunadoggybrustudios@gmail.com?subject=${encodeURIComponent('PandarIA Fit · animaciones')}&body=${encodeURIComponent(body)}">Enviar</a></div></div>`,{center:true}); };
 A.fbCopy=()=>{ const t=$('#fbt').value; try{ navigator.clipboard.writeText(t).then(()=>toast('Copiado'),()=>fallbackCopy(t)); }catch(e){ fallbackCopy(t); } };
 SCREENS.exercise = p => {
   const ex=getEx(p.id), P=PATTERNS[ex.pat]||PATTERNS.core;
@@ -6131,7 +6143,12 @@ function releaseAwake(){ try{ wakeLock&&wakeLock.release(); }catch(e){} wakeLock
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && S && S.active) keepAwake(); });
 
 // PandarIA ajusta los descansos de cada serie (Premium, con PandarIA activada en la rutina)
-function restSmart(r){ return !!(r && r.pandaria && S.settings.restSmart!==false && (typeof isPremium!=='function' || isPremium())); }
+// Todo lo de PandarIA (sugerencias, ajustes, estimaciones y algoritmos) es Premium. Sin Premium la rutina guarda su
+// interruptor de PandarIA, pero no hace nada hasta que llega Premium (entonces se activa sola).
+function premOK(){ return typeof isPremium!=='function' || isPremium(); }
+function pIA(r){ return !!(r && r.pandaria) && premOK(); }
+const PREM_SET=['restSmart','checkin','period','report'];
+function restSmart(r){ return pIA(r) && S.settings.restSmart!==false; }
 function activeItemFrom(tplItem, r){
   const it=clone(tplItem);
   it.sets=tplItem.sets.map((s,i)=>{
@@ -6152,9 +6169,9 @@ A.startWorkout=rid=>{
     const vj=viajeActivo(r), vUsed=[], vEq=vj?VIAJE_EQ[vj.eq]||VIAJE_EQ.pc:null;
     S.active={routineId:r.id, name:r.name, start:Date.now(), items:r.items.map(it=>activeItemFrom(vj?travelItem(it,vEq,vUsed):it,r)), rest:null, rec:snap, intensity:6};
     if (vj){ S.active.viaje={eq:vj.eq, n:S.active.items.filter(x=>x.viajeDe).length}; WK_VIAJE=null; }
-    const aj=wkAjuste(r); if (aj && r.pandaria) S.active.ajuste={f:aj.f,why:aj.why}; WK_AJUSTE=null;
+    const aj=wkAjuste(r); if (aj && pIA(r)) S.active.ajuste={f:aj.f,why:aj.why}; WK_AJUSTE=null;
     save(true); openLayer('workout'); keepAwake();
-    const ld=lastTrainedDays(); if (ld!==null && ld>=14 && r.pandaria) toast(`Volviste tras ${Math.round(ld)} días: PandarIA ajustó los pesos`);
+    const ld=lastTrainedDays(); if (ld!==null && ld>=14 && pIA(r)) toast(`Volviste tras ${Math.round(ld)} días: PandarIA ajustó los pesos`);
     speak(`Empezamos ${r.name}. Primer ejercicio: ${getEx(r.items[0].exId).n}`);
   };
   if (S.active){
@@ -6195,7 +6212,7 @@ SCREENS.workout = () => {
   const a=S.active;
   if (!a) return lhdr('Entreno')+'<div class="empty">No hay entreno en curso.</div>';
   const r=findR(a.routineId);
-  let b=`<div style="padding:4px 0 10px"><div style="font-size:22px;font-weight:800">${esc(a.name)}</div><div class="xs mut" style="margin-top:4px">${fmtDateL(a.start)}${r&&r.pandaria?` · <span style="color:var(--ac)">PandarIA sugiere en gris</span>`:''}</div></div>`;
+  let b=`<div style="padding:4px 0 10px"><div style="font-size:22px;font-weight:800">${esc(a.name)}</div><div class="xs mut" style="margin-top:4px">${fmtDateL(a.start)}${pIA(r)?` · <span style="color:var(--ac)">PandarIA sugiere en gris</span>`:''}</div></div>`;
   if (deloadActive()) b+=`<div class="banner blue"><span class="ic">${I('refresh',20)}</span><div class="grow sm">Semana de descarga: pesos un 15 % más livianos y concéntrate en la técnica.</div></div>`;
   b+=metodoBanner(r);
   if (a.rest && !a.rest.uid) b+=restBarHtml();
@@ -6469,7 +6486,7 @@ A.wkFinish=()=>{
       <div class="int-val" id="intv">${INT_EMO[iv]} ${iv}/10 · ${INT_LBL[iv]}</div>
       <input type="range" min="1" max="10" step="1" value="${iv}" data-in="finInt">
       <div class="int-lbl"><span>Muy fácil</span><span>Al límite</span></div>
-      <div class="xs mut" style="text-align:center;margin-top:8px">PandarIA usa esta barra para ajustar tu progreso.</div></div>
+      ${premOK()?'<div class="xs mut" style="text-align:center;margin-top:8px">PandarIA usa esta barra para ajustar tu progreso.</div>':''}</div>
     <button class="opt" data-a="finDo" data-v="update"><span class="oi">${I('refresh',24)}</span><span class="grow"><div class="b">Actualizar rutina</div><div class="od">Guarda en la rutina los pesos, series y ejercicios que cambiaste hoy.</div></span></button>
     <button class="opt" data-a="finDo" data-v="keep"><span class="oi">${I('check',24)}</span><span class="grow"><div class="b">Dejarla como antes</div><div class="od">La rutina no cambia.</div></span></button>
     <div class="xs mut" style="padding:0 12px 6px">Con ambas opciones el entrenamiento se guarda en tu historial.</div>
@@ -6511,14 +6528,14 @@ SCREENS.summary = p => {
   <div class="stats"><div class="stat"><div class="v">${fmtDur(s.end-s.start)}</div><div class="l">Duración</div></div><div class="stat"><div class="v">${fmtNum(toUnit(s.vol))}</div><div class="l">Volumen (${S.settings.unit})</div></div></div>
   <div class="stats"><div class="stat"><div class="v">${sets}</div><div class="l">Series</div></div><div class="stat"><div class="v">${s.prs.length}</div><div class="l">Récords</div></div><div class="stat"><div class="v">${INT_EMO[s.intensity]} ${s.intensity}</div><div class="l">${INT_LBL[s.intensity]}</div></div></div>`;
   if (s.prs.length) b+=`<div class="sec">Récords personales</div><div class="card" style="padding:4px 14px">${s.prs.map(x=>{const e=getEx(x.exId);return `<div class="kv"><span>★ ${esc(e.n)}</span><b>${e.mode==='p'?fmtKg(x.kg)+' × '+x.reps:e.mode==='t'?fmtTime(x.time):x.reps+' reps'}</b></div>`;}).join('')}</div>`;
-  b+=`<div class="sec">PandarIA</div><div class="card">`;
   const lines=[];
   if (prevS && prevS.vol && s.vol){ const d=(s.vol-prevS.vol)/prevS.vol*100; lines.push(d>=0?`Moviste un ${Math.round(d)} % más de volumen que la última vez.`:`Volumen ${Math.round(-d)} % menor que la última vez: está bien alternar días más suaves.`); }
   if (s.intensity>=9) lines.push('Sesión muy exigente. Duerme bien y come proteína: la recuperación es donde creces.');
   else if (s.intensity<=4) lines.push('Te resultó fácil: en las próximas sesiones PandarIA subirá la exigencia.');
   (p.created||[]).forEach(c=>lines.push(`Nueva sugerencia: <b>${esc(c.title)}</b>. La verás al abrir la rutina.`));
+  { const pc=protCorta(); if (pc) lines.push(esc(protCortaTxt(pc))); }
   if (!lines.length) lines.push('Sigue así. Cada entreno registrado ayuda a PandarIA a afinar tus sugerencias.');
-  b+=lines.map(l=>`<div class="row" style="align-items:flex-start;padding:5px 0"><span style="color:var(--ac)">${I('spark',16)}</span><span class="sm" style="line-height:1.45">${l}</span></div>`).join('')+'</div>';
+  if (premOK()) b+=`<div class="sec">PandarIA</div><div class="card">`+lines.map(l=>`<div class="row" style="align-items:flex-start;padding:5px 0"><span style="color:var(--ac)">${I('spark',16)}</span><span class="sm" style="line-height:1.45">${l}</span></div>`).join('')+'</div>';
   if ((p.ach||[]).length) b+=`<div class="sec">Logros desbloqueados</div><div class="ach">${p.ach.map(id=>{const a=ACHIEVEMENTS.find(x=>x.id===id);return `<div class="a on"><div class="e">${a.ic}</div><div class="n">${esc(a.n)}</div></div>`;}).join('')}</div>`;
   return `<div class="lhdr"><span style="width:12px"></span><h2>Resumen</h2></div><div class="lbody">${b}</div><div class="lfoot"><div class="row" style="gap:8px"><button class="btn" style="height:58px" data-a="shareSession" data-v="${s.id}">${I('upload',20)}</button><button class="btn pri big grow" data-a="back">Listo</button></div></div>`;
 };
@@ -6957,7 +6974,7 @@ SCREENS.tpl = p => {
   const lv={}; p.items.forEach(it=>getEx(it.exId).prim.forEach(m=>lv[m]=1));
   let b=`<div class="xhero" style="background:linear-gradient(140deg,${g[0]},${g[1]});color:#fff"><div class="xs" style="opacity:.85;text-transform:uppercase;letter-spacing:1px;font-weight:700">${esc(sec.n)}</div><h2 style="font-size:24px;margin:6px 0 10px">${esc(t.n)}</h2>
     <div class="row xs" style="gap:12px"><span class="onclr">${diffBars(t.l)}</span><span>${['','Fácil','Media','Difícil'][t.l]}</span><span>· ${GOALS[t.g].n}</span><span>· ~${routineMinutes({items:p.items})} min</span></div></div>
-    <div class="row xs" style="gap:8px;margin:12px 0"><span class="tag ac">${I('spark',12)} PandarIA activada</span><span class="tag">Adaptada a tu nivel: ${LEVEL_NAMES[userLevel()]}</span></div>`;
+    <div class="row xs" style="gap:8px;margin:12px 0">${premOK()?`<span class="tag ac">${I('spark',12)} PandarIA activada</span><span class="tag">Adaptada a tu nivel: ${LEVEL_NAMES[userLevel()]}</span>`:`<span class="tag" data-a="pfGo" data-v="pandaria" style="cursor:pointer">PandarIA · Premium 🔒</span>`}</div>`;
   if (subs) b+=`<div class="banner blue"><span class="ic">${I('swap',20)}</span><div class="grow sm">Cambié ${plural(subs,'ejercicio','ejercicios')} por alternativas que puedes hacer con tu equipo o preferencias.</div></div>`;
   b+=`<div class="card">${bodyMap(lv,{w:260})}</div><div class="sec">Ejercicios</div><div class="card" style="padding:4px 14px">${p.items.map((it,k)=>`<div style="${k?'border-top:1px solid var(--line)':''}">${exRow(it,'openEx',it.exId,I('right',18))}</div>`).join('')}</div>`;
   return lhdr(t.n)+`<div class="lbody">${b}</div><div class="lfoot"><button class="btn pri big" data-a="tplAdd">${I('plus',20)} Añadir a mis rutinas</button></div>`;
@@ -7082,7 +7099,7 @@ function nextInPlan(){
   const last=[...S.sessions].reverse().find(s=>rs.some(r=>r.id===s.routineId));
   let i=0; if (last){ i=(rs.findIndex(r=>r.id===last.routineId)+1)%rs.length; }
   const cand=rs[i];
-  if (recoveryWarning(cand).length){
+  if (premOK() && recoveryWarning(cand).length){
     for (let k=1;k<rs.length;k++){ const alt=rs[(i+k)%rs.length]; if (!recoveryWarning(alt).length) return {r:alt,swapped:cand}; }
   }
   return {r:cand};
@@ -7090,7 +7107,7 @@ function nextInPlan(){
 function hoyCard(){
   if (!S.plan || !planRoutines().length){
     if (S.routines.filter(r=>!r.archived).length<2) return '';
-    return `<div class="card row" data-a="openPlan" style="cursor:pointer"><span style="color:var(--ac)">${I('calendar',24)}</span><div class="grow"><div class="b">Arma tu plan semanal</div><div class="sm mut">PandarIA te dirá cada día qué rutina toca.</div></div>${I('right',18)}</div>`;
+    return `<div class="card row" data-a="openPlan" style="cursor:pointer"><span style="color:var(--ac)">${I('calendar',24)}</span><div class="grow"><div class="b">Arma tu plan semanal</div><div class="sm mut">${premOK()?'PandarIA te dirá cada día qué rutina toca.':'Elige tus días y el orden de tus rutinas.'}</div></div>${I('right',18)}</div>`;
   }
   const today=new Date(); const dow=today.getDay();
   const wk=weekKey(Date.now()); const doneDays=new Set(S.sessions.filter(s=>weekKey(s.end)===wk).map(s=>new Date(s.end).getDay()));
@@ -7101,11 +7118,12 @@ function hoyCard(){
   let body;
   if (trainedToday) body=`<div class="b" style="font-size:18px">¡Hoy ya entrenaste!</div><div class="sm mut" style="margin-top:4px">Próxima: ${esc(nx.r.name)}. Descansa, hidrátate y come proteína.</div>`;
   else if (S.plan.days.includes(dow)) body=`<div class="xs mut b" style="letter-spacing:1px">HOY TOCA</div><div class="b" style="font-size:20px;margin-top:2px">${esc(nx.r.name)}</div>
-    <div class="sm mut" style="margin-top:4px">~${routineMinutes(nx.r)} min · ${plural(nx.r.items.filter(i=>!i.warm&&!i.cool).length,'ejercicio','ejercicios')}${ph?` · Bloque ${ph.n.toLowerCase()} (${ph.d})`:''}</div>
+    <div class="sm mut" style="margin-top:4px">~${routineMinutes(nx.r)} min · ${plural(nx.r.items.filter(i=>!i.warm&&!i.cool).length,'ejercicio','ejercicios')}${ph?` · ${tx(`Bloque ${ph.n.toLowerCase()} (${ph.d})`,`${{Volumen:'Volume',Intensidad:'Intensity',Descarga:'Deload'}[ph.n]||ph.n} block (${ph.d.replace(/semanas?/,x=>x==='semana'?'week':'weeks').replace(' de ',' of ')})`)}`:''}</div>
     ${nx.swapped?`<div class="xs" style="color:var(--blue);margin-top:6px">PandarIA adelantó esta rutina: los músculos de ${esc(nx.swapped.name)} aún se recuperan.</div>`:''}
-    ${(rs=>rs.lvl==='buena'?'':`<div class="xs" style="color:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'};margin-top:6px;line-height:1.4">Recuperación ${rs.lvl}: ${esc(rs.msgs.join(' · '))}${kbLink('recuperacion.ajuste','Por qué')}</div>`)(recoveryState(nx.r))}
-    <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${nx.r.pandaria&&recoveryState(nx.r).lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">Suave</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
-    <button class="link xs" style="margin-top:8px" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}</button>`;
+    ${(x=>x?`<div class="xs" style="color:var(--gold);margin-top:6px;line-height:1.4">🥩 ${esc(protCortaTxt(x))}${kbLink('conexion.proteina',tx('Por qué','Why'))}</div>`:'')(protCorta())}
+    ${(rs=>rs.lvl==='buena'||!premOK()?'':`<div class="xs" style="color:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'};margin-top:6px;line-height:1.4">${tx('Recuperación '+rs.lvl,(rs.lvl==='baja'?'Low':'Medium')+' recovery')}: ${esc(rs.msgs.join(' · '))}${kbLink('recuperacion.ajuste',tx('Por qué','Why'))}</div>`)(recoveryState(nx.r))}
+    <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${pIA(nx.r)&&recoveryState(nx.r).lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">${tx('Suave','Easy')}</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
+    <button class="link xs" style="margin-top:8px" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}${premOK()?'':' 🔒'}</button>`;
   else { let k=1; while(k<8 && !S.plan.days.includes((dow+k)%7)) k++;
     body=`<div class="xs mut b" style="letter-spacing:1px">HOY</div><div class="b" style="font-size:20px;margin-top:2px">Día de descanso</div><div class="sm mut" style="margin-top:4px">Próximo entreno: ${k===1?'mañana':DAYS_LONG[(dow+k)%7]} · ${esc(nx.r.name)}</div>
     <button class="link sm" style="margin-top:10px" data-a="hoyChange">Entrenar igual hoy</button>`; }
@@ -7113,30 +7131,32 @@ function hoyCard(){
 }
 function recoveryState(r){
   const KR=kb('recuperacion.ajuste'), msgs=[]; let pts=0;
-  const fat=r?recoveryWarning(r):[]; if (fat.length){ pts++; msgs.push(`${fat.map(m=>MUSCLES[m]?MUSCLES[m].toLowerCase():m).slice(0,3).join(', ')} trabajados hace menos de 48 h`); }
+  const fat=r?recoveryWarning(r):[]; if (fat.length){ pts++; const mn=fat.map(m=>MUSCLES[m]?((EN_LANG()&&EN_MAP.get(MUSCLES[m]))||MUSCLES[m]).toLowerCase():m).slice(0,3).join(', '); msgs.push(tx(`${mn} trabajados hace menos de 48 h`,`${mn} trained less than 48 h ago`)); }
   const last=S.sessions[S.sessions.length-1];
-  if (last && Date.now()-last.end<KR.horas*3600000 && (last.intensity||0)>=KR.intensa){ pts++; msgs.push('tu última sesión fue muy exigente'); }
-  const ck=S.sessions.slice(-3).filter(s=>s.checkin); if (ck.length>=2 && ck.filter(s=>s.checkin.sleep===0||s.checkin.energy===0).length>=2){ pts+=2; msgs.push('varios días con poco descanso'); }
+  if (last && Date.now()-last.end<KR.horas*3600000 && (last.intensity||0)>=KR.intensa){ pts++; msgs.push(tx('tu última sesión fue muy exigente','your last session was very hard')); }
+  const ck=S.sessions.slice(-3).filter(s=>s.checkin); if (ck.length>=2 && ck.filter(s=>s.checkin.sleep===0||s.checkin.energy===0).length>=2){ pts+=2; msgs.push(tx('varios días con poco descanso','several days with little rest')); }
+  const ay=ayunoCarga(); if (ay){ pts++; msgs.push(ay); }
+  const pu=pulsoAlto(); if (pu){ pts++; msgs.push(tx(`pulso en reposo de ${pu.last} lpm, ${pu.last-pu.avg} sobre tu media`,`resting heart rate ${pu.last} bpm, ${pu.last-pu.avg} above your average`)); }
   return {lvl:pts>=2?'baja':pts===1?'media':'buena', msgs};
 }
 A.startSoft=rid=>{ const KR=kb('recuperacion.ajuste'); WK_AJUSTE={f:KR.f, why:`Sesión suave: ${Math.round((1-KR.f)*100)} % menos de carga`, rid, t:Date.now()}; A.startWorkout(rid); };
-A.hoyChange=()=>sheet('¿Qué quieres entrenar hoy?',S.routines.filter(r=>!r.archived).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startWorkout(r.id)})).concat([{icon:'swap',label:tx('✈️ Modo viaje: una rutina sin equipo','✈️ Travel mode: a routine without equipment'),fn:()=>setTimeout(()=>sheet(tx('¿Qué rutina hacemos sin equipo?','Which routine without equipment?'),S.routines.filter(r=>!r.archived&&r.items.length).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startTravel(r.id)}))),250)}]));
+A.hoyChange=()=>sheet('¿Qué quieres entrenar hoy?',S.routines.filter(r=>!r.archived).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startWorkout(r.id)})).concat([{icon:'swap',label:tx('✈️ Modo viaje: una rutina sin equipo','✈️ Travel mode: a routine without equipment')+(premOK()?'':' 🔒'),fn:()=>setTimeout(()=>sheet(tx('¿Qué rutina hacemos sin equipo?','Which routine without equipment?'),S.routines.filter(r=>!r.archived&&r.items.length).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startTravel(r.id)}))),250)}]));
 A.openPlan=()=>{ const ids=S.routines.filter(r=>!r.archived).map(r=>r.id); const pl=S.plan?clone(S.plan):{days:defaultDays(Math.min(ids.length,3)),order:ids.slice(0,6)}; openLayer('plan',{pl}); };
 SCREENS.plan = p => {
   const pl=p.pl; const all=S.routines.filter(r=>!r.archived);
   const inPlan=pl.order.filter(id=>all.some(r=>r.id===id)); const out=all.filter(r=>!inPlan.includes(r.id));
-  return lhdr('Plan semanal')+`<div class="lbody"><p class="mut sm" style="margin-top:0;line-height:1.45">Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno, PandarIA te propone la siguiente y la cambia si los músculos aún no se recuperaron (48 horas).</p>
+  return lhdr('Plan semanal')+`<div class="lbody"><p class="mut sm" style="margin-top:0;line-height:1.45">${premOK()?'Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno, PandarIA te propone la siguiente y la cambia si los músculos aún no se recuperaron (48 horas).':'Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno verás cuál toca. Con Premium, PandarIA la cambia si los músculos aún no se recuperaron.'}</p>
   <div class="sec">Días de entreno</div><div class="chips">${[1,2,3,4,5,6,0].map(d=>`<button class="chip ${pl.days.includes(d)?'on':''}" style="width:42px;justify-content:center;padding:0" data-a="plDay" data-v="${d}">${DAYS_SHORT[d]}</button>`).join('')}</div>
   <div class="sec">Orden de las rutinas</div>${inPlan.length?`<div class="card" style="padding:4px 12px">${inPlan.map((id,i)=>{const r=findR(id);return `<div class="row" style="padding:8px 0;${i?'border-top:1px solid var(--line)':''}"><span class="tag ac">${i+1}</span><div class="grow b ell">${esc(r.name)}</div><button class="ibtn" data-a="plMove" data-v="${id}|-1">${I('up',18)}</button><button class="ibtn" data-a="plMove" data-v="${id}|1">${I('down',18)}</button><button class="ibtn" data-a="plTog" data-v="${id}">${I('x',18)}</button></div>`;}).join('')}</div>`:'<div class="card mut sm">Añade rutinas al plan.</div>'}
   ${out.length?`<div class="sec">Fuera del plan</div><div class="card" style="padding:4px 12px">${out.map((r,i)=>`<div class="row" style="padding:8px 0;${i?'border-top:1px solid var(--line)':''}"><div class="grow ell">${esc(r.name)}</div><button class="btn sm" data-a="plTog" data-v="${r.id}">${I('plus',16)} Añadir</button></div>`).join('')}</div>`:''}
-  <button class="btn wide" style="margin-top:14px" data-a="plAuto">${I('spark',18)} Que PandarIA lo proponga</button>
+  <button class="btn wide" style="margin-top:14px" data-a="plAuto">${I('spark',18)} Que PandarIA lo proponga${premOK()?'':' <span>🔒</span>'}</button>
   ${S.plan?`<button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="plDel">Quitar plan semanal</button>`:''}</div>
   <div class="lfoot"><button class="btn pri big" data-a="plSave">Guardar plan</button></div>`;
 };
 A.plDay=d=>{ const pl=pkP().pl; d=+d; const i=pl.days.indexOf(d); if(i>=0) pl.days.splice(i,1); else pl.days.push(d); refreshTop(); };
 A.plTog=id=>{ const pl=pkP().pl; const i=pl.order.indexOf(id); if(i>=0) pl.order.splice(i,1); else pl.order.push(id); refreshTop(); };
 A.plMove=v=>{ const [id,d]=v.split('|'); const o=pkP().pl.order; const i=o.indexOf(id), j=i+(+d); if(j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; refreshTop(); };
-A.plAuto=()=>{ const pl=pkP().pl; const rs=S.routines.filter(r=>!r.archived); const prog=rs.filter(r=>r.programId); const use=(prog.length?prog:rs).slice(0,6);
+A.plAuto=()=>{ if (!premOK()) return window.pfPay&&pfPay('pandaria'); const pl=pkP().pl; const rs=S.routines.filter(r=>!r.archived); const prog=rs.filter(r=>r.programId); const use=(prog.length?prog:rs).slice(0,6);
   pl.order=use.map(r=>r.id); pl.days=defaultDays(use.length); refreshTop(); toast('Plan propuesto por PandarIA'); };
 A.plDel=()=>{ S.plan=null; save(); closeLayer(); toast('Plan semanal quitado'); };
 A.plSave=()=>{ const pl=pkP().pl; if(!pl.days.length||!pl.order.length){ toast('Elige al menos un día y una rutina'); return; } S.plan=pl; save(); closeLayer(); toast('Plan semanal guardado'); };
@@ -7221,6 +7241,39 @@ function balanceReport(days){
   return {c,msgs:out};
 }
 
+/* ---------- 1.0.1 · PandarIA conecta comida, ayuno, pulso y entreno (Premium) ---------- */
+// Días con diario: al menos 2 comidas anotadas
+function diaDiario(k){ return dayItems(k).length>=2; }
+function protCorta(){
+  if (!premOK() || habitos()) return null; const c=calcNutrition(); if (!c) return null; const K=kb('conexion.proteina');
+  const ds=[]; for (let i=1;i<=14 && ds.length<K.dias;i++){ const k=dayKey(Date.now()-i*DAY); if (diaDiario(k)) ds.push(dayTotals(k).p); }
+  if (ds.length<K.min) return null; const low=ds.filter(p=>p<c.prot*K.f).length;
+  return low>=K.min?{low, n:ds.length, meta:c.prot, media:Math.round(ds.reduce((a,p)=>a+p,0)/ds.length)}:null;
+}
+function protCortaTxt(x){ return tx(`Tu proteína quedó corta en ${x.low} de tus últimos ${x.n} días con diario (media ${x.media} g de ${x.meta} g). Te ayuda a recuperarte de los entrenos.`,`Your protein fell short on ${x.low} of your last ${x.n} days with a food diary (average ${x.media} g of ${x.meta} g). It helps you recover from your workouts.`); }
+function ayunoCarga(){
+  if (!premOK()) return null; const K=kb('conexion.ayuno'), f=nut().fast.active;
+  const h=f?(Date.now()-f.start)/3600000:0;
+  if (h>=K.horas) return tx(`llevas ${Math.floor(h)} h de ayuno`,`you have been fasting for ${Math.floor(h)} h`);
+  if (habitos()) return null; const c=calcNutrition(), k=dayKey(Date.now()-DAY);
+  if (c && diaDiario(k) && dayTotals(k).k<c.kcal*K.kcal) return tx('ayer comiste bastante menos que tu objetivo','yesterday you ate well below your target');
+  return null;
+}
+function pulsoAlto(){
+  if (!premOK()) return null; const R0=window.PF_RHR, K=kb('conexion.pulso');
+  if (!R0 || !(R0.n>=K.min) || !R0.avg || !R0.last || Date.now()-(R0.at||0)>36*3600000) return null;
+  return R0.last-R0.avg>=K.lpm?R0:null;
+}
+// Agua, ayuno y proteína de la semana para el informe
+function semanaNutri(wk){
+  const hoy=dayKey(), dias=[]; for (let i=0;i<7;i++){ const k=dayKey(wk+i*DAY+12*3600000); dias.push(k); if (k===hoy) break; }
+  const meta=waterGoal(); const agua=dias.filter(k=>waterToday(k)>=meta).length;
+  const ay=(nut().fast.history||[]).filter(x=>x.ok&&weekKey(x.end)===wk).length;
+  const c=habitos()?null:calcNutrition(), K=kb('conexion.proteina');
+  const conD=c?dias.filter(diaDiario):[]; const prot=c?conD.filter(k=>dayTotals(k).p>=c.prot*K.ok).length:0;
+  return {dias:dias.length, agua, ay, prot, conD:conD.length, c};
+}
+
 /* ---------- Informe semanal ---------- */
 function weekReport(wk){
   const ss=S.sessions.filter(s=>weekKey(s.end)===wk);
@@ -7249,6 +7302,7 @@ function histInformes(){
     <div class="stats" style="margin:12px 0 8px"><div class="stat"><div class="v">${r.n}</div><div class="l">Entrenos</div></div><div class="stat"><div class="v">${r.mins}</div><div class="l">Minutos</div></div><div class="stat"><div class="v">${fmtNum(Math.round(toUnit(r.vol)))}</div><div class="l">Volumen${r.pvol?` <span style="color:${r.vol>=r.pvol?'var(--ok)':'var(--bad)'}">${r.vol>=r.pvol?'▲':'▼'}${Math.abs(Math.round((r.vol-r.pvol)/r.pvol*100))}%</span>`:''}</div></div></div>
     ${(O=>`<div class="mac" style="margin:4px 0 10px"><div class="mbar"><div style="width:${Math.min(100,Math.round(r.mins/O.moderada[0]*100))}%;background:${r.mins>=O.moderada[0]?'var(--ok)':'var(--blue)'}"></div></div><div class="row xs"><span class="grow">Actividad: ${r.mins} de ${O.moderada[0]} min recomendados por la OMS${kbLink('actividad.oms','Fuente')}</span><span>${r.mins>=O.moderada[0]?'✓':''}</span></div></div>`)(kb('actividad.oms'))}
     ${r.top.length?`<div class="xs mut">Más trabajados: ${r.top.map(([m,n])=>`${MUSCLES[m]} (${fmtNum(n)})`).join(', ')}</div>`:''}
+    ${(n=>`<div class="xs mut" style="margin-top:6px;line-height:1.5">💧 ${tx(`Agua: meta cumplida ${n.agua} de ${n.dias} días`,`Water: goal met ${n.agua} of ${n.dias} days`)} · ⏱️ ${tx(`Ayunos completados: ${n.ay}`,`Fasts completed: ${n.ay}`)}${n.c?` · 🥩 ${n.conD?tx(`Proteína: ${n.prot} de ${n.conD} días con diario en tu meta`,`Protein: ${n.prot} of ${n.conD} days with a food diary on target`):tx('Proteína: sin días con diario','Protein: no days with a food diary')}`:''}</div>${n.c&&n.conD>=3&&n.prot*2<n.conD?`<div class="sm" style="margin-top:8px;line-height:1.4;color:var(--gold)">🥩 ${tx('Más de la mitad de tus días con diario te faltó proteína: suma una fuente de proteína en cada comida.','On more than half of your days with a food diary you were short on protein: add a protein source to every meal.')}${kbLink('conexion.proteina',tx('Por qué','Why'))}</div>`:''}`)(semanaNutri(wk))}
     ${bal.map(m=>`<div class="sm" style="margin-top:8px;line-height:1.4;color:var(--blue)">⚖️ ${esc(m)}</div>`).join('')}
     <div class="sm" style="margin-top:10px;line-height:1.45"><span style="color:var(--ac)">${I('spark',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')}</span> ${esc(r.main)}</div></div>`;
   }
@@ -8821,7 +8875,7 @@ function travelItem(it, eq, used){
   return x;
 }
 function viajeActivo(r){ const v=WK_VIAJE; return v && r && v.rid===r.id && Date.now()-v.t<600000 ? v : null; }
-A.startTravel=rid=>{ const last=S.settings.viajeEq||'pc';
+A.startTravel=rid=>{ if (!premOK()) return window.pfPay&&pfPay('pandaria'); const last=S.settings.viajeEq||'pc';
   sheet(tx('Modo viaje: ¿qué tienes a mano?','Travel mode: what do you have?'),Object.keys(VIAJE_EQ).map(k=>({icon:k===last?'check':'dumbbell',label:VIAJE_N[k],desc:k==='pc'?tx('Suelo, pared y una silla o cama','Floor, wall and a chair or bed'):'',fn:()=>{ S.settings.viajeEq=k; WK_VIAJE={rid,eq:k,t:Date.now()}; A.startWorkout(rid); }}))); };
 
 /* ---------- Ciencia de PandarIA: la Biblioteca de evidencia en la app ---------- */
@@ -8869,9 +8923,9 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='1.0';
 const CHANGELOG=[
- {v:'1.0',t:'Lista para Google Play (en desarrollo)',items:['Métodos especiales en el editor de rutinas: superseries, series descendentes, rest-pause, myo-reps, pirámide, series en clúster, volumen alemán (10 × 10) y método Bilbo. Elegirlos es gratis; con Premium, PandarIA arma las series por ti','Cada método explica cómo se hace, lleva la etiqueta «No comprobado que sea mejor que el entrenamiento normal» y su fuente en Ciencia de PandarIA; el método Bilbo y las myo-reps, además, «Evidencia limitada»','Seguridad: los métodos que llegan cerca del fallo son para nivel intermedio o avanzado y no se aplican a la sentadilla ni al peso muerto con barra ni a ejercicios que carguen una zona sensible','Codo y cadera como zonas sensibles: PandarIA evita los ejercicios que más las cargan y, con el codo, sube el peso de brazos de a un disco y añade calentamiento','Premium con suscripción de Google Play: mensual o trimestral, con 3 días gratis; «Restaurar compras» y «Administrar suscripción»','Pedir Premium gratis: si no puedes pagarlo, envía tu código y el motivo; los códigos quedan solo como regalo','Biblioteca de evidencia 1.3: 12 reglas nuevas']},
+ {v:'1.0',t:'Lista para Google Play (en desarrollo)',items:['Métodos especiales en el editor de rutinas: superseries, series descendentes, rest-pause, myo-reps, pirámide, series en clúster, volumen alemán (10 × 10) y método Bilbo. Elegirlos es gratis; con Premium, PandarIA arma las series por ti','Cada método explica cómo se hace, lleva la etiqueta «No comprobado que sea mejor que el entrenamiento normal» y su fuente en Ciencia de PandarIA; el método Bilbo y las myo-reps, además, «Evidencia limitada»','Seguridad: los métodos que llegan cerca del fallo son para nivel intermedio o avanzado y no se aplican a la sentadilla ni al peso muerto con barra ni a ejercicios que carguen una zona sensible','Codo y cadera como zonas sensibles: PandarIA evita los ejercicios que más las cargan y, con el codo, sube el peso de brazos de a un disco y añade calentamiento','Premium con suscripción de Google Play: mensual o trimestral, con 3 días gratis; «Restaurar compras» y «Administrar suscripción»','Pedir Premium gratis: si no puedes pagarlo, envía tu código y el motivo; los códigos quedan solo como regalo','Biblioteca de evidencia 1.3: 12 reglas nuevas','1.0.1 · Todo lo de PandarIA es parte de Premium: sin Premium la rutina muestra «PandarIA · Premium» y ves lo que hiciste la última vez','1.0.1 · PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación','1.0.1 · El informe semanal suma agua, ayunos y proteína','1.0.1 · La versión de Google Play pide solo los 8 permisos de Health Connect que usa','Biblioteca de evidencia 1.4: 3 reglas nuevas']},
  {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y recetas típicas',items:['Etapa 4 · Ajustes ordenados: la pantalla principal queda corta, con tu perfil, Premium y 8 grupos (Tu cuenta y tus datos, Entrenamiento, PandarIA, Nutrición y ayuno, Avisos y sonido, Pantalla e idioma, Salud y Acerca de) que abren su propia pantalla','«Borrar todos los datos» queda aparte, al final de Tu cuenta y tus datos','La política de privacidad se puede abrir desde Ajustes › Acerca de','40 recetas típicas de Uruguay, Argentina, Cuba, México y España en el diario (milanesas, chivito, choripán, tortilla de papas, pascualina, ropa vieja, picadillo, chilaquiles, tacos al pastor, paella, gazpacho, fabada y más), calculadas con ingredientes del USDA y con sus alérgenos; la ficha muestra qué lleva cada una','Nuevo nombre del estudio: LunaDoggyBru Studios','La revisión de animaciones se apaga para la versión final (los votos ya enviados se guardan)','Arreglo: algunas metas guardadas con un formato antiguo mostraban «Invalid Date» y la barra de progreso vacía','Etapa 3 · Inglés completo: toda la app en inglés, también los 386 consejos de ejercicio, la técnica paso a paso, Explorar, el historial de cambios, los logros y los avisos del teléfono','La voz de los entrenos, los avisos del teléfono, la notificación del entreno en curso y los widgets hablan en el idioma que elijas','En inglés los números y las fechas van al estilo inglés (1,910 kcal · 80.6 kg · November 12)','Nueva prueba automática: en inglés, si queda algún texto en español en las pantallas, la versión no sale','Arreglo: más espacio arriba para la cámara y la barra de estado (notch) en todas las pantallas','Arreglo: al tocar «Buscar actualizaciones» se abre directamente la versión nueva, aunque antes hubieras elegido «Más tarde» o «Saltar esta versión»; el aviso también aparece en Ajustes','Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
- {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
+ {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de publicarla; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
  {v:'0.6',t:'Animaciones nuevas y descanso por serie',items:['Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre','Se ve el equipo de cada ejercicio: pesas, bancos, máquinas, poleas con su cable, bandas, barras y aparatos de cardio','Corregidos los movimientos raros (hiperextensiones, superman, elevación lateral de pierna, colgarse, fondos, granjero…) y nuevos movimientos propios para diamante, arquero, Arnold, remo en T, sissy, nórdico inverso y muchos más','Comprobación automática de posturas: rodillas y codos que no se doblan al revés y nada atraviesa el suelo','En la ficha: pausa, cámara lenta, fase del movimiento (baja, sube, empuja…) y anillo de «Aguanta» en los ejercicios estáticos','Premium: músculos que trabajan resaltados en la animación','Ejercicios propios: puedes elegir una animación parecida','Descanso distinto en cada serie: tócalo y elige «Solo esta serie» o «Todas las series»','Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas','Botón «Fijar» para guardar el descanso que ajustaste con +15/−15','Premium: PandarIA acorta el descanso de los calentamientos y suma 30 s si una serie costó','El historial guarda el descanso real de cada serie y los códigos de rutina incluyen los descansos','Versión de prueba: botón «¿Se entiende?» en cada animación para enviar tus votos al creador']},
  {v:'0.5.1',t:'Mejoras de testers',items:['Modo intervalos: ahora puedes cambiar el tiempo de descanso entre series en todos los formatos, también en Tabata','Durante los intervalos, botones −10 s y +10 s en cada descanso; el cambio se aplica a los descansos siguientes y se recuerda para la próxima vez']},
@@ -8902,10 +8956,11 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.0 · Primera entrega para Google Play", "Métodos especiales en el editor de rutinas (superseries, descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y Bilbo)", "Codo y cadera como zonas sensibles", "Premium con suscripción de Google Play y 3 días gratis", "Pedir Premium gratis si no puedes pagarlo"];
-const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
+const NOTAS_VERSION=["1.0 · Primera entrega para Google Play", "Métodos especiales en el editor de rutinas (superseries, descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y Bilbo)", "Codo y cadera como zonas sensibles", "Premium con suscripción de Google Play y 3 días gratis", "Pedir Premium gratis si no puedes pagarlo", "1.0.1 · Todo lo de PandarIA es parte de Premium", "1.0.1 · PandarIA conecta ayuno, calorías, proteína y pulso en reposo con tu recuperación", "1.0.1 · El informe semanal suma agua, ayunos y proteína", "1.0.1 · Solo los 8 permisos de Health Connect que usa la app"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
+/*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
+const UPD_REPO='eddy970728/PandarIA-Fit', UPD_EVERY=6*3600e3;
 const updOn=()=>AVISOS_DEV && updBuild()!=null && S && S.settings.updAvisos!==false;
 function updParse(r){ const m=String(r.tag_name||'').match(/(\d+)\.(\d+)\.(\d+)/); if(!m) return null; const apk=(r.assets||[]).find(a=>/\.apk$/i.test(a.name));
   return {maj:+m[1],min:+m[2],n:+m[3],tag:r.tag_name,date:r.published_at||r.created_at,url:apk?apk.browser_download_url:r.html_url,notes:String(r.body||'').split(/\r?\n/).filter(l=>/^\s*[-*•]\s+/.test(l)).map(l=>l.replace(/^\s*[-*•]\s+/,'').trim()).filter(Boolean)}; }
@@ -8951,6 +9006,7 @@ A.updToggle=()=>{ S.settings.updAvisos=S.settings.updAvisos===false; save(); ref
 function updInit(){ if (!AVISOS_DEV) return; S.upd=S.upd||{}; const b=updBuild(); if (b!=null && S.upd.seen==null){ S.upd.seen=b; save(); }
   if (b!=null && S.upd.list) { S.upd.list=S.upd.list.filter(updNewer); }
   setTimeout(()=>updCheck(false),2500); document.addEventListener('visibilitychange',()=>{ if (!document.hidden) updCheck(false); }); }
+/*@GITHUB-FIN*/
 /* ============ 0.9 · Etapa 2: bienvenida, cuenta de Google y copia en Google Drive ============
    La app funciona igual sin cuenta. Con Google, una copia de tus datos se guarda en la carpeta oculta
    de la app en TU Google Drive (permiso drive.appdata: la app no ve el resto de tu Drive).
@@ -9263,7 +9319,7 @@ SCREENS.tpl=p=>{ let h=_tplScreen(p); const sec=EXPLORE.find(s=>s.id===p.sid);
 /* ---------- Ajustes reorganizados ---------- */
 function viewAjustes(){
   const st=S.settings, pr=S.profile||{};
-  const tg=(k,on,ic,lbl,desc)=>`<button class="srow" data-a="toggleSet" data-v="${k}"><span class="si">${I(ic,20)}</span><span class="grow"><div class="b">${lbl}</div>${desc?`<div class="xs mut">${desc}</div>`:''}</span><span class="toggle ${on?'on':''}"></span></button>`;
+  const tg=(k,on,ic,lbl,desc)=>{ const lk=PREM_SET.includes(k)&&!premOK(); return `<button class="srow" data-a="toggleSet" data-v="${k}"><span class="si">${I(ic,20)}</span><span class="grow"><div class="b">${lbl}${lk?' <span>🔒</span>':''}</div>${desc?`<div class="xs mut">${lk&&!/^Premium/.test(desc)?'<span>Premium · </span>':''}${desc}</div>`:''}</span><span class="toggle ${on&&!lk?'on':''}"></span></button>`; };
   const nav=(act,ic,lbl,val,v)=>`<button class="srow" data-a="${act}" ${v?`data-v="${v}"`:''}><span class="si">${I(ic,20)}</span><span class="grow b">${lbl}</span><span class="mut sm">${val||''}</span>${I('right',18)}</button>`;
   const arch=S.routines.filter(r=>r.archived).length, nAv=Object.keys(st.avoid||{}).length;
   const prof=[pr.age?pr.age+' años':'',pr.weight?pr.weight+' kg':''].filter(Boolean).join(' · ')||'Completar';
@@ -11255,7 +11311,7 @@ No hay beneficios extra en alargarlo. Considera romperlo con proteína y verdura
 Crear rutina para estos músculos|Create a routine for these muscles
 Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.|Sets per muscle. For muscle growth, 10–20 per week are recommended.
 Rosé wine|Rosé wine`;
-const KB_LOG_EN={'1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
+const KB_LOG_EN={'1.4':'PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and the resting heart rate from Health Connect count towards your recovery; the weekly report adds water, fasting and protein.','1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
  '1.1':'Rules that change results: 2 minutes of rest on weighted compound lifts for muscle; weight-loss pace of 0.5 to 1 % of body weight per week instead of a fixed 15 %; a calorie target that adjusts with your diary and weight; a lighter load if you arrive poorly rested; water goal recalibrated with the EFSA reference; alternatives of similar difficulty.',
  '1.3':'Special methods (supersets, drop sets, rest-pause, myo-reps, pyramids, clusters, German volume training and the Bilbo method), each with its evidence and a note that it is not proven to be better; elbow and hip as sensitive areas.',
  '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
@@ -11866,7 +11922,28 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `(con lo que falla). Las nuevas en 3D llevan la etiqueta|(and what is wrong). The new 3D ones carry the label
+const EN_09 = `Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno verás cuál toca. Con Premium, PandarIA la cambia si los músculos aún no se recuperaron.|Choose which days you train and the order of your routines. On each training day you will see which one is up next. With Premium, PandarIA swaps it if those muscles have not recovered yet.
+Quitar plan semanal|Remove weekly plan
+Ayuno largo o pocas calorías antes de entrenar|Long fast or few calories before training
+Proteína corta varios días|Protein short for several days
+Pulso en reposo más alto de lo normal|Resting heart rate higher than usual
+Adultos sanos con Health Connect|Healthy adults with Health Connect
+«Hoy toca» y recuperación|“Up next” and recovery
+«Hoy toca», resumen del entreno e informe semanal|“Up next”, workout summary and weekly report
+«Hoy toca» y recuperación (con Health Connect)|“Up next” and recovery (with Health Connect)
+1.0.1 · Todo lo de PandarIA es parte de Premium: sin Premium la rutina muestra «PandarIA · Premium» y ves lo que hiciste la última vez|1.0.1 · Everything PandarIA does is part of Premium: without Premium the routine shows “PandarIA · Premium” and you see what you did last time
+1.0.1 · PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación|1.0.1 · PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and your resting heart rate from Health Connect count towards your recovery
+1.0.1 · El informe semanal suma agua, ayunos y proteína|1.0.1 · The weekly report adds water, fasts and protein
+1.0.1 · La versión de Google Play pide solo los 8 permisos de Health Connect que usa|1.0.1 · The Google Play version asks only for the 8 Health Connect permissions it uses
+Biblioteca de evidencia 1.4: 3 reglas nuevas|Evidence library 1.4: 3 new rules
+1.0.1 · Todo lo de PandarIA es parte de Premium|1.0.1 · Everything PandarIA does is part of Premium
+1.0.1 · PandarIA conecta ayuno, calorías, proteína y pulso en reposo con tu recuperación|1.0.1 · PandarIA connects fasting, calories, protein and resting heart rate with your recovery
+1.0.1 · Solo los 8 permisos de Health Connect que usa la app|1.0.1 · Only the 8 Health Connect permissions the app uses
+PandarIA · Premium 🔒|PandarIA · Premium 🔒
+Con Premium, PandarIA sugiere pesos y repeticiones y ajusta tu rutina con tu progreso. Gratis ves lo que hiciste la última vez.|With Premium, PandarIA suggests weights and reps and adjusts your routine as you progress. For free you see what you did last time.
+Elige tus días y el orden de tus rutinas.|Choose your days and the order of your routines.
+Cada día de entreno verás cuál toca. Con Premium, PandarIA la cambia si los músculos aún no se recuperaron.|On each training day you will see which one is up next. With Premium, PandarIA swaps it if your muscles have not recovered yet.
+(con lo que falla). Las nuevas en 3D llevan la etiqueta|(and what is wrong). The new 3D ones carry the label
 . Cuando termines una sección, envía tus votos.|. When you finish a section, send your votes.
 . Avisos con sonido y vibración.|. Sound and vibration cues.
 . Avisos con sonido, voz y vibración.|. Sound, voice and vibration cues.
@@ -12143,7 +12220,7 @@ Atajos: calentamientos con menos descanso, más descanso antes de las últimas s
 Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo|Fasting linked to the diary: start from your last logged meal, see today's eating window and, if you log food while fasting, PandarIA offers to end the fast
 Ayuno: elegir la hora de inicio si empezaste antes|Fasting: choose the start time if you began earlier
 Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %|Lose fat at your pace: slow, normal or fast (0.5 to 1% of body weight per week), with a safety limit; to build muscle, +5, +10 or +15%
-Base segura: pruebas automáticas que comprueban cada versión antes de crear la APK; si un cálculo de PandarIA cambia sin querer, la versión no sale|Safe foundation: automatic tests check every version before the APK is built; if a PandarIA calculation changes by accident, the version is not released
+Base segura: pruebas automáticas que comprueban cada versión antes de publicarla; si un cálculo de PandarIA cambia sin querer, la versión no sale|Safe foundation: automatic tests check every version before it is published; if a PandarIA calculation changes by accident, the version is not released
 Biblioteca clasificada por músculo, con filtro por tipo de equipo y búsqueda por apodos (mariposa, multipower, gravitron…)|Library sorted by muscle, with an equipment filter and search by nicknames (butterfly, multipower, gravitron…)
 Biblioteca de ejercicios con ficha, buscador y ejercicios propios|Exercise library with details, search and your own exercises
 Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)|Evidence library 1.2: 16 new rules with their sources (ISSN, EFSA, WHO and ACSM)
