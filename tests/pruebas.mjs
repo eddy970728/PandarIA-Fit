@@ -397,6 +397,51 @@ if (fs.existsSync(COPIA07)) {
   comprobar('biblioteca: cada regla se usa en la app', !sinUso.length, sinUso.join(', '));
 }
 
+/* ---------- 1.0.1: PandarIA solo con Premium, conexiones nuevas y versión de Google Play ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE, {level:'intermedio'}); const out={};
+    const it=buildItem('press_banca','musculo',2), rt={id:'rx',name:'X',pandaria:true,goal:'musculo',items:[it]}; S.routines.push(rt);
+    out.premium={pIA:pIA(rt), rest:restSmart(rt)};
+    window.isPremium=()=>false;
+    out.gratis={pIA:pIA(rt), rest:restSmart(rt), descarga:deloadActive(), tag:/PandarIA · Premium/.test(SCREENS.routine({id:'rx'})), ajustes:(SCREENS.ajGrupo({g:'pandaria'}).match(/🔒/g)||[]).length};
+    window.isPremium=()=>true;
+    const n=nd(); for (let i=1;i<=3;i++){ n.diario[dayKey(Date.now()-i*DAY)]=[{n:'a',k:300,p:5,c:60,g:2},{n:'b',k:250,p:6,c:40,g:3}]; }
+    out.prot=protCorta(); nut().fast.active={start:Date.now()-19*3600000,goalH:20}; out.ayuno=ayunoCarga();
+    window.PF_RHR={last:70,avg:60,n:5,at:Date.now()}; out.pulso=!!pulsoAlto(); window.PF_RHR={last:63,avg:60,n:5,at:Date.now()}; out.pulsoNormal=!!pulsoAlto();
+    window.isPremium=()=>false; out.gratisConexiones=[protCorta(),ayunoCarga(),pulsoAlto()].every(x=>x===null); window.isPremium=()=>true;
+    return JSON.stringify(out); })()`));
+  comprobar('PandarIA con Premium: activa en la rutina', r.premium.pIA && r.premium.rest);
+  comprobar('PandarIA sin Premium: no ajusta descansos ni descargas y la rutina muestra «PandarIA · Premium»', !r.gratis.pIA && !r.gratis.rest && !r.gratis.descarga && r.gratis.tag, JSON.stringify(r.gratis));
+  comprobar('PandarIA sin Premium: los 4 ajustes de PandarIA llevan candado', r.gratis.ajustes >= 4, `candados: ${r.gratis.ajustes}`);
+  comprobar('conexiones: proteína corta 3 días seguidos', r.prot && r.prot.low === 3, JSON.stringify(r.prot));
+  comprobar('conexiones: 19 h de ayuno cuentan para la recuperación', /19 h/.test(r.ayuno || ''), r.ayuno);
+  comprobar('conexiones: pulso en reposo 10 por encima de la media sí, 3 no', r.pulso && !r.pulsoNormal);
+  comprobar('conexiones: sin Premium no hay conexiones', r.gratisConexiones);
+  a.cerrar();
+}
+{
+  // Versión de Google Play: sin código de actualizaciones de GitHub y con el JavaScript intacto
+  const tmp = path.join(fs.mkdtempSync(path.join(DIR, '..', '.tmp-')), 'index.html');
+  fs.copyFileSync(HTML, tmp);
+  const { execFileSync } = await import('node:child_process');
+  let okScript = true; try { execFileSync(process.execPath, [path.join(DIR, '..', 'scripts', 'version-play.mjs'), tmp], { stdio: 'pipe' }); } catch (e) { okScript = false; }
+  const h = fs.readFileSync(tmp, 'utf8');
+  let okJs = true; try { [...h.matchAll(/<script>([\s\S]*?)<\/script>/g)].forEach(m => new Function(m[1])); } catch (e) { okJs = e.message; }
+  fs.rmSync(path.dirname(tmp), { recursive: true, force: true });
+  comprobar('versión de Play: se borra el código que busca y descarga versiones de GitHub', okScript && !/api\.github\.com|PandarIA-Fit\.apk|apps desconocidas/.test(h) && h.includes('const AVISOS_DEV=false;'));
+  comprobar('versión de Play: el JavaScript sigue siendo válido', okJs === true, okJs);
+  // Health Connect: los permisos que deja el manifiesto son justo los que usa native.js
+  const nat = fs.readFileSync(path.join(DIR, '..', 'www', 'native.js'), 'utf8'), ext = fs.readFileSync(path.join(DIR, '..', 'scripts', 'android-extra.mjs'), 'utf8');
+  const lista = re => (nat.match(re) || ['', ''])[1].match(/'([a-zA-Z]+)'/g).map(x => x.slice(1, -1));
+  const TIPO = { steps: 'STEPS', weight: 'WEIGHT', heartRate: 'HEART_RATE', restingHeartRate: 'RESTING_HEART_RATE', calories: 'ACTIVE_CALORIES_BURNED', dietaryEnergyConsumed: 'NUTRITION', dietaryWater: 'HYDRATION' };
+  const usa = [...lista(/HC_READ = \[([^\]]*)\]/).map(t => 'READ_' + TIPO[t]), ...lista(/HC_WRITE = \[([^\]]*)\]/).map(t => 'WRITE_' + TIPO[t])].sort();
+  const deja = ((ext.match(/HC_USA = \[([^\]]*)\]/) || ['', ''])[1].match(/'([A-Z_]+)'/g) || []).map(x => x.slice(1, -1)).sort();
+  comprobar('Health Connect: el manifiesto deja solo los 8 permisos que usa la app', usa.length === 8 && JSON.stringify(usa) === JSON.stringify(deja), `usa ${usa.join(',')} · deja ${deja.join(',')}`);
+}
+
 /* ---------- Comparación con los resultados guardados ---------- */
 if (ACTUALIZAR) {
   fs.writeFileSync(ESPERADO, JSON.stringify(resultados, null, 1) + '\n');
