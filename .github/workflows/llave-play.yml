@@ -39,9 +39,15 @@ jobs:
           { echo "-----BEGIN PUBLIC KEY-----"; echo "$CUERPO" | fold -w 64; echo "-----END PUBLIC KEY-----"; } > clave.pem
           openssl pkey -pubin -in clave.pem -noout || { echo "La clave pegada no es válida. Cópiala completa desde Play Console."; exit 1; }
           curl -fsSL "$PEPK_URL" -o pepk.jar
-          java -jar pepk.jar --keystore=firma.jks --alias="$KEY_ALIAS" \
-            --keystore-pass="pass:$KEYSTORE_PASSWORD" --key-pass="pass:$KEYSTORE_PASSWORD" \
-            --output=llave-para-play.zip --include-cert --rsa-aes-encryption --encryption-key-path=clave.pem
+          # PEPK recibe la contraseña tal cual (sin «pass:»); si esta versión pidiera el prefijo, se intenta también con él
+          OK=0
+          for P in "" "pass:"; do
+            if java -jar pepk.jar --keystore=firma.jks --alias="$KEY_ALIAS" \
+              --keystore-pass="$P$KEYSTORE_PASSWORD" --key-pass="$P$KEYSTORE_PASSWORD" \
+              --output=llave-para-play.zip --include-cert --rsa-aes-encryption --encryption-key-path=clave.pem; then OK=1; break; fi
+            echo "Probando de otra forma…"
+          done
+          if [ "$OK" != "1" ]; then rm -f firma.jks; echo "ERROR: PEPK no pudo abrir la llave con la contraseña del secreto KEYSTORE_PASSWORD"; exit 1; fi
           rm firma.jks
           ls -la llave-para-play.zip
 
