@@ -78,15 +78,28 @@ jobs:
           $BT/apksigner verify PandarIA-Fit.apk
           rm firma.jks
 
+      - name: Control de permisos (si hay uno que Google Play no acepta, no se publica nada)
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          $BT/aapt2 dump permissions PandarIA-Fit.apk | grep -o "android[.a-z]*\.permission[.a-z]*\.[A-Z0-9_]*" | sort -u > permisos.txt
+          echo "Permisos de la app:"; cat permisos.txt
+          MAL=$(grep -E "REQUEST_INSTALL_PACKAGES|QUERY_ALL_PACKAGES|USE_EXACT_ALARM|AD_ID|ADSERVICES" permisos.txt || true)
+          SALUD_OK="READ_STEPS READ_WEIGHT READ_HEART_RATE READ_RESTING_HEART_RATE WRITE_WEIGHT WRITE_ACTIVE_CALORIES_BURNED WRITE_NUTRITION WRITE_HYDRATION"
+          for p in $(grep "permission.health." permisos.txt | sed 's/.*permission\.health\.//'); do
+            echo " $SALUD_OK " | grep -q " $p " || MAL="$MAL android.permission.health.$p"
+          done
+          N=$(grep -c "permission.health." permisos.txt || true)
+          if [ -n "$MAL" ] || [ "$N" != "8" ]; then echo "ERROR: permisos que no deben estar: $MAL (salud: $N de 8)"; exit 1; fi
+          echo "Permisos correctos: 8 de salud y ninguno prohibido"
+
       - name: Paquete para Google Play (AAB, sin aviso de versiones de GitHub)
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          # en la versión de Play las actualizaciones llegan por la tienda: se apaga el aviso de GitHub
-          sed -i 's/const AVISOS_DEV=true;/const AVISOS_DEV=false;/' www/index.html
-          grep -q 'const AVISOS_DEV=false;' www/index.html
+          # en la versión de Play las actualizaciones llegan por la tienda: se borra el código de avisos y descargas de GitHub
+          node scripts/version-play.mjs www/index.html
           npx cap copy android
           cd android && ./gradlew bundleRelease --no-daemon && cd ..
           echo "$KEYSTORE_BASE64" | base64 -d > firma.jks
