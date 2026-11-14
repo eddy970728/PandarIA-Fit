@@ -92,6 +92,25 @@ m = m.replace('</application>', `
         </service>
         <receiver android:name=".WidgetActionReceiver" android:exported="false" />${widget('WidgetToday', 'today')}${widget('WidgetFast', 'fast')}${widget('WidgetWater', 'water')}${widget('WidgetStreak', 'streak')}
     </application>`);
+// Health Connect: el complemento declara 47 permisos de salud; Google Play rechaza los que la app no usa.
+// Se quitan todos menos los 8 que usa PandarIA (native.js: HC_READ y HC_WRITE).
+const HC_USA = ['READ_STEPS', 'READ_WEIGHT', 'READ_HEART_RATE', 'READ_RESTING_HEART_RATE',
+  'WRITE_WEIGHT', 'WRITE_ACTIVE_CALORIES_BURNED', 'WRITE_NUTRITION', 'WRITE_HYDRATION'];
+const HC_TIPOS = ['STEPS', 'DISTANCE', 'ACTIVE_CALORIES_BURNED', 'HEART_RATE', 'WEIGHT', 'SLEEP', 'RESPIRATORY_RATE',
+  'OXYGEN_SATURATION', 'RESTING_HEART_RATE', 'HEART_RATE_VARIABILITY', 'VO2_MAX', 'BLOOD_PRESSURE', 'BLOOD_GLUCOSE',
+  'BODY_TEMPERATURE', 'HEIGHT', 'FLOORS_CLIMBED', 'BODY_FAT', 'BASAL_BODY_TEMPERATURE', 'BASAL_METABOLIC_RATE',
+  'TOTAL_CALORIES_BURNED', 'MINDFULNESS', 'HYDRATION', 'NUTRITION', 'EXERCISE', 'EXERCISE_ROUTE', 'SPEED', 'POWER',
+  'LEAN_BODY_MASS', 'BONE_MASS', 'BODY_WATER_MASS', 'ELEVATION_GAINED', 'WHEELCHAIR_PUSHES', 'CYCLING_PEDALING_CADENCE',
+  'STEPS_CADENCE', 'MENSTRUATION', 'OVULATION_TEST', 'CERVICAL_MUCUS', 'SEXUAL_ACTIVITY', 'INTERMENSTRUAL_BLEEDING',
+  'SKIN_TEMPERATURE', 'PLANNED_EXERCISE'];
+const HC_QUITAR = [...HC_TIPOS.flatMap(t => ['READ_' + t, 'WRITE_' + t]), 'READ_HEALTH_DATA_HISTORY', 'READ_HEALTH_DATA_IN_BACKGROUND']
+  .filter(p => !HC_USA.includes(p));
+// Otros permisos que la versión de Play no debe tener nunca (los añade a veces alguna librería).
+const OTROS_QUITAR = ['com.google.android.gms.permission.AD_ID', 'android.permission.ACCESS_ADSERVICES_AD_ID',
+  'android.permission.ACCESS_ADSERVICES_ATTRIBUTION', 'android.permission.REQUEST_INSTALL_PACKAGES', 'android.permission.QUERY_ALL_PACKAGES'];
+if (!/xmlns:tools=/.test(m)) m = m.replace(/<manifest\b/, '<manifest xmlns:tools="http://schemas.android.com/tools"');
+const quitar = [...HC_QUITAR.map(p => 'android.permission.health.' + p), ...OTROS_QUITAR];
+m = m.replace('</manifest>', quitar.map(p => `    <uses-permission android:name="${p}" tools:node="remove" />`).join('\n') + '\n</manifest>');
 writeFileSync(mf, m);
 
 // 4) Health Connect necesita Android 8 o superior
