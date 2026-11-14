@@ -1,7 +1,8 @@
 // Prepara www/index.html para la versión de Google Play (el .aab):
 // - apaga el aviso de versiones (AVISOS_DEV=false);
 // - borra entero el código que busca versiones en GitHub y descarga el APK (Google Play no permite actualizar por fuera);
-// - borra el texto de «instalar apps desconocidas».
+// - borra el texto de «instalar apps desconocidas»;
+// - quita GitHub de la política de seguridad (CSP).
 // Si algo no está como se espera, termina con error y no se crea el .aab.
 import { readFileSync, writeFileSync } from 'node:fs';
 const p = process.argv[2] || 'www/index.html';
@@ -14,6 +15,10 @@ const a = h.indexOf(A), b = h.indexOf(B);
 if (a < 0 || b < a || h.indexOf(A, a + 1) >= 0 || h.indexOf(B, b + 1) >= 0) fallo('marcas del bloque de GitHub');
 h = h.slice(0, a) + "const updOn=()=>false; function updPending(){ return null; } function updCard(){ return ''; } function updCardNew(){ return ''; } function updInit(){}" + h.slice(b + B.length);
 h = h.split('\n').filter(l => !l.startsWith('Se descarga el archivo PandarIA-Fit.apk')).join('\n');
+// La política de seguridad (CSP) de la versión de Play no permite conectar con GitHub.
+if (!h.includes("connect-src 'self' https://www.googleapis.com https://api.github.com;")) fallo('política de seguridad (CSP)');
+h = h.replace("connect-src 'self' https://www.googleapis.com https://api.github.com;", "connect-src 'self' https://www.googleapis.com;");
+h = h.replace('y, en la versión de GitHub, con GitHub (avisos de versión)', 'y con nada más');
 for (const x of ['api.github.com', 'browser_download_url', 'PandarIA-Fit.apk', 'apps desconocidas', 'updDownload'])
   if (h.includes(x)) fallo('queda «' + x + '»');
 writeFileSync(p, h);

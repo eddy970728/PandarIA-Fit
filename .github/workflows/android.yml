@@ -109,7 +109,26 @@ jobs:
           jarsigner -verify PandarIA-Fit.aab | tail -1
           rm firma.jks
 
+      - name: Comprobar que el AAB lleva el archivo de desofuscación (R8)
+        run: |
+          unzip -l PandarIA-Fit.aab | grep -q "BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map" || { echo "ERROR: el AAB no lleva el archivo de mapeo de R8"; exit 1; }
+          echo "El AAB lleva el archivo de mapeo: Google Play lo toma solo"
+
+      # Ramas de prueba (por ejemplo fase-1): la APK y el AAB quedan como artefacto descargable
+      # en la pestaña Actions, sin crear una versión nueva en Releases (así la app de GitHub no avisa a nadie).
+      - name: Guardar APK y AAB de prueba (solo ramas que no son main)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PandarIA-Fit-${{ env.VER }}.${{ github.run_number }}-prueba
+          path: |
+            PandarIA-Fit.apk
+            PandarIA-Fit.aab
+            notas.md
+          retention-days: 14
+
       - name: Publicar en Releases
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VER }}.${{ github.run_number }}

@@ -26,6 +26,9 @@
         "twitter": false
       },
       "logLevel": 1
+    },
+    "SystemBars": {
+      "initialViewportFitValueHint": "cover"
     }
   }
 }

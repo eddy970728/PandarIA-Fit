@@ -442,6 +442,44 @@ if (fs.existsSync(COPIA07)) {
   comprobar('Health Connect: el manifiesto deja solo los 8 permisos que usa la app', usa.length === 8 && JSON.stringify(usa) === JSON.stringify(deja), `usa ${usa.join(',')} · deja ${deja.join(',')}`);
 }
 
+/* ---------- 1.1: base sólida (Google Play, seguridad, fotos, Premium sin conexión, legibilidad) ---------- */
+{
+  const leer = f => fs.readFileSync(path.join(DIR, '..', f), 'utf8');
+  const html = leer('www/index.html'), nat = leer('www/native.js'), prem = leer('www/premium.js'), ext = leer('scripts/android-extra.mjs');
+  const pkg = JSON.parse(leer('package.json')), cfg = JSON.parse(leer('capacitor.config.json'));
+  // Cada función que native.js o premium.js reemplaza tiene que existir en index.html (si se renombra, el reemplazo dejaría de funcionar sin avisar)
+  const reemplazos = [...new Set([...nat.matchAll(/^\s*([a-zA-Z_]\w*) = (?:async )?function/gm), ...prem.matchAll(/^\s*([a-zA-Z_]\w*) = (?:async )?function/gm)].map(m => m[1]))];
+  const faltan = reemplazos.filter(n => !new RegExp(`(function ${n}\\(|(let|var|const) ${n}\\s*=)`).test(html));
+  comprobar(`reemplazos: las ${reemplazos.length} funciones que cambian native.js y premium.js existen en index.html`, reemplazos.length >= 15 && !faltan.length, faltan.join(', '));
+  // Google Play: R8 y borde a borde
+  comprobar('R8: se activa con reglas que conservan Capacitor, los complementos y la app', /minifyEnabled true/.test(ext) && /-keep class com\.getcapacitor\.\*\*/.test(ext) && /-keep class com\.pandaria\.fit\.\*\*/.test(ext) && /-keep class ee\.forgr\.\*\*/.test(ext) && /-keep class app\.capgo\.\*\*/.test(ext));
+  comprobar('borde a borde: sin el complemento StatusBar ni setBackgroundColor; EdgeToEdge activado', !pkg.dependencies['@capacitor/status-bar'] && !/StatusBar|setBackgroundColor/.test(nat) && /EdgeToEdge\.enable\(this\)/.test(ext) && /SystemBars\.setStyle/.test(nat) && cfg.plugins.SystemBars);
+  // Seguridad
+  const csp = (html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/) || [])[1] || '';
+  comprobar('CSP: solo se conecta con Google y GitHub; sin objetos ni marcos', /connect-src 'self' https:\/\/www\.googleapis\.com https:\/\/api\.github\.com;/.test(csp) && /object-src 'none'/.test(csp) && /frame-src 'none'/.test(csp) && /img-src 'self' data: blob:;/.test(csp), csp);
+  comprobar('avisos: se muestran como texto, nunca como HTML', /t\.textContent=String\(msg\?\?''\)/.test(html) && !/t\.innerHTML=msg/.test(html));
+  comprobar('Premium: la suscripción vale 7 días sin comprobar y los códigos no se alargan atrasando el reloj', /const SUB_DAYS = 7;/.test(prem) && /window\.isPremium = \(\) => licOk\(\) \|\| subOk\(\);/.test(prem) && /hoyGuard\(\) > l\.exp/.test(prem));
+  comprobar('Premium: el texto de la prueba gratis dice que es para la primera suscripción', /3 días gratis si es tu primera suscripción/.test(prem));
+  // En la app
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={};
+    out.recEst=conRecord(getEx('est_isquios')); out.recBanca=conRecord(getEx('press_banca'));
+    const foto='data:image/jpeg;base64,'+'A'.repeat(400);
+    S.measures.push({id:'m1',date:Date.now(),peso:80,foto});
+    out.sinIdb=JSON.parse(datosJSON()).measures.find(m=>m.id==='m1').foto===foto; // sin IndexedDB (jsdom) la foto se queda en los datos
+    FOTOS_OK.add('m1'); out.conIdb=JSON.parse(datosJSON()).measures.find(m=>m.id==='m1').foto==='idb'; out.copia=JSON.parse(datosCompletosJSON()).measures.find(m=>m.id==='m1').foto===foto; FOTOS_OK.delete('m1');
+    S.measures.find(m=>m.id==='m1').foto='idb'; const n=fotosPrep(); out.prep=n===1 && S.measures.find(m=>m.id==='m1').foto===FOTO_CARGANDO && JSON.parse(datosJSON()).measures.find(m=>m.id==='m1').foto==='idb';
+    toast('<b id="tx">x</b>'); out.toast=!document.getElementById('tx');
+    return JSON.stringify(out); })()`));
+  comprobar('récords: los estiramientos no cuentan; la fuerza sí', !r.recEst && r.recBanca);
+  comprobar('fotos: sin IndexedDB se quedan en los datos; con IndexedDB confirmado quedan como «idb»; las copias las llevan completas', r.sinIdb && r.conIdb && r.copia, JSON.stringify(r));
+  comprobar('fotos: una copia importada con marcas «idb» las busca en IndexedDB y nunca guarda la imagen vacía', r.prep);
+  comprobar('avisos: un aviso con etiquetas no crea HTML', r.toast);
+  a.cerrar();
+}
+
 /* ---------- Comparación con los resultados guardados ---------- */
 if (ACTUALIZAR) {
   fs.writeFileSync(ESPERADO, JSON.stringify(resultados, null, 1) + '\n');

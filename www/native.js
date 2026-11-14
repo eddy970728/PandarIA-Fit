@@ -5,7 +5,7 @@
   const C = window.Capacitor;
   if (!C || !C.isNativePlatform || !C.isNativePlatform()) return;
   const P = name => (C.Plugins && C.Plugins[name]) || (C.registerPlugin ? C.registerPlugin(name) : null);
-  const App = P('App'), Haptics = P('Haptics'), StatusBar = P('StatusBar'), Splash = P('SplashScreen'),
+  const App = P('App'), Haptics = P('Haptics'), SystemBars = P('SystemBars'), Splash = P('SplashScreen'),
         FS = P('Filesystem'), Share = P('Share'), TTS = P('TextToSpeech'), Awake = P('KeepAwake');
   const safe = (fn) => { try { const r = fn(); if (r && r.catch) r.catch(()=>{}); return r; } catch(e){} };
   const BACKUP = 'pandaria-backup.json', BACKUP_PREV = 'pandaria-backup-anterior.json';
@@ -70,7 +70,10 @@
   let bkT = null, lastPrevDay = null;
   async function writeBackup(){
     clearTimeout(bkT);
-    const data = localStorage.getItem(KEY); if (!data) return;
+    if (!localStorage.getItem(KEY)) return;
+    // 1.1: las fotos están en IndexedDB; la copia interna se escribe con las fotos completas, cuando ya se cargaron
+    if (typeof window.fotosListo === 'function') await window.fotosListo();
+    const data = typeof window.datosCompletosJSON === 'function' ? window.datosCompletosJSON() : localStorage.getItem(KEY);
     try{
       const today = new Date().toDateString();
       if (lastPrevDay !== today){
@@ -149,9 +152,9 @@
 
   /* ---------- 5. Barra de estado y tema ---------- */
   function syncBars(){
+    // 1.1: barras transparentes (borde a borde); solo cambia el color de los iconos (el color de fondo de las barras quedó obsoleto en Android 15).
     const light = S.settings.theme === 'light';
-    safe(() => StatusBar.setStyle({style: light ? 'LIGHT' : 'DARK'}));
-    safe(() => StatusBar.setBackgroundColor({color: light ? '#ffffff' : '#12151a'}));
+    safe(() => SystemBars.setStyle({style: light ? 'LIGHT' : 'DARK'}));
   }
   const _applyTheme = applyTheme;
   applyTheme = function(){ _applyTheme(); syncBars(); };
@@ -196,7 +199,7 @@
     toast('Guardado en Documentos › PandarIA Fit');
   }
   const fail = () => toast('No se pudo completar. Prueba con Compartir.');
-  const backupText = () => JSON.stringify(S);
+  const backupText = () => typeof window.datosCompletosJSON === 'function' ? window.datosCompletosJSON() : JSON.stringify(S);
 
   A.exportFile = () => shareFile(`pandaria-fit-copia-${stamp()}.json`, backupText(), false, 'Copia de seguridad de PandarIA Fit').catch(fail);
   A.exportData = () => sheet('Exportar copia de seguridad', [

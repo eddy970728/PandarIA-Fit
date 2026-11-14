@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<!-- 1.1 · Política de seguridad: la página solo puede conectarse con Google (copia en Drive) y, en la versión de GitHub, con GitHub (avisos de versión). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self' https://www.googleapis.com https://api.github.com; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
 <meta name="theme-color" content="#181c23">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -37,7 +39,7 @@ svg{display:block}
 #view{flex:1;overflow-y:auto;padding:0 16px calc(var(--nav) + 24px + var(--safe-b));-webkit-overflow-scrolling:touch}
 /* Nav */
 #nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--bg2);border-top:1px solid var(--line);display:flex;max-width:560px;margin:0 auto;z-index:20}
-#nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mut);font-size:11.5px;font-weight:500;position:relative}
+#nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mut);font-size:12px;font-weight:500;position:relative}
 #nav button .pill{width:56px;height:30px;border-radius:15px;display:grid;place-items:center;transition:.2s}
 #nav button.on{color:var(--tx)}
 #nav button.on .pill{background:var(--acs);color:var(--ac)}
@@ -68,16 +70,22 @@ svg{display:block}
 .row{display:flex;align-items:center;gap:12px}
 .col{display:flex;flex-direction:column;gap:4px}
 .grow{flex:1;min-width:0}
-.mut{color:var(--mut)} .sm{font-size:13px} .xs{font-size:11.5px}
+.mut{color:var(--mut)} .sm{font-size:13px} .xs{font-size:12.5px}
 .b{font-weight:700} .ttl{font-size:17px;font-weight:700}
 .ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sec{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin:22px 2px 10px}
 .chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:16px;background:var(--card2);color:var(--tx);font-size:13.5px;font-weight:500;border:1px solid transparent;white-space:nowrap}
 .chip.on{background:var(--acs);color:var(--ac);border-color:var(--ac)}
+/* 1.1 · Zonas táctiles: los botones pequeños se ven igual, pero la zona que responde al dedo llega a unos 44 px de alto */
+.chip{height:34px}
+button.chip,button.link,[data-a=kbOpen]{position:relative}
+button.chip::after{content:'';position:absolute;left:-2px;right:-2px;top:-5px;bottom:-5px}
+button.link::after,[data-a=kbOpen]::after{content:'';position:absolute;left:-6px;right:-6px;top:-9px;bottom:-9px}
+[data-a=dPrefs]{width:42px!important;height:42px!important}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
 .chips.scroll::-webkit-scrollbar{display:none}
-.tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:8px;background:var(--card2);color:var(--mut)}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:3px 8px;border-radius:8px;background:var(--card2);color:var(--mut)}
 .tag.ac{background:var(--acs);color:var(--ac)}
 .tag.ok{background:var(--oks);color:var(--ok)}
 .tag.blue{background:var(--blues);color:var(--blue)}
@@ -160,7 +168,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .wk-ex .note.sticky{background:rgba(255,200,61,.12);color:var(--gold)}
 .sgrid{display:grid;grid-template-columns:40px 1fr 74px 74px 46px;align-items:center;gap:8px}
 .sgrid.nokg{grid-template-columns:40px 1fr 96px 46px}
-.shead{font-size:11.5px;font-weight:700;letter-spacing:1px;color:var(--mut);padding:4px 0 6px;text-align:center}
+.shead{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--mut);padding:4px 0 6px;text-align:center}
 .shead>:nth-child(2){text-align:left}
 .srw{padding:5px 0;border-radius:10px;transition:background .2s}
 .srw.done{background:var(--oks)}
@@ -178,7 +186,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .restline::before,.restline::after{content:'';flex:1;height:3px;border-radius:2px;background:var(--blues)}
 .restline.done{color:var(--ok)} .restline.done::before,.restline.done::after{background:var(--oks)}
 .restline.cus{color:var(--ac)} .restline.cus::before,.restline.cus::after{background:rgba(255,122,26,.28)}
-.restline .rtag{font-size:11px;font-weight:700;opacity:.85}
+.restline .rtag{font-size:12px;font-weight:700;opacity:.85}
 .erest{grid-column:1/-1;justify-self:center;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);padding:0 12px;height:20px;margin:-3px 0;border-radius:10px}
 .erest.on{color:var(--ac);font-weight:700;background:rgba(255,122,26,.1)}
 .restbar button.fix{width:46px;font-size:12px;background:rgba(0,0,0,.18)}
@@ -187,7 +195,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .restbar .t{position:relative;flex:1;text-align:center;font-weight:800;font-size:18px;color:#fff;font-variant-numeric:tabular-nums}
 .restbar button{position:relative;width:52px;height:100%;font-weight:700;color:#fff;font-size:13px}
 .ssup{border-left:3px solid var(--ac);padding-left:10px;margin-left:-13px}
-.suptag{font-size:11px;color:var(--ac);font-weight:800;letter-spacing:.8px;margin-bottom:6px}
+.suptag{font-size:12px;color:var(--ac);font-weight:800;letter-spacing:.8px;margin-bottom:6px}
 .minibar{position:fixed;left:12px;right:12px;bottom:calc(var(--nav) + 10px + var(--safe-b));z-index:25;max-width:536px;margin:0 auto;background:var(--ac);color:#1a0d02;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .toast{position:fixed;left:50%;bottom:calc(var(--nav) + 22px + var(--safe-b));transform:translateX(-50%);z-index:80;background:var(--card2);color:var(--tx);padding:12px 18px;border-radius:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:up .2s;max-width:90vw;text-align:center;border:1px solid var(--line)}
 .in-layer .toast{bottom:auto;top:calc(74px + var(--safe-t))}
@@ -200,7 +208,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .esets .sinp{height:38px;font-size:15px}
 /* Calendar */
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
-.cal .dh{font-size:11px;color:var(--mut);font-weight:700;padding:4px 0}
+.cal .dh{font-size:12px;color:var(--mut);font-weight:700;padding:4px 0}
 .cal .d{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:13.5px;position:relative}
 .cal .d.on{background:var(--ac);color:#1a0d02;font-weight:800}
 .cal .d.today{box-shadow:inset 0 0 0 2px var(--ac)}
@@ -214,7 +222,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .ach .a .e{font-size:28px;filter:grayscale(1);opacity:.35}
 .ach .a.on .e{filter:none;opacity:1}
 .ach .a .n{font-size:12.5px;font-weight:700;margin-top:6px}
-.ach .a .dd{font-size:11px;color:var(--mut);margin-top:2px;line-height:1.3}
+.ach .a .dd{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.3}
 .photo{width:100%;border-radius:12px;display:block}
 .photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .photos img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px}
@@ -287,7 +295,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .intrun{position:absolute;inset:0;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:calc(60px + var(--safe-t)) 20px calc(24px + var(--safe-b));transition:background .4s}
 .intrun .ovb.pri{color:#c2410c}
 
-#nav button{font-size:10.5px}
+#nav button{font-size:12px}
 #nav button .pill{width:50px}
 .wstrip{display:flex;gap:6px}
 .wd{flex:1;height:44px;border-radius:12px;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:var(--mut)}
@@ -1815,10 +1823,13 @@ function streakWeeks(){
   while (wk.has(k)){ n++; k-=7*DAY; }
   return n;
 }
+// 1.1: los estiramientos, la movilidad y el yoga no tienen récords (aguantar más una postura no es un récord de rendimiento)
+const SIN_RECORD=new Set(['estiramiento','movilidad','yoga']);
+const conRecord=ex=>!SIN_RECORD.has(ex.pat);
 function records(){
   const rec={};
   S.sessions.forEach(s=>s.items.forEach(it=>{
-    const ex=getEx(it.exId); const r=rec[it.exId]=rec[it.exId]||{kg:0,reps:0,vol:0,time:0,date:0};
+    const ex=getEx(it.exId); if (!conRecord(ex)) return; const r=rec[it.exId]=rec[it.exId]||{kg:0,reps:0,vol:0,time:0,date:0};
     it.sets.filter(x=>x.done&&x.t!=='c').forEach(x=>{
       const kg=+x.kg||0, reps=+x.reps||0, t=+x.time||0;
       if (ex.mode==='p' && kg>r.kg){ r.kg=kg; r.kgReps=reps; r.date=s.end; }
@@ -1862,7 +1873,6 @@ const ICONS = {
   bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>',
   lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   heart:'<path d="M12 20s-7-4.4-9-9.2C1.6 7.3 4 4 7.3 4c2 0 3.4 1.1 4.7 2.7C13.3 5.1 14.7 4 16.7 4 20 4 22.4 7.3 21 10.8 19 15.6 12 20 12 20z"/>',
-  back:'<path d="M15 18l-6-6 6-6"/>',
   close:'<path d="M6 6l12 12M18 6L6 18"/>',
   moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>',
   ruler:'<path d="M21.3 8.7 8.7 21.3a1 1 0 0 1-1.4 0l-4.6-4.6a1 1 0 0 1 0-1.4L15.3 2.7a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4zM7.5 10.5l2 2M10.5 7.5l2 2M13.5 4.5l2 2"/>',
@@ -5252,6 +5262,83 @@ const DEF = () => ({
   customEx:[], routines:[], sessions:[], measures:[], achievements:{}, active:null, applied:0,
   deload:null, lastDeload:null, firstSession:null, dismissed:{}, profile:{injuries:[]}, goals:[], plan:null
 });
+
+/* ---------- 1.1 · Fotos de progreso fuera de la memoria del navegador ----------
+   Las fotos son lo que más ocupa. Se guardan en IndexedDB (mucho más espacio) y en los datos solo queda la marca «idb».
+   Reglas para no perder nada:
+   - una foto solo se quita de los datos cuando IndexedDB confirmó que la guardó;
+   - mientras se cargan, en la app se ve una imagen vacía (FOTO_CARGANDO) y las copias esperan a que terminen;
+   - las copias (archivo interno de Android, Drive, exportar) llevan siempre las fotos completas;
+   - si IndexedDB no existe o falla, todo sigue como antes (fotos dentro de los datos). */
+const FOTO_CARGANDO='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const FOTOS_DB='pandaria-fit-fotos';
+let FOTOS_IDB=null, FOTOS_LISTAS=false, FOTOS_ESPERA=[];
+const FOTOS_OK=new Set();      // fotos que IndexedDB confirmó (clave = id de la medida)
+const FOTOS_PEND=new Set();    // marcas «idb» que todavía no se han podido leer
+const fotoKey=m=>m.id||('t'+m.date);
+const fotoReal=f=>typeof f==='string' && f.startsWith('data:image/') && f!==FOTO_CARGANDO;
+function fotosAbrir(){
+  if (FOTOS_IDB) return FOTOS_IDB;
+  FOTOS_IDB=new Promise(res=>{
+    try{
+      if (!window.indexedDB) return res(null);
+      const rq=indexedDB.open(FOTOS_DB,1);
+      rq.onupgradeneeded=()=>{ try{ rq.result.createObjectStore('fotos',{keyPath:'k'}); }catch(e){} };
+      rq.onsuccess=()=>res(rq.result); rq.onerror=()=>res(null); rq.onblocked=()=>res(null);
+      setTimeout(()=>res(null),4000);
+    }catch(e){ res(null); }
+  });
+  return FOTOS_IDB;
+}
+function fotosTx(db,mode,fn){ return new Promise(res=>{ try{ const t=db.transaction('fotos',mode); const st=t.objectStore('fotos'); const out=fn(st); t.oncomplete=()=>res(out&&out.result!==undefined?out.result:true); t.onerror=()=>res(null); t.onabort=()=>res(null); }catch(e){ res(null); } }); }
+const fotosListo=()=>FOTOS_LISTAS?Promise.resolve():new Promise(r=>FOTOS_ESPERA.push(r));
+function fotosMarcarListas(){ FOTOS_LISTAS=true; const w=FOTOS_ESPERA; FOTOS_ESPERA=[]; w.forEach(r=>{ try{ r(); }catch(e){} }); }
+// Cambia las marcas «idb» por la imagen vacía mientras se leen (se llama al cargar y en cada guardado: sirve para copias importadas)
+function fotosPrep(){
+  let n=0; (S&&S.measures||[]).forEach(m=>{ if (m.foto==='idb'){ if(!m.id) m.id=uid(); m.foto=FOTO_CARGANDO; FOTOS_PEND.add(fotoKey(m)); n++; } });
+  if (n && FOTOS_LISTAS){ FOTOS_LISTAS=false; fotosCargar(); }
+  return n;
+}
+async function fotosCargar(){
+  const db=await fotosAbrir();
+  if (db && FOTOS_PEND.size){
+    const all=await fotosTx(db,'readonly',st=>st.getAll());
+    if (Array.isArray(all)){
+      const byK={}; all.forEach(r=>{ if(r&&r.k&&fotoReal(r.d)) byK[r.k]=r.d; });
+      let n=0; S.measures.forEach(m=>{ const k=fotoKey(m); if (m.foto===FOTO_CARGANDO && byK[k]){ m.foto=byK[k]; FOTOS_OK.add(k); FOTOS_PEND.delete(k); n++; } });
+      if (n){ try{ render.keep=true; render(); if (LAYERS.length) refreshTop(); }catch(e){} }
+    }
+  }
+  fotosMarcarListas();
+  fotosSync();
+}
+// Guarda en IndexedDB las fotos nuevas y borra las que ya no usa ninguna medida
+let FOTOS_SYNC=false;
+async function fotosSync(){
+  if (FOTOS_SYNC || !FOTOS_LISTAS) return; FOTOS_SYNC=true;
+  try{
+    const db=await fotosAbrir(); if (!db) return;
+    const nuevas=S.measures.filter(m=>fotoReal(m.foto) && !FOTOS_OK.has(fotoKey(m)));
+    let n=0;
+    for (const m of nuevas){ if(!m.id) m.id=uid(); const k=fotoKey(m), d=m.foto;
+      const ok=await fotosTx(db,'readwrite',st=>st.put({k,d,t:Date.now()}));
+      // se vuelve a leer para confirmar que quedó guardada igual
+      const back=ok?await fotosTx(db,'readonly',st=>st.get(k)):null;
+      if (back && back.d===d){ FOTOS_OK.add(k); n++; } }
+    // Borrar: solo fotos que esta sesión ya tenía confirmadas y que el usuario quitó (nunca fotos que no llegó a leer)
+    if (!FOTOS_PEND.size){
+      const usadas=new Set(S.measures.filter(m=>m.foto).map(fotoKey));
+      const sobran=[...FOTOS_OK].filter(k=>!usadas.has(k));
+      if (sobran.length){ const ok=await fotosTx(db,'readwrite',st=>{ sobran.forEach(k=>st.delete(k)); }); if (ok) sobran.forEach(k=>FOTOS_OK.delete(k)); }
+    }
+    if (n) save();
+  }catch(e){} finally{ FOTOS_SYNC=false; }
+}
+// Datos para la memoria del navegador: las fotos confirmadas van como «idb»
+function datosJSON(){ return JSON.stringify(S,function(k,v){ return k==='foto' && typeof v==='string' && (v===FOTO_CARGANDO || (fotoReal(v) && FOTOS_OK.has(fotoKey(this)))) ? 'idb' : v; }); }
+// Datos completos para las copias: con las fotos dentro (las que no se pudieron leer quedan como «idb»)
+function datosCompletosJSON(){ return JSON.stringify(S,(k,v)=>k==='foto' && v===FOTO_CARGANDO ? 'idb' : v); }
+window.datosCompletosJSON=datosCompletosJSON; window.fotosListo=fotosListo;
 let S;
 function load(){
   let migrated=false;
@@ -5261,18 +5348,19 @@ function load(){
   S.settings = Object.assign(DEF().settings, S.settings||{});
   loadExercises(S.customEx);
   try{ animRedo(); }catch(e){}
+  fotosPrep(); fotosCargar();
   if (migrated) save(true);
 }
 let saveT=null;
 function save(now){
   clearTimeout(saveT);
-  const go=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ liberarEspacio(); } };
+  const go=()=>{ fotosPrep(); try{ localStorage.setItem(KEY, datosJSON()); }catch(e){ liberarEspacio(); } fotosSync(); };
   if (now) go(); else saveT=setTimeout(go,250);
 }
 // Si la memoria se llena, primero se borra la copia de antes de actualizar y luego las fotos más antiguas
 // (nunca la primera), hasta que los datos se puedan guardar. Los entrenos no se pierden.
 function liberarEspacio(){
-  const intenta=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(S)); return true; }catch(e){ return false; } };
+  const intenta=()=>{ try{ localStorage.setItem(KEY, datosJSON()); return true; }catch(e){ return false; } };
   try{ Object.keys(localStorage).filter(k=>/^pandaria-fit-antes-v/.test(k)).forEach(k=>localStorage.removeItem(k)); }catch(e){}
   if (intenta()) return toast(tx('Memoria casi llena: se borró la copia de antes de actualizar.','Memory almost full: the pre-update copy was deleted.'));
   let n=0; const ph=()=>S.measures.filter(x=>x.foto).sort((a,b)=>a.date-b.date);
@@ -5310,7 +5398,7 @@ const diffBars = l => `<span class="diff l${l}"><i></i><i></i><i></i></span>`;
 const plural = (n,a,b) => `${n} ${n===1?a:b}`;
 function toast(msg, cls){
   document.querySelectorAll('.toast').forEach(x=>x.remove());
-  const t=document.createElement('div'); t.className='toast '+(cls||''); t.innerHTML=msg;
+  const t=document.createElement('div'); t.className='toast '+(cls||''); t.textContent=String(msg??''); // 1.1: siempre texto plano, nunca HTML
   document.body.appendChild(t); setTimeout(()=>t.remove(), cls==='pr'?2600:2200);
 }
 let audioCtx=null;
@@ -5531,12 +5619,13 @@ A.exportData=()=>sheet('Exportar copia de seguridad',[
   {icon:'download',label:'Descargar archivo',desc:'Guarda un archivo .json en tu dispositivo.',fn:()=>A.exportFile()},
   {icon:'copy',label:'Copiar al portapapeles',desc:'Útil en la app instalada: pégalo en una nota o envíatelo por mensaje.',fn:()=>A.exportCopy()}
 ]);
-A.exportCopy=()=>{ const txt=JSON.stringify(S);
+A.exportCopy=()=>{ if (!FOTOS_LISTAS) return toast(tx('Cargando tus fotos, prueba en un momento','Loading your photos, try again in a moment')); const txt=datosCompletosJSON();
   const ok=()=>toast('Copia copiada al portapapeles');
   try{ navigator.clipboard.writeText(txt).then(ok,()=>fallbackCopy(txt)); }catch(e){ fallbackCopy(txt); } };
 function fallbackCopy(txt){ const t=document.createElement('textarea'); t.value=txt; document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); toast('Copia copiada al portapapeles'); }catch(e){ toast('No se pudo copiar'); } t.remove(); }
 A.exportFile=()=>{
-  const blob=new Blob([JSON.stringify(S)],{type:'application/json'});
+  if (!FOTOS_LISTAS) return toast(tx('Cargando tus fotos, prueba en un momento','Loading your photos, try again in a moment'));
+  const blob=new Blob([datosCompletosJSON()],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`pandaria-fit-copia-${new Date().toISOString().slice(0,10)}.json`;
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
@@ -6337,20 +6426,20 @@ function completeSet(u,i,seguro){
   // lo que hiciste pasa a ser la referencia de las series siguientes
   if (s.t!=='c') it.sets.slice(+i+1).forEach(n=>{ if(n.done||n.t==='c') return; if(ex.mode==='p'&&n.kg==null&&s.kg!=null) n.sk=s.kg; if(ex.mode==='t'&&n.time==null&&s.time) n.st=s.time; });
   // récord personal
-  if (s.t!=='c'){
+  if (s.t!=='c' && conRecord(ex)){
     const rec=S.active.rec[it.exId];
     if (rec){
       let pr=false;
       if (ex.mode==='p' && rec.kg>0 && s.kg>rec.kg){ pr=true; rec.kg=s.kg; }
       else if (ex.mode==='r' && rec.reps>0 && s.reps>rec.reps){ pr=true; rec.reps=s.reps; }
       else if (ex.mode==='t' && rec.time>0 && s.time>rec.time){ pr=true; rec.time=s.time; }
-      if (pr){ s.pr=true; toast(`★ ¡Nuevo récord en ${esc(ex.n)}!`,'pr'); vibrate([60,40,60,40,120]); }
+      if (pr){ s.pr=true; toast(`★ ¡Nuevo récord en ${ex.n}!`,'pr'); vibrate([60,40,60,40,120]); }
     } else S.active.rec[it.exId]={kg:+s.kg||0,reps:+s.reps||0,time:+s.time||0};
   }
   // descanso
   const idx=S.active.items.indexOf(it);
   const nextSame = it.superset && S.active.items[idx+1] && S.active.items[idx+1].superset===it.superset;
-  if (nextSame){ toast(`Sigue: ${esc(getEx(S.active.items[idx+1].exId).n)}`); S.active.rest=null; }
+  if (nextSame){ toast(`Sigue: ${getEx(S.active.items[idx+1].exId).n}`); S.active.rest=null; }
   else {
     let rest=restFor(it,+i);
     // PandarIA: si la serie costó (2 o más repeticiones por debajo de lo previsto), más descanso antes de la siguiente
@@ -6607,7 +6696,7 @@ function checkAch(){
   const cond={first:n>=1,s5:n>=5,s25:n>=25,s50:n>=50,s100:n>=100,w2:st>=2,w4:st>=4,w12:st>=12,pr1:prs>=1,pr25:prs>=25,vol10:vol>=10000,vol100:vol>=100000,
     early:hours.some(h=>h<8),night:hours.some(h=>h>=22),measure:S.measures.length>0,pandaria:(S.applied||0)>=5};
   Object.entries(cond).forEach(([k,v])=>{ if(v && !got[k]){ got[k]=Date.now(); out.push(k); } });
-  if (out.length){ save(); const a=ACHIEVEMENTS.find(x=>x.id===out[0]); setTimeout(()=>toast(`${a.ic} Logro: ${esc(a.n)}`),900); }
+  if (out.length){ save(); const a=ACHIEVEMENTS.find(x=>x.id===out[0]); setTimeout(()=>toast(`${a.ic} Logro: ${a.n}`),900); }
   return out;
 }
 
@@ -6858,7 +6947,10 @@ function histProgreso(){
   const wk=[]; const k0=weekKey(Date.now());
   for (let i=11;i>=0;i--){ const k=k0-i*7*DAY; const ss=S.sessions.filter(s=>weekKey(s.end)===k); wk.push({k,vol:ss.reduce((a,s)=>a+(s.vol||0),0),n:ss.length}); }
   const lbl=wk.map((w,i)=>i%3===2||i===11?`${new Date(w.k).getDate()}/${new Date(w.k).getMonth()+1}`:'');
-  let h=`<div class="sec">Volumen semanal (${S.settings.unit})</div><div class="card">${barChart(wk.map(w=>Math.round(toUnit(w.vol))),lbl,{fmt:v=>v>=1000?(Math.round(v/100)/10)+'k':v})}</div>
+  // 1.1: con menos de 2 semanas de datos las barras casi no dicen nada; se explica en vez de dejar la gráfica «vacía»
+  const semanasCon=wk.filter(w=>w.n>0).length;
+  const aviso=semanasCon<2?`<div class="banner" style="margin-top:10px"><span class="ic">${I('info',20)}</span><div class="grow sm">${tx('Entrena al menos 2 semanas para ver tu tendencia. Cada semana con entrenos suma una barra.','Train for at least 2 weeks to see your trend. Each week with workouts adds a bar.')}</div></div>`:'';
+  let h=aviso+`<div class="sec">Volumen semanal (${S.settings.unit})</div><div class="card">${barChart(wk.map(w=>Math.round(toUnit(w.vol))),lbl,{fmt:v=>v>=1000?(Math.round(v/100)/10)+'k':v})}</div>
   <div class="sec">Entrenos por semana</div><div class="card">${barChart(wk.map(w=>w.n),lbl)}</div>
   <div class="sec">Series por músculo cada semana</div><div class="chips scroll" style="margin-bottom:10px">${MUSCLE_GROUPS.filter(([k])=>k!=='cardio').map(([k,n])=>`<button class="chip ${PMUS===k?'on':''}" data-a="pmus" data-v="${k}">${n}</button>`).join('')}</div><div class="card">${muscleWeekChart(PMUS)}<div class="xs mut" style="margin-top:6px">La franja verde (10 a 20 series) es lo recomendado para ganar músculo. Las series de músculos secundarios cuentan como media.</div></div>`;
   const trained={}; S.sessions.forEach(s=>s.items.forEach(i=>trained[i.exId]=(trained[i.exId]||0)+1));
@@ -7516,7 +7608,7 @@ function viewNutricion(){
     ${dd.n?`<div class="xs" style="margin-top:10px;color:var(--blue);line-height:1.4">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}
     ${cafLine(dd.caf)}
     <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
-    <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div></div>`;
+    <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>${days.filter(v=>v>0).length<2?`<div class="xs mut" style="margin-top:6px;text-align:center">${tx('Registra agua varios días para ver tu semana aquí.','Log water on a few days to see your week here.')}</div>`:''}</div>`;
   h+=supCardsHtml();
   h+=fastCard();
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
@@ -8921,9 +9013,10 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.0';
+const APP_VERSION='1.1';
 const CHANGELOG=[
- {v:'1.0',t:'Lista para Google Play (en desarrollo)',items:['Métodos especiales en el editor de rutinas: superseries, series descendentes, rest-pause, myo-reps, pirámide, series en clúster, volumen alemán (10 × 10) y método Bilbo. Elegirlos es gratis; con Premium, PandarIA arma las series por ti','Cada método explica cómo se hace, lleva la etiqueta «No comprobado que sea mejor que el entrenamiento normal» y su fuente en Ciencia de PandarIA; el método Bilbo y las myo-reps, además, «Evidencia limitada»','Seguridad: los métodos que llegan cerca del fallo son para nivel intermedio o avanzado y no se aplican a la sentadilla ni al peso muerto con barra ni a ejercicios que carguen una zona sensible','Codo y cadera como zonas sensibles: PandarIA evita los ejercicios que más las cargan y, con el codo, sube el peso de brazos de a un disco y añade calentamiento','Premium con suscripción de Google Play: mensual o trimestral, con 3 días gratis; «Restaurar compras» y «Administrar suscripción»','Pedir Premium gratis: si no puedes pagarlo, envía tu código y el motivo; los códigos quedan solo como regalo','Biblioteca de evidencia 1.3: 12 reglas nuevas','1.0.1 · Todo lo de PandarIA es parte de Premium: sin Premium la rutina muestra «PandarIA · Premium» y ves lo que hiciste la última vez','1.0.1 · PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación','1.0.1 · El informe semanal suma agua, ayunos y proteína','1.0.1 · La versión de Google Play pide solo los 8 permisos de Health Connect que usa','Biblioteca de evidencia 1.4: 3 reglas nuevas']},
+ {v:'1.1',t:'Base sólida',items:['Pantalla de borde a borde en todas las versiones de Android y código optimizado para Google Play', 'Las fotos de progreso se guardan aparte: mucho más espacio para tus datos', 'Seguridad: la app solo puede conectarse con Google (y con GitHub en la versión de GitHub) y los avisos se muestran siempre como texto', 'Premium: la suscripción se vuelve a comprobar con Google Play al menos cada 7 días', 'Prueba gratis: la pantalla Premium aclara que los 3 días gratis son para tu primera suscripción', 'Los códigos de regalo no se alargan cambiando la fecha del teléfono', 'Textos más grandes (mínimo 12 px) y zonas táctiles más amplias en los botones pequeños', 'Los estiramientos, la movilidad y el yoga ya no cuentan como récords', 'Progreso y agua explican qué falta cuando todavía hay pocos datos']},
+ {v:'1.0',t:'Lista para Google Play',items:['Métodos especiales en el editor de rutinas: superseries, series descendentes, rest-pause, myo-reps, pirámide, series en clúster, volumen alemán (10 × 10) y método Bilbo. Elegirlos es gratis; con Premium, PandarIA arma las series por ti','Cada método explica cómo se hace, lleva la etiqueta «No comprobado que sea mejor que el entrenamiento normal» y su fuente en Ciencia de PandarIA; el método Bilbo y las myo-reps, además, «Evidencia limitada»','Seguridad: los métodos que llegan cerca del fallo son para nivel intermedio o avanzado y no se aplican a la sentadilla ni al peso muerto con barra ni a ejercicios que carguen una zona sensible','Codo y cadera como zonas sensibles: PandarIA evita los ejercicios que más las cargan y, con el codo, sube el peso de brazos de a un disco y añade calentamiento','Premium con suscripción de Google Play: mensual o trimestral, con 3 días gratis; «Restaurar compras» y «Administrar suscripción»','Pedir Premium gratis: si no puedes pagarlo, envía tu código y el motivo; los códigos quedan solo como regalo','Biblioteca de evidencia 1.3: 12 reglas nuevas','1.0.1 · Todo lo de PandarIA es parte de Premium: sin Premium la rutina muestra «PandarIA · Premium» y ves lo que hiciste la última vez','1.0.1 · PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación','1.0.1 · El informe semanal suma agua, ayunos y proteína','1.0.1 · La versión de Google Play pide solo los 8 permisos de Health Connect que usa','Biblioteca de evidencia 1.4: 3 reglas nuevas']},
  {v:'0.9',t:'Pulido: cero errores, copia en Google Drive, inglés completo y recetas típicas',items:['Etapa 4 · Ajustes ordenados: la pantalla principal queda corta, con tu perfil, Premium y 8 grupos (Tu cuenta y tus datos, Entrenamiento, PandarIA, Nutrición y ayuno, Avisos y sonido, Pantalla e idioma, Salud y Acerca de) que abren su propia pantalla','«Borrar todos los datos» queda aparte, al final de Tu cuenta y tus datos','La política de privacidad se puede abrir desde Ajustes › Acerca de','40 recetas típicas de Uruguay, Argentina, Cuba, México y España en el diario (milanesas, chivito, choripán, tortilla de papas, pascualina, ropa vieja, picadillo, chilaquiles, tacos al pastor, paella, gazpacho, fabada y más), calculadas con ingredientes del USDA y con sus alérgenos; la ficha muestra qué lleva cada una','Nuevo nombre del estudio: LunaDoggyBru Studios','La revisión de animaciones se apaga para la versión final (los votos ya enviados se guardan)','Arreglo: algunas metas guardadas con un formato antiguo mostraban «Invalid Date» y la barra de progreso vacía','Etapa 3 · Inglés completo: toda la app en inglés, también los 386 consejos de ejercicio, la técnica paso a paso, Explorar, el historial de cambios, los logros y los avisos del teléfono','La voz de los entrenos, los avisos del teléfono, la notificación del entreno en curso y los widgets hablan en el idioma que elijas','En inglés los números y las fechas van al estilo inglés (1,910 kcal · 80.6 kg · November 12)','Nueva prueba automática: en inglés, si queda algún texto en español en las pantallas, la versión no sale','Arreglo: más espacio arriba para la cámara y la barra de estado (notch) en todas las pantallas','Arreglo: al tocar «Buscar actualizaciones» se abre directamente la versión nueva, aunque antes hubieras elegido «Más tarde» o «Saltar esta versión»; el aviso también aparece en Ajustes','Etapa 2 · Bienvenida nueva: pantallas cortas con barra de progreso, «Continuar con Google» o «Usar sin cuenta», tu nombre, datos sobre ti con «Ahora no», dónde entrenas y los permisos opcionales','Copia en tu Google Drive (opcional): se guarda sola al terminar cada entreno y una vez al día, en una carpeta oculta de tu propio Drive que nadie más ve; la app no puede ver tus otros archivos','En un teléfono nuevo, al iniciar sesión, PandarIA encuentra tu copia y la recupera: entrenos, rutinas, diario, medidas, fotos y Premium','Si dos teléfonos tienen datos distintos, nunca se pisa nada: la app te muestra las dos copias y eliges','Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia','Premium con tu cuenta: los códigos de desbloqueo de cuenta (PA-) funcionan en cualquier teléfono donde inicies sesión; los de teléfono (PF-) siguen igual','Quien ya tenía la app ve una sola vez una tarjeta breve para conectar Google; si dice «Ahora no», queda en Ajustes','Etapa 1 · Datos imposibles bloqueados: edad de 12 a 100 años, altura de 100 a 230 cm, peso de 30 a 300 kg y medidas con sus límites; un error de tecleo ya no dispara tus calorías','Si un pesaje cambia mucho respecto al anterior, la app pregunta si es correcto antes de guardarlo','Series: no se aceptan números negativos y, si anotas un peso, unas repeticiones o un tiempo muy por encima de tu historial (por ejemplo 1000 kg en vez de 100), PandarIA pregunta antes de guardarlo como récord','Fotos de progreso: máximo 40. Al pasar de 40 se borra la más antigua, pero la primera se conserva siempre para comparar; aviso desde la foto 35','Si la memoria se llena, la app libera espacio (primero la copia de antes de actualizar, luego las fotos más antiguas) y tus entrenos se guardan igual','Texto más claro para quien tiene más rutinas que el límite gratis','Nueva prueba automática: antes de crear cada versión se tocan unos 780 botones de todas las pestañas en español y en inglés; si uno da error, la versión no sale']},
  {v:'0.8',t:'Nutrición completa y PandarIA con evidencia',items:['Etapa 5 · Suplementos con evidencia en Nutrición: creatina, cafeína, beta-alanina y proteína en polvo, con su dosis para tu peso, su nivel de evidencia y avisos si estás embarazada, tienes presión alta, problemas de riñón o corazón, o tomas medicación (en menores no da dosis)','Calidad del día en el diario (Premium): fibra frente a los 25 g de la EFSA, sodio frente a los 2 g de la OMS y comidas con suficiente proteína, con consejos suaves','Ejemplos de menú (Premium): un día de comidas con tus calorías, tu proteína, tu alimentación y tus alergias; añádelo al diario con un toque o pide otro','Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora','Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo','Modo viaje: en «Hoy toca» o en Cambiar, haz tu rutina sin equipo (solo peso corporal, con bandas, con TRX o en un gimnasio de hotel); PandarIA cambia cada ejercicio por uno del mismo músculo y tu rutina no cambia','Health Connect: guarda también las calorías de tus comidas y el agua (Premium)','Todo lo nuevo de la 0.8 en inglés: diario y nombres de los 597 alimentos, Ciencia de PandarIA con sus 53 reglas, suplementos, menús, Health Connect y ayuno','Biblioteca de evidencia 1.2: 16 reglas nuevas con sus fuentes (ISSN, EFSA, OMS y ACSM)','Revisión 6 de animaciones: escaladores y burpees más fluidos y a ritmo humano; la comba pasa por encima de la cabeza y por debajo de los pies; sprint sin cortes; saltos de patinador con transiciones suaves; salto al cajón con impulso, vuelo, aterrizaje y bajada pierna a pierna; boxeo de sombra sin cruces de piernas; elíptica hacia delante; balón con caída, rebote y recogida; escaladora con escalera visible; cuerdas cuya onda viaja hasta el anclaje','Etapa 4 · Reglas que cambian resultados (Biblioteca 1.1): 2 minutos de descanso en los multiarticulares con peso cuando el objetivo es ganar músculo','Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %','Objetivo que se ajusta solo (Premium): con 10 días de diario y dos pesajes, PandarIA estima tu gasto real y corrige tus calorías','Check-in con efecto: si dormiste mal o tienes poca energía, la carga sugerida baja un 10 %; «Hoy toca» avisa de tu recuperación y ofrece empezar suave','Informe semanal con tus minutos de actividad frente a la meta de la OMS','Meta de agua recalibrada con la referencia de la EFSA (ya no se dispara en personas grandes)','Corregido: al estancarte, PandarIA ya no propone un ejercicio mucho más fácil (por ejemplo flexiones en pared en lugar de press de banca)','Etapa 3 · Diario de comidas en Nutrición: desayuno, almuerzo, merienda, cena y snacks, con 597 alimentos que funcionan sin internet (datos del USDA, de dominio público) y nombres de Uruguay, Argentina, Cuba, México y España','Porciones caseras (taza, unidad, rebanada, cucharada…) o gramos, recientes, favoritos, copiar el día anterior y comidas guardadas','Crea tus alimentos con la etiqueta y tus recetas por raciones (10 gratis, sin límite en Premium)','Preferencias: vegetariana o vegana y alergias (leche, huevo, gluten, maní, frutos secos, soja, pescado, mariscos, sésamo); PandarIA avisa cuando algo no encaja','Modo hábitos: registra sin ver calorías ni números; se activa solo si en el ayuno marcaste un trastorno alimentario','Registrar es gratis; con Premium comparas el día con tu objetivo de calorías y macros y ves tu semana','Etapa 2 · Biblioteca de evidencia: los números que usa PandarIA (series, descansos, cargas, calorías, proteína, agua, seguridad) viven en un solo sitio, cada uno con su fuente y su nivel de evidencia','Nueva pantalla Ciencia de PandarIA en Ajustes › Acerca de, con las 37 reglas, sus fuentes y el historial de la Biblioteca','Toca el porqué de una sugerencia, o «Ver fuente» en un consejo o en Nutrición, para ver de dónde sale','Corregido el texto de la proteína: la ISSN recomienda 1,4–2,0 g/kg si entrenas (antes decía 1,6–2,2)','Etapa 1 · Base segura: pruebas automáticas que comprueban cada versión antes de publicarla; si un cálculo de PandarIA cambia sin querer, la versión no sale','Tus datos llevan número de versión y, antes de actualizarlos, la app guarda una copia exacta de cómo estaban','En Ajustes › Tus datos puedes volver a los datos de antes de actualizar o borrar esa copia; se borra sola a los 60 días']},
  {v:'0.7',t:'Animaciones en 3D: todos los ejercicios',items:['Temporal mientras dura el desarrollo: aviso de versión nueva en Mis rutinas con los cambios y botón para descargarla; en Ajustes, número exacto de versión y Buscar actualizaciones','Versión gratis: hasta 3 rutinas a la vez contando las archivadas (para crear otra hay que eliminar alguna); con Premium, ilimitadas','Cardio en 3D: 31 ejercicios con sus máquinas (cinta normal, inclinada y curva, bicicletas estática, de spinning, reclinada y de aire, elíptica, arc trainer, remo, SkiErg, escaladora, stepper, VersaClimber, trineo y cuerdas de batalla) y los de peso corporal (burpees, saltos, comba, boxeo, escaladores, paso de oso…). Ya no queda ninguna animación en 2D','Revisión 5: 322 aprobadas y 33 corregidas. Esterillas, bancos y almohadillas ya no atraviesan el cuerpo; brazos estirados de verdad en hundred, sierra, roll up, teaser y saltos; codos bien en face pull e Y-T-W; rodillas que ya no se giran en las elevaciones de piernas ni en el dead bug; saludo al sol con paso atrás en zancada y chaturanga; bandera del dragón, muscle-up, sissy, Copenhague y movilidad articular (ahora con 8 movimientos) rehechos; halo sin tocar la cabeza','Peso corporal en 3D: 128 ejercicios nuevos con su equipo (barra de dominadas, paralelas, anillas y TRX, bandas, banco, cajón, silla, pared y esterilla): flexiones y fondos, dominadas, core, piernas y glúteo, movilidad, estiramientos, yoga (con el saludo al sol encadenado) y pilates','Las posturas mantenidas (planchas, estiramientos, yoga) respiran suavemente en lugar de quedarse congeladas','Revisión 4: 218 animaciones aprobadas. Pesos muertos rehechos con biomecánica real: los pies no se mueven, primero se estiran las rodillas y luego la cadera, y la barra sube en línea recta deslizándose pegada a las piernas sin atravesarlas ni dar tirones. Halo con kettlebell: los antebrazos pasan por encima de la cabeza sin tocarla','Revisión 3: 160 animaciones aprobadas y 67 corregidas. Bancos y colchonetas ya no atraviesan el cuerpo; en los pesos muertos la barra sube por delante de las piernas; la barra Z tiene su forma; en los curls de muñeca solo se mueve la muñeca; press Arnold, press cubano, cargada, halo y levantamiento turco con el movimiento real y sin saltos; zancadas caminando alternando piernas; remo invertido con los talones fijos; rueda (rollout) sin despegarse del suelo','Las animaciones corregidas vuelven a aparecer como pendientes en Revisión de animaciones','95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)','Peso libre en 3D: 109 ejercicios con barra, mancuernas, kettlebell, barra Z, hexagonal, landmine, balón y fitball, incluidos los tumbados de lado','52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)','Poleas y Smith en 3D: 54 ejercicios con su torre de polea, cable, cuerda o barra, y la barra guiada que solo sube y baja','Nuevo motor de animación 3D: el cuerpo tiene profundidad real y cada ejercicio se ve desde el ángulo que mejor lo explica','Botón ⟲ en la ficha para girar la vista','Las 64 máquinas rehechas con máquinas reales: asiento, respaldo, palancas con su eje, rodillos, pila de discos, raíles y plataformas','Las manos y los pies se quedan en las asas, los rodillos y las plataformas durante todo el movimiento','Corregidas también las aperturas con mancuernas y los cruces de poleas','Revisión de animaciones en Explorar, por secciones de equipo: marca cada una como correcta o incorrecta y envía tus votos','Sello «En revisión» en las animaciones que todavía no están aprobadas']},
@@ -8956,7 +9049,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.0 · Primera entrega para Google Play", "Métodos especiales en el editor de rutinas (superseries, descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y Bilbo)", "Codo y cadera como zonas sensibles", "Premium con suscripción de Google Play y 3 días gratis", "Pedir Premium gratis si no puedes pagarlo", "1.0.1 · Todo lo de PandarIA es parte de Premium", "1.0.1 · PandarIA conecta ayuno, calorías, proteína y pulso en reposo con tu recuperación", "1.0.1 · El informe semanal suma agua, ayunos y proteína", "1.0.1 · Solo los 8 permisos de Health Connect que usa la app"];
+const NOTAS_VERSION=["1.1 · Base sólida para Google Play", "Fotos de progreso guardadas aparte: más espacio para tus datos", "Seguridad reforzada", "Premium: comprobación cada 7 días y prueba gratis más clara", "Textos y botones más fáciles de leer y tocar", "Los estiramientos ya no cuentan como récords"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>APP_VERSION+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -9069,7 +9162,7 @@ const fileInfo = f => { const a=(f&&f.appProperties)||{}; return {id:f.id, at:+a
 /* ---------- Copia: guardar ---------- */
 let CLOUD_BUSY=false;
 function cloudEnvelope(){
-  const data=clone(S); delete data.settings.cloud;
+  const data=JSON.parse(datosCompletosJSON()); delete data.settings.cloud;
   const env={app:'PandarIA Fit', fmt:1, ver:APP_VERSION, dataVer:DATA_VER, at:Date.now(), dev:cloudDev(), modelo:(window.PF_MODELO||''), resumen:cloudResumen(), data};
   if (typeof window.pfAccountLicense==='function'){ const l=window.pfAccountLicense(); if (l) env.prem=l; }
   return env; }
@@ -9078,6 +9171,7 @@ async function cloudBackup(o){
   if (c.conflict && !o.force){ if (o.manual) cloudConflictAsk(); return false; }
   CLOUD_BUSY=true; if (o.manual) toast(tx('Guardando en Google Drive…','Saving to Google Drive…'));
   try{
+    await fotosListo(); // 1.1: la copia en Drive siempre lleva las fotos completas
     const f=await driveFind(); const info=f?fileInfo(f):null;
     // Otra instalación guardó después de nuestra última copia: no se pisa sin preguntar
     if (info && info.dev && info.dev!==cloudDev() && info.at>(c.at||0) && !o.force){
@@ -11341,7 +11435,7 @@ const EN_08_RX=[
   [/^Plan (.+)\. Toca para empezarlo\.$/,'Plan $1. Tap to start it.'],
   [/^de (\d+) h · (.+)$/,'of $1 h · $2'],[/^Siguiente: (.+) a las (\d+) h$/,(m,a,h)=>`Next: ${EN_MAP.get(a)||a} at ${h} h`]
 ];
-const EN_POR={'chivito':'chivito','choripán':'choripán','sándwich':'sandwich','taco':'taco','taza':'cup','unidad':'unit','unidades':'units','porción':'serving','cucharada':'tbsp','cucharadas':'tbsp','cucharadita':'tsp','cucharaditas':'tsp','vaso':'glass','pieza':'piece','piezas':'pieces','lata':'can','rebanada':'slice','rebanadas':'slices','plato':'plate','puñado':'handful','mediano':'medium','mediana':'medium','filete':'fillet','grande':'large','hoja':'leaf','hojas':'leaves','pote':'pot','feta':'slice','barra':'bar','bife':'steak','sobre':'packet','cuadrito':'square','pequeña':'small','pequeño':'small','tallo':'stalk','tajada':'slice','scoop':'scoop','copa':'glass','rodaja':'slice','rodajas':'slices','ramillete':'floret','pizca':'pinch','mitad':'half','medida':'measure','medidas':'measures','botella':'bottle','bola':'scoop','yema':'yolk','uvas':'grapes','trozo':'piece','tiras':'strips','tira':'strip','tapa':'wrapper','tacita':'small cup','ramita':'sprig','racimo':'bunch','penca':'pad','pechuga':'breast','medallón':'patty','mazorca':'ear','lonja':'slice','diente':'clove','cubo':'cube','clara':'white','cerezas':'cherries','bulbo':'bulb','bolsita':'bag','aceituna':'olive','picada':'chopped','picado':'chopped','en':'','rodajas':'slices','cubos':'cubes','trozos':'pieces','puré':'purée','gajos':'segments','mitades':'halves','rallada':'grated','entera':'whole','molida':'ground','desmenuzada':'crumbled','derretida':'melted','compacta':'packed','cocida':'cooked','de':'','empanada':'empanada'};
+const EN_POR={'chivito':'chivito','choripán':'choripán','sándwich':'sandwich','taco':'taco','taza':'cup','unidad':'unit','unidades':'units','porción':'serving','cucharada':'tbsp','cucharadas':'tbsp','cucharadita':'tsp','cucharaditas':'tsp','vaso':'glass','pieza':'piece','piezas':'pieces','lata':'can','rebanada':'slice','rebanadas':'slices','plato':'plate','puñado':'handful','mediano':'medium','mediana':'medium','filete':'fillet','grande':'large','hoja':'leaf','hojas':'leaves','pote':'pot','feta':'slice','barra':'bar','bife':'steak','sobre':'packet','cuadrito':'square','pequeña':'small','pequeño':'small','tallo':'stalk','tajada':'slice','scoop':'scoop','copa':'glass','rodaja':'slice','rodajas':'slices','ramillete':'floret','pizca':'pinch','mitad':'half','medida':'measure','medidas':'measures','botella':'bottle','bola':'scoop','yema':'yolk','uvas':'grapes','trozo':'piece','tiras':'strips','tira':'strip','tapa':'wrapper','tacita':'small cup','ramita':'sprig','racimo':'bunch','penca':'pad','pechuga':'breast','medallón':'patty','mazorca':'ear','lonja':'slice','diente':'clove','cubo':'cube','clara':'white','cerezas':'cherries','bulbo':'bulb','bolsita':'bag','aceituna':'olive','picada':'chopped','picado':'chopped','en':'','cubos':'cubes','trozos':'pieces','puré':'purée','gajos':'segments','mitades':'halves','rallada':'grated','entera':'whole','molida':'ground','desmenuzada':'crumbled','derretida':'melted','compacta':'packed','cocida':'cooked','de':'','empanada':'empanada'};
 function enPor(p){ return p.split(' ').map(w=>EN_POR[w]!=null?EN_POR[w]:w).filter(Boolean).join(' '); }
 EN_08_RX.push([/^(\d+(?:\/\d+)?|\d+ ×) ([a-zñáéíóú ]+)$/,(m,q,p)=>p.split(' ').every(w=>EN_POR[w]!=null)?q+' '+enPor(p):m]);
 
@@ -11922,7 +12016,23 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno verás cuál toca. Con Premium, PandarIA la cambia si los músculos aún no se recuperaron.|Choose which days you train and the order of your routines. On each training day you will see which one is up next. With Premium, PandarIA swaps it if those muscles have not recovered yet.
+const EN_09 = `Pantalla de borde a borde en todas las versiones de Android y código optimizado para Google Play|Edge-to-edge screen on every Android version and code optimized for Google Play
+Las fotos de progreso se guardan aparte: mucho más espacio para tus datos|Progress photos are stored separately: much more room for your data
+Seguridad: la app solo puede conectarse con Google (y con GitHub en la versión de GitHub) y los avisos se muestran siempre como texto|Security: the app can only connect to Google (and to GitHub in the GitHub version) and messages are always shown as plain text
+Premium: la suscripción se vuelve a comprobar con Google Play al menos cada 7 días|Premium: the subscription is checked again with Google Play at least every 7 days
+Prueba gratis: la pantalla Premium aclara que los 3 días gratis son para tu primera suscripción|Free trial: the Premium screen makes clear the 3 free days are for your first subscription
+Los códigos de regalo no se alargan cambiando la fecha del teléfono|Gift codes cannot be extended by changing the phone date
+Textos más grandes (mínimo 12 px) y zonas táctiles más amplias en los botones pequeños|Bigger text (at least 12 px) and larger touch areas on small buttons
+Los estiramientos, la movilidad y el yoga ya no cuentan como récords|Stretches, mobility and yoga no longer count as records
+Progreso y agua explican qué falta cuando todavía hay pocos datos|Progress and water explain what is missing when there is little data yet
+1.1 · Base sólida para Google Play|1.1 · Solid base for Google Play
+Fotos de progreso guardadas aparte: más espacio para tus datos|Progress photos stored separately: more room for your data
+Seguridad reforzada|Stronger security
+Premium: comprobación cada 7 días y prueba gratis más clara|Premium: checked every 7 days and a clearer free trial
+Textos y botones más fáciles de leer y tocar|Text and buttons easier to read and tap
+Los estiramientos ya no cuentan como récords|Stretches no longer count as records
+Lista para Google Play|Ready for Google Play
+Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno verás cuál toca. Con Premium, PandarIA la cambia si los músculos aún no se recuperaron.|Choose which days you train and the order of your routines. On each training day you will see which one is up next. With Premium, PandarIA swaps it if those muscles have not recovered yet.
 Quitar plan semanal|Remove weekly plan
 Ayuno largo o pocas calorías antes de entrenar|Long fast or few calories before training
 Proteína corta varios días|Protein short for several days
