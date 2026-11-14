@@ -935,12 +935,16 @@
   }
 
   /* ---------- 8. Ciclo de vida ---------- */
+  // 1.1.01: al volver a la app (por ejemplo, después de elegir una foto en la galería) no se redibuja la pantalla de encima
+  // si tiene campos de texto: se borraba lo escrito y la foto elegida llegaba a un campo que ya no existía.
+  const capaConCampos = () => { const l = document.querySelector('#layers .layer:last-child') || document.querySelector('.layer:last-child');
+    return !!(l && l.querySelector('input:not([type=checkbox]):not([type=radio]),textarea,select')); };
   function init(){
     syncBars();
     if (App){
       App.addListener('backButton', onBack);
       App.addListener('pause', () => { save(true); writeBackup(); onPauseNotif(); svcSync(true); pushWidgets(true); });
-      App.addListener('resume', () => { onResumeNotif(); svcResync(); consumeWidget(); hcSync(false); if (S.active || (typeof INT !== 'undefined' && INT)) { awakeOn = false; keepAwake(); } render.keep = true; render(); if (LAYERS.length) refreshTop(); });
+      App.addListener('resume', () => { onResumeNotif(); svcResync(); consumeWidget(); hcSync(false); if (S.active || (typeof INT !== 'undefined' && INT)) { awakeOn = false; keepAwake(); } render.keep = true; render(); if (LAYERS.length && !capaConCampos()) refreshTop(); });
     }
     if (S.active) keepAwake();
     setupNotif();
