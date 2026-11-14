@@ -153,7 +153,7 @@
   /* ---------- 5. Barra de estado y tema ---------- */
   function syncBars(){
     // 1.1: barras transparentes (borde a borde); solo cambia el color de los iconos (el color de fondo de las barras quedó obsoleto en Android 15).
-    const light = S.settings.theme === 'light';
+    const light = document.documentElement.dataset.theme === 'light';
     safe(() => SystemBars.setStyle({style: light ? 'LIGHT' : 'DARK'}));
   }
   const _applyTheme = applyTheme;
@@ -766,16 +766,7 @@
       <div class="row" style="gap:8px;margin-top:14px"><button class="btn grow" data-a="cbm" data-v="${cb(() => { try{ navigator.clipboard.writeText(text).then(() => toast('Copiado'), () => fallbackCopy(text)); }catch(e){ fallbackCopy(text); } })}">${I('copy',18)} Copiar</button>
       <button class="btn pri grow" data-a="cbm" data-v="${cb(() => { const Sh = P('Share'); if (Sh) Sh.share({title:'Rutina de PandarIA Fit', text, dialogTitle:'Compartir rutina'}).catch(() => {}); })}">${I('upload',18)} Compartir</button></div></div>`, {center:true});
   };
-  // Tema según el sistema
-  const darkMQ = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
-  const _atS = applyTheme;
-  applyTheme = function(){
-    const s = S.settings, keep = s.theme;
-    if (keep === 'system') s.theme = darkMQ && darkMQ.matches ? 'dark' : 'light';
-    try{ _atS(); } finally { s.theme = keep; }
-  };
-  if (darkMQ && darkMQ.addEventListener) darkMQ.addEventListener('change', () => { if (S.settings.theme === 'system') applyTheme(); });
-  A.setThemeMode = v => { S.settings.theme = v; applyTheme(); save(); render.keep = true; render(); };
+  // 1.2: el tema según el sistema (Automático) y los dos oscuros los resuelve index.html (temaActual)
   let APPV = '';
 
   /* ---------- 13. Health Connect (Fase 6) ---------- */
@@ -901,8 +892,6 @@
   const _vaN = viewAjustes;
   viewAjustes = function(){
     let h = _vaN.apply(this, arguments);
-    const t = S.settings.theme;
-    h = h.replace(/<button class="srow" data-a="toggleSet" data-v="theme">[\s\S]*?<\/button>/, `<div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('moon',20)}</span><span class="b grow">Tema</span></div><div class="seg">${[['system','Sistema'],['light','Claro'],['dark','Oscuro']].map(([k, n]) => `<button class="${t === k ? 'on' : ''}" data-a="setThemeMode" data-v="${k}">${n}</button>`).join('')}</div></div>`);
     const s = HCS();
     const row = `<div class="sec">Salud</div><div class="card" style="padding:0 12px"><button class="srow" data-a="hcMenu"><span class="si">${I('flame',20)}</span><span class="grow"><div class="b">Health Connect</div><div class="xs mut">${s.on ? 'Conectado' + (HD.steps != null ? ` · ${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy` : '') : 'Pasos, peso y pulso de Samsung Health'}</div></span>${I('right',18)}</button></div>`;
     h = h.replace('<div class="sec">Notificaciones</div>', row + '<div class="sec">Notificaciones</div>');

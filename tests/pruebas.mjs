@@ -480,6 +480,50 @@ if (fs.existsSync(COPIA07)) {
   a.cerrar();
 }
 
+/* ---------- 1.2: PandarIA v2, temas, tamaño del texto y versión web ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; const H=3600000;
+    out.e1=Math.round(e1Sesion([{kg:100,reps:5},{kg:80,reps:15},{kg:90,reps:8}])*10)/10;
+    out.e1Alto=e1Sesion([{kg:60,reps:15}]);
+    const ses=(h,items,int)=>({id:'s'+h,routineId:'x',routineName:'X',start:Date.now()-h*H-3600000,end:Date.now()-h*H,intensity:int||6,items:items.map(([id,n,kg,reps])=>({exId:id,sets:Array.from({length:n},()=>({done:true,t:'n',kg,reps}))})),prs:[],vol:0});
+    S.sessions=[ses(24,[['press_banca',6,80,8]]), ses(10,[['sentadilla',3,100,5]],9)];
+    const R0=recMusculos(); out.pecho=Math.round(R0.pecho.pct*100); out.cuad=Math.round(R0.cuadriceps.pct*100); out.triceps=Math.round(R0.triceps.pct*100);
+    S.sessions=[ses(24*40,[['press_banca',3,70,8]]), ses(24*35,[['press_banca',3,72,8]]), ses(24*10,[['press_banca',3,77,8]])];
+    out.fuerza=fuerzaMusculos();
+    window.isPremium=()=>true; gustoCambio('press_banca','press_banca_man'); gustoCambio('press_banca','press_banca_man'); out.gusto=[gustoAjuste('press_banca'),gustoAjuste('press_banca_man')];
+    window.isPremium=()=>false; out.gustoGratis=gustoAjuste('press_banca'); window.isPremium=()=>true; delete S.gustos;
+    S.settings.theme='oled'; applyTheme(); out.oled=document.documentElement.dataset.theme;
+    S.settings.theme='system'; S.settings.oscuroAuto='oled'; out.auto=temaActual();
+    S.settings.theme='dark'; applyTheme();
+    S.settings.bigText=true; delete S.settings.texto; out.texto=textoNivel(); A.setTexto('mg'); out.zoom=document.body.style.zoom; A.setTexto('n');
+    const rt={id:'rp',name:'P',pandaria:true,goal:'musculo',items:[]}; S.routines.push(rt); S.active={routineId:'rp',items:[]}; S.settings.rir=false;
+    out.rirPrem=rirOn(); window.isPremium=()=>false; out.rirGratis=rirOn(); window.isPremium=()=>true; S.settings.rirAuto=false; out.rirApagado=rirOn(); S.active=null;
+    out.recuScreen=/Recuperación por músculo/.test(SCREENS.recuMapa({}));
+    return JSON.stringify(out); })()`));
+  comprobar('fuerza estimada: Epley con la mejor serie de hasta 12 repeticiones', r.e1 === 116.7 && r.e1Alto === null, JSON.stringify([r.e1, r.e1Alto]));
+  comprobar('recuperación: 6 series de pecho hace 24 h ≈ 50 %; 3 series de pierna intensas hace 10 h ≈ 36 %; tríceps (secundario) más recuperado', r.pecho === 50 && r.cuad === 36 && r.triceps > r.pecho, JSON.stringify([r.pecho, r.cuad, r.triceps]));
+  comprobar('fuerza por músculo: compara las últimas 4 semanas con las 4 anteriores', r.fuerza.length === 1 && r.fuerza[0].m === 'pecho' && r.fuerza[0].pct === 7, JSON.stringify(r.fuerza));
+  comprobar('gustos: el ejercicio quitado baja y el elegido sube; sin Premium no cuenta', r.gusto[0] < 0 && r.gusto[1] > 0 && r.gustoGratis === 0, JSON.stringify([r.gusto, r.gustoGratis]));
+  comprobar('temas: Negro puro y Automático con el oscuro elegido', r.oled === 'oled' && ['oled', 'light'].includes(r.auto), JSON.stringify([r.oled, r.auto]));
+  comprobar('tamaño del texto: «Texto grande» antiguo pasa a Grande; Muy grande amplía 1,25', r.texto === 'g' && r.zoom === '1.25', JSON.stringify([r.texto, r.zoom]));
+  comprobar('esfuerzo por serie: se pregunta solo en rutinas de PandarIA con Premium y se puede apagar', r.rirPrem && !r.rirGratis && !r.rirApagado);
+  comprobar('mapa de recuperación: la pantalla se dibuja', r.recuScreen);
+  a.cerrar();
+  // La versión web de prueba (docs/web) está al día con www/
+  const { execFileSync } = await import('node:child_process');
+  const tmpw = fs.mkdtempSync(path.join(DIR, '..', '.tmp-web-'));
+  let okWeb = true; try { execFileSync(process.execPath, [path.join(DIR, '..', 'scripts', 'version-web.mjs'), tmpw], { stdio: 'pipe' }); } catch (e) { okWeb = false; console.log('version-web:', String(e.stderr || e).slice(0, 300)); }
+  const igual = f => okWeb && fs.existsSync(path.join(DIR, '..', 'docs', 'web', f)) && fs.readFileSync(path.join(tmpw, f), 'utf8') === fs.readFileSync(path.join(DIR, '..', 'docs', 'web', f), 'utf8');
+  const wh = okWeb ? fs.readFileSync(path.join(tmpw, 'index.html'), 'utf8') : '';
+  const alDia = igual('index.html') && igual('premium.js');
+  fs.rmSync(tmpw, { recursive: true, force: true });
+  comprobar('versión web: docs/web está al día (si falla: node scripts/version-web.mjs)', alDia);
+  comprobar('versión web: lleva premium.js (Premium bloqueado) y nada de GitHub', /<script src="premium\.js"><\/script>/.test(wh) && !/api\.github\.com|PandarIA-Fit\.apk/.test(wh));
+}
+
 /* ---------- Comparación con los resultados guardados ---------- */
 if (ACTUALIZAR) {
   fs.writeFileSync(ESPERADO, JSON.stringify(resultados, null, 1) + '\n');

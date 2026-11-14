@@ -23,6 +23,10 @@
   --safe-t:var(--safe-area-inset-top,env(safe-area-inset-top,0px)); --safe-b:var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px));
   color-scheme:dark;
 }
+:root[data-theme="oled"]{
+  /* 1.2 · Negro puro: en pantallas OLED (AMOLED) los píxeles negros se apagan y ahorran batería */
+  --bg:#000000; --bg2:#0b0c0f; --card:#121418; --card2:#1b1e24; --line:#24282f;
+}
 :root[data-theme="light"]{
   --bg:#f3f4f7; --bg2:#ffffff; --card:#ffffff; --card2:#eef0f4; --line:#e1e4ea;
   --tx:#161a20; --mut:#69717f; --mut2:#9aa1ad;
@@ -918,13 +922,14 @@ const ACHIEVEMENTS = [
      consejo → cualquier otra fuente: solo tomamos el consejo, con nuestras palabras, y la citamos.
      propio  → criterio de PandarIA, cuando no hay una fuente que dé el número exacto.
    Evidencia: solida · moderada · limitada · contradictoria.  'rev' = revisar antes de esa fecha. */
-const KB_VER='1.4';
+const KB_VER='1.5';
 const KB_LOG=[
   {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'},
   {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'},
   {v:'1.2', d:'2026-11-12', app:'0.8.4', t:'Suplementos (creatina, cafeína, beta-alanina y proteína en polvo) con su dosis, su evidencia y para quién no son; calidad de la dieta (fibra, sodio y proteína por comida); ejemplos de menú; bebidas y cafeína en el agua del día; más agua en los entrenos largos; ayuno conectado con el diario y modo viaje sin equipo.'},
   {v:'1.3', d:'2026-11-12', app:'1.0', t:'Métodos especiales (superseries, series descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y método Bilbo), cada uno con su evidencia y la aclaración de que no está comprobado que sea mejor; codo y cadera como zonas sensibles.'},
   {v:'1.4', d:'2026-11-13', app:'1.0.1', t:'PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína que queda corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación; el informe semanal suma agua, ayuno y proteína.'},
+  {v:'1.5', d:'2026-11-14', app:'1.2', t:'Recuperación por músculo (cuánto se recuperó cada músculo, en un mapa) y aprender de tus cambios de ejercicio. Son criterios propios de PandarIA y no cambian ningún resultado anterior.'}
 ];
 const KB_LIC={pd:'Dominio público, con crédito', consejo:'Consejo de la fuente, con nuestras palabras', propio:'Criterio propio de PandarIA'};
 const KB_EV={solida:'Evidencia sólida', moderada:'Evidencia moderada', limitada:'Evidencia limitada', contradictoria:'Evidencia contradictoria'};
@@ -1102,6 +1107,10 @@ const KB_RULES=[
     t:'Entrenar en ayunas no empeora las sesiones cortas, pero en las largas rinde más quien comió antes. Por eso, si llevas 18 horas o más de ayuno, o ayer comiste menos del 60 % de tu objetivo, «Hoy toca» te propone empezar suave.', usa:'«Hoy toca» y recuperación', rev:'2028-11-01', desde:'1.0.1'},
   {id:'conexion.proteina', area:'nutricion', n:'Proteína corta varios días', v:{dias:3, min:2, f:0.7, ok:0.9}, src:['issn2017','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos que entrenan',
     t:'La proteína diaria ayuda a recuperarte y a ganar músculo con el entreno. Si en 2 de tus últimos 3 días con diario quedaste por debajo del 70 % de tu meta, PandarIA te lo avisa junto a tus entrenos. En el informe semanal, un día cuenta como cumplido desde el 90 % de la meta.', usa:'«Hoy toca», resumen del entreno e informe semanal', rev:'2028-11-01', desde:'1.0.1'},
+  {id:'recuperacion.mapa', area:'recuperacion', n:'Recuperación por músculo', v:{maxH:96, minF:0.5, maxF:1.5, intensa:8, extra:1.15}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'PandarIA estima cuánto se recuperó cada músculo con lo que entrenaste en los últimos 4 días. Con 6 series hacen falta unas 48 h; con menos series, menos tiempo (desde 24 h); con muchas más, hasta 72 h. Una sesión muy exigente (intensidad 8 o más) suma un 15 %, sin pasar de 96 h. Los músculos secundarios cuentan la mitad. Es una guía orientativa: cada persona se recupera a su ritmo.', usa:'Recuperación por músculo', rev:'2028-11-01', desde:'1.2'},
+  {id:'gustos.cambios', area:'entreno', n:'Aprender de tus cambios', v:{quita:1.2, pone:0.8, max:3}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'Cuando cambias un ejercicio por otro a mano, PandarIA propone menos el que quitaste y un poco más el que elegiste, al crear rutinas y al buscar alternativas. Cuenta hasta 3 cambios de cada ejercicio, y puedes borrarlos en Ajustes › PandarIA.', usa:'Rutinas de PandarIA y alternativas', rev:'2028-11-01', desde:'1.2'},
   {id:'conexion.pulso', area:'recuperacion', n:'Pulso en reposo más alto de lo normal', v:{min:4, lpm:7}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos con Health Connect',
     t:'Un pulso en reposo claramente más alto que tu media puede ser una señal de cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si el de hoy está 7 latidos o más por encima de tu media (con al menos 4 medidas anteriores), PandarIA lo cuenta como una señal más, igual que el check-in.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.0.1'},
 ];
@@ -1121,6 +1130,8 @@ const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sue
 const KB_EN_T={
  'conexion.ayuno':'Training fasted does not hurt short sessions, but in long ones people who ate beforehand perform better. So if you have been fasting for 18 hours or more, or ate less than 60 % of your target yesterday, “Up next” suggests starting easy.',
  'conexion.proteina':'Daily protein helps you recover and build muscle with training. If on 2 of your last 3 days with a food diary you stayed below 70 % of your goal, PandarIA tells you next to your workouts. In the weekly report, a day counts as met from 90 % of the goal.',
+ 'recuperacion.mapa':'PandarIA estimates how recovered each muscle is from what you trained in the last 4 days. With 6 sets it takes about 48 h; with fewer sets, less time (from 24 h); with many more, up to 72 h. A very hard session (intensity 8 or more) adds 15 %, never past 96 h. Secondary muscles count half. It is a rough guide: everyone recovers at their own pace.',
+ 'gustos.cambios':'When you swap an exercise for another by hand, PandarIA suggests the one you removed less often and the one you chose a bit more often, when building routines and looking for alternatives. It counts up to 3 swaps per exercise, and you can clear them in Settings › PandarIA.',
  'conexion.pulso':'A resting heart rate clearly above your average can be a sign of fatigue, although it also changes with sleep, stress or illness. If today’s is 7 beats or more above your average (with at least 4 earlier readings), PandarIA counts it as one more signal, just like the check-in.',
  'metodo.avanzados':'Special methods (drop sets, rest-pause, pyramids, German volume training…) do not build more muscle than normal sets with the same effort. They save time or add variety. PandarIA offers them as an option, never as a proven improvement.',
  'metodo.seguridad':'Methods that go close to failure (drop sets, rest-pause and myo-reps) are for intermediate or advanced lifters. PandarIA does not apply them to barbell squats or deadlifts, or to exercises that load a sensitive area.',
@@ -1456,6 +1467,7 @@ function alternatives(exId, exclude){
     const guided=o.eq.some(q=>['maq','smi','pol'].includes(q));
     if ((S.settings.avoid||{})[exId]==='molesta' && guided) sc+=2;
     else if (o.eq.some(q=>ex.eq.includes(q))) sc+=0.5;
+    sc+=gustoAjuste(id);
     out.push([sc,id]);
   }
   return out.sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
@@ -1542,6 +1554,7 @@ function pickExercise(slot, ctx){
     if (ctx.dayPat && ctx.dayPat.has(o.pat+'|'+o.prim[0])){ if (ctx.strict||slot.strict) continue; sc-=2.5; }
     if (ctx.prefer && ctx.prefer.includes(id)) sc+=1;
     if (STAPLES.has(id)) sc+=1.5;
+    sc+=gustoAjuste(id);
     cands.push([sc,id]);
   }
   if (!cands.length) return null;
@@ -1926,7 +1939,8 @@ function bodyMap(levels, opts){
   const col = opts.color || 'var(--ac)';
   const draw = (map,cx)=>Object.entries(map).map(([m,arr])=>{
     const v=levels[m]||0; if (!v) return '';
-    return arr.map(([x,y,rx,ry])=>`<ellipse cx="${cx+x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${col}" opacity="${(0.25+0.75*Math.min(1,v)).toFixed(2)}"/>`).join('');
+    const c=(opts.colors&&opts.colors[m])||col; // 1.2: un color por músculo (mapa de recuperación)
+    return arr.map(([x,y,rx,ry])=>`<ellipse cx="${cx+x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${c}" opacity="${(0.25+0.75*Math.min(1,v)).toFixed(2)}"/>`).join('');
   }).join('');
   return `<svg class="bodymap" viewBox="0 0 220 190" width="100%" style="max-width:${opts.w||320}px;margin:0 auto">
     ${bodySil(55)}${draw(BODY_F,55)}${bodySil(165)}${draw(BODY_B,165)}
@@ -5419,7 +5433,11 @@ function speak(text){
   if (!S.settings.voice || !window.speechSynthesis) return; text=spkTr(text);
   try{ const u=new SpeechSynthesisUtterance(text); u.lang=EN_LANG()?'en-US':'es-ES'; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
 }
-function applyTheme(){ document.documentElement.dataset.theme=S.settings.theme; const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=S.settings.theme==='light'?'#ffffff':'#181c23'; }
+// 1.2 · Temas: Automático (sigue al teléfono), Claro, Oscuro gris (LCD) y Negro puro (OLED). En Automático, de noche se usa el oscuro elegido.
+const DARK_MQ=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+function temaActual(){ const s=S.settings; let t=s.theme||'dark'; if (t==='system') t=DARK_MQ&&DARK_MQ.matches?(s.oscuroAuto==='oled'?'oled':'dark'):'light'; return ['light','dark','oled'].includes(t)?t:'dark'; }
+if (DARK_MQ&&DARK_MQ.addEventListener) DARK_MQ.addEventListener('change',()=>{ try{ if (S&&S.settings.theme==='system') applyTheme(); }catch(e){} });
+function applyTheme(){ const t=temaActual(); document.documentElement.dataset.theme=t; const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=t==='light'?'#ffffff':t==='oled'?'#000000':'#181c23'; }
 
 /* ---------- Navegación: pestañas, capas y ventanas ---------- */
 let TAB='rutinas';
@@ -5598,7 +5616,12 @@ A.openRoutine=id=>openLayer('routine',{id,key:id});
 
 /* =================== AJUSTES =================== */
 // (La pantalla de Ajustes está más abajo, en «Ajustes reorganizados».)
-A.toggleSet=k=>{ const s=S.settings; if(k==='theme'){ s.theme=s.theme==='dark'?'light':'dark'; applyTheme(); } else if(['checkin','period','report','tips','awake'].includes(k)) s[k]=s[k]===false; else s[k]=!s[k]; applyA11y(); if(k==='voice'&&s.voice) speak('Avisos por voz activados'); save(); render.keep=true; render(); };
+A.setThemeMode=v=>{ S.settings.theme=v; applyTheme(); save(); render.keep=true; render(); };
+A.setOscuroAuto=v=>{ S.settings.oscuroAuto=v; applyTheme(); save(); render.keep=true; render(); };
+// 1.2 · Tamaño del texto: Normal, Grande y Muy grande (antes solo «Texto grande»)
+const textoNivel=()=>S.settings.texto||(S.settings.bigText?'g':'n');
+A.setTexto=v=>{ S.settings.texto=v; S.settings.bigText=v!=='n'; applyA11y(); save(); render.keep=true; render(); };
+A.toggleSet=k=>{ const s=S.settings; if(k==='theme'){ s.theme=s.theme==='dark'?'light':'dark'; applyTheme(); } else if(['checkin','period','report','tips','awake','rirAuto'].includes(k)) s[k]=s[k]===false; else s[k]=!s[k]; applyA11y(); if(k==='voice'&&s.voice) speak('Avisos por voz activados'); save(); render.keep=true; render(); };
 A.setLevel=v=>{ S.settings.level=v; save(); render.keep=true; render(); toast('Dificultad: '+LEVEL_NAMES[LEVELS[v]]); };
 A.setUnit=v=>{ S.settings.unit=v; save(); render.keep=true; render(); };
 A.setRestDef=()=>sheet('Descanso por defecto',[30,45,60,90,120,150,180,240].map(s=>({icon:'timer',label:fmtTime(s)+(S.settings.rest===s?'  ✓':''),fn:()=>{S.settings.rest=s;save();render.keep=true;render();}})));
@@ -5891,7 +5914,7 @@ A.edMove=v=>{ const [u,d]=v.split('|'); const a=edP().draft.items; const i=a.fin
 A.edItemMenu=u=>{
   const d=edP().draft, it=edItem(u), idx=d.items.indexOf(it), ex=getEx(it.exId);
   const opts=[
-    {icon:'swap',label:'Reemplazar ejercicio',fn:()=>openLayer('picker',{mode:'replace',from:it.exId,q:'',m:'',mine:true,onPick:id=>{ it.exId=id; const e=getEx(id); it.sets.forEach(s=>{ if(e.mode==='t'){s.time=s.time||30;} else {s.reps=s.reps||10;} if(e.mode!=='p') s.kg=null; else s.kg=s.kg||estimateKg(id,s.reps||10); }); if(e.mode==='t') it.range=null; edDirty(); }})},
+    {icon:'swap',label:'Reemplazar ejercicio',fn:()=>openLayer('picker',{mode:'replace',from:it.exId,q:'',m:'',mine:true,onPick:id=>{ gustoCambio(it.exId,id); it.exId=id; const e=getEx(id); it.sets.forEach(s=>{ if(e.mode==='t'){s.time=s.time||30;} else {s.reps=s.reps||10;} if(e.mode!=='p') s.kg=null; else s.kg=s.kg||estimateKg(id,s.reps||10); }); if(e.mode==='t') it.range=null; edDirty(); }})},
     {icon:'flame',label:'Añadir series de calentamiento',fn:()=>{ if(ex.mode!=='p'){toast('Solo para ejercicios con peso');return;} const w=it.sets.find(s=>s.t!=='c'); const kg=w&&w.kg; [0.5,0.7].reverse().forEach(f=>it.sets.unshift({t:'c',kg:kg?roundTo(kg*f,incFor(ex)):null,reps:f===0.5?10:5})); edDirty(); refreshTop(); }},
     it.superset?{icon:'link',label:'Quitar de la superserie',fn:()=>{ const g=it.superset; it.superset=null; const left=d.items.filter(x=>x.superset===g); if(left.length<2) left.forEach(x=>x.superset=null); edDirty(); refreshTop(); }}
       :{icon:'link',label:'Crear superserie con el siguiente',fn:()=>{ const n=d.items[idx+1]; if(!n){toast('Añade otro ejercicio debajo primero');return;} const g=n.superset||uid(); it.superset=g; n.superset=g; edDirty(); refreshTop(); }},
@@ -6085,6 +6108,7 @@ SCREENS.exercise = p => {
     b+=`<div class="stats">${ex.mode==='p'?`<div class="stat"><div class="v">${fmtKg(rec.kg)}</div><div class="l">Peso máximo</div></div><div class="stat"><div class="v">${fmtNum(toUnit(rec.vol))}</div><div class="l">Mejor serie (${S.settings.unit}×reps)</div></div>`:ex.mode==='t'?`<div class="stat"><div class="v">${fmtTime(rec.time)}</div><div class="l">Mejor tiempo</div></div>`:`<div class="stat"><div class="v">${rec.reps}</div><div class="l">Máx. repeticiones</div></div>`}<div class="stat"><div class="v">${exHistory(ex.id).length}</div><div class="l">Sesiones</div></div></div>`;
     const pts=h.slice().reverse().map(e=>({x:e.date,y: ex.mode==='p'?Math.max(...e.sets.map(s=>+s.kg||0)): ex.mode==='t'?Math.max(...e.sets.map(s=>+s.time||0)):Math.max(...e.sets.map(s=>+s.reps||0))}));
     if (pts.length>1) b+=`<div class="card">${lineChart(pts.map(p=>({x:p.x,y:ex.mode==='p'?toUnit(p.y):p.y})),{unit:ex.mode==='p'?S.settings.unit:ex.mode==='t'?'s':'reps'})}</div>`;
+    if (ex.mode==='p') b+=e1Card(ex.id);
     b+=`<div class="card" style="padding:4px 14px">${h.slice(0,5).map((e,i)=>`<div class="kv"><span class="mut">${fmtDate(e.date)}</span><span>${e.sets.map(s=>ex.mode==='p'?`${fmtNum(toUnit(s.kg))}×${s.reps}`:ex.mode==='t'?fmtTime(s.time):s.reps).join(' · ')}</span></div>`).join('')}</div>`;
   }
   const alts=alternatives(ex.id).slice(0,4);
@@ -6236,7 +6260,7 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden && S && S
 // interruptor de PandarIA, pero no hace nada hasta que llega Premium (entonces se activa sola).
 function premOK(){ return typeof isPremium!=='function' || isPremium(); }
 function pIA(r){ return !!(r && r.pandaria) && premOK(); }
-const PREM_SET=['restSmart','checkin','period','report'];
+const PREM_SET=['restSmart','checkin','period','report','rirAuto'];
 function restSmart(r){ return pIA(r) && S.settings.restSmart!==false; }
 function activeItemFrom(tplItem, r){
   const it=clone(tplItem);
@@ -6331,7 +6355,7 @@ SCREENS.workout = () => {
       const tm=a.timer && a.timer.uid===it.uid && a.timer.i===i;
       if (tm) b+=timerBarHtml();
       else if (!s.done && !stepDone){ stepDone=true; b+=stepRowHtml(it,i,mode); }
-      if (s.done && S.settings.rir && s.t!=='c') b+=rirHtml(it,i,s);
+      if (s.done && rirOn() && s.t!=='c') b+=rirHtml(it,i,s);
       const isActiveRest = a.rest && a.rest.uid===it.uid && a.rest.i===i;
       if (isActiveRest) b+=restBarHtml();
       else if (nextSame) { if(i<it.sets.length-1) b+=`<div class="xs" style="text-align:center;color:var(--ac);padding:3px 0">→ alterna con el siguiente ejercicio</div>`; }
@@ -6435,6 +6459,13 @@ function completeSet(u,i,seguro){
       else if (ex.mode==='t' && rec.time>0 && s.time>rec.time){ pr=true; rec.time=s.time; }
       if (pr){ s.pr=true; toast(`★ ¡Nuevo récord en ${ex.n}!`,'pr'); vibrate([60,40,60,40,120]); }
     } else S.active.rec[it.exId]={kg:+s.kg||0,reps:+s.reps||0,time:+s.time||0};
+    // 1.2 · Premium: récord de fuerza estimada (1RM) aunque no hayas subido el peso máximo
+    if (!s.pr && premOK() && ex.mode==='p' && +s.kg>0 && +s.reps>0 && +s.reps<=E1_MAX_REPS){
+      const e=e1rm(+s.kg,+s.reps), A1=S.active.e1=S.active.e1||{};
+      if (A1[it.exId]==null) A1[it.exId]=e1Mejor(it.exId)||0;
+      if (A1[it.exId]>0 && e>A1[it.exId]*1.005){ toast(`💪 Récord de fuerza estimada en ${ex.n}: ${fmtKg(Math.round(e*10)/10)}`,'pr'); vibrate([60,40,120]); }
+      A1[it.exId]=Math.max(A1[it.exId],e);
+    }
   }
   // descanso
   const idx=S.active.items.indexOf(it);
@@ -6511,7 +6542,7 @@ A.wkMenu=u=>{
       save(); refreshTop(); }},
     {icon:'timer',label:`Descanso de todas las series (${fmtTime(it.rest)})`,fn:()=>A.wkRestEdit(u)},
     {icon:'list',label:'Descansos por serie',fn:()=>sheet('Descansos por serie',restPresetItems(it,()=>{ syncRoutineRest(it); save(); refreshTop(); }))},
-    {icon:'swap',label:'Reemplazar ejercicio',fn:()=>openLayer('picker',{mode:'replace',from:it.exId,q:'',m:'',mine:true,onPick:id=>{
+    {icon:'swap',label:'Reemplazar ejercicio',fn:()=>openLayer('picker',{mode:'replace',from:it.exId,q:'',m:'',mine:true,onPick:id=>{ gustoCambio(it.exId,id);
       const r=findR(S.active.routineId)||{pandaria:true}; const nb=buildItem(id,r.goal||'musculo',userLevel());
       nb.sets=it.sets.filter(s=>s.t!=='c').map(()=>Object.assign({},nb.sets[0])); if(!nb.sets.length) nb.sets=[buildItem(id,'musculo',1).sets[0]];
       const na=activeItemFrom(nb,r); na.uid=it.uid; na.rest=it.rest; na.superset=it.superset; na.sticky='';
@@ -6900,7 +6931,7 @@ function histResumen(){
   // mapa muscular semanal
   const ms=muscleSets(7); const mx=Math.max(10,...Object.values(ms));
   const lv={}; Object.entries(ms).forEach(([k,v])=>lv[k]=v/mx);
-  h+=`<div class="sec">Mapa muscular de los últimos 7 días</div><div class="card">${bodyMap(lv,{w:300})}
+  h+=`<div class="sec">Mapa muscular de los últimos 7 días</div><div class="card">${bodyMap(lv,{w:300})}<button class="btn wide sm" style="margin-top:10px" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>
     ${Object.keys(ms).length?`<div class="chips" style="margin-top:10px;justify-content:center">${Object.entries(ms).filter(([k])=>MUSCLES[k]&&!['cardio','movilidad'].includes(k)).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<span class="tag">${MUSCLES[k]} · ${fmtNum(v)}</span>`).join('')}</div><div class="xs mut" style="text-align:center;margin-top:8px">Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.</div>`:'<div class="xs mut" style="text-align:center">Entrena para ver qué músculos trabajaste.</div>'}</div>`;
   // sesiones
   h+=`<div class="sec">Entrenamientos</div>`;
@@ -6962,6 +6993,8 @@ function histProgreso(){
   h+=`<div class="sec">Progreso por ejercicio</div><div class="chips scroll" style="margin-bottom:10px">${ids.slice(0,15).map(id=>`<button class="chip ${PEX===id?'on':''}" data-a="pex" data-v="${id}">${esc(getEx(id).n)}</button>`).join('')}</div>
   <div class="card"><div class="b">${esc(ex.n)}</div><div class="xs mut" style="margin-bottom:8px">${ex.mode==='p'?'Peso máximo por sesión':ex.mode==='t'?'Mejor tiempo por sesión (s)':'Máximo de repeticiones por sesión'}</div>
   ${pts.length>1?lineChart(pts,{unit:ex.mode==='p'?S.settings.unit:ex.mode==='t'?'s':''}):'<div class="mut sm">Necesitas al menos 2 sesiones de este ejercicio.</div>'}</div>`;
+  if (ex.mode==='p') h+=e1Card(PEX);
+  h+=fuerzaMusculosHtml();
   return h;
 }
 A.pex=v=>{ PEX=v; render.keep=true; render(); };
@@ -7215,7 +7248,8 @@ function hoyCard(){
     ${(x=>x?`<div class="xs" style="color:var(--gold);margin-top:6px;line-height:1.4">🥩 ${esc(protCortaTxt(x))}${kbLink('conexion.proteina',tx('Por qué','Why'))}</div>`:'')(protCorta())}
     ${(rs=>rs.lvl==='buena'||!premOK()?'':`<div class="xs" style="color:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'};margin-top:6px;line-height:1.4">${tx('Recuperación '+rs.lvl,(rs.lvl==='baja'?'Low':'Medium')+' recovery')}: ${esc(rs.msgs.join(' · '))}${kbLink('recuperacion.ajuste',tx('Por qué','Why'))}</div>`)(recoveryState(nx.r))}
     <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${pIA(nx.r)&&recoveryState(nx.r).lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">${tx('Suave','Easy')}</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
-    <button class="link xs" style="margin-top:8px" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}${premOK()?'':' 🔒'}</button>`;
+    <button class="link xs" style="margin-top:8px" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}${premOK()?'':' 🔒'}</button>
+    <button class="link xs" style="margin-top:8px;display:block" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>`;
   else { let k=1; while(k<8 && !S.plan.days.includes((dow+k)%7)) k++;
     body=`<div class="xs mut b" style="letter-spacing:1px">HOY</div><div class="b" style="font-size:20px;margin-top:2px">Día de descanso</div><div class="sm mut" style="margin-top:4px">Próximo entreno: ${k===1?'mañana':DAYS_LONG[(dow+k)%7]} · ${esc(nx.r.name)}</div>
     <button class="link sm" style="margin-top:10px" data-a="hoyChange">Entrenar igual hoy</button>`; }
@@ -7231,6 +7265,75 @@ function recoveryState(r){
   const pu=pulsoAlto(); if (pu){ pts++; msgs.push(tx(`pulso en reposo de ${pu.last} lpm, ${pu.last-pu.avg} sobre tu media`,`resting heart rate ${pu.last} bpm, ${pu.last-pu.avg} above your average`)); }
   return {lvl:pts>=2?'baja':pts===1?'media':'buena', msgs};
 }
+
+/* ============ 1.2 · PandarIA v2: fuerza estimada, recuperación por músculo, esfuerzo y gustos (Premium) ============ */
+// Fuerza estimada (1RM, fórmula de Epley de la regla fuerza.e1rm) de una sesión: la mejor serie de trabajo hasta 12 repeticiones.
+// Por encima de 12 repeticiones la estimación pierde precisión, así que esas series no cuentan.
+const E1_MAX_REPS=12;
+function e1Card(exId){
+  if (!premOK()) return `<button class="card row tap" style="width:100%;text-align:left;gap:12px" data-a="pfGo" data-v="pandaria"><span style="font-size:22px">💪</span><div class="grow"><div class="b">${tx('Fuerza estimada (1RM)','Estimated strength (1RM)')} 🔒</div><div class="xs mut">${tx('Con Premium, PandarIA calcula tu máximo a una repetición y su evolución.','With Premium, PandarIA works out your one-rep max and how it changes.')}</div></div></button>`;
+  const h=e1Hist(exId,20); if (!h.length) return '';
+  const best=Math.max(...h.map(p=>p.y)), last=h[h.length-1].y;
+  return `<div class="card"><div class="row"><div class="grow"><div class="b">${tx('Fuerza estimada (1RM)','Estimated strength (1RM)')}</div><div class="xs mut">${tx('Tu máximo a una repetición, calculado con tus series de hasta 12 repeticiones.','Your one-rep max, worked out from your sets of up to 12 reps.')}${kbLink('fuerza.e1rm',tx('Fórmula','Formula'))}</div></div></div>
+    <div class="stats" style="margin-top:10px"><div class="stat"><div class="v">${fmtKg(Math.round(last*10)/10)}</div><div class="l">${tx('Última sesión','Last session')}</div></div><div class="stat"><div class="v">${fmtKg(Math.round(best*10)/10)}</div><div class="l">${tx('Mejor','Best')}</div></div></div>
+    ${h.length>1?lineChart(h.map(p=>({x:p.x,y:Math.round(toUnit(p.y)*10)/10})),{unit:S.settings.unit}):''}</div>`;
+}
+function e1Sesion(sets){ let m=0; (sets||[]).forEach(x=>{ const kg=+x.kg||0, r=+x.reps||0; if (kg>0 && r>0 && r<=E1_MAX_REPS) m=Math.max(m,e1rm(kg,r)); }); return m||null; }
+function e1Hist(exId,limit){ return exHistory(exId,limit||20).map(e=>({x:e.date,y:e1Sesion(e.sets)})).filter(p=>p.y).reverse(); }
+function e1Mejor(exId){ let m=0; S.sessions.forEach(s=>s.items.forEach(it=>{ if (it.exId===exId){ const v=e1Sesion(it.sets.filter(x=>x.done&&x.t!=='c')); if (v>m) m=v; } })); return m||null; }
+// Tu fuerza por músculo: mejor fuerza estimada de cada ejercicio en las últimas 4 semanas frente a las 4 anteriores,
+// promediada por músculo principal. Solo cuenta lo que hiciste tú (no se compara con nadie).
+function fuerzaMusculosHtml(){
+  if (!premOK()) return '';
+  const L=fuerzaMusculos();
+  let b=`<div class="sec">${tx('Tu fuerza por músculo','Your strength by muscle')}</div><div class="card"><div class="xs mut" style="margin-bottom:6px;line-height:1.4">${tx('Fuerza estimada de las últimas 4 semanas frente a las 4 anteriores.','Estimated strength in the last 4 weeks compared with the 4 before.')}</div>`;
+  if (!L.length) return b+`<div class="sm mut" style="line-height:1.45">${tx('Aparecerá cuando tengas al menos 5 semanas entrenando ejercicios con peso.','It will appear once you have at least 5 weeks training exercises with weights.')}</div></div>`;
+  return b+L.map(o=>`<div class="kv"><span>${esc(MUSCLES[o.m])}</span><b style="color:${o.pct>0?'var(--ok)':o.pct<0?'var(--bad)':'var(--mut)'}">${o.pct>0?'+':''}${o.pct} %</b></div>`).join('')+`</div>`;
+}
+function fuerzaMusculos(){
+  const now=Date.now(), W=28*DAY, por={};
+  S.sessions.forEach(s=>s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.mode!=='p'||ex.missing) return; const e=e1Sesion(it.sets.filter(x=>x.done&&x.t!=='c')); if (!e) return;
+    const age=now-(s.end||s.start); const k=age<W?'a':age<2*W?'b':null; if (!k) return;
+    const o=por[it.exId]=por[it.exId]||{a:0,b:0}; o[k]=Math.max(o[k],e); }));
+  const mus={};
+  Object.entries(por).forEach(([id,o])=>{ if (!o.a||!o.b) return; const m=getEx(id).prim[0]; if (!MUSCLES[m]||['cardio','movilidad'].includes(m)) return; (mus[m]=mus[m]||[]).push(o.a/o.b-1); });
+  return Object.entries(mus).map(([m,arr])=>({m, pct:Math.round(arr.reduce((a,b)=>a+b,0)/arr.length*100), n:arr.length})).sort((a,b)=>b.pct-a.pct);
+}
+// Recuperación por músculo (0 a 1): cada sesión de los últimos 4 días cansa los músculos que trabajó.
+// Con las series de la regla recuperacion.48h (6) hacen falta 48 h; con menos, menos tiempo; con el doble, 72 h; máximo 96 h.
+// Una sesión muy exigente (intensidad 8 o más) suma un 15 %. Es una estimación orientativa.
+function recMusculos(){
+  const KR=kb('recuperacion.48h'), KM=kb('recuperacion.mapa'), now=Date.now(), out={};
+  S.sessions.filter(s=>s.end && now-s.end<KM.maxH*3600000).forEach(s=>{
+    const load={};
+    s.items.forEach(it=>{ const ex=getEx(it.exId); if (!conRecord(ex)) return; const n=it.sets.filter(x=>x.done&&x.t!=='c').length; if (!n) return;
+      ex.prim.forEach(m=>load[m]=(load[m]||0)+n); ex.sec.forEach(m=>load[m]=(load[m]||0)+n*0.5); });
+    const f=(s.intensity||6)>=KM.intensa?KM.extra:1;
+    Object.entries(load).forEach(([m,n])=>{ if (!MUSCLES[m]||['cardio','movilidad'].includes(m)) return;
+      const h=Math.min(KM.maxH, KR.horas*Math.max(KM.minF, Math.min(KM.maxF, n/KR.series))*f);
+      const pct=Math.max(0,Math.min(1,(now-s.end)/(h*3600000)));
+      const prev=out[m]; if (!prev||pct<prev.pct) out[m]={pct, listo:s.end+h*3600000}; });
+  });
+  return out;
+}
+A.recuMapa=()=>{ if (!premOK()) return pfPay('pandaria'); openLayer('recuMapa',{}); };
+SCREENS.recuMapa=()=>{
+  const R0=recMusculos(), ms=Object.entries(R0).filter(([,o])=>o.pct<1).sort((a,b)=>a[1].pct-b[1].pct);
+  const color=p=>p<0.5?'var(--bad)':p<0.85?'var(--gold)':'var(--ok)';
+  const lv={}, cols={}; ms.forEach(([m,o])=>{ lv[m]=Math.max(0.35,1-o.pct*0.7); cols[m]=color(o.pct); });
+  const horas=t=>{ const h=Math.max(1,Math.round((t-Date.now())/3600000)); return h<24?tx(`en ${h} h`,`in ${h} h`):tx(`en ${Math.round(h/24*10)/10} días`.replace('.',','),`in ${Math.round(h/24*10)/10} days`); };
+  let b=`<p class="sm mut" style="margin-top:0;line-height:1.5">${tx('Cuánto se ha recuperado cada músculo según lo que entrenaste en los últimos 4 días. Es una estimación: tu cuerpo manda.','How recovered each muscle is, based on what you trained in the last 4 days. It is an estimate: your body has the final say.')}${kbLink('recuperacion.mapa',tx('Cómo se calcula','How it is calculated'))}</p>`;
+  b+=`<div class="card">${bodyMap(lv,{w:300,colors:cols})}<div class="row xs" style="justify-content:center;gap:14px;margin-top:8px;flex-wrap:wrap"><span><span class="ndot" style="background:var(--bad)"></span> ${tx('Menos del 50 %','Under 50 %')}</span><span><span class="ndot" style="background:var(--gold)"></span> 50–85 %</span><span><span class="ndot" style="background:var(--ok)"></span> ${tx('Casi listo','Almost ready')}</span></div></div>`;
+  if (!ms.length) b+=`<div class="empty"><div class="big">💪</div>${tx('Todos tus músculos están recuperados.','All your muscles are recovered.')}</div>`;
+  else b+=`<div class="card" style="padding:4px 14px">${ms.map(([m,o],i)=>`<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="row"><span class="grow b">${esc(MUSCLES[m])}</span><span class="b" style="color:${color(o.pct)}">${Math.round(o.pct*100)} %</span></div><div style="height:6px;border-radius:3px;background:var(--card2);margin-top:6px;overflow:hidden"><div style="height:100%;width:${Math.round(o.pct*100)}%;background:${color(o.pct)}"></div></div><div class="xs mut" style="margin-top:4px">${tx('Recuperado','Recovered')} ${horas(o.listo)}</div></div>`).join('')}</div>`;
+  return lhdr(tx('Recuperación por músculo','Recovery by muscle'))+`<div class="lbody">${b}</div>`;
+};
+// Esfuerzo por serie: en las rutinas de PandarIA se pregunta solo (Premium), además del ajuste «en todas las rutinas»
+const rirOn=()=>{ if (S.settings.rir) return true; if (!premOK()||S.settings.rirAuto===false||!S.active) return false; const r=findR(S.active.routineId); return !!(r&&r.pandaria); };
+// Gustos: si cambias un ejercicio por otro a mano, PandarIA lo tiene en cuenta al proponer ejercicios (Premium)
+function gustoCambio(de,a){ if (!de||!a||de===a) return; const g=S.gustos=S.gustos||{quita:{},pone:{}}; g.quita[de]=Math.min(5,(g.quita[de]||0)+1); g.pone[a]=Math.min(5,(g.pone[a]||0)+1); }
+function gustoAjuste(id){ const g=S.gustos; if (!g||!premOK()) return 0; const K=kb('gustos.cambios'); return -K.quita*Math.min(K.max,g.quita[id]||0)+K.pone*Math.min(K.max,g.pone[id]||0); }
+A.gustosReset=()=>confirmBox({title:tx('¿Olvidar tus cambios de ejercicio?','Forget your exercise swaps?'),text:tx('PandarIA dejará de tener en cuenta los ejercicios que cambiaste a mano.','PandarIA will stop taking into account the exercises you swapped by hand.'),okText:tx('Olvidar','Forget'),ok:()=>{ delete S.gustos; save(); render.keep=true; render(); if (LAYERS.length) refreshTop(); toast(tx('Listo','Done')); }});
 A.startSoft=rid=>{ const KR=kb('recuperacion.ajuste'); WK_AJUSTE={f:KR.f, why:`Sesión suave: ${Math.round((1-KR.f)*100)} % menos de carga`, rid, t:Date.now()}; A.startWorkout(rid); };
 A.hoyChange=()=>sheet('¿Qué quieres entrenar hoy?',S.routines.filter(r=>!r.archived).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startWorkout(r.id)})).concat([{icon:'swap',label:tx('✈️ Modo viaje: una rutina sin equipo','✈️ Travel mode: a routine without equipment')+(premOK()?'':' 🔒'),fn:()=>setTimeout(()=>sheet(tx('¿Qué rutina hacemos sin equipo?','Which routine without equipment?'),S.routines.filter(r=>!r.archived&&r.items.length).map(r=>({icon:'dumbbell',label:r.name,fn:()=>A.startTravel(r.id)}))),250)}]));
 A.openPlan=()=>{ const ids=S.routines.filter(r=>!r.archived).map(r=>r.id); const pl=S.plan?clone(S.plan):{days:defaultDays(Math.min(ids.length,3)),order:ids.slice(0,6)}; openLayer('plan',{pl}); };
@@ -9013,11 +9116,12 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.1';
+const APP_VERSION='1.2';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
-const APP_PARCHE='01';
+const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.2',t:'PandarIA v2 y temas',items:['PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno', 'PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores', 'PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo', 'PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión', 'PandarIA v2 · Aprende de tus cambios: si cambias un ejercicio a mano, lo tiene en cuenta al proponer ejercicios', 'Temas: Automático, Claro, Oscuro gris (pantallas LCD) y Negro puro (pantallas OLED)', 'Tamaño del texto: Normal, Grande y Muy grande', 'Biblioteca de evidencia 1.5: 2 reglas nuevas']},
  {v:'1.1.01',t:'Arreglos',items:['La parte de arriba de la pantalla ya no muestra restos de la imagen de inicio','Al elegir una foto de progreso ya no se borran las medidas que escribiste y la foto se guarda']},
  {v:'1.1',t:'Base sólida',items:['Pantalla de borde a borde en todas las versiones de Android y código optimizado para Google Play', 'Las fotos de progreso se guardan aparte: mucho más espacio para tus datos', 'Seguridad: la app solo puede conectarse con Google (y con GitHub en la versión de GitHub) y los avisos se muestran siempre como texto', 'Premium: la suscripción se vuelve a comprobar con Google Play al menos cada 7 días', 'Prueba gratis: la pantalla Premium aclara que los 3 días gratis son para tu primera suscripción', 'Los códigos de regalo no se alargan cambiando la fecha del teléfono', 'Textos más grandes (mínimo 12 px) y zonas táctiles más amplias en los botones pequeños', 'Los estiramientos, la movilidad y el yoga ya no cuentan como récords', 'Progreso y agua explican qué falta cuando todavía hay pocos datos']},
  {v:'1.0',t:'Lista para Google Play',items:['Métodos especiales en el editor de rutinas: superseries, series descendentes, rest-pause, myo-reps, pirámide, series en clúster, volumen alemán (10 × 10) y método Bilbo. Elegirlos es gratis; con Premium, PandarIA arma las series por ti','Cada método explica cómo se hace, lleva la etiqueta «No comprobado que sea mejor que el entrenamiento normal» y su fuente en Ciencia de PandarIA; el método Bilbo y las myo-reps, además, «Evidencia limitada»','Seguridad: los métodos que llegan cerca del fallo son para nivel intermedio o avanzado y no se aplican a la sentadilla ni al peso muerto con barra ni a ejercicios que carguen una zona sensible','Codo y cadera como zonas sensibles: PandarIA evita los ejercicios que más las cargan y, con el codo, sube el peso de brazos de a un disco y añade calentamiento','Premium con suscripción de Google Play: mensual o trimestral, con 3 días gratis; «Restaurar compras» y «Administrar suscripción»','Pedir Premium gratis: si no puedes pagarlo, envía tu código y el motivo; los códigos quedan solo como regalo','Biblioteca de evidencia 1.3: 12 reglas nuevas','1.0.1 · Todo lo de PandarIA es parte de Premium: sin Premium la rutina muestra «PandarIA · Premium» y ves lo que hiciste la última vez','1.0.1 · PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación','1.0.1 · El informe semanal suma agua, ayunos y proteína','1.0.1 · La versión de Google Play pide solo los 8 permisos de Health Connect que usa','Biblioteca de evidencia 1.4: 3 reglas nuevas']},
@@ -9053,7 +9157,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.1.01 · Arreglos de la parte de arriba de la pantalla y de las fotos de progreso", "1.1 · Base sólida para Google Play", "Fotos de progreso guardadas aparte: más espacio para tus datos", "Seguridad reforzada", "Premium: comprobación cada 7 días y prueba gratis más clara", "Textos y botones más fáciles de leer y tocar", "Los estiramientos ya no cuentan como récords"];
+const NOTAS_VERSION=["1.2 · PandarIA v2 y temas", "Fuerza estimada (1RM) y tu fuerza por músculo", "Recuperación por músculo en un mapa", "Esfuerzo por serie en las rutinas de PandarIA", "Temas Automático, Claro, Oscuro gris y Negro puro", "Tamaño del texto en tres niveles"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -9380,7 +9484,7 @@ function cloudBoot(){
 }
 
 /* ---------- Accesibilidad ---------- */
-function applyA11y(){ document.body.style.zoom = S.settings.bigText?'1.12':''; document.documentElement.dataset.contrast = S.settings.contrast?'high':''; }
+function applyA11y(){ document.body.style.zoom = ({n:'',g:'1.12',mg:'1.25'})[textoNivel()]||''; document.documentElement.dataset.contrast = S.settings.contrast?'high':''; }
 
 /* ---------- Explorar: secciones nuevas ---------- */
 EXPLORE.push(
@@ -9434,15 +9538,17 @@ function viewAjustes(){
     ${typeof ANIM_FEEDBACK!=='undefined'&&ANIM_FEEDBACK?nav('openRev','search','Revisión de animaciones',`${Object.keys(S.animRev||{}).length}`):''}
     <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('weight',20)}</span><span class="b grow">Unidades</span></div>
       <div class="seg">${['kg','lb'].map(u=>`<button class="${st.unit===u?'on':''}" data-a="setUnit" data-v="${u}">${u==='kg'?'Kilogramos (kg)':'Libras (lb)'}</button>`).join('')}</div></div>
-    ${tg('rir',st.rir,'target','Esfuerzo por serie (RIR)','Anota cuántas repeticiones te quedaban')}
+    ${tg('rir',st.rir,'target','Esfuerzo por serie (RIR)','En todas las rutinas: anota cuántas repeticiones te quedaban')}
     ${nav('openAvoid','eyeoff','Ejercicios evitados',nAv||'')}
     ${nav('openArchived','archive','Archivadas',arch||'')}
   </div>
   <div class="sec">PandarIA</div><div class="card" style="padding:0 12px">
+    ${tg('rirAuto',st.rirAuto!==false,'target','Preguntar el esfuerzo en rutinas de PandarIA','Premium · tras cada serie: cuántas repeticiones te quedaban. PandarIA ajusta la próxima sesión')}
     ${tg('checkin',st.checkin!==false,'spark','Check-in antes de entrenar','Sueño, energía y agujetas; se puede saltar')}
     ${tg('period',st.period!==false,'layers','Periodización por bloques','Ciclos de volumen, intensidad y descarga')}
     ${tg('report',st.report!==false,'chart','Informe semanal','Aviso cada lunes con el resumen de tu semana')}
     ${tg('tips',st.tips!==false,'book','Consejos del día','En Mis rutinas')}
+    ${S.gustos&&Object.keys(S.gustos.quita||{}).length?nav('gustosReset','swap','Olvidar mis cambios de ejercicio',Object.keys(S.gustos.quita).length):''}
   </div>
   <div class="sec">Nutrición y ayuno</div><div class="card" style="padding:0 12px">
     ${nav('tab','leaf','Objetivo nutricional',NGOALS[nut().goal],'nutricion')}
@@ -9456,8 +9562,12 @@ function viewAjustes(){
     ${tg('awake',st.awake!==false,'flame','Pantalla siempre encendida')}
   </div>
   <div class="sec">Apariencia y accesibilidad</div><div class="card" style="padding:0 12px">
-    ${tg('theme',st.theme==='dark','moon','Modo oscuro')}
-    ${tg('bigText',st.bigText,'info','Texto grande')}
+    <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('moon',20)}</span><span class="b grow">Tema</span></div>
+      <div class="seg">${[['system','Automático'],['light','Claro'],['dark','Oscuro'],['oled','Negro']].map(([k,n])=>`<button class="${(st.theme||'dark')===k?'on':''}" data-a="setThemeMode" data-v="${k}">${n}</button>`).join('')}</div>
+      ${st.theme==='system'?`<div class="xs mut" style="margin:10px 0 6px">De noche usa</div><div class="seg">${[['dark','Oscuro gris'],['oled','Negro puro']].map(([k,n])=>`<button class="${(st.oscuroAuto||'dark')===k?'on':''}" data-a="setOscuroAuto" data-v="${k}">${n}</button>`).join('')}</div>`:''}
+      <div class="xs mut" style="margin-top:8px;line-height:1.4">Oscuro gris se ve mejor en pantallas LCD. Negro puro ahorra batería en pantallas OLED (AMOLED).</div></div>
+    <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('info',20)}</span><span class="b grow">Tamaño del texto</span></div>
+      <div class="seg">${[['n','Normal'],['g','Grande'],['mg','Muy grande']].map(([k,n])=>`<button class="${textoNivel()===k?'on':''}" data-a="setTexto" data-v="${k}">${n}</button>`).join('')}</div></div>
     ${tg('contrast',st.contrast,'eyeoff','Alto contraste')}
     <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('compass',20)}</span><span class="b grow">Idioma</span></div>
       <div class="seg"><button class="${st.lang!=='en'?'on':''}" data-a="setLang" data-v="es">Español</button><button class="${st.lang==='en'?'on':''}" data-a="setLang" data-v="en">English</button></div></div>
@@ -9489,13 +9599,13 @@ const AJ_GRUPOS=[
   {id:'entreno',ic:'dumbbell',t:'Entrenamiento',en:'Training',d:'Equipos, nivel, plan semanal, unidades',den:'Equipment, level, weekly plan, units',
    parts:[{keys:['openEquip','setLevel','openPlan','setUnit','setPlate','setRestDef','openAvoid','openArchived'],rest:['Entrenamiento']}]},
   {id:'pandaria',ic:'spark',t:'PandarIA',en:'PandarIA',d:'Descansos, esfuerzo, check-in e informes',den:'Rests, effort, check-in and reports',
-   parts:[{keys:['toggleSet:restSmart','toggleSet:rir','toggleSet:checkin','toggleSet:period','toggleSet:report','toggleSet:tips'],rest:['PandarIA']}]},
+   parts:[{keys:['toggleSet:restSmart','toggleSet:rirAuto','toggleSet:rir','toggleSet:checkin','toggleSet:period','toggleSet:report','toggleSet:tips','gustosReset'],rest:['PandarIA']}]},
   {id:'nutri',ic:'leaf',t:'Nutrición y ayuno',en:'Nutrition and fasting',d:'Objetivo nutricional y ayuno',den:'Nutrition goal and fasting',
    parts:[{keys:[],rest:['Nutrición y ayuno']}]},
   {id:'avisos',ic:'bell',t:'Avisos y sonido',en:'Reminders and sound',d:'Notificaciones, sonido, vibración y voz',den:'Notifications, sound, vibration and voice',
    parts:[{keys:['nfMenu'],rest:['Notificaciones','Recordatorios'],whole:true},{sec:'Durante el entreno',keys:['toggleSet:sound','toggleSet:vibrate','toggleSet:voice','toggleSet:uiSound']}]},
-  {id:'pantalla',ic:'moon',t:'Pantalla e idioma',en:'Display and language',d:'Idioma, tema, texto grande y animaciones',den:'Language, theme, large text and animations',
-   parts:[{keys:['setLang','setThemeMode','toggleSet:bigText','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
+  {id:'pantalla',ic:'moon',t:'Pantalla e idioma',en:'Display and language',d:'Idioma, tema, tamaño del texto y animaciones',den:'Language, theme, text size and animations',
+   parts:[{keys:['setLang','setThemeMode','setTexto','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
   {id:'salud',ic:'heart',t:'Salud',en:'Health',d:'Health Connect',den:'Health Connect',parts:[{keys:[],rest:['Salud'],whole:true}]},
   {id:'acerca',ic:'info',t:'Acerca de',en:'About',d:'Ciencia, historial de cambios, créditos y versión',den:'Science, change history, credits and version',
    parts:[{sec:'Acerca de',whole:true,noHead:true},{html:()=>typeof A.hcPrivacy==='function'?`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" data-a="hcPrivacy"><span class="si">${I('lock',20)}</span><span class="grow b">${tx('Política de privacidad','Privacy policy')}</span><span class="mut" style="font-size:22px;line-height:1">›</span></button></div>`:''},{sec:'Créditos',whole:true},{otros:true}]}
@@ -11409,7 +11519,7 @@ No hay beneficios extra en alargarlo. Considera romperlo con proteína y verdura
 Crear rutina para estos músculos|Create a routine for these muscles
 Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.|Sets per muscle. For muscle growth, 10–20 per week are recommended.
 Rosé wine|Rosé wine`;
-const KB_LOG_EN={'1.4':'PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and the resting heart rate from Health Connect count towards your recovery; the weekly report adds water, fasting and protein.','1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
+const KB_LOG_EN={'1.5':'Recovery by muscle (how recovered each muscle is, on a map) and learning from your exercise swaps. They are PandarIA’s own criteria and do not change any earlier result.','1.4':'PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and the resting heart rate from Health Connect count towards your recovery; the weekly report adds water, fasting and protein.','1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
  '1.1':'Rules that change results: 2 minutes of rest on weighted compound lifts for muscle; weight-loss pace of 0.5 to 1 % of body weight per week instead of a fixed 15 %; a calorie target that adjusts with your diary and weight; a lighter load if you arrive poorly rested; water goal recalibrated with the EFSA reference; alternatives of similar difficulty.',
  '1.3':'Special methods (supersets, drop sets, rest-pause, myo-reps, pyramids, clusters, German volume training and the Bilbo method), each with its evidence and a note that it is not proven to be better; elbow and hip as sensitive areas.',
  '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
@@ -12020,7 +12130,38 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `La parte de arriba de la pantalla ya no muestra restos de la imagen de inicio|The top of the screen no longer shows leftovers of the start image
+const EN_09 = `PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno|PandarIA v2 · Estimated strength (1RM) for every weighted exercise, with its chart and a strength record alert during the workout
+PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores|PandarIA v2 · Your strength by muscle: the last 4 weeks compared with the 4 before
+PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo|PandarIA v2 · Recovery by muscle: a map with each muscle’s percentage and when it will be ready
+PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión|PandarIA v2 · PandarIA routines ask how many reps you had left in each set, to adjust the next session
+PandarIA v2 · Aprende de tus cambios: si cambias un ejercicio a mano, lo tiene en cuenta al proponer ejercicios|PandarIA v2 · Learns from your swaps: if you swap an exercise by hand, it takes that into account when suggesting exercises
+Temas: Automático, Claro, Oscuro gris (pantallas LCD) y Negro puro (pantallas OLED)|Themes: Automatic, Light, Dark grey (LCD screens) and Pure black (OLED screens)
+Tamaño del texto: Normal, Grande y Muy grande|Text size: Normal, Large and Extra large
+Biblioteca de evidencia 1.5: 2 reglas nuevas|Evidence library 1.5: 2 new rules
+1.2 · PandarIA v2 y temas|1.2 · PandarIA v2 and themes
+Fuerza estimada (1RM) y tu fuerza por músculo|Estimated strength (1RM) and your strength by muscle
+Recuperación por músculo en un mapa|Recovery by muscle on a map
+Esfuerzo por serie en las rutinas de PandarIA|Effort per set in PandarIA routines
+Temas Automático, Claro, Oscuro gris y Negro puro|Automatic, Light, Dark grey and Pure black themes
+Tamaño del texto en tres niveles|Text size in three levels
+Automático|Automatic
+Negro|Black
+De noche usa|At night use
+Oscuro gris|Dark grey
+Negro puro|Pure black
+Oscuro gris se ve mejor en pantallas LCD. Negro puro ahorra batería en pantallas OLED (AMOLED).|Dark grey looks better on LCD screens. Pure black saves battery on OLED (AMOLED) screens.
+Tamaño del texto|Text size
+Grande|Large
+Muy grande|Extra large
+Preguntar el esfuerzo en rutinas de PandarIA|Ask for effort in PandarIA routines
+Premium · tras cada serie: cuántas repeticiones te quedaban. PandarIA ajusta la próxima sesión|Premium · after each set: how many reps you had left. PandarIA adjusts the next session
+En todas las rutinas: anota cuántas repeticiones te quedaban|In every routine: note how many reps you had left
+Olvidar mis cambios de ejercicio|Forget my exercise swaps
+Recuperación por músculo|Recovery by muscle
+Aprender de tus cambios|Learning from your swaps
+Rutinas de PandarIA y alternativas|PandarIA routines and alternatives
+PandarIA v2 y temas|PandarIA v2 and themes
+La parte de arriba de la pantalla ya no muestra restos de la imagen de inicio|The top of the screen no longer shows leftovers of the start image
 Al elegir una foto de progreso ya no se borran las medidas que escribiste y la foto se guarda|Picking a progress photo no longer clears the measurements you typed, and the photo is saved
 Arreglos|Fixes
 1.1.01 · Arreglos de la parte de arriba de la pantalla y de las fotos de progreso|1.1.01 · Fixes for the top of the screen and progress photos
