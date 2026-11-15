@@ -50,7 +50,10 @@ jobs:
 
       - name: Crear proyecto iOS (CocoaPods)
         run: |
-          npx cap add ios --packagemanager CocoaPods
+          # «cap add» ya intenta el pod install con iOS 15.0 y ML Kit pide 15.5: ese primer intento puede fallar;
+          # ios-extra.mjs sube el mínimo y «cap sync» lo repite (ahí sí debe salir bien)
+          npx cap add ios --packagemanager CocoaPods || echo "pod install se repite tras ajustar el Podfile"
+          test -f ios/App/Podfile || { echo "ERROR: no se creó el proyecto iOS"; exit 1; }
           npx @capacitor/assets generate --ios --iconBackgroundColor '#12151a' --splashBackgroundColor '#12151a' --splashBackgroundColorDark '#12151a'
           node scripts/ios-extra.mjs
           npx cap sync ios
