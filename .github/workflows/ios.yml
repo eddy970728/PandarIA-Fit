@@ -6,7 +6,8 @@ name: Compilar app de iPhone (IPA sin firmar)
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    # también las ramas de prueba (fase-…): la IPA queda como artefacto para probarla antes de pasarla a main
+    branches: [main, 'fase-*']
     paths: ['www/**', 'scripts/**', 'assets/**', 'package.json', 'capacitor.config.json', '.github/workflows/ios.yml']
 
 permissions:
