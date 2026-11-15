@@ -1299,7 +1299,7 @@ function exHistory(exId, limit){
     if (!it) continue;
     const work=it.sets.filter(x=>x.done && x.t!=='c');
     if (!work.length) continue;
-    out.push({date:s.end||s.start, sets:work, all:it.sets, intensity:s.intensity||6, sid:s.id, chk:s.checkin||null});
+    out.push({date:s.end||s.start, sets:work, all:it.sets, intensity:s.intensity||6, sid:s.id, chk:s.checkin||null, aj:s.ajuste&&s.ajuste.f<1?s.ajuste.f:0});
     if (limit && out.length>=limit) break;
   }
   return out;
@@ -1399,7 +1399,8 @@ function suggestSet(routine, item, idx){
   const ph=(typeof periodPhase==='function')?periodPhase(routine):null;
   if (ph==='intensidad') range=[Math.max(1,range[0]-2),Math.max(2,range[1]-2)];
   // las semanas de descarga no cuentan como referencia de progreso
-  const normal=hist0.filter(h=>!inDeloadWindow(h.date));
+  // 1.5: tampoco los días aligerados (poco descanso o «sesión suave»): si no, un mal día te hacía retroceder
+  const normal=hist0.filter(h=>!inDeloadWindow(h.date) && !h.aj);
   const hist=(normal.length?normal:hist0).slice(0,3);
   const res={kg:set.kg, reps:set.reps, time:set.time, why:''};
   // partes de un método especial: mismo peso que la serie principal (−20 % en cada bajada)
@@ -1440,7 +1441,8 @@ function suggestSet(routine, item, idx){
     const twoFails = fails(hist[0]) && fails(hist[1]);
     let kg=+ref.kg||0, reps=+ref.reps||range[0];
     const RPE=kb('carga.esfuerzo').rpe;
-    if (allTop && last.intensity<RPE){
+    if (last.aj){ kg=roundTo(kg/last.aj,incFor(ex)); res.why='Mismo peso que antes del día suave'; } // solo hay días aligerados: se vuelve al peso de antes, sin subir
+    else if (allTop && last.intensity<RPE){
       const pct = isLower(ex)?kb('carga.subida').inf:kb('carga.subida').sup;
       let inc=Math.max(incFor(ex), kg*pct); if (last.intensity<=4) inc*=2;
       const rirs=last.sets.map(x=>x.rir).filter(x=>x!=null); const rirAvg=rirs.length?rirs.reduce((a,b)=>a+b,0)/rirs.length:null;
@@ -6663,7 +6665,7 @@ A.finDo=v=>{
 function finishWorkout(mode){
   const a=S.active, end=Date.now();
   const r=findR(a.routineId);
-  const session={id:uid(), routineId:a.routineId, routineName:a.name, start:a.start, end, intensity:a.intensity||6, checkin:a.checkin||null,
+  const session={id:uid(), routineId:a.routineId, routineName:a.name, start:a.start, end, intensity:a.intensity||6, checkin:a.checkin||null, ...(a.ajuste&&a.ajuste.f<1?{ajuste:{f:a.ajuste.f}}:{}),
     items:a.items.map(it=>({exId:it.exId, note:it.note||'', sets:it.sets.filter(s=>s.done).map(s=>{ const o={t:s.t,kg:s.kg,reps:s.reps,time:s.time,done:true,pr:!!s.pr,rir:s.rir??null}; if(s.rd!=null) o.rd=s.rd; if(s.m) o.m=s.m; return o; })})).filter(x=>x.sets.length)};
   session.vol=sessionVolume(session);
   session.prs=[]; session.items.forEach(it=>it.sets.forEach(s=>{ if(s.pr) session.prs.push({exId:it.exId,kg:s.kg,reps:s.reps,time:s.time}); }));

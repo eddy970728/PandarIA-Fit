@@ -635,6 +635,11 @@ if (fs.existsSync(COPIA07)) {
     cbOk(Date.now()-2*3600000, Date.now()-5*3600000); out.f5rechaza=f5.history.length===9; MODALS.length=0; renderModals();
     LAYERS.push({t:'fastStats',p:{y:new Date().getFullYear(),m:new Date().getMonth()}}); renderLayers(); out.f5stats=/Racha actual/.test(document.querySelector('.layer:last-child').textContent) && document.querySelectorAll('.layer:last-child .cal .d').length>=28; LAYERS.length=0; renderLayers();
     f5.horario={on:true,hora:'00:00'}; const ini=fastHorarioIni(); A.fastDesdeHorario(); out.f5horario=!!f5.active && f5.active.start===ini && ini<=Date.now(); f5.active=null; f5.horario={on:false,hora:'20:00'};
+    // 1.5 · un día aligerado (poco descanso) no se usa como referencia para subir
+    { const ex=EX.press_banca, rr={id:'simAj',name:'x',pandaria:true,goal:'musculo',items:[buildItem('press_banca','musculo',2)]}; const S0=S.sessions; S.sessions=[]; const ip=window.isPremium; window.isPremium=()=>true;
+      const mk=(d,kg,aj)=>Object.assign({id:'a'+d,routineId:'simAj',start:Date.now()-d*DAY-3600000,end:Date.now()-d*DAY,intensity:7,items:[{exId:'press_banca',sets:[0,1,2].map(()=>({t:'n',kg,reps:12,done:true}))}]},aj?{ajuste:{f:0.9}}:{});
+      S.sessions.push(mk(4,100), mk(2,90,true)); const it=rr.items[0]; out.ajNormal=suggestSet(rr,it,it.sets.indexOf(it.sets.find(x=>x.t!=='c'))).kg;
+      S.sessions=[mk(2,90,true)]; out.ajSolo=suggestSet(rr,it,it.sets.indexOf(it.sets.find(x=>x.t!=='c'))).kg; S.sessions=S0; window.isPremium=ip; }
     // 1.5 · Agua completa
     const n5=nut(), k5=dayKey(); n5.water[k5]=300; n5.waterLog={}; n5.waterExtra={}; const g0=waterGoal();
     A.water(330,'Taza'); A.water(500); out.a5log=wLog(k5).length===2 && wLog(k5)[0].n==='Taza' && n5.water[k5]===1130;
@@ -659,6 +664,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('ayuno 1.5: rachas, y PandarIA compara cómo te sientan los ayunos largos', r.f5racha === '{"act":1,"mej":1}' && r.f5sens, r.f5racha);
   comprobar('ayuno 1.5: añadir un ayuno olvidado y rechazar uno que termina antes de empezar', r.f5anade && r.f5rechaza);
   comprobar('ayuno 1.5: estadísticas con calendario y empezar desde el horario fijo', r.f5stats && r.f5horario);
+  comprobar('progreso: un día aligerado no hace retroceder (sube desde los 100 kg, no desde 90; si solo hay días aligerados vuelve a 100)', r.ajNormal === 102.5 && r.ajSolo === 100, JSON.stringify([r.ajNormal, r.ajSolo]));
   comprobar('agua 1.5: lista del día con nombre, deshacer el último y borrar uno', r.a5log && r.a5deshacer && r.a5borrar, JSON.stringify([r.a5log,r.a5deshacer,r.a5borrar]));
   comprobar('agua 1.5: día de calor suma 500 ml a la meta y se quita', r.a5calor && r.a5calorOff);
   comprobar('agua 1.5: estadísticas del agua', r.a5stats);
