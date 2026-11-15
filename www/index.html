@@ -217,6 +217,8 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .minibar{position:fixed;left:12px;right:12px;bottom:calc(var(--nav) + 10px + var(--safe-b));z-index:25;max-width:536px;margin:0 auto;background:var(--ac);color:#1a0d02;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .toast{position:fixed;left:50%;bottom:calc(var(--nav) + 22px + var(--safe-b));transform:translateX(-50%);z-index:80;background:var(--card2);color:var(--tx);padding:12px 18px;border-radius:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:up .2s;max-width:90vw;text-align:center;border:1px solid var(--line)}
 .in-layer .toast{bottom:auto;top:calc(74px + var(--safe-t))}
+.toast.undo{display:flex;align-items:center;gap:14px;text-align:left}
+.toast.undo .link{color:var(--ac);font-weight:800;white-space:nowrap}
 .toast.pr{background:var(--gold);color:#2a1d00}
 /* Edit routine */
 .eitem{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:10px}
@@ -5453,6 +5455,14 @@ function toast(msg, cls){
   const t=document.createElement('div'); t.className='toast '+(cls||''); t.textContent=String(msg??''); // 1.1: siempre texto plano, nunca HTML
   document.body.appendChild(t); setTimeout(()=>t.remove(), cls==='pr'?2600:2200);
 }
+// 1.5: aviso con botón Deshacer (borrados y ayuno terminado). Dura 6 segundos.
+function toastUndo(msg, fn){
+  document.querySelectorAll('.toast').forEach(x=>x.remove());
+  const t=document.createElement('div'); t.className='toast undo';
+  const s=document.createElement('span'); s.textContent=String(msg??''); t.appendChild(s);
+  const b=document.createElement('button'); b.className='link'; b.textContent=tx('Deshacer','Undo');
+  b.addEventListener('click',e=>{ e.stopPropagation(); t.remove(); try{ fn(); }catch(err){} save(); render.keep=true; render(); refreshTopSafe(); toast(tx('Deshecho','Undone')); });
+  t.appendChild(b); document.body.appendChild(t); setTimeout(()=>t.remove(),6000); }
 let audioCtx=null;
 function beep(){
   if (!S.settings.sound) return;
@@ -7003,7 +7013,7 @@ SCREENS.session = p => {
   b+=`<button class="btn wide" style="margin-top:8px" data-a="shareSession" data-v="${s.id}">${I('upload',18)} Compartir tarjeta</button><button class="btn danger wide" style="margin-top:8px" data-a="delSession" data-v="${s.id}">${I('trash',18)} Eliminar este entreno</button>`;
   return lhdr('Detalle del entreno')+`<div class="lbody">${b}</div>`;
 };
-A.delSession=id=>confirmBox({title:'¿Eliminar entreno?',text:'Se quitará del historial y de tus estadísticas.',danger:true,okText:'Eliminar',ok:()=>{ S.sessions=S.sessions.filter(s=>s.id!==id); save(); closeLayer(); toast('Entreno eliminado'); }});
+A.delSession=id=>confirmBox({title:'¿Eliminar entreno?',text:'Se quitará del historial y de tus estadísticas.',danger:true,okText:'Eliminar',ok:()=>{ const L0=S.sessions.slice(); S.sessions=S.sessions.filter(s=>s.id!==id); save(); closeLayer(); toastUndo(tx('Entreno eliminado','Workout deleted'),()=>{ S.sessions=L0; }); }});
 
 function histRecords(){
   const rec=records(); const ids=Object.keys(rec).filter(id=>EX[id]||id.startsWith('c_'));
@@ -7057,7 +7067,7 @@ function histCuerpo(){
   return h;
 }
 A.addMeasure=()=>openLayer('measure',{foto:null});
-A.delMeasure=id=>confirmBox({title:'¿Eliminar registro?',danger:true,okText:'Eliminar',ok:()=>{ S.measures=S.measures.filter(m=>m.id!==id); save(); render.keep=true; render(); }});
+A.delMeasure=id=>confirmBox({title:'¿Eliminar registro?',danger:true,okText:'Eliminar',ok:()=>{ const L0=S.measures.slice(); S.measures=S.measures.filter(m=>m.id!==id); save(); render.keep=true; render(); toastUndo(tx('Registro eliminado','Entry deleted'),()=>{ S.measures=L0; }); }});
 SCREENS.measure = p => {
   const last=S.measures[S.measures.length-1]||{};
   const f=(k,n,u)=>`<div class="field" style="flex:1"><label>${n} (${u})</label><input id="m_${k}" class="inp" type="number" inputmode="decimal" step="any" placeholder="${last[k]||''}"></div>`;
@@ -8668,13 +8678,14 @@ function diarioAdded(k, entries){
   const f=S.nutri&&S.nutri.fast, a=f&&f.active; if (!a || k!==dayKey() || !entries.length) return;
   if (entries.every(e=>{ const x=alimGet(e.fid); return x && (x.k*(+e.gr||0)/100)<15; })) return; // agua, café o té solos no rompen el ayuno
   const hh=(Date.now()-a.start)/3600000;
-  setTimeout(()=>confirmBox({title:tx('Estás en ayuno','You are fasting'),text:tx(`Registraste comida durante tu ayuno (llevas ${fmtHMl(hh)}). ¿Lo terminamos ahora?`,`You logged food during your fast (${Math.floor(hh)} h ${String(Math.floor(hh*60)%60).padStart(2,'0')} min so far). End it now?`),okText:tx('Terminar ayuno','End fast'),ok:()=>A.fastEnd(),noText:tx('Sigo ayunando','Keep fasting')}),350);
+  setTimeout(()=>confirmBox({title:tx('Estás en ayuno','You are fasting'),text:tx(`Registraste comida durante tu ayuno (llevas ${fmtHMl(hh)}). ¿Lo terminamos ahora?`,`You logged food during your fast (${Math.floor(hh)} h ${String(Math.floor(hh*60)%60).padStart(2,'0')} min so far). End it now?`),okText:tx('Terminar ayuno','End fast'),ok:()=>A.fastEndNow(),noText:tx('Sigo ayunando','Keep fasting')}),350);
 }
 function dEntry(id){ const k=dayKeyOf(); return dayItems(k).find(e=>e.id===id); }
 A.dEdit=id=>{ const e=dEntry(id); if(!e) return; const f=alimGet(e.fid);
   if (!f) return sheet(e.n,[{icon:'trash',label:'Quitar del diario',fn:()=>dDel(id)}]);
   amountModal(f,{edit:id,m:e.m,por:e.por,q:e.q,gr:e.gr}); };
-function dDel(id){ const n=nd(), k=dayKeyOf(); n.diario[k]=(n.diario[k]||[]).filter(e=>e.id!==id); if(!n.diario[k].length) delete n.diario[k]; save(); render.keep=true; render(); refreshTopSafe(); }
+function dDel(id){ const n=nd(), k=dayKeyOf(), L0=(n.diario[k]||[]).slice(), x=L0.find(e=>e.id===id); n.diario[k]=L0.filter(e=>e.id!==id); if(!n.diario[k].length) delete n.diario[k]; save(); render.keep=true; render(); refreshTopSafe();
+  if (x) toastUndo(tx(`${x.n} quitado`,`${x.n} removed`),()=>{ n.diario[k]=L0; }); }
 const refreshTopSafe=()=>{ if (LAYERS.length) refreshTop(); };
 
 /* ---------- Buscador de alimentos ---------- */
@@ -8895,7 +8906,7 @@ function fastCard(){
       <button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="fastUnwell">Me siento mal</button></div>`;
   } else {
     h+=`<div class="card" style="text-align:center"><div class="xs mut b" style="letter-spacing:1px">VENTANA DE COMIDA</div><div style="font-size:15px;margin:8px 0 12px;line-height:1.45">${plan.h?`Plan ${plan.n}: ayunas ${plan.h} h y comes en ${24-plan.h} h.`:'Ayuno libre: inícialo cuando termines tu última comida.'}</div>
-      ${fastHorarioHtml(plan)}<button class="btn pri big" data-a="fastStart">${I('play',18)} Empezar ayuno ahora</button>${(lm=>lm?`<button class="btn wide" style="margin-top:10px" data-a="fastFromDiary">${I('note',18)} ${tx('Desde mi última comida','Since my last meal')} (${hhmm(lm)})</button>`:'')(lastMealTs())}<button class="btn wide" style="margin-top:10px" data-a="fastStartPast">${I('timer',18)} Empecé antes: elegir hora</button>${fastWindowHtml()}</div>`;
+      ${fastReanudarHtml()}${fastHorarioHtml(plan)}<button class="btn pri big" data-a="fastStart">${I('play',18)} Empezar ayuno ahora</button>${(lm=>lm?`<button class="btn wide" style="margin-top:10px" data-a="fastFromDiary">${I('note',18)} ${tx('Desde mi última comida','Since my last meal')} (${hhmm(lm)})</button>`:'')(lastMealTs())}<button class="btn wide" style="margin-top:10px" data-a="fastStartPast">${I('timer',18)} Empecé antes: elegir hora</button>${fastWindowHtml()}</div>`;
   }
   return h+fastAdvice()+fastHistory();
 }
@@ -8956,10 +8967,25 @@ function fastTimePicker(adjust){
     <div class="field"><label>Fecha y hora de inicio</label><input id="ftdt" class="inp" type="datetime-local" value="${toLocalInput(cur)}" max="${toLocalInput(now)}"></div>
     <button class="btn pri big" data-a="cbm" data-v="${okK}">${adjust?'Guardar hora':'Empezar ayuno'}</button></div>`);
 }
-A.fastEnd=()=>{ const f=nut().fast, a=f.active; if(!a) return; const end=Date.now(); const el=(end-a.start)/3600000;
-  f.history.push({start:a.start,end,goalH:a.goalH,ok:!a.goalH||el>=a.goalH}); f.history=f.history.slice(-400); f.active=null; save(); render.keep=true; render(); if (el>=4) setTimeout(()=>{ if (!MODALS.length) A.fastSentir(f.history.length-1); },1600);
-  toast(a.goalH&&el>=a.goalH?'✓ ¡Ayuno completado! Rompe con proteína y verduras.':'Ayuno terminado. Cada paso cuenta.'); };
-A.fastUnwell=()=>confirmBox({title:'Escucha a tu cuerpo',text:'Si sientes mareo, debilidad, dolor de cabeza fuerte o malestar, lo recomendable es <b>terminar el ayuno ahora</b> y comer algo con hidratos y proteína. Si los síntomas son intensos o no pasan, busca atención médica.',okText:'Terminar ayuno y comer',ok:()=>A.fastEnd(),noText:'Ya me siento mejor'});
+// 1.5: terminar pregunta antes; si fue sin querer, se deshace (aviso o «Reanudar» durante 15 minutos).
+// Un ayuno de menos de 1 hora no se guarda en el historial (son pruebas o despistes y estropean tus estadísticas).
+const FAST_MIN_H=1;
+A.fastEnd=()=>{ const f=nut().fast, a=f.active; if(!a) return; const el=(Date.now()-a.start)/3600000;
+  confirmBox({title:tx('¿Terminar el ayuno?','End your fast?'),
+    text:tx(`Llevas ${fmtHMl(el)}${a.goalH?` de ${a.goalH} h`:''}.`,`You have fasted ${Math.floor(el)} h ${String(Math.floor(el*60)%60).padStart(2,'0')} min${a.goalH?` of ${a.goalH} h`:''}.`)+(el<FAST_MIN_H?' '+tx('Como es menos de 1 hora, no se guardará en tu historial.','As it is under 1 hour, it will not be saved to your history.'):''),
+    okText:tx('Terminar ayuno','End fast'),noText:tx('Seguir ayunando','Keep fasting'),ok:()=>A.fastEndNow()}); };
+A.fastEndNow=()=>{ const f=nut().fast, a=f.active; if(!a) return; const end=Date.now(); const el=(end-a.start)/3600000, guarda=el>=FAST_MIN_H;
+  if (guarda){ f.history.push({start:a.start,end,goalH:a.goalH,ok:!a.goalH||el>=a.goalH}); f.history=f.history.slice(-400); }
+  f.active=null; f.deshacer={a:{start:a.start,goalH:a.goalH},end,guardado:guarda}; save(); render.keep=true; render();
+  if (guarda && el>=4) setTimeout(()=>{ if (!MODALS.length && !document.querySelector('.toast.undo')) A.fastSentir(f.history.length-1); },6500);
+  toastUndo(!guarda?tx('Ayuno de menos de 1 hora: no se guarda','Fast under 1 hour: not saved'):a.goalH&&el>=a.goalH?tx('✓ ¡Ayuno completado!','✓ Fast complete!'):tx('Ayuno terminado','Fast ended'),()=>fastReanudar()); };
+function fastReanudar(){ const f=nut().fast, d=f.deshacer; if (!d || f.active) return;
+  if (d.guardado){ const i=f.history.findIndex(x=>x.start===d.a.start&&x.end===d.end); if (i>=0) f.history.splice(i,1); }
+  f.active={start:d.a.start,goalH:d.a.goalH}; delete f.deshacer; }
+A.fastReanudar=()=>{ fastReanudar(); save(); render.keep=true; render(); toast(tx('Ayuno reanudado: sigue contando desde su inicio','Fast resumed: it keeps counting from its start')); };
+function fastReanudarHtml(){ const d=nut().fast.deshacer; if (!d || Date.now()-d.end>15*60000) return '';
+  return `<button class="link sm" style="display:block;margin:0 auto 12px" data-a="fastReanudar">${I('refresh',14)} ${tx(`¿Lo terminaste sin querer? Reanudar el ayuno de las ${hhmm(d.a.start)}`,`Ended it by mistake? Resume the fast from ${hhmm(d.a.start)}`)}</button>`; }
+A.fastUnwell=()=>confirmBox({title:'Escucha a tu cuerpo',text:'Si sientes mareo, debilidad, dolor de cabeza fuerte o malestar, lo recomendable es <b>terminar el ayuno ahora</b> y comer algo con hidratos y proteína. Si los síntomas son intensos o no pasan, busca atención médica.',okText:'Terminar ayuno y comer',ok:()=>A.fastEndNow(),noText:'Ya me siento mejor'});
 function fastTick(){ const f=S&&S.nutri&&S.nutri.fast&&S.nutri.fast.active; if(!f) return; const el=document.querySelectorAll('.tick-fast'); if(!el.length) return; const hh=(Date.now()-f.start)/3600000; el.forEach(e=>e.textContent=e.dataset.long?fmtHMl(hh):fmtHM(hh)); }
 setInterval(fastTick,10000);
 
@@ -9022,7 +9048,7 @@ A.fastEdit=v=>{ const f=nut().fast, nuevo=v==='nuevo', x=nuevo?{start:Date.now()
     if (f.active && e>f.active.start) return toast(tx('Se cruza con el ayuno que tienes en marcha','It overlaps the fast you have running'));
     const y=Object.assign({},x,{start:s,end:e}); y.ok=!y.goalH||(e-s)/3600000>=y.goalH; if (nuevo) f.history.push(y); else f.history[+v]=y;
     f.history.sort((a,b)=>a.start-b.start); f.history=f.history.slice(-400); save(); render.keep=true; render(); refreshTop(); toast(nuevo?tx('Ayuno añadido','Fast added'):tx('Ayuno corregido','Fast updated')); });
-  const del=nuevo?'':cb(()=>confirmBox({title:tx('Borrar este ayuno','Delete this fast'),text:tx('No se puede deshacer.','This cannot be undone.'),okText:tx('Borrar','Delete'),danger:true,ok:()=>{ f.history.splice(+v,1); save(); render.keep=true; render(); refreshTop(); toast(tx('Ayuno borrado','Fast deleted')); }}));
+  const del=nuevo?'':cb(()=>confirmBox({title:tx('Borrar este ayuno','Delete this fast'),text:tx('No se puede deshacer.','This cannot be undone.'),okText:tx('Borrar','Delete'),danger:true,ok:()=>{ const L0=f.history.slice(); f.history.splice(+v,1); save(); render.keep=true; render(); refreshTop(); toastUndo(tx('Ayuno borrado','Fast deleted'),()=>{ f.history=L0; }); }}));
   openModal(`<div class="sheet"><div class="grab"></div><h3>${nuevo?tx('Añadir un ayuno olvidado','Add a forgotten fast'):tx('Corregir ayuno','Edit fast')}</h3>
     <div class="field"><label>${tx('Empezó','Started')}</label><input id="feS" class="inp" type="datetime-local" value="${toLocalInput(x.start)}" max="${toLocalInput(Date.now())}"></div>
     <div class="field"><label>${tx('Terminó','Ended')}</label><input id="feE" class="inp" type="datetime-local" value="${toLocalInput(x.end)}" max="${toLocalInput(Date.now())}"></div>
@@ -9068,7 +9094,7 @@ function aguaHoyHtml(){ const n=nut(), k=dayKey(), L=wLog(k), sum=L.reduce((a,x)
   if (!L.length && !resto) return h+`<div class="card sm mut">${tx('Todavía no registraste agua hoy.','You have not logged any water today.')}</div>`;
   return h+`<div class="card" style="padding:4px 14px">${L.map((x,i)=>[x,i]).reverse().map(([x,i])=>`<div class="kv"><span>${I('drop',14)} <b>${x.ml} ml</b>${x.n?` <span class="mut xs">${esc(x.n)}</span>`:''}</span><span class="row" style="gap:6px"><span class="mut sm">${hhmm(x.t)}</span><button class="ibtn" style="width:32px;height:32px" data-a="wDel" data-v="${i}" aria-label="${tx('Borrar','Delete')}">${I('close',16)}</button></span></div>`).join('')}
     ${resto?`<div class="kv"><span>${I('drop',14)} <b>${resto} ml</b></span><span class="mut xs">${tx('sin hora (widget o aviso)','no time (widget or notification)')}</span></div>`:''}</div>`; }
-A.wDel=i=>{ const n=nut(), k=dayKey(), L=wLog(k), x=L[+i]; if (!x) return; L.splice(+i,1); n.water[k]=Math.max(0,(n.water[k]||0)-x.ml); save(); render.keep=true; render(); toast(tx(`${x.ml} ml borrados`,`${x.ml} ml removed`)); };
+A.wDel=i=>{ const n=nut(), k=dayKey(), L=wLog(k), x=L[+i]; if (!x) return; L.splice(+i,1); n.water[k]=Math.max(0,(n.water[k]||0)-x.ml); save(); render.keep=true; render(); toastUndo(tx(`${x.ml} ml borrados`,`${x.ml} ml removed`),()=>{ L.splice(+i,0,x); n.water[k]=(n.water[k]||0)+x.ml; }); };
 A.wCalor=()=>{ const n=nut(), k=dayKey(); n.waterExtra=n.waterExtra||{}; if (n.waterExtra[k]) delete n.waterExtra[k]; else n.waterExtra[k]=kb('agua.calor').ml;
   Object.keys(n.waterExtra).forEach(x=>{ if (x<dayKey(Date.now()-30*DAY)) delete n.waterExtra[x]; }); save(); render.keep=true; render(); };
 A.wHora=()=>{ const V=vasos(); const ok=cb(()=>{ const [H,M]=String(MV.whT||'').split(':').map(Number), ml=Math.round(+MV.whM); if (isNaN(H)) return toast(tx('Elige una hora','Pick a time'));
@@ -9726,6 +9752,27 @@ function guiaRender(){ if (!MODALS.length || !MODALS[MODALS.length-1].guia) retu
 IN.guiaB=el=>{ if (!GUIA) return; GUIA.q=el.value; const L=document.getElementById('guiaL'); if (!L) return;
   if (GUIA.q.trim()) L.innerHTML=guiaLista(); else guiaRender(); if (!GUIA.q.trim()){ const i=document.getElementById('guiaB'); if (i) i.focus(); } };
 
+// 1.5: «Limpiar datos de prueba»: entrenos de menos de 3 minutos o sin series hechas y ayunos de menos de 1 hora.
+// Así PandarIA no aprende de pruebas (ayunos de 2 minutos, entrenos de 20 segundos). Se elige qué borrar y se puede deshacer.
+const PRUEBA_ENT_MIN=3;
+function pruebasDatos(){ const ent=S.sessions.filter(s=>((s.end||0)-(s.start||0))<PRUEBA_ENT_MIN*60000 || !s.items.some(it=>it.sets.some(x=>x.done&&x.t!=='c')));
+  const ay=((S.nutri&&S.nutri.fast&&S.nutri.fast.history)||[]).filter(x=>(x.end-x.start)<FAST_MIN_H*3600000); return {ent,ay}; }
+let LP_SEL=null;
+function limpiarHtml(){ const {ent,ay}=pruebasDatos(), n=LP_SEL.size;
+  const fila=(id,t,s)=>`<button class="srow" data-a="lpTog" data-v="${id}"><span class="check ${LP_SEL.has(id)?'on':''}">${LP_SEL.has(id)?I('check',16):''}</span><span class="grow"><div class="sm b">${esc(t)}</div><div class="xs mut">${esc(s)}</div></span></button>`;
+  const dur=ms=>ms<60000?`${Math.round(ms/1000)} s`:`${Math.round(ms/60000)} min`;
+  return `<div class="sheet"><div class="grab"></div><h3>${tx('Limpiar datos de prueba','Clean up test data')}</h3><p class="sm mut" style="margin:-6px 4px 12px;line-height:1.45">${tx('Entrenos de menos de 3 minutos o sin series hechas, y ayunos de menos de 1 hora. Marca lo que quieras borrar: PandarIA dejará de tenerlo en cuenta.','Workouts under 3 minutes or with no sets done, and fasts under 1 hour. Tick what you want to delete: PandarIA will stop using it.')}</p>
+  ${!ent.length&&!ay.length?`<div class="card sm mut">${tx('No hay datos que parezcan de prueba. ¡Todo limpio!','Nothing looks like test data. All clean!')}</div>`:''}
+  ${ent.length?`<div class="sec">${tx('Entrenos','Workouts')} (${ent.length})</div><div class="card" style="padding:0 12px;max-height:30vh;overflow:auto">${ent.map(s=>fila('s:'+s.id,s.routineName||tx('Entreno','Workout'),`${fmtDate(s.end)} · ${dur((s.end||0)-(s.start||0))}`)).join('')}</div>`:''}
+  ${ay.length?`<div class="sec">${tx('Ayunos','Fasts')} (${ay.length})</div><div class="card" style="padding:0 12px;max-height:30vh;overflow:auto">${ay.map(x=>fila('f:'+x.start,fmtDate(x.start)+' · '+hhmm(x.start),dur(x.end-x.start))).join('')}</div>`:''}
+  ${ent.length||ay.length?`<button class="btn danger big" style="margin-top:12px" data-a="lpBorrar" ${n?'':'disabled'}>${I('trash',18)} ${tx(`Borrar ${n}`,`Delete ${n}`)}</button>`:''}
+  <button class="btn ghost wide" style="margin-top:6px" data-a="closeModal">${tx('Cerrar','Close')}</button></div>`; }
+const lpRedraw=()=>{ const m=MODALS[MODALS.length-1]; if (!m) return; m.html=limpiarHtml(); const box=document.querySelector('#modals .scrim:last-child'); if (box) box.innerHTML=m.html; };
+A.limpiarPruebas=()=>{ const {ent,ay}=pruebasDatos(); LP_SEL=new Set([...ent.map(s=>'s:'+s.id),...ay.map(x=>'f:'+x.start)]); openModal(limpiarHtml()); };
+A.lpTog=v=>{ if (LP_SEL.has(v)) LP_SEL.delete(v); else LP_SEL.add(v); lpRedraw(); };
+A.lpBorrar=()=>{ if (!LP_SEL.size) return; const S0=S.sessions.slice(), f=nut().fast, H0=f.history.slice(), n=LP_SEL.size;
+  S.sessions=S.sessions.filter(s=>!LP_SEL.has('s:'+s.id)); f.history=f.history.filter(x=>!LP_SEL.has('f:'+x.start)); save(); closeModal(); render.keep=true; render();
+  toastUndo(tx(`${n} borrados`,`${n} deleted`),()=>{ S.sessions=S0; f.history=H0; }); };
 /* ---------- Tarjeta para compartir ---------- */
 function shareCardCanvas(s){
   const c=document.createElement('canvas'); c.width=1080; c.height=1350; const g=c.getContext('2d');
@@ -10010,7 +10057,7 @@ const APP_VERSION='1.5';
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
- {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas', 'Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno', 'Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar', 'Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)']},
+ {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas', 'Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno', 'Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar', 'Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)', 'Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno', 'Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer', 'Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos']},
  {v:'1.4',t:'Retos y Consulta a PandarIA',items:['Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale', 'Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)', 'Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos', 'Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores', 'Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir', 'Tarjeta del entreno renovada, con el panda y tus récords', 'Versión para iPhone y iPad (se instala con AltStore desde el PC)', 'Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)']},
  {v:'1.3',t:'Comer, dormir y ayunar',items:['Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua', 'Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano', 'Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado', 'Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)', 'Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)', 'Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)', 'Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)', 'Notificación del entreno con la serie siguiente y el botón «✓ Hecha»', 'Biblioteca de evidencia 1.6: 4 reglas nuevas']},
  {v:'1.2',t:'PandarIA v2 y temas',items:['PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno', 'PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores', 'PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo', 'PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión', 'PandarIA v2 · Aprende de tus cambios: si cambias un ejercicio a mano, lo tiene en cuenta al proponer ejercicios', 'Temas: Automático, Claro, Oscuro gris (pantallas LCD) y Negro puro (pantallas OLED)', 'Tamaño del texto: Normal, Grande y Muy grande', 'Biblioteca de evidencia 1.5: 2 reglas nuevas']},
@@ -10049,7 +10096,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.5 · Ayuno y agua completos", "Fases del ayuno, estadísticas y horario fijo", "Corrige o añade ayunos olvidados", "Cómo te sienta cada ayuno", "Agua: tus recipientes y la lista del día", "Día de calor y estadísticas del agua", "Widgets interactivos: agua, ayuno, check-in, Mi día y calorías"];
+const NOTAS_VERSION=["1.5 · Ayuno y agua completos", "Fases del ayuno, estadísticas y horario fijo", "Corrige o añade ayunos olvidados", "Cómo te sienta cada ayuno", "Agua: tus recipientes y la lista del día", "Día de calor y estadísticas del agua", "Widgets interactivos: agua, ayuno, check-in, Mi día y calorías", "Deshacer al borrar y al terminar un ayuno", "Limpiar datos de prueba"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -10476,6 +10523,7 @@ function viewAjustes(){
     ${nav('importData','upload','Importar copia de seguridad')}
     ${nav('exportCSV','list','Exportar entrenos a Excel (CSV)')}
     ${premigList().length?nav('premigOpen','history','Datos de antes de actualizar'):''}
+    ${nav('limpiarPruebas','refresh',tx('Limpiar datos de prueba','Clean up test data'))}
     <button class="srow" data-a="wipeData"><span class="si" style="color:var(--bad)">${I('trash',20)}</span><span class="grow b" style="color:var(--bad)">Borrar todos los datos</span></button>
   </div>
   <div class="sec">Acerca de</div><div class="card sm mut" style="line-height:1.5">PandarIA basa sus recomendaciones en guías del American College of Sports Medicine (ACSM) y la National Strength and Conditioning Association (NSCA) para fuerza, la Organización Mundial de la Salud (OMS) para actividad física y la International Society of Sports Nutrition (ISSN) para nutrición. No reemplaza a un profesional de la salud.
@@ -10489,7 +10537,7 @@ function viewAjustes(){
    la principal queda corta (perfil, Premium y 8 grupos) y cada grupo abre su propia pantalla con sus ajustes de siempre. */
 const AJ_GRUPOS=[
   {id:'cuenta',ic:'user',t:'Tu cuenta y tus datos',en:'Your account and data',d:'Copia en Google Drive, exportar e importar',den:'Google Drive backup, export and import',
-   parts:[{sec:'Copia en Google Drive',whole:true},{sec:'Tus datos',keys:['exportData','importData','exportCSV','premigOpen'],rest:['Tus datos']},{keys:['wipeData']}]},
+   parts:[{sec:'Copia en Google Drive',whole:true},{sec:'Tus datos',keys:['exportData','importData','exportCSV','premigOpen','limpiarPruebas'],rest:['Tus datos']},{keys:['wipeData']}]},
   {id:'entreno',ic:'dumbbell',t:'Entrenamiento',en:'Training',d:'Equipos, nivel, plan semanal, unidades',den:'Equipment, level, weekly plan, units',
    parts:[{keys:['openEquip','setLevel','openPlan','setUnit','setPlate','setRestDef','openAvoid','openArchived'],rest:['Entrenamiento']}]},
   {id:'pandaria',ic:'spark',t:'PandarIA',en:'PandarIA',d:'Descansos, esfuerzo, check-in e informes',den:'Rests, effort, check-in and reports',
@@ -10670,8 +10718,8 @@ function applyAnim(){ document.documentElement.dataset.fx=ANIM_ON()?'on':'off'; 
   // ayuno
   const fs0=A.fastStart;
   if (fs0) A.fastStart=function(){ const had=!!nut().fast.active; const r=fs0.apply(this,arguments); if(!had&&nut().fast.active){ sfx('start'); anim(document.querySelector('.fring'),'fx-ring'); } return r; };
-  const fe0=A.fastEnd;
-  A.fastEnd=()=>{ const a=nut().fast.active; const ok=a&&(!a.goalH||(Date.now()-a.start)/3600000>=a.goalH); fe0(); if(!a) return; if (ok&&a.goalH){ sfx('finish'); confetti({n:110}); } else sfx('success'); };
+  const fe0=A.fastEndNow;
+  A.fastEndNow=()=>{ const a=nut().fast.active; const ok=a&&(!a.goalH||(Date.now()-a.start)/3600000>=a.goalH); fe0(); if(!a) return; if (ok&&a.goalH){ sfx('finish'); confetti({n:110}); } else sfx('success'); };
   // ajustes
   const tg0=A.toggleSet;
   A.toggleSet=k=>{ const s=S.settings; if (k==='uiSound'||k==='anim'){ s[k]=s[k]===false; applyAnim(); save(); render.keep=true; render(); if(k==='uiSound'&&s.uiSound!==false) sfx('success'); return; } tg0(k); };
@@ -12355,6 +12403,10 @@ Estadísticas del agua: calendario, medias y rachas|Water stats: calendar, avera
 Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno|Widgets that work without opening the app: water with your containers and undo, start and end your fast
 Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar|New check-in widget: how you feel today in three taps, and the app no longer asks again when you train
 Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)|New My day widget (workout, water, fasting and calories) and Calories left widget (Premium)
+Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno|Undo when deleting a meal, a workout, a measurement, water or a fast
+Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer|Ending a fast asks first (also from the widget and the notification) and can be resumed if it was a mistake
+Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos|Clean up test data: deletes workouts of seconds and fasts of minutes so PandarIA does not learn from them
+Limpiar datos de prueba|Clean up test data
 Una sola comida al día. Muy exigente.|One meal a day. Very demanding.
 Meta de agua del día|Daily water goal
 Modo viaje|Travel mode

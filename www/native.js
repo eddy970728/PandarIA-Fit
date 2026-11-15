@@ -479,7 +479,7 @@
     setTimeout(() => { try{
       if (act === 'w250' || act === 'w500'){ A.water(act === 'w250' ? 250 : 500); toast('💧 Agua añadida'); return; }
       if (act === 'faststart'){ if (!nut().fast.active) A.fastStart(); A.tab('ayuno'); return; }
-      if (act === 'fastend'){ if (nut().fast.active) A.fastEnd(); A.tab('ayuno'); return; }
+      if (act === 'fastend'){ A.tab('ayuno'); if (nut().fast.active) setTimeout(() => A.fastEnd(), 350); return; } // 1.5: abre la app y pregunta
       if (act === 'start' && x.rid && findR(x.rid)){ A.startWorkout(x.rid); return; }
       switch (x.go){
         case 'workout': if (S.active && !LAYERS.some(l => l.t === 'workout')) openLayer('workout'); break;

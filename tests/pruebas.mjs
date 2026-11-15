@@ -640,6 +640,18 @@ if (fs.existsSync(COPIA07)) {
       const mk=(d,kg,aj)=>Object.assign({id:'a'+d,routineId:'simAj',start:Date.now()-d*DAY-3600000,end:Date.now()-d*DAY,intensity:7,items:[{exId:'press_banca',sets:[0,1,2].map(()=>({t:'n',kg,reps:12,done:true}))}]},aj?{ajuste:{f:0.9}}:{});
       S.sessions.push(mk(4,100), mk(2,90,true)); const it=rr.items[0]; out.ajNormal=suggestSet(rr,it,it.sets.indexOf(it.sets.find(x=>x.t!=='c'))).kg;
       S.sessions=[mk(2,90,true)]; out.ajSolo=suggestSet(rr,it,it.sets.indexOf(it.sets.find(x=>x.t!=='c'))).kg; S.sessions=S0; window.isPremium=ip; }
+    // 1.5 · borrar con deshacer, terminar el ayuno preguntando y limpiar datos de prueba
+    { const fz=nut().fast; fz.screened=true; fz.blocked=false; fz.active={start:Date.now()-20*60000,goalH:16}; const n0=fz.history.length; MODALS.length=0; renderModals();
+      A.fastEnd(); out.dzPregunta=MODALS.length===1 && !!fz.active && /Terminar el ayuno/.test(document.querySelector('#modals').textContent); MODALS.length=0; renderModals();
+      A.fastEndNow(); out.dzCorto=!fz.active && fz.history.length===n0 && !!fz.deshacer;
+      A.fastReanudar(); out.dzReanuda=!!fz.active && fz.active.start===Date.now()-20*60000 || (!!fz.active && Math.abs(fz.active.start-(Date.now()-20*60000))<5000);
+      fz.active={start:Date.now()-5*3600000,goalH:16}; A.fastEndNow(); const n1=fz.history.length; A.fastReanudar(); out.dzLargo=n1===n0+1 && fz.history.length===n0 && !!fz.active; fz.active=null;
+      document.querySelectorAll('.toast').forEach(x=>x.remove());
+      const kd=dayKey(); nd().diario[kd]=[{id:'zz1',fid:'05064',n:'Pollo',gr:100,k:100,p:20,c:0,g:2,m:'almuerzo',t:Date.now()}]; NUT_DAY=null; dDel('zz1');
+      const bt=document.querySelector('.toast.undo button'); out.dzComida=!(nd().diario[kd]||[]).length && !!bt; if (bt) bt.click(); out.dzDeshacer=(nd().diario[kd]||[]).length===1; delete nd().diario[kd];
+      const S1=S.sessions; S.sessions=S1.concat([{id:'zt',routineId:'r',routineName:'Prueba',start:Date.now()-20000,end:Date.now(),intensity:5,items:[{exId:'press_banca',sets:[{t:'n',kg:20,reps:5,done:true}]}]}]);
+      fz.history.push({start:Date.now()-3*60000,end:Date.now()-60000,goalH:16,ok:false}); const pd=pruebasDatos(); out.dzDetecta=pd.ent.some(s=>s.id==='zt') && pd.ay.length>=1;
+      A.limpiarPruebas(); A.lpBorrar(); out.dzLimpia=!S.sessions.some(s=>s.id==='zt') && !pruebasDatos().ay.length; S.sessions=S1; MODALS.length=0; renderModals(); }
     // 1.5 · Agua completa
     const n5=nut(), k5=dayKey(); n5.water[k5]=300; n5.waterLog={}; n5.waterExtra={}; const g0=waterGoal();
     A.water(330,'Taza'); A.water(500); out.a5log=wLog(k5).length===2 && wLog(k5)[0].n==='Taza' && n5.water[k5]===1130;
@@ -665,6 +677,9 @@ if (fs.existsSync(COPIA07)) {
   comprobar('ayuno 1.5: añadir un ayuno olvidado y rechazar uno que termina antes de empezar', r.f5anade && r.f5rechaza);
   comprobar('ayuno 1.5: estadísticas con calendario y empezar desde el horario fijo', r.f5stats && r.f5horario);
   comprobar('progreso: un día aligerado no hace retroceder (sube desde los 100 kg, no desde 90; si solo hay días aligerados vuelve a 100)', r.ajNormal === 102.5 && r.ajSolo === 100, JSON.stringify([r.ajNormal, r.ajSolo]));
+  comprobar('ayuno 1.5: terminar pregunta antes; uno de menos de 1 h no se guarda; se puede reanudar (y se quita del historial)', r.dzPregunta && r.dzCorto && r.dzReanuda && r.dzLargo, JSON.stringify([r.dzPregunta,r.dzCorto,r.dzReanuda,r.dzLargo]));
+  comprobar('borrar 1.5: quitar una comida tiene Deshacer y funciona', r.dzComida && r.dzDeshacer);
+  comprobar('limpiar 1.5: detecta un entreno de 20 segundos y un ayuno de 2 minutos y los borra', r.dzDetecta && r.dzLimpia);
   comprobar('agua 1.5: lista del día con nombre, deshacer el último y borrar uno', r.a5log && r.a5deshacer && r.a5borrar, JSON.stringify([r.a5log,r.a5deshacer,r.a5borrar]));
   comprobar('agua 1.5: día de calor suma 500 ml a la meta y se quita', r.a5calor && r.a5calorOff);
   comprobar('agua 1.5: estadísticas del agua', r.a5stats);
