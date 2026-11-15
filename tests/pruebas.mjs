@@ -589,7 +589,22 @@ if (fs.existsSync(COPIA07)) {
     out.buscar=cqBuscar(null,'creatina').map(q=>q.id)[0];
     const pq=SCREENS.consultaQ({id:'proteina',p:{}}); out.premCompleto=/Tu caso/.test(pq) && /Basado en/.test(pq) && !/data-a="cqPay"/.test(pq);
     window.isPremium=()=>false; const fq=SCREENS.consultaQ({id:'proteina',p:{}}); out.gratis=/RESPUESTA CORTA/.test(fq) && /data-a="cqPay"/.test(fq) && /blur/.test(fq); window.isPremium=()=>true;
-    out.experimental=/experimental/i.test(SCREENS.consulta({q:''})) && /experimental/i.test(viewRutinas());
+    out.experimental=/experimental/i.test(SCREENS.consulta({q:''}));
+    // burbuja flotante: visible en las pestañas, oculta en el entreno; el chat responde y busca sin inventar
+    S.settings.onboarded=true; LAYERS.length=0; MODALS.length=0; renderLayers(); renderModals(); TAB='rutinas'; render();
+    const bb=document.getElementById('pfBub'); out.bubTab=!!bb && !bb.hidden;
+    LAYERS.push({t:'workout',p:{}}); bubSync(); out.bubEntreno=bb.hidden; LAYERS.length=0; bubSync();
+    A.chatAbrir(); out.chatAbre=!!document.querySelector('#modals .pfchat') && /experimental/i.test(document.querySelector('#modals .pfchat').textContent);
+    A.chatQ('proteina'); out.chatResp=/128 g/.test(CHAT.msgs[CHAT.msgs.length-1].html);
+    A.chatQ('pesoUsar'); out.chatPar=CHAT.chips.length>0 && CHAT.chips[0][0]==='par';
+    const f=document.querySelector('#modals form[data-chat]'); f.querySelector('#chatT').value='creatina'; f.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+    out.chatBusca=CHAT.chips.some(c=>c[1]==='creatina');
+    const f2=document.querySelector('#modals form[data-chat]'); f2.querySelector('#chatT').value='xyzzy plutonio'; f2.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+    out.chatNoInventa=CHAT.chips.some(c=>c[0]==='pedir');
+    MODALS.length=0; renderModals();
+    // escáner: el nombre de un alimento nuevo abre el teclado de letras
+    const an=SCREENS.alimNuevo({d:{n:'',porl:'',porg:'',k:'',p:'',c:'',g:'',f:'',a:'',na:'',fl:'',codigo:'123',fuente:''}});
+    out.teclado=/id="an_n" class="inp" type="text" inputmode="text"/.test(an) && /id="an_k" class="inp" type="number" inputmode="decimal"/.test(an);
     // Retos del mes y con amigos
     S.plan={days:[1,3,5],order:['r']};
     const rm=retosMes(); out.retosMes=rm.map(x=>x.id+':'+x.meta+':'+x.v).join(' ');
@@ -606,7 +621,10 @@ if (fs.existsSync(COPIA07)) {
   comprobar('Consulta: ve el estancamiento del press de banca y calcula la proteína (2 g/kg al bajar… 1,6 al mantener: 128 g)', /no sube desde hace/.test(r.estanco) && /128 g/.test(r.proteina), JSON.stringify([r.estanco, r.proteina]));
   comprobar('Consulta: el buscador encuentra «creatina»', r.buscar === 'creatina', r.buscar);
   comprobar('Consulta: con Premium el informe completo; gratis solo la respuesta corta con candado', r.premCompleto && r.gratis);
-  comprobar('Consulta: marcada como experimental en su pantalla y en Mis rutinas', r.experimental);
+  comprobar('Consulta: marcada como experimental', r.experimental);
+  comprobar('burbuja de PandarIA: visible en las pestañas y oculta durante el entreno', r.bubTab && r.bubEntreno);
+  comprobar('chat de PandarIA: abre marcado como experimental, responde, pide el ejercicio, busca y no inventa', r.chatAbre && r.chatResp && r.chatPar && r.chatBusca && r.chatNoInventa, JSON.stringify([r.chatAbre,r.chatResp,r.chatPar,r.chatBusca,r.chatNoInventa]));
+  comprobar('escáner: el nombre del alimento nuevo usa el teclado de letras y los números el numérico', r.teclado);
   comprobar('retos del mes: metas según el plan (3 días por semana)', /^entrenos:\d+:\d+ agua:\d+:\d+/.test(r.retosMes), r.retosMes);
   comprobar('retos con amigos: código PFR dentro de un mensaje, sin duplicados y rechazando códigos malos', r.retoImport && r.retoDuplicado && r.retoMalo);
   comprobar('retos con amigos: el progreso PFP de un amigo se actualiza (no se repite)', r.rival === '[["Ana",9]]', r.rival);
