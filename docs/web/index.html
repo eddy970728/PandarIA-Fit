@@ -44,21 +44,21 @@ svg{display:block}
 #app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto;padding-top:var(--safe-t);background:var(--bg)}
 #view{flex:1;overflow-y:auto;padding:0 16px calc(var(--nav) + 24px + var(--safe-b));-webkit-overflow-scrolling:touch}
 /* Nav */
-#pfBub{position:fixed;z-index:40;width:42px;height:42px;border-radius:50%;border:0;padding:0;background:var(--blue);box-shadow:0 4px 14px rgba(0,0,0,.35);opacity:.88;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:22px;transition:left .18s,right .18s,top .18s,transform .15s}
+#pfBub{position:fixed;z-index:40;width:42px;height:42px;border-radius:12px;border:0;padding:0;background:#12151a;box-shadow:0 4px 14px rgba(0,0,0,.35);opacity:.88;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:22px;transition:left .18s,right .18s,top .18s,transform .15s}
+#pfBub img{width:100%;height:100%;border-radius:12px;pointer-events:none}
 #pfBub i{position:absolute;right:-3px;bottom:-3px;font-size:11px;font-style:normal;background:var(--bg2);border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center}
 #pfBub.drag{transition:none;transform:scale(1.12);opacity:1}
 #pfBub[hidden]{display:none}
-.pfchat{width:calc(100% - 16px);max-width:520px;height:min(72vh,600px);margin-bottom:calc(8px + var(--safe-b));background:var(--bg2);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;animation:up .2s ease;box-shadow:0 18px 50px rgba(0,0,0,.45)}
-.pfch-h{display:flex;align-items:center;gap:10px;padding:12px 10px 10px 14px;border-bottom:1px solid var(--line)}
-.pfch-av{width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
-.pfch-m{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
-.pfch-b{max-width:84%;padding:9px 12px;border-radius:18px;line-height:1.45;font-size:14px}
-.pfch-b.pi{background:var(--card2);align-self:flex-start;border-bottom-left-radius:6px}
-.pfch-b.yo{background:var(--ac);color:#1a0d02;align-self:flex-end;border-bottom-right-radius:6px}
-.pfch-c{display:flex;flex-wrap:wrap;gap:6px;max-height:34%;overflow-y:auto;padding:8px 12px}
-.pfch-c .chip{white-space:normal;text-align:left;line-height:1.3;height:auto;min-height:34px;padding-top:7px;padding-bottom:7px}
-.pfch-i{display:flex;gap:8px;align-items:center;padding:6px 10px 10px;border-top:1px solid var(--line)}
-.pfch-i .inp{flex:1;border-radius:22px}
+.pfguia{width:calc(100% - 16px);max-width:480px;max-height:min(70vh,580px);margin-bottom:calc(8px + var(--safe-b));background:var(--bg2);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;animation:up .2s ease;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.pfg-h{display:flex;align-items:center;gap:8px;padding:10px 8px 10px 12px;border-bottom:1px solid var(--line)}
+.pfg-av{width:34px;height:34px;border-radius:10px;flex:none}
+.pfg-b{flex:1;overflow-y:auto;padding:12px 14px 16px}
+.pfg-t{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin:2px 0 4px}
+.pfg-f{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:11px 2px;border-top:1px solid var(--line);font-size:14px;line-height:1.35}
+.pfg-s{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pfg-s button{display:flex;align-items:center;gap:8px;text-align:left;padding:10px;border-radius:12px;background:var(--card);font-size:13px;font-weight:600;line-height:1.25}
+.pfg-s span{font-size:18px}
+.pfg-r{margin-top:10px;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--ac);line-height:1.5;font-size:14px}
 #nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--bg2);border-top:1px solid var(--line);display:flex;max-width:560px;margin:0 auto;z-index:20}
 #nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mut);font-size:12px;font-weight:500;position:relative}
 #nav button .pill{width:56px;height:30px;border-radius:15px;display:grid;place-items:center;transition:.2s}
@@ -9440,7 +9440,7 @@ const CQ=[
 const cap1es=s=>String(s).charAt(0).toUpperCase()+String(s).slice(1)+'.';
 function cqPerfil(){ return {corta:tx('Completa tu perfil (peso, altura, edad) para que PandarIA pueda calcularlo.','Complete your profile (weight, height, age) so PandarIA can work it out.'),caso:[],exp:[],ej:[],hacer:[],acciones:[['openProfile','',tx('Completar perfil','Complete profile')]]}; }
 const cqNorm=s=>anorm(String(s||''));
-function cqTexto(q,p){ let t=tx(q.q[0],q.q[1]); if (q.p){ const o=(CQ_PARAMS[q.p].ops().find(x=>x[0]===(p&&p[q.p]))||[])[1]; const gen={ej:['un ejercicio','an exercise'],hora:['una hora concreta','a given time'],zona:['una zona','an area'],momento:['a cierta hora','at a certain time']}[q.p]; const raw=p&&p[q.p]; t=t.replace('{'+q.p+'}',o?esc(q.p==='ej'?o:o.toLowerCase()):raw&&q.p==='hora'?esc(raw):tx(gen[0],gen[1])); } return t; }
+function cqTexto(q,p){ let t=tx(q.q[0],q.q[1]); if (q.p){ const o=(CQ_PARAMS[q.p].ops().find(x=>x[0]===(p&&p[q.p]))||[])[1]; const gen={ej:['un ejercicio','an exercise'],hora:['cierta hora','a given time'],zona:['una zona','an area'],momento:['a cierta hora','at a certain time']}[q.p]; const raw=p&&p[q.p]; if (q.p==='hora' && !o && !(p&&p.hora)) t=t.replace(/ (a las|at) \{hora\}/,''); t=t.replace('{'+q.p+'}',o?esc(q.p==='ej'?o:o.toLowerCase()):raw&&q.p==='hora'?esc(raw):tx(gen[0],gen[1])); } return t; }
 const CQ_VACIAS=new Set('puedo puede debo debe deberia como cual cuales cuando cuanto cuanta cuantos cuantas donde para por porque que quiero necesito tengo hago hacer tomar usar esta este esto estoy muy mas menos bien algo the and can should how what when does with from have need want your mis tus con sin una uno unos unas los las del pero'.split(' '));
 function cqBuscar(sec,qs){ const L=CQ.filter(q=>!sec||q.s===sec); const w=cqNorm(qs).replace(/[^a-z0-9ñ ]/g,' ').split(/\s+/).filter(x=>x.length>2&&!CQ_VACIAS.has(x)); if (!w.length) return sec?L:[];
   return L.map(q=>{ const h=cqNorm(tx(q.q[0],q.q[1])+' '+q.alias); return [w.filter(x=>h.includes(x)||h.includes(x.slice(0,-1))).length,q]; }).filter(x=>x[0]).sort((a,b)=>b[0]-a[0]).map(x=>x[1]); }
@@ -9451,7 +9451,6 @@ SCREENS.consulta=p=>{ const L=p.q?cqBuscar(null,p.q):null;
   <div class="search">${I('search',20)}<input class="inp" placeholder="${tx('Buscar una pregunta…','Search a question…')}" value="${esc(p.q)}" data-in="cqQ"></div>`;
   if (L) b+=L.length?`<div class="card" style="padding:4px 14px;margin-top:12px">${L.slice(0,12).map((q,i)=>`<button class="row" style="width:100%;text-align:left;padding:11px 0;${i?'border-top:1px solid var(--line)':''}" data-a="cqAbrir" data-v="${q.id}"><span class="grow sm">${cqTexto(q,{})}</span>${I('right',16)}</button>`).join('')}</div>`:`<p class="sm mut" style="margin-top:12px">${tx('No encontré esa pregunta. Prueba con otras palabras o elige un tema.','I could not find that question. Try other words or pick a topic.')}</p>`;
   b+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">${CQ_SECS.map(s=>`<button class="card" style="margin:0;text-align:left;padding:14px" data-a="cqSec" data-v="${s.id}"><div style="font-size:26px">${s.ic}</div><div class="b sm" style="margin-top:6px">${tx(s.n,s.en)}</div><div class="xs mut">${CQ.filter(q=>q.s===s.id).length} ${tx('preguntas','questions')}</div></button>`).join('')}</div>`;
-  b+=`<button class="card row" style="width:100%;text-align:left;gap:12px;margin-top:14px" data-a="cqPedir"><span style="font-size:22px">✉️</span><div class="grow"><div class="b sm">${tx('¿No encuentras tu pregunta?','Can’t find your question?')}</div><div class="xs mut">${tx('Envíala al creador: las más pedidas se añaden en próximas versiones.','Send it to the creator: the most requested ones are added in future versions.')}</div></div>${I('right',16)}</button>`;
   b+=`<p class="xs mut" style="text-align:center;margin:16px 8px 0;line-height:1.5">${tx('Orientación general basada en la biblioteca de evidencia de PandarIA. No sustituye a un profesional de la salud.','General guidance based on PandarIA’s evidence library. It does not replace a health professional.')}</p>`;
   return lhdr(tx('Consulta a PandarIA','Ask PandarIA'))+`<div class="lbody">${b}</div>`; };
 IN.cqQ=el=>{ const t=LAYERS[LAYERS.length-1]; if (!t) return; t.p.q=el.value; clearTimeout(IN.cqT); IN.cqT=setTimeout(()=>{ refreshTop(); const i=document.querySelector('.layer:last-child input[data-in="cqQ"]'); if (i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } },350); };
@@ -9480,11 +9479,10 @@ SCREENS.consultaQ=p=>{ const q=CQ.find(x=>x.id===p.id); if (!q) return lhdr('')+
   b+=premOK()?resto.join(''):`<div style="position:relative"><div aria-hidden="true" style="filter:blur(5px);opacity:.5;pointer-events:none;user-select:none;max-height:380px;overflow:hidden">${resto.join('')}</div><button class="card" style="position:absolute;left:50%;top:40px;transform:translateX(-50%);width:min(90%,360px);text-align:center;background:var(--bg2);box-shadow:0 12px 34px rgba(0,0,0,.35)" data-a="cqPay"><div style="font-size:28px">🔒</div><div class="b" style="margin-top:6px">${tx('El análisis completo es Premium','The full analysis is Premium')}</div><div class="xs mut" style="margin-top:4px">${tx('Tu caso, explicación, ejemplos y qué hacer, con tus datos.','Your case, explanation, examples and what to do, with your data.')}</div></button></div>`;
   return lhdr(tx('Consulta a PandarIA','Ask PandarIA'))+`<div class="lbody">${b}</div>`; };
 
-/* ---------- 1.4 · Burbuja flotante de PandarIA (Consulta en formato chat, experimental) ----------
-   Un botón pequeño que se puede arrastrar a cualquier borde. Al tocarlo se abre un chat flotante:
-   PandarIA saluda, sugiere preguntas de la pantalla en la que estás, responde con la respuesta corta
-   (y el informe completo con Premium) y busca entre sus preguntas lo que escribas. Nunca inventa: si no
-   tiene una pregunta parecida, lo dice y ofrece enviarla al creador. */
+/* ---------- 1.4 · Burbuja flotante de PandarIA: mini guía (experimental) ----------
+   Un botón pequeño con el icono de la app que se puede arrastrar a cualquier borde. Al tocarlo se abre una
+   guía flotante: preguntas de la pantalla en la que estás, temas y un buscador entre las preguntas preparadas.
+   Responde con la respuesta corta (el informe completo con Premium). No hay texto libre ni envíos por correo. */
 const BUB_OCULTA=['workout','onboard','intervals','intRun','editor','consulta','consultaSec','consultaQ','premium','updNew','updWhatsNew','photoCmp','wizPandaria','wizGrupo','alimNuevo','retoNuevo','createEx','goalForm','measure','receta','profile'];
 const CQ_CTX={rutinas:['hoy','series','descarga','estanco'],explorar:['pesoUsar','calentar','series'],nutricion:['proteina','calorias','despues','polvo'],
   agua:['cuantaAgua','aguaEntreno','cafeAgua'],ayuno:['planAyuno','romper','ayunasEntreno','ayunoMusculo'],historial:['noBajo','estanco','pesarme','ritmo'],ajustes:['datos','premium','progresion','recuCalc'],
@@ -9501,80 +9499,65 @@ function bubVisible(){ if (S.settings.burbuja===false || !S.settings.onboarded) 
 function bubPos(b){ const P=S.settings.bubPos||{l:0,y:.62}; const H=innerHeight, W=Math.min(innerWidth,9999);
   const y=Math.max(70,Math.min(H-150,P.y*H)); b.style.top=y+'px'; b.style.left=P.l?'6px':''; b.style.right=P.l?'':'6px'; void W; }
 function bubSync(){ let b=document.getElementById('pfBub');
-  if (!b){ b=document.createElement('button'); b.id='pfBub'; b.setAttribute('aria-label',tx('Consulta a PandarIA (experimental)','Ask PandarIA (experimental)'));
-    b.innerHTML='<span>🐼</span><i>🧪</i>'; document.body.appendChild(b); bubArrastre(b); }
+  if (!b){ b=document.createElement('button'); b.id='pfBub'; b.setAttribute('aria-label',tx('Guía de PandarIA (experimental)','PandarIA guide (experimental)'));
+    b.innerHTML=`<img src="${GUIA_IC}" alt=""><i>🧪</i>`; document.body.appendChild(b); bubArrastre(b); }
   b.hidden=!bubVisible(); if (!b.hidden) bubPos(b); }
 function bubArrastre(b){ let st=null;
   b.addEventListener('pointerdown',e=>{ st={x:e.clientX,y:e.clientY,t0:b.offsetTop,mov:false}; try{ b.setPointerCapture(e.pointerId); }catch(_){} });
   b.addEventListener('pointermove',e=>{ if (!st) return; const dx=e.clientX-st.x, dy=e.clientY-st.y; if (!st.mov && Math.hypot(dx,dy)<8) return;
     st.mov=true; b.classList.add('drag'); b.style.top=Math.max(50,Math.min(innerHeight-90,st.t0+dy))+'px'; b.style.left=(e.clientX-21)+'px'; b.style.right=''; });
   const fin=e=>{ if (!st) return; const s0=st; st=null; b.classList.remove('drag');
-    if (!s0.mov){ A.chatAbrir(); return; }
+    if (!s0.mov){ A.guiaAbrir(); return; }
     S.settings.bubPos={l:e.clientX<innerWidth/2?1:0, y:Math.round(b.offsetTop/innerHeight*1000)/1000}; save(); bubPos(b); };
   b.addEventListener('pointerup',fin); b.addEventListener('pointercancel',()=>{ st=null; b.classList.remove('drag'); bubPos(b); });
   addEventListener('resize',()=>{ if (!b.hidden) bubPos(b); }); }
 { const r0=render; render=function(){ const o=r0.apply(this,arguments); try{ bubSync(); }catch(e){} return o; }; }
 { const r1=renderLayers; renderLayers=function(){ const o=r1.apply(this,arguments); try{ bubSync(); }catch(e){} return o; }; }
 { const r2=renderModals; renderModals=function(){ const o=r2.apply(this,arguments); try{ bubSync(); }catch(e){} return o; }; }
-// ----- el chat -----
-let CHAT=null;
-const chatPi=html=>CHAT.msgs.push({de:'pi',html}), chatYo=t=>CHAT.msgs.push({de:'yo',html:esc(t)});
-function chatSugeridas(){ const c=cqContexto(); CHAT.ctxP=c.p; return c.ids.map(id=>['q',id]); }
-A.chatAbrir=()=>{ const c=cqContexto();
-  if (!CHAT || Date.now()-CHAT.t>30*60000){ CHAT={t:Date.now(),msgs:[],chips:[]};
-    chatPi(`${tx('¡Hola! Soy PandarIA','Hi! I’m PandarIA')} 🐼 ${tx('Elige una pregunta o escríbela y te respondo con tus datos, sin internet.','Pick a question or type it and I’ll answer with your data, offline.')}<div class="xs" style="margin-top:6px;opacity:.75">🧪 ${tx('Función en desarrollo (experimental)','Feature in development (experimental)')}</div>`); }
-  CHAT.t=Date.now(); CHAT.ctxP=c.p; CHAT.chips=[...c.ids.map(id=>['q',id]),['temas','']];
-  openModal(chatHtml(),{chat:true}); chatScroll(); };
-function chatChip([t,v,l]){ if (t==='q'){ const q=CQ.find(x=>x.id===v); return q?`<button class="chip" data-a="chatQ" data-v="${q.id}">${cqTexto(q,q.p&&CHAT.ctxP&&CHAT.ctxP[q.p]?CHAT.ctxP:{})}</button>`:''; }
-  if (t==='sec'){ const s=CQ_SECS.find(x=>x.id===v); return `<button class="chip" data-a="chatSec" data-v="${v}">${s.ic} ${tx(s.n,s.en)}</button>`; }
-  if (t==='par') return `<button class="chip" data-a="chatPar" data-v="${esc(v)}">${esc(l)}</button>`;
-  if (t==='temas') return `<button class="chip" data-a="chatTemas">📚 ${tx('Ver temas','See topics')}</button>`;
-  if (t==='pedir') return `<button class="chip" data-a="chatPedir">✉️ ${tx('Enviar al creador','Send to the creator')}</button>`;
-  return ''; }
-function chatHtml(){ return `<div class="pfchat" role="dialog" aria-label="${tx('Consulta a PandarIA','Ask PandarIA')}">
-  <div class="pfch-h"><span class="pfch-av">🐼</span><div class="grow"><div class="b">PandarIA</div><div class="xs mut">🧪 ${tx('Experimental · responde con tus datos','Experimental · answers with your data')}</div></div>
-    <button class="ibtn" data-a="chatTodo" aria-label="${tx('Abrir todas las preguntas','Open all questions')}">${I('book',20)}</button><button class="ibtn" data-a="closeModal" aria-label="${tx('Cerrar','Close')}">${I('close',20)}</button></div>
-  <div class="pfch-m">${CHAT.msgs.map(m=>`<div class="pfch-b ${m.de}">${m.html}</div>`).join('')}</div>
-  <div class="pfch-c">${CHAT.chips.map(chatChip).join('')}</div>
-  <form class="pfch-i" data-chat="1"><input class="inp" id="chatT" placeholder="${tx('Escribe tu pregunta…','Type your question…')}" autocomplete="off" enterkeyhint="send"><button class="ibtn" type="submit" aria-label="${tx('Enviar','Send')}">${I('right',20)}</button></form></div>`; }
-function chatRender(){ if (!MODALS.length || !MODALS[MODALS.length-1].chat) return; const html=chatHtml(); MODALS[MODALS.length-1].html=html;
-  const box=document.querySelector('#modals .scrim:last-child'); if (box){ box.innerHTML=html; chatScroll(); } }
-function chatScroll(){ requestAnimationFrame(()=>{ const m=document.querySelector('#modals .pfch-m'); if (m) m.scrollTop=m.scrollHeight; }); }
-A.chatTemas=()=>{ chatYo(tx('Ver temas','See topics')); chatPi(tx('Estos son los temas que conozco:','These are the topics I know:')); CHAT.chips=CQ_SECS.map(s=>['sec',s.id]); chatRender(); };
-A.chatSec=v=>{ const s=CQ_SECS.find(x=>x.id===v); chatYo(`${s.ic} ${tx(s.n,s.en)}`); chatPi(tx('¿Qué quieres saber?','What would you like to know?'));
-  CHAT.chips=[...CQ.filter(q=>q.s===v).map(q=>['q',q.id]),['temas','']]; chatRender(); };
-A.chatQ=id=>{ const q=CQ.find(x=>x.id===id); if (!q) return;
-  if (q.p && !(CHAT.ctxP&&CHAT.ctxP[q.p])){ CHAT.pend=id; chatYo(cqTexto(q,{}).replace(/<[^>]+>/g,'')); chatPi(`${tx('¿Cuál?','Which one?')} <span class="xs mut">(${tx(CQ_PARAMS[q.p].n[0],CQ_PARAMS[q.p].n[1]).toLowerCase()})</span>`);
-    CHAT.chips=CQ_PARAMS[q.p].ops().map(([k,l])=>['par',k,l]); chatRender(); return; }
-  chatResp(q, q.p?{[q.p]:CHAT.ctxP[q.p]}:{}, true); };
-A.chatPar=v=>{ const q=CQ.find(x=>x.id===CHAT.pend); if (!q) return; const l=(CQ_PARAMS[q.p].ops().find(x=>x[0]===v)||[])[1]||v; chatYo(l); chatResp(q,{[q.p]:v},false); };
-function chatResp(q,p,eco){ if (eco) chatYo(cqTexto(q,p).replace(/&amp;/g,'&').replace(/<[^>]+>/g,''));
-  let R; try{ R=q.f(p)||{}; }catch(e){ R={corta:tx('Todavía no puedo analizar esto con tus datos.','I can’t analyse this with your data yet.')}; }
-  CHAT.ult={id:q.id,p};
-  chatPi(`${esc(R.corta||'')}<div style="margin-top:8px"><button class="btn sm ${premOK()?'pri':''}" style="${premOK()?'':'background:var(--card);border:1px solid var(--line)'}" data-a="chatInforme">${premOK()?tx('Ver informe completo','See full report'):'🔒 '+tx('Informe completo (Premium)','Full report (Premium)')}</button></div>`);
-  CHAT.chips=[...CQ.filter(x=>x.s===q.s&&x.id!==q.id).slice(0,3).map(x=>['q',x.id]),['temas','']]; chatRender(); }
-A.chatInforme=()=>{ const u=CHAT&&CHAT.ult; if (!u) return; closeModal(); setTimeout(()=>{ if (premOK()) openLayer('consultaQ',{id:u.id,p:Object.assign({},u.p)}); else A.cqPay(); },90); };
-A.chatTodo=()=>{ closeModal(); setTimeout(()=>A.consulta(),90); };
-A.chatPedir=()=>{ const t=CHAT.pedir||''; closeModal(); setTimeout(()=>{ A.cqPedir(); const el=$('#cqt'); if (el) el.value=t; },90); };
-document.addEventListener('submit',e=>{ const f=e.target.closest('form[data-chat]'); if (!f) return; e.preventDefault();
-  const el=f.querySelector('#chatT'), t=(el.value||'').trim(); if (!t) return; chatYo(t);
-  const L=cqBuscar(null,t).slice(0,4), tn=' '+cqNorm(t)+' ';
-  // si escribe una zona, un ejercicio o una hora, la pregunta ya sale completa
-  CHAT.ctxP=Object.assign({},cqContexto().p||{});
-  const ZW={rodilla:'rodilla knee',hombro:'hombro shoulder',lumbar:'lumbar espalda back',codo:'codo elbow',cadera:'cadera hip',muneca:'muneca wrist'};
-  Object.entries(ZW).forEach(([k,ws])=>{ if (ws.split(' ').some(x=>tn.includes(' '+x))) CHAT.ctxP.zona=k; });
-  [['manana','manana morning'],['tarde','tarde afternoon'],['noche','noche night']].forEach(([k,ws])=>{ if (ws.split(' ').some(x=>tn.includes(' '+x))) CHAT.ctxP.momento=k; });
-  const ej=CQ_PARAMS.ej.ops().map(([id,l])=>[id,cqNorm(l).split(' ')]).find(([,w])=>{ const c=w.filter(x=>x.length>3&&!CQ_VACIAS.has(x)); return c.length && c.slice(0,2).every(x=>tn.includes(x)); }); if (ej) CHAT.ctxP.ej=ej[0];
-  const hh=t.match(/\b([01]?\d|2[0-3])(?::([0-5]\d))?\s*(h|hs|am|pm)?\b/i); if (hh && /\d/.test(t) && /hora|entren|a las|at /i.test(t)){ let H=+hh[1]; if (/pm/i.test(hh[3]||'')&&H<12) H+=12; CHAT.ctxP.hora=String(H).padStart(2,'0')+':'+(hh[2]||'00'); }
-  if (L.length){ chatPi(L.length===1?tx('Creo que te refieres a esta:','I think you mean this one:'):tx('Esto es lo que sé responder sobre eso:','This is what I can answer about that:')); CHAT.chips=[...L.map(q=>['q',q.id]),['temas','']]; }
-  else { CHAT.pedir=t; chatPi(tx('Todavía no sé responder eso y prefiero no inventarme nada. ¿Se la envío al creador para que la añada?','I can’t answer that yet and I’d rather not make anything up. Shall I send it to the creator so it gets added?')); CHAT.chips=[['pedir',''],['temas','']]; }
-  chatRender(); setTimeout(()=>{ const i=document.querySelector('#chatT'); if (i) i.focus(); },50); });
-const CQ_MAIL='lunadoggybrustudios@gmail.com';
-A.cqPedir=()=>{ openModal(`<div class="modal"><h3>${tx('Sugerir una pregunta','Suggest a question')}</h3><p class="sm mut" style="line-height:1.45">${tx('Escribe lo que te gustaría preguntarle a PandarIA. No se envía ningún dato tuyo: solo este texto.','Write what you would like to ask PandarIA. None of your data is sent: only this text.')}</p><textarea class="inp" id="cqt" rows="4" style="width:100%" placeholder="${tx('Ej.: ¿Puedo entrenar con resfriado?','E.g.: Can I train with a cold?')}"></textarea>
-  <p class="xs mut" style="user-select:text">${tx('Correo','Email')}: ${CQ_MAIL}</p><div class="row" style="gap:8px;margin-top:10px"><button class="btn grow" data-a="closeModal">${tx('Cerrar','Close')}</button><button class="btn pri grow" data-a="cqEnviar">${tx('Enviar','Send')}</button></div></div>`,{center:true}); };
-A.cqEnviar=()=>{ const el=$('#cqt'), t=(el&&el.value||'').trim(); if (!t) return toast(tx('Escribe tu pregunta','Write your question'));
-  const url=`mailto:${CQ_MAIL}?subject=${encodeURIComponent('PandarIA Fit · Consulta a PandarIA')}&body=${encodeURIComponent(`${t}\n\n— ${tx('Versión','Version')} ${verTxt()}`)}`;
-  const l=document.createElement('a'); l.href=url; l.style.display='none'; document.body.appendChild(l); l.click(); l.remove(); closeModal(); };
+// ----- la mini enciclopedia (guía flotante) -----
+// Sin escribir preguntas libres ni enviar nada a nadie: solo temas, preguntas ya preparadas y un buscador entre ellas.
+let GUIA=null;
+const GUIA_IC='data:image/webp;base64,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';
+A.guiaAbrir=()=>{ const c=cqContexto(); GUIA={v:'inicio',ctx:c,q:'',hist:[]}; openModal(guiaHtml(),{guia:true}); };
+A.chatAbrir=A.guiaAbrir; // nombre anterior
+function guiaIr(n){ GUIA.hist.push({v:GUIA.v,s:GUIA.s,id:GUIA.id,p:GUIA.p}); Object.assign(GUIA,n); guiaRender(); }
+A.guiaAtras=()=>{ const h=GUIA&&GUIA.hist.pop(); if (!h) return closeModal(); Object.assign(GUIA,h); guiaRender(); };
+A.guiaInicio=()=>{ GUIA.hist=[]; GUIA.v='inicio'; GUIA.q=''; guiaRender(); };
+A.guiaSec=v=>guiaIr({v:'sec',s:v});
+A.guiaQ=id=>{ const q=CQ.find(x=>x.id===id); if (!q) return; const p={};
+  if (q.p){ const o=CQ_PARAMS[q.p].ops(), cp=GUIA.ctx.p&&GUIA.ctx.p[q.p]; p[q.p]=cp&&o.some(x=>x[0]===cp)?cp:(o.length?o[0][0]:''); }
+  guiaIr({v:'q',id,p}); };
+A.guiaPar=v=>{ const q=CQ.find(x=>x.id===GUIA.id); if (!q||!q.p) return; GUIA.p={[q.p]:v}; guiaRender(); };
+A.guiaInforme=()=>{ const id=GUIA.id, p=Object.assign({},GUIA.p); closeModal(); setTimeout(()=>{ if (premOK()) openLayer('consultaQ',{id,p}); else A.cqPay(); },90); };
+A.guiaTodo=()=>{ closeModal(); setTimeout(()=>A.consulta(),90); };
+const guiaFila=(q,i)=>`<button class="pfg-f" data-a="guiaQ" data-v="${q.id}" ${i?'':'style="border-top:0"'}><span class="grow">${cqTexto(q,q.p&&GUIA.ctx.p&&GUIA.ctx.p[q.p]?GUIA.ctx.p:{})}</span>${I('right',16)}</button>`;
+function guiaLista(){ const L=cqBuscar(null,GUIA.q).slice(0,10);
+  return L.length?L.map(guiaFila).join(''):`<p class="sm mut" style="padding:10px 2px;line-height:1.45">${tx('No está en la guía todavía. Prueba con otras palabras o mira los temas.','It is not in the guide yet. Try other words or browse the topics.')}</p>`; }
+function guiaCuerpo(){ const G=GUIA;
+  if (G.v==='sec'){ const s=CQ_SECS.find(x=>x.id===G.s)||CQ_SECS[0];
+    return `<div class="pfg-t">${s.ic} ${tx(s.n,s.en)}</div>${CQ.filter(q=>q.s===s.id).map(guiaFila).join('')}`; }
+  if (G.v==='q'){ const q=CQ.find(x=>x.id===G.id); if (!q) return '';
+    let R; try{ R=q.f(G.p||{})||{}; }catch(e){ R={corta:tx('Todavía no puedo analizar esto con tus datos.','I can’t analyse this with your data yet.')}; }
+    let h=`<div class="b" style="line-height:1.35;font-size:15px">${cqTexto(q,G.p)}</div>`;
+    if (q.p) h+=`<div class="chips scroll" style="margin-top:8px">${CQ_PARAMS[q.p].ops().map(([k,l])=>`<button class="chip ${G.p[q.p]===k?'on':''}" data-a="guiaPar" data-v="${esc(k)}">${esc(l)}</button>`).join('')}</div>`;
+    h+=`<div class="pfg-r">${esc(R.corta||'')}</div>`;
+    h+=`<button class="btn sm ${premOK()?'pri':''}" style="width:100%;margin-top:10px;${premOK()?'':'background:var(--card);border:1px solid var(--line)'}" data-a="guiaInforme">${premOK()?tx('Ver informe completo','See full report'):'<span>🔒</span> '+tx('Informe completo (Premium)','Full report (Premium)')}</button>`;
+    const rel=CQ.filter(x=>x.s===q.s&&x.id!==q.id).slice(0,3);
+    if (rel.length) h+=`<div class="pfg-t" style="margin-top:14px">${tx('Relacionadas','Related')}</div>${rel.map(guiaFila).join('')}`;
+    return h; }
+  const ids=G.ctx.ids.map(id=>CQ.find(q=>q.id===id)).filter(Boolean);
+  return `<div class="search" style="margin:0 0 10px">${I('search',18)}<input class="inp" id="guiaB" placeholder="${tx('Buscar en la guía…','Search the guide…')}" value="${esc(G.q)}" autocomplete="off" data-in="guiaB"></div>
+  <div id="guiaL">${G.q?guiaLista():`<div class="pfg-t">${tx('En esta pantalla','On this screen')}</div>${ids.map(guiaFila).join('')}
+  <div class="pfg-t" style="margin-top:14px">${tx('Temas','Topics')}</div><div class="pfg-s">${CQ_SECS.map(s=>`<button data-a="guiaSec" data-v="${s.id}"><span>${s.ic}</span>${tx(s.n,s.en)}</button>`).join('')}</div>`}</div>`; }
+function guiaHtml(){ const atras=GUIA.v!=='inicio';
+  return `<div class="pfguia" role="dialog" aria-label="${tx('Guía de PandarIA','PandarIA guide')}">
+  <div class="pfg-h">${atras?`<button class="ibtn" data-a="guiaAtras" aria-label="${tx('Atrás','Back')}">${I('back',20)}</button>`:''}<img src="${GUIA_IC}" alt="" class="pfg-av"><div class="grow"><div class="b">${tx('Guía de PandarIA','PandarIA guide')}</div><div class="xs mut">🧪 ${tx('Experimental · con tus datos','Experimental · with your data')}</div></div>
+    <button class="ibtn" data-a="guiaTodo" aria-label="${tx('Abrir la consulta completa','Open the full consultation')}">${I('book',20)}</button><button class="ibtn" data-a="closeModal" aria-label="${tx('Cerrar','Close')}">${I('close',20)}</button></div>
+  <div class="pfg-b">${guiaCuerpo()}</div></div>`; }
+function guiaRender(){ if (!MODALS.length || !MODALS[MODALS.length-1].guia) return; const html=guiaHtml(); MODALS[MODALS.length-1].html=html;
+  const box=document.querySelector('#modals .scrim:last-child'); if (box){ box.innerHTML=html; const b=box.querySelector('.pfg-b'); if (b) b.scrollTop=0; } }
+IN.guiaB=el=>{ if (!GUIA) return; GUIA.q=el.value; const L=document.getElementById('guiaL'); if (!L) return;
+  if (GUIA.q.trim()) L.innerHTML=guiaLista(); else guiaRender(); if (!GUIA.q.trim()){ const i=document.getElementById('guiaB'); if (i) i.focus(); } };
 
 /* ---------- Tarjeta para compartir ---------- */
 function shareCardCanvas(s){
@@ -9860,7 +9843,7 @@ const APP_VERSION='1.4';
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
- {v:'1.4',t:'Retos y Consulta a PandarIA',items:['Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale', 'Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos', 'Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores', 'Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir', 'Tarjeta del entreno renovada, con el panda y tus récords', 'Versión para iPhone y iPad (se instala con AltStore desde el PC)', 'Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)']},
+ {v:'1.4',t:'Retos y Consulta a PandarIA',items:['Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale', 'Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)', 'Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos', 'Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores', 'Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir', 'Tarjeta del entreno renovada, con el panda y tus récords', 'Versión para iPhone y iPad (se instala con AltStore desde el PC)', 'Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)']},
  {v:'1.3',t:'Comer, dormir y ayunar',items:['Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua', 'Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano', 'Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado', 'Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)', 'Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)', 'Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)', 'Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)', 'Notificación del entreno con la serie siguiente y el botón «✓ Hecha»', 'Biblioteca de evidencia 1.6: 4 reglas nuevas']},
  {v:'1.2',t:'PandarIA v2 y temas',items:['PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno', 'PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores', 'PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo', 'PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión', 'PandarIA v2 · Aprende de tus cambios: si cambias un ejercicio a mano, lo tiene en cuenta al proponer ejercicios', 'Temas: Automático, Claro, Oscuro gris (pantallas LCD) y Negro puro (pantallas OLED)', 'Tamaño del texto: Normal, Grande y Muy grande', 'Biblioteca de evidencia 1.5: 2 reglas nuevas']},
  {v:'1.1.01',t:'Arreglos',items:['La parte de arriba de la pantalla ya no muestra restos de la imagen de inicio','Al elegir una foto de progreso ya no se borran las medidas que escribiste y la foto se guarda']},
@@ -10242,7 +10225,7 @@ function viewAjustes(){
     ${tg('period',st.period!==false,'layers','Periodización por bloques','Ciclos de volumen, intensidad y descarga')}
     ${tg('report',st.report!==false,'chart','Informe semanal','Aviso cada lunes con el resumen de tu semana')}
     ${tg('tips',st.tips!==false,'book','Consejos del día','En Mis rutinas')}
-    ${tg('burbuja',st.burbuja!==false,'spark','Burbuja de PandarIA','Consulta a PandarIA en un chat flotante (experimental). Se puede arrastrar a cualquier borde')}
+    ${tg('burbuja',st.burbuja!==false,'spark','Burbuja de PandarIA','Guía rápida flotante con preguntas de cada pantalla (experimental). Se puede arrastrar a cualquier borde')}
     ${S.gustos&&Object.keys(S.gustos.quita||{}).length?nav('gustosReset','swap','Olvidar mis cambios de ejercicio',Object.keys(S.gustos.quita).length):''}
   </div>
   <div class="sec">Nutrición y ayuno</div><div class="card" style="padding:0 12px">
@@ -12826,7 +12809,9 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `Pregúntale sobre entreno, comida, sueño o ayuno: responde con tus datos.|Ask about training, food, sleep or fasting: it answers with your data.
+const EN_09 = `Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)|PandarIA bubble: a small button with the app icon that opens a quick guide with questions about the screen you are on (you can drag it or turn it off in Settings)
+Guía rápida flotante con preguntas de cada pantalla (experimental). Se puede arrastrar a cualquier borde|Floating quick guide with questions for each screen (experimental). You can drag it to any edge
+Pregúntale sobre entreno, comida, sueño o ayuno: responde con tus datos.|Ask about training, food, sleep or fasting: it answers with your data.
 Consulta a PandarIA|Ask PandarIA
 Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale|Ask PandarIA (Premium, experimental): 34 questions in 9 topics that PandarIA answers with your data, offline, with examples, what to do and the rule behind it
 Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos|Monthly challenges that adapt to your plan: workouts, days hitting your water goal and fasts

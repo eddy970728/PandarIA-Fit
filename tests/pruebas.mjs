@@ -594,13 +594,18 @@ if (fs.existsSync(COPIA07)) {
     S.settings.onboarded=true; LAYERS.length=0; MODALS.length=0; renderLayers(); renderModals(); TAB='rutinas'; render();
     const bb=document.getElementById('pfBub'); out.bubTab=!!bb && !bb.hidden;
     LAYERS.push({t:'workout',p:{}}); bubSync(); out.bubEntreno=bb.hidden; LAYERS.length=0; bubSync();
-    A.chatAbrir(); out.chatAbre=!!document.querySelector('#modals .pfchat') && /experimental/i.test(document.querySelector('#modals .pfchat').textContent);
-    A.chatQ('proteina'); out.chatResp=/128 g/.test(CHAT.msgs[CHAT.msgs.length-1].html);
-    A.chatQ('pesoUsar'); out.chatPar=CHAT.chips.length>0 && CHAT.chips[0][0]==='par';
-    const f=document.querySelector('#modals form[data-chat]'); f.querySelector('#chatT').value='creatina'; f.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
-    out.chatBusca=CHAT.chips.some(c=>c[1]==='creatina');
-    const f2=document.querySelector('#modals form[data-chat]'); f2.querySelector('#chatT').value='xyzzy plutonio'; f2.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
-    out.chatNoInventa=CHAT.chips.some(c=>c[0]==='pedir');
+    out.bubIcono=!!bb.querySelector('img[src^="data:image/webp"]') && !/🐼/.test(bb.textContent);
+    A.guiaAbrir(); const gd=()=>document.querySelector('#modals .pfguia');
+    out.guiaAbre=!!gd() && /experimental/i.test(gd().textContent) && !gd().querySelector('form,textarea') && gd().querySelectorAll('[data-a="guiaQ"]').length>0;
+    A.guiaQ('proteina'); out.guiaResp=/128 g/.test(gd().querySelector('.pfg-r').textContent);
+    A.guiaQ('pesoUsar'); out.guiaPar=gd().querySelectorAll('[data-a="guiaPar"]').length>0;
+    A.guiaAtras(); A.guiaAtras(); out.guiaAtras=GUIA.v==='inicio';
+    const gi=document.getElementById('guiaB'); gi.value='creatina'; gi.dispatchEvent(new Event('input',{bubbles:true}));
+    out.guiaBusca=!!document.querySelector('#guiaL [data-v="creatina"]');
+    gi.value='xyzzy plutonio'; gi.dispatchEvent(new Event('input',{bubbles:true}));
+    out.guiaNada=!document.querySelector('#guiaL [data-a="guiaQ"]') && !/mailto|correo|email/i.test(document.getElementById('guiaL').innerHTML);
+    out.sinCorreo=typeof A.cqPedir==='undefined' && typeof A.cqEnviar==='undefined';
+    closeModal();
     MODALS.length=0; renderModals();
     // escáner: el nombre de un alimento nuevo abre el teclado de letras
     const an=SCREENS.alimNuevo({d:{n:'',porl:'',porg:'',k:'',p:'',c:'',g:'',f:'',a:'',na:'',fl:'',codigo:'123',fuente:''}});
@@ -623,7 +628,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('Consulta: con Premium el informe completo; gratis solo la respuesta corta con candado', r.premCompleto && r.gratis);
   comprobar('Consulta: marcada como experimental', r.experimental);
   comprobar('burbuja de PandarIA: visible en las pestañas y oculta durante el entreno', r.bubTab && r.bubEntreno);
-  comprobar('chat de PandarIA: abre marcado como experimental, responde, pide el ejercicio, busca y no inventa', r.chatAbre && r.chatResp && r.chatPar && r.chatBusca && r.chatNoInventa, JSON.stringify([r.chatAbre,r.chatResp,r.chatPar,r.chatBusca,r.chatNoInventa]));
+  comprobar('guía de PandarIA: icono de la app, experimental, sin texto libre ni correo; responde, pide el ejercicio, vuelve atrás y busca', r.bubIcono && r.guiaAbre && r.guiaResp && r.guiaPar && r.guiaAtras && r.guiaBusca && r.guiaNada && r.sinCorreo, JSON.stringify([r.bubIcono,r.guiaAbre,r.guiaResp,r.guiaPar,r.guiaAtras,r.guiaBusca,r.guiaNada,r.sinCorreo]));
   comprobar('escáner: el nombre del alimento nuevo usa el teclado de letras y los números el numérico', r.teclado);
   comprobar('retos del mes: metas según el plan (3 días por semana)', /^entrenos:\d+:\d+ agua:\d+:\d+/.test(r.retosMes), r.retosMes);
   comprobar('retos con amigos: código PFR dentro de un mensaje, sin duplicados y rechazando códigos malos', r.retoImport && r.retoDuplicado && r.retoMalo);
