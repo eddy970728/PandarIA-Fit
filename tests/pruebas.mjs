@@ -605,6 +605,8 @@ if (fs.existsSync(COPIA07)) {
     gi.value='xyzzy plutonio'; gi.dispatchEvent(new Event('input',{bubbles:true}));
     out.guiaNada=!document.querySelector('#guiaL [data-a="guiaQ"]') && !/mailto|correo|email/i.test(document.getElementById('guiaL').innerHTML);
     out.sinCorreo=typeof A.cqPedir==='undefined' && typeof A.cqEnviar==='undefined';
+    out.sinMatraz=!/🧪/.test(bb.innerHTML+document.querySelector('#modals .pfguia').innerHTML);
+    try{ LAYERS.push({t:'exercise',p:{id:'est_isquios'}}); renderLayers(); out.estira=!!document.querySelector('.layer'); }catch(e){ out.estira=false; } LAYERS.length=0; renderLayers();
     closeModal();
     MODALS.length=0; renderModals();
     // escáner: el nombre de un alimento nuevo abre el teclado de letras
@@ -628,7 +630,8 @@ if (fs.existsSync(COPIA07)) {
   comprobar('Consulta: con Premium el informe completo; gratis solo la respuesta corta con candado', r.premCompleto && r.gratis);
   comprobar('Consulta: marcada como experimental', r.experimental);
   comprobar('burbuja de PandarIA: visible en las pestañas y oculta durante el entreno', r.bubTab && r.bubEntreno);
-  comprobar('guía de PandarIA: icono de la app, experimental, sin texto libre ni correo; responde, pide el ejercicio, vuelve atrás y busca', r.bubIcono && r.guiaAbre && r.guiaResp && r.guiaPar && r.guiaAtras && r.guiaBusca && r.guiaNada && r.sinCorreo, JSON.stringify([r.bubIcono,r.guiaAbre,r.guiaResp,r.guiaPar,r.guiaAtras,r.guiaBusca,r.guiaNada,r.sinCorreo]));
+  comprobar('abrir un estiramiento o ejercicio de movilidad no falla', r.estira);
+  comprobar('guía de PandarIA: icono de la app, experimental, sin texto libre ni correo; responde, pide el ejercicio, vuelve atrás y busca', r.bubIcono && r.guiaAbre && r.guiaResp && r.guiaPar && r.guiaAtras && r.guiaBusca && r.guiaNada && r.sinCorreo && r.sinMatraz, JSON.stringify([r.sinMatraz,r.bubIcono,r.guiaAbre,r.guiaResp,r.guiaPar,r.guiaAtras,r.guiaBusca,r.guiaNada,r.sinCorreo]));
   comprobar('escáner: el nombre del alimento nuevo usa el teclado de letras y los números el numérico', r.teclado);
   comprobar('retos del mes: metas según el plan (3 días por semana)', /^entrenos:\d+:\d+ agua:\d+:\d+/.test(r.retosMes), r.retosMes);
   comprobar('retos con amigos: código PFR dentro de un mensaje, sin duplicados y rechazando códigos malos', r.retoImport && r.retoDuplicado && r.retoMalo);

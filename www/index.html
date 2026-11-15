@@ -44,7 +44,6 @@ svg{display:block}
 /* Nav */
 #pfBub{position:fixed;z-index:40;width:42px;height:42px;border-radius:12px;border:0;padding:0;background:#12151a;box-shadow:0 4px 14px rgba(0,0,0,.35);opacity:.88;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:22px;transition:left .18s,right .18s,top .18s,transform .15s}
 #pfBub img{width:100%;height:100%;border-radius:12px;pointer-events:none}
-#pfBub i{position:absolute;right:-3px;bottom:-3px;font-size:11px;font-style:normal;background:var(--bg2);border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center}
 #pfBub.drag{transition:none;transform:scale(1.12);opacity:1}
 #pfBub[hidden]{display:none}
 .pfguia{width:calc(100% - 16px);max-width:480px;max-height:min(70vh,580px);margin-bottom:calc(8px + var(--safe-b));background:var(--bg2);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;animation:up .2s ease;box-shadow:0 18px 50px rgba(0,0,0,.45)}
@@ -5561,7 +5560,8 @@ function renderModals(){
   MODALS.forEach((m,i)=>{
     const d=document.createElement('div'); d.className='scrim'+(m.center?' center':'');
     d.innerHTML=m.html; d.dataset.i=i;
-    d.addEventListener('click',e=>{ if(e.target===d && !m.locked) goBack(); });
+    if (!m.t0) m.t0=Date.now();
+    d.addEventListener('click',e=>{ if(e.target===d && !m.locked && Date.now()-m.t0>450) goBack(); });
     box.appendChild(d);
   });
   startAnims();
@@ -6119,7 +6119,7 @@ A.fbCopy=()=>{ const t=$('#fbt').value; try{ navigator.clipboard.writeText(t).th
 SCREENS.exercise = p => {
   const ex=getEx(p.id), P=PATTERNS[ex.pat]||PATTERNS.core;
   const lv={}; ex.prim.forEach(m=>lv[m]=1); ex.sec.forEach(m=>{ if(!lv[m]) lv[m]=0.35; });
-  const h=exHistory(ex.id,12), rec=records()[ex.id];
+  const h=exHistory(ex.id,12), rec=records()[ex.id]; // estiramientos y movilidad no tienen récords (1.4: antes fallaba al abrirlos)
   const av=(S.settings.avoid||{})[ex.id];
   let b=`<div style="text-align:center;padding:6px 0 14px"><div style="max-width:220px;margin:0 auto">${ex.custom&&!ex.like?exIcon(ex,true):exAnim(ex)}</div>${exAnimTools(ex)}
     <div style="font-size:22px;font-weight:800;margin-top:14px">${esc(ex.n)}</div>
@@ -6133,7 +6133,7 @@ SCREENS.exercise = p => {
   b+=`<div class="sec">Tu historial</div>`;
   if (!h.length) b+=`<div class="card mut sm">Todavía no registraste este ejercicio.</div>`;
   else {
-    b+=`<div class="stats">${ex.mode==='p'?`<div class="stat"><div class="v">${fmtKg(rec.kg)}</div><div class="l">Peso máximo</div></div><div class="stat"><div class="v">${fmtNum(toUnit(rec.vol))}</div><div class="l">Mejor serie (${S.settings.unit}×reps)</div></div>`:ex.mode==='t'?`<div class="stat"><div class="v">${fmtTime(rec.time)}</div><div class="l">Mejor tiempo</div></div>`:`<div class="stat"><div class="v">${rec.reps}</div><div class="l">Máx. repeticiones</div></div>`}<div class="stat"><div class="v">${exHistory(ex.id).length}</div><div class="l">Sesiones</div></div></div>`;
+    if (rec) b+=`<div class="stats">${ex.mode==='p'?`<div class="stat"><div class="v">${fmtKg(rec.kg)}</div><div class="l">Peso máximo</div></div><div class="stat"><div class="v">${fmtNum(toUnit(rec.vol))}</div><div class="l">Mejor serie (${S.settings.unit}×reps)</div></div>`:ex.mode==='t'?`<div class="stat"><div class="v">${fmtTime(rec.time)}</div><div class="l">Mejor tiempo</div></div>`:`<div class="stat"><div class="v">${rec.reps}</div><div class="l">Máx. repeticiones</div></div>`}<div class="stat"><div class="v">${exHistory(ex.id).length}</div><div class="l">Sesiones</div></div></div>`;
     const pts=h.slice().reverse().map(e=>({x:e.date,y: ex.mode==='p'?Math.max(...e.sets.map(s=>+s.kg||0)): ex.mode==='t'?Math.max(...e.sets.map(s=>+s.time||0)):Math.max(...e.sets.map(s=>+s.reps||0))}));
     if (pts.length>1) b+=`<div class="card">${lineChart(pts.map(p=>({x:p.x,y:ex.mode==='p'?toUnit(p.y):p.y})),{unit:ex.mode==='p'?S.settings.unit:ex.mode==='t'?'s':'reps'})}</div>`;
     if (ex.mode==='p') b+=e1Card(ex.id);
@@ -9442,7 +9442,7 @@ function cqTexto(q,p){ let t=tx(q.q[0],q.q[1]); if (q.p){ const o=(CQ_PARAMS[q.p
 const CQ_VACIAS=new Set('puedo puede debo debe deberia como cual cuales cuando cuanto cuanta cuantos cuantas donde para por porque que quiero necesito tengo hago hacer tomar usar esta este esto estoy muy mas menos bien algo the and can should how what when does with from have need want your mis tus con sin una uno unos unas los las del pero'.split(' '));
 function cqBuscar(sec,qs){ const L=CQ.filter(q=>!sec||q.s===sec); const w=cqNorm(qs).replace(/[^a-z0-9ñ ]/g,' ').split(/\s+/).filter(x=>x.length>2&&!CQ_VACIAS.has(x)); if (!w.length) return sec?L:[];
   return L.map(q=>{ const h=cqNorm(tx(q.q[0],q.q[1])+' '+q.alias); return [w.filter(x=>h.includes(x)||h.includes(x.slice(0,-1))).length,q]; }).filter(x=>x[0]).sort((a,b)=>b[0]-a[0]).map(x=>x[1]); }
-const CQ_BADGE=()=>`<span class="tag" style="background:var(--blues);color:var(--blue)">🧪 ${tx('Función en desarrollo (experimental)','Feature in development (experimental)')}</span>`;
+const CQ_BADGE=()=>`<span class="tag" style="background:var(--blues);color:var(--blue)">${tx('Función en desarrollo (experimental)','Feature in development (experimental)')}</span>`;
 A.consulta=()=>openLayer('consulta',{q:''});
 SCREENS.consulta=p=>{ const L=p.q?cqBuscar(null,p.q):null;
   let b=`<div style="margin-bottom:10px">${CQ_BADGE()}</div><p class="sm mut" style="margin-top:0;line-height:1.5">${tx('Elige un tema y una pregunta. PandarIA mira tus datos y te responde con un informe a tu medida, sin internet.','Pick a topic and a question. PandarIA looks at your data and answers with a report tailored to you, offline.')}</p>
@@ -9498,16 +9498,17 @@ function bubPos(b){ const P=S.settings.bubPos||{l:0,y:.62}; const H=innerHeight,
   const y=Math.max(70,Math.min(H-150,P.y*H)); b.style.top=y+'px'; b.style.left=P.l?'6px':''; b.style.right=P.l?'':'6px'; void W; }
 function bubSync(){ let b=document.getElementById('pfBub');
   if (!b){ b=document.createElement('button'); b.id='pfBub'; b.setAttribute('aria-label',tx('Guía de PandarIA (experimental)','PandarIA guide (experimental)'));
-    b.innerHTML=`<img src="${GUIA_IC}" alt=""><i>🧪</i>`; document.body.appendChild(b); bubArrastre(b); }
+    b.innerHTML=`<img src="${GUIA_IC}" alt="">`; document.body.appendChild(b); bubArrastre(b); }
   b.hidden=!bubVisible(); if (!b.hidden) bubPos(b); }
 function bubArrastre(b){ let st=null;
   b.addEventListener('pointerdown',e=>{ st={x:e.clientX,y:e.clientY,t0:b.offsetTop,mov:false}; try{ b.setPointerCapture(e.pointerId); }catch(_){} });
   b.addEventListener('pointermove',e=>{ if (!st) return; const dx=e.clientX-st.x, dy=e.clientY-st.y; if (!st.mov && Math.hypot(dx,dy)<8) return;
     st.mov=true; b.classList.add('drag'); b.style.top=Math.max(50,Math.min(innerHeight-90,st.t0+dy))+'px'; b.style.left=(e.clientX-21)+'px'; b.style.right=''; });
   const fin=e=>{ if (!st) return; const s0=st; st=null; b.classList.remove('drag');
-    if (!s0.mov){ A.guiaAbrir(); return; }
+    if (!s0.mov) return; b.dataset.arr=Date.now();
     S.settings.bubPos={l:e.clientX<innerWidth/2?1:0, y:Math.round(b.offsetTop/innerHeight*1000)/1000}; save(); bubPos(b); };
-  b.addEventListener('pointerup',fin); b.addEventListener('pointercancel',()=>{ st=null; b.classList.remove('drag'); bubPos(b); });
+  b.addEventListener('pointerup',fin);
+  b.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); if (Date.now()-(+b.dataset.arr||0)<400) return; A.guiaAbrir(); }); b.addEventListener('pointercancel',()=>{ st=null; b.classList.remove('drag'); bubPos(b); });
   addEventListener('resize',()=>{ if (!b.hidden) bubPos(b); }); }
 { const r0=render; render=function(){ const o=r0.apply(this,arguments); try{ bubSync(); }catch(e){} return o; }; }
 { const r1=renderLayers; renderLayers=function(){ const o=r1.apply(this,arguments); try{ bubSync(); }catch(e){} return o; }; }
@@ -9549,7 +9550,7 @@ function guiaCuerpo(){ const G=GUIA;
   <div class="pfg-t" style="margin-top:14px">${tx('Temas','Topics')}</div><div class="pfg-s">${CQ_SECS.map(s=>`<button data-a="guiaSec" data-v="${s.id}"><span>${s.ic}</span>${tx(s.n,s.en)}</button>`).join('')}</div>`}</div>`; }
 function guiaHtml(){ const atras=GUIA.v!=='inicio';
   return `<div class="pfguia" role="dialog" aria-label="${tx('Guía de PandarIA','PandarIA guide')}">
-  <div class="pfg-h">${atras?`<button class="ibtn" data-a="guiaAtras" aria-label="${tx('Atrás','Back')}">${I('back',20)}</button>`:''}<img src="${GUIA_IC}" alt="" class="pfg-av"><div class="grow"><div class="b">${tx('Guía de PandarIA','PandarIA guide')}</div><div class="xs mut">🧪 ${tx('Experimental · con tus datos','Experimental · with your data')}</div></div>
+  <div class="pfg-h">${atras?`<button class="ibtn" data-a="guiaAtras" aria-label="${tx('Atrás','Back')}">${I('back',20)}</button>`:''}<img src="${GUIA_IC}" alt="" class="pfg-av"><div class="grow"><div class="b">${tx('Guía de PandarIA','PandarIA guide')}</div><div class="xs mut">${tx('Experimental · con tus datos','Experimental · with your data')}</div></div>
     <button class="ibtn" data-a="guiaTodo" aria-label="${tx('Abrir la consulta completa','Open the full consultation')}">${I('book',20)}</button><button class="ibtn" data-a="closeModal" aria-label="${tx('Cerrar','Close')}">${I('close',20)}</button></div>
   <div class="pfg-b">${guiaCuerpo()}</div></div>`; }
 function guiaRender(){ if (!MODALS.length || !MODALS[MODALS.length-1].guia) return; const html=guiaHtml(); MODALS[MODALS.length-1].html=html;
@@ -10425,8 +10426,9 @@ const SFX={
 };
 function sfx(n){ if (FX_ON() && SFX[n]) try{ SFX[n](); }catch(e){} }
 // desbloqueo del audio en el primer toque + sonido de toque suave
-document.addEventListener('pointerdown',e=>{
-  actx();
+document.addEventListener('pointerdown',()=>actx(),{capture:true,passive:true});
+// 1.4: el sonido va en «click», que solo llega con un toque de verdad (al deslizar o hacer scroll no suena)
+document.addEventListener('click',e=>{
   const b=e.target.closest('button,[data-a]'); if(!b) return;
   const a=b.dataset.a; if (['wkCheck','water','tab','toggleSet'].includes(a)) return;
   sfx('tap');
