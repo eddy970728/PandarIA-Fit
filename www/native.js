@@ -763,7 +763,7 @@
           n.waterLog = n.waterLog || {}; (n.waterLog[k] = n.waterLog[k] || []).push(Object.assign({t: at, ml: add}, a.n ? {n: String(a.n).slice(0, 18)} : {}));
           n.waterLog[k].sort((x, y) => x.t - y.t); n.water[k] = (n.water[k] || 0) + add; n.waterLast = Math.max(n.waterLast || 0, at); ml += add; }
         else if (a.type === 'wundo'){ const k = dayKey(a.at || Date.now()), n = nut(), L = (n.waterLog || {})[k] || []; const x = L.pop(); if (x){ n.water[k] = Math.max(0, (n.water[k] || 0) - x.ml); ml -= x.ml; } }
-        else if (a.type === 'fastStart'){ const f = nut().fast; if (!f.active && f.screened && !f.blocked){ f.active = {start: Math.min(Date.now(), a.at || Date.now()), goalH: (FAST_PLANS[f.plan] || {}).h || null}; msgs.push(tx('Ayuno empezado desde el widget', 'Fast started from the widget')); } }
+        else if (a.type === 'fastStart'){ const f = nut().fast; if (!f.active && f.screened && !f.blocked){ delete f.deshacer; f.active = {start: Math.min(Date.now(), a.at || Date.now()), goalH: (FAST_PLANS[f.plan] || {}).h || null}; msgs.push(tx('Ayuno empezado desde el widget', 'Fast started from the widget')); } }
         else if (a.type === 'fastEnd'){ const f = nut().fast, x = f.active; if (x){ const end = Math.max(x.start + 60000, a.at || Date.now()), el = (end - x.start) / 3600000;
           f.history.push({start: x.start, end, goalH: x.goalH, ok: !x.goalH || el >= x.goalH}); f.history = f.history.slice(-400); f.active = null; msgs.push(tx('Ayuno terminado desde el widget', 'Fast ended from the widget')); } }
         else if (a.type === 'chk'){ const day = a.day || dayKey(); if (!S.checkinDia || S.checkinDia.day !== day) S.checkinDia = {day, sleep: null, energy: null, sore: null};

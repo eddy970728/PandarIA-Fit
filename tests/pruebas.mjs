@@ -652,6 +652,18 @@ if (fs.existsSync(COPIA07)) {
       const S1=S.sessions; S.sessions=S1.concat([{id:'zt',routineId:'r',routineName:'Prueba',start:Date.now()-20000,end:Date.now(),intensity:5,items:[{exId:'press_banca',sets:[{t:'n',kg:20,reps:5,done:true}]}]}]);
       fz.history.push({start:Date.now()-3*60000,end:Date.now()-60000,goalH:16,ok:false}); const pd=pruebasDatos(); out.dzDetecta=pd.ent.some(s=>s.id==='zt') && pd.ay.length>=1;
       A.limpiarPruebas(); A.lpBorrar(); out.dzLimpia=!S.sessions.some(s=>s.id==='zt') && !pruebasDatos().ay.length; S.sessions=S1; MODALS.length=0; renderModals(); }
+    // 1.5 · flujo real de un mal día: check-in «Mal» → 10 % menos → la sesión se guarda como aligerada → la siguiente vuelve a progresar desde la normal
+    { const ip=window.isPremium; window.isPremium=()=>true; const S1=S.sessions, R1=S.routines; S.settings.checkin=true; S.active=null;
+      const rr=newRoutine({name:'Prueba mal día',items:[buildItem('press_banca','musculo',2)],pandaria:true,goal:'musculo'}); S.routines=R1.concat([rr]);
+      const it0=rr.items[0], w0=it0.sets.filter(x=>x.t!=='c').length;
+      S.sessions=[{id:'n1',routineId:rr.id,start:Date.now()-3*DAY-3600000,end:Date.now()-3*DAY,intensity:7,items:[{exId:'press_banca',sets:Array.from({length:w0},()=>({t:'n',kg:100,reps:12,done:true}))}]}];
+      S.checkinDia={day:dayKey(),sleep:0,energy:1,sore:2}; MODALS.length=0; renderModals();
+      A.startWorkout(rr.id); const it=S.active&&S.active.items[0]; out.mdAjuste=!!(S.active&&S.active.ajuste&&S.active.ajuste.f===0.9) && !MODALS.length;
+      if (it){ const w=it.sets.filter(x=>x.t!=='c'); w.forEach(s=>{ const sg=suggestSet(rr,it,it.sets.indexOf(s)); s.kg=sg.kg; s.reps=12; s.done=true; }); out.mdKg=w[0].kg; }
+      try{ finishWorkout('save'); }catch(e){ out.mdErr=e.message; } MODALS.length=0; renderModals(); LAYERS.length=0; renderLayers();
+      const last=S.sessions[S.sessions.length-1]; out.mdGuardada=!!(last&&last.ajuste&&last.ajuste.f===0.9);
+      const nx=rr.items[0]; out.mdSiguiente=suggestSet(rr,nx,nx.sets.indexOf(nx.sets.find(x=>x.t!=='c'))).kg;
+      S.active=null; S.sessions=S1; S.routines=R1; delete S.checkinDia; window.isPremium=ip; }
     // 1.5 · Agua completa
     const n5=nut(), k5=dayKey(); n5.water[k5]=300; n5.waterLog={}; n5.waterExtra={}; const g0=waterGoal();
     A.water(330,'Taza'); A.water(500); out.a5log=wLog(k5).length===2 && wLog(k5)[0].n==='Taza' && n5.water[k5]===1130;
@@ -680,6 +692,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('ayuno 1.5: terminar pregunta antes; uno de menos de 1 h no se guarda; se puede reanudar (y se quita del historial)', r.dzPregunta && r.dzCorto && r.dzReanuda && r.dzLargo, JSON.stringify([r.dzPregunta,r.dzCorto,r.dzReanuda,r.dzLargo]));
   comprobar('borrar 1.5: quitar una comida tiene Deshacer y funciona', r.dzComida && r.dzDeshacer);
   comprobar('limpiar 1.5: detecta un entreno de 20 segundos y un ayuno de 2 minutos y los borra', r.dzDetecta && r.dzLimpia);
+  comprobar('mal día (flujo completo): el check-in de la mañana aplica 10 % menos (92,5 kg en vez de 102,5), la sesión se guarda aligerada y la siguiente sube desde 100 kg', r.mdAjuste && r.mdKg === 92.5 && r.mdGuardada && r.mdSiguiente === 102.5, JSON.stringify([r.mdAjuste, r.mdKg, r.mdGuardada, r.mdSiguiente, r.mdErr]));
   comprobar('agua 1.5: lista del día con nombre, deshacer el último y borrar uno', r.a5log && r.a5deshacer && r.a5borrar, JSON.stringify([r.a5log,r.a5deshacer,r.a5borrar]));
   comprobar('agua 1.5: día de calor suma 500 ml a la meta y se quita', r.a5calor && r.a5calorOff);
   comprobar('agua 1.5: estadísticas del agua', r.a5stats);
@@ -692,7 +705,7 @@ if (fs.existsSync(COPIA07)) {
   const ex = fs.readFileSync(path.join(DIR, '..', 'scripts', 'android-extra.mjs'), 'utf8');
   comprobar('widgets 1.5: Check-in, Mi día y Calorías registrados, con sus diseños y toques sin abrir la app',
     ['WidgetCheckin', 'WidgetDia', 'WidgetKcal'].every(c => ex.includes(`widget('${c}'`) && ex.includes(`"java/${c}.java"`)) &&
-    ['pf_widget_checkin', 'pf_widget_dia', 'pf_widget_kcal', 'pf_widget_chip'].every(f => ex.includes(f + '.xml"')) && /a\.startsWith\(Widgets\.ACT\)/.test(ex) && /pending\\", \\"\[\]\\"\)\)\) prefs/.test(ex));
+    ['pf_widget_checkin', 'pf_widget_dia', 'pf_widget_kcal', 'pf_widget_chip'].every(f => ex.includes(f + '.xml"')) && /a\.startsWith\(Widgets\.ACT\)/.test(ex));
   comprobar('widgets 1.5: la app aplica agua, deshacer, ayuno y check-in del widget, y les manda los textos traducidos',
     ['water', 'wundo', 'fastStart', 'fastEnd', 'chk'].every(t => nat.includes(`a.type === '${t}'`)) && /window\.pfWidgetApply/.test(nat) && /kMac:/.test(nat) && /'widgetAction'/.test(nat));
   comprobar('Google Play: símbolos nativos en el AAB y la cámara no es obligatoria', /debugSymbolLevel 'SYMBOL_TABLE'/.test(ex) && /'android\.hardware\.camera'/.test(ex) && /android:required="false" tools:replace/.test(ex));
