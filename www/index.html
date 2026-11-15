@@ -330,6 +330,12 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .wring>div{width:84px;height:84px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;line-height:1.1}
 .wring b{font-size:20px}
 .fring{width:190px;height:190px;border-radius:50%;margin:14px auto;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--card2) 0);display:grid;place-items:center}
+.fline{margin:4px 0 12px;text-align:center}
+.fl-bar{position:relative;height:8px;border-radius:4px;background:var(--card2);margin:10px 8px 0}
+.fl-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--ac)}
+.fl-bar b{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--card);border:2px solid var(--mut2)}
+.fl-bar b.on{border-color:var(--ac);background:var(--ac)}
+.fl-bar em{position:absolute;top:12px;transform:translateX(-50%);font-size:10px;font-style:normal;color:var(--mut);white-space:nowrap}
 .fring>div{width:160px;height:160px;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center}
 .codebox{font:800 22px ui-monospace,Menlo,monospace;letter-spacing:1px;text-align:center;background:var(--card2);border-radius:14px;padding:16px 10px;word-break:break-all;user-select:all;-webkit-user-select:all}
 :root[data-contrast="high"]{--mut:#c3c9d4;--mut2:#9aa2b0;--line:#55606f;--card2:#343c4a}
@@ -1061,6 +1067,8 @@ const KB_RULES=[
     t:'La referencia de la EFSA cuenta el agua de todas las bebidas. PandarIA suma a tu meta el agua de las bebidas que registras en el diario (café, té, leche, zumos, refrescos…), estimada como el peso de la bebida menos sus hidratos, proteínas y grasas. Las bebidas con alcohol no cuentan.', usa:'Agua del día', rev:'2027-11-01', desde:'0.8.4'},
   {id:'sup.cafeina_bebidas', area:'nutricion', n:'Cafeína de las bebidas', v:{mg100:{'14209':45,'14215':45,'14210':133,'14355':23,'14278':23,'14148':11,'14416':11,'14154':32}, sueno:100}, src:['efsa_cafeina2015'], lic:'consejo', ev:'moderada', pob:'Adultos',
     t:'Cantidades aproximadas de la EFSA: un espresso de 60 ml tiene unos 80 mg, una taza de café de filtro de 200 ml unos 90 mg, una taza de té de 220 ml unos 50 mg, una lata de cola de 355 ml unos 40 mg y una bebida energética de 250 ml unos 80 mg (el café instantáneo se cuenta como el de filtro). Unos 100 mg cerca de la hora de dormir pueden empeorar el sueño de algunas personas.', usa:'Cafeína del día en Agua', rev:'2028-11-01', desde:'0.8.4'},
+  {id:'agua.calor', area:'nutricion', n:'Agua extra con calor o sudor', v:{ml:500}, src:['acsm2007','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'Con calor o mucho sudor se pierde bastante más agua: el ACSM habla de 0,4 a 1,8 litros por hora de ejercicio según la persona y el clima. Si marcas un día de calor o de mucho sudor, PandarIA suma medio litro a tu meta de ese día. Bebe también según tu sed.', usa:'Meta de agua del día', rev:'2027-11-15', desde:'1.5'},
   {id:'ayuno.prudencia', area:'seguridad', n:'Ayuno con prudencia', v:{inicioMaxH:18, inicioN:3, sedentarioMaxH:20, maxUtilH:24}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
     t:'PandarIA sugiere empezar por ayunos cortos (12 a 14 h), avisa si un plan es muy exigente para tu actividad y recomienda romper el ayuno pasadas 24 horas.', usa:'Consejos del ayuno', rev:'2027-11-01', desde:'0.8.1'},
   // ---------- Suplementos y calidad de la dieta ----------
@@ -1210,6 +1218,7 @@ const KB_EN_T={
  'agua':'EFSA considers 2.0 L of total water a day adequate for women and 2.5 L for men, including the water in food (usually estimated at 20 %). PandarIA starts from 33 ml per kg, keeps it close to that reference so it does not shoot up for large people or fall short for small ones, and adds half a litre on training days. Because sweat varies a lot (ACSM mentions 0.4 to 0.8 L per hour), for sessions over 1 hour it adds 250 ml for each extra half hour, up to 500 ml more.',
  'agua.bebidas':'The EFSA reference counts the water from all drinks. PandarIA adds to your goal the water from the drinks you log in the diary (coffee, tea, milk, juices, soft drinks…), estimated as the drink’s weight minus its carbs, protein and fat. Alcoholic drinks do not count.',
  'sup.cafeina_bebidas':'Approximate EFSA amounts: a 60 ml espresso has about 80 mg, a 200 ml cup of filter coffee about 90 mg, a 220 ml cup of tea about 50 mg, a 355 ml can of cola about 40 mg and a 250 ml energy drink about 80 mg (instant coffee is counted like filter coffee). About 100 mg close to bedtime can worsen some people’s sleep.',
+ 'agua.calor':'With heat or heavy sweating you lose a lot more water: the ACSM mentions 0.4 to 1.8 litres per hour of exercise depending on the person and the weather. If you mark a hot or sweaty day, PandarIA adds half a litre to that day\'s goal. Also drink according to your thirst.',
  'ayuno.prudencia':'PandarIA suggests starting with short fasts (12 to 14 h), warns you if a plan is very demanding for your activity level and recommends breaking the fast after 24 hours.',
  'sup.creatina':'Creatine monohydrate is the supplement with the most evidence for gaining strength and muscle with training. 3 to 5 g a day, every day, at any time is enough. The loading phase (0.3 g per kg a day for 5 to 7 days) only makes the effect arrive sooner. It is considered safe in healthy people; it can raise body weight by 1 or 2 kg from the water muscle holds.',
  'sup.cafeina':'Caffeine improves performance in many sports at 3 to 6 mg per kg, about 60 minutes before. Lower doses can also help, and higher ones do not work better and cause more side effects (jitters, racing heart, poor sleep). EFSA considers single doses of up to 200 mg and up to 400 mg a day in total safe for healthy adults, counting coffee, tea and soft drinks; 200 mg a day in pregnancy and breastfeeding, and 3 mg per kg a day for minors.',
@@ -7657,7 +7666,7 @@ function balanceBanner(){
 
 /* ============ Nutrición y ayuno ============ */
 const FAST_PLANS={libre:{n:'Libre',h:null,d:'Empiezas y terminas cuando quieras.'},'12:12':{n:'12:12',h:12,d:'Ideal para empezar.'},'14:10':{n:'14:10',h:14,d:'Paso siguiente, fácil de sostener.'},
-  '16:8':{n:'16:8',h:16,d:'El más popular.'},'18:6':{n:'18:6',h:18,d:'Para quien ya tiene experiencia.'},'20:4':{n:'20:4',h:20,d:'Exigente; no recomendado para empezar.'},'5:2':{n:'5:2',h:null,d:'5 días normales y 2 días de 500–600 kcal.'}};
+  '16:8':{n:'16:8',h:16,d:'El más popular.'},'18:6':{n:'18:6',h:18,d:'Para quien ya tiene experiencia.'},'20:4':{n:'20:4',h:20,d:'Exigente; no recomendado para empezar.'},'23:1':{n:'23:1',h:23,d:'Una sola comida al día. Muy exigente.'},'5:2':{n:'5:2',h:null,d:'5 días normales y 2 días de 500–600 kcal.'}};
 const NGOALS={bajar:'Bajar grasa',mantener:'Mantener',ganar:'Ganar músculo'};
 function nut(){ S.nutri=S.nutri||{goal:'mantener',water:{},fast:{plan:'14:10',active:null,history:[],screened:false,blocked:false,days52:[1,4]}}; return S.nutri; }
 const dayKey = ts => { const d=new Date(ts||Date.now()); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
@@ -7694,6 +7703,7 @@ function waterGoal(){ const w=bodyWeight(), K=kb('agua'), sx=(S.profile||{}).sex
   const base=Math.min(ref*K.max, Math.max(ref*K.min, K.mlkg*w));
   const tt=trainedToday(); let extra=0;
   if (tt.length){ const mins=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0); extra=K.entreno+Math.min(K.extraMax,Math.floor(Math.max(0,mins-K.largo)/30)*K.extra30); }
+  extra+=((nut().waterExtra||{})[dayKey()])||0; // 1.5: día de calor o de mucho sudor
   return Math.round((base+extra)/50)*50; }
 // Agua de las bebidas registradas en el diario (sin alcohol) y cafeína aproximada del día
 function isDrink(f){ const B=kb('agua.bebidas'); return !!f && !B.alcohol.includes(f.id) && (f.cat==='bebida' || B.lacteas.includes(f.id)) && f.id!=='19165' && f.id!=='14192'; }
@@ -7756,11 +7766,12 @@ function viewNutricion(){
   const tt=trainedToday(), ttMin=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0), KA=kb('agua');
   const extraTxt=!tt.length?'':ttMin>KA.largo+29?tx(`, + agua extra por tu entreno de ${Math.round(ttMin)} min`,`, + extra water for your ${Math.round(ttMin)}-min workout`):tx(', + 500 ml porque hoy entrenaste',', + 500 ml because you trained today');
   h+=`<div class="sec">Agua</div><div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString(LOC(),{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString(LOC(),{maximumFractionDigits:1})} L</span></div></div>
-    <div class="grow col" style="gap:8px"><button class="btn sm" data-a="water" data-v="250">${I('drop',16)} + Vaso 250 ml</button><button class="btn sm" data-a="water" data-v="500">${I('drop',16)} + Botella 500 ml</button><div class="row" style="gap:6px"><button class="btn sm grow" data-a="wOther">${I('plus',16)} ${tx('Otra bebida','Other drink')}</button><button class="btn sm ghost" data-a="water" data-v="-250" aria-label="−250 ml">− 250</button></div></div></div>
+    <div class="grow col" style="gap:8px">${vasos().map((v,i)=>`<button class="btn sm" data-a="wVaso" data-v="${i}">${I('drop',16)} + ${esc(v.n)} ${v.ml} ml</button>`).join('')}<div class="row" style="gap:6px"><button class="btn sm grow" data-a="wOther">${I('plus',16)} ${tx('Otra bebida','Other drink')}</button><button class="btn sm ghost" data-a="water" data-v="-250" aria-label="${tx('Deshacer el último','Undo the last one')}">${tx('Deshacer','Undo')}</button></div><button class="link xs" style="align-self:flex-start" data-a="wVasos">${I('edit',13)} ${tx('Tus recipientes','Your containers')}</button></div></div>
     ${dd.n?`<div class="xs" style="margin-top:10px;color:var(--blue);line-height:1.4">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}
     ${cafLine(dd.caf)}
-    <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
-    <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>${days.filter(v=>v>0).length<2?`<div class="xs mut" style="margin-top:6px;text-align:center">${tx('Registra agua varios días para ver tu semana aquí.','Log water on a few days to see your week here.')}</div>`:''}</div>`;
+    <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}${waterExtraHoy()?tx(`, + ${waterExtraHoy()} ml por el calor`,`, + ${waterExtraHoy()} ml for the heat`):''}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
+    <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>${days.filter(v=>v>0).length<2?`<div class="xs mut" style="margin-top:6px;text-align:center">${tx('Registra agua varios días para ver tu semana aquí.','Log water on a few days to see your week here.')}</div>`:''}<button class="btn sm wide" style="margin-top:10px" data-a="aguaStats">${I('chart',16)} ${tx('Estadísticas del agua','Water stats')}</button></div>`;
+    h+=aguaHoyHtml();
   }
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
   return h;
@@ -7781,7 +7792,10 @@ function viewAyuno(){
 A.nGoal=v=>{ nut().goal=v; delete nut().ritmo; save(); render.keep=true; render(); };
 A.nRitmo=v=>{ nut().ritmo=v; save(); render.keep=true; render(); };
 A.nAdapt=()=>{ const n=nut(); n.adaptOff=!n.adaptOff; save(); render.keep=true; render(); toast(n.adaptOff?'Ajuste automático desactivado':'Ajuste automático activado'); };
-A.water=v=>{ const n=nut(), k=dayKey(), b0=waterToday(k); n.water[k]=Math.max(0,(n.water[k]||0)+(+v)); save(); render.keep=true; render(); if(+v>0) vibrate(15);
+A.water=(v,nom)=>{ const n=nut(), k=dayKey(), b0=waterToday(k); v=+v;
+  if (v<0){ const L=wLog(k); if (L.length){ const x=L.pop(); v=-x.ml; } } // «Deshacer» quita el último registro (1.5)
+  else if (v>0){ n.waterLog=n.waterLog||{}; (n.waterLog[k]=n.waterLog[k]||[]).push({t:Date.now(),ml:v,...(nom?{n:String(nom).slice(0,18)}:{})}); }
+  n.water[k]=Math.max(0,(n.water[k]||0)+v); wGuardaMeta(); save(); render.keep=true; render(); if(v>0) vibrate(15);
   if (waterToday(k)>=waterGoal() && b0<waterGoal()) toast('💧 ¡Meta de agua cumplida!'); };
 // Otra bebida: se registra en el diario y cuenta para el agua
 A.wOther=()=>{ NUT_DAY=null; openLayer('alimBuscar',{m:mealNow(),q:'',tab:'todo',cat:'bebida',day:dayKey()}); };
@@ -8871,12 +8885,12 @@ function fastCard(){
     const reached=goal && el>=goal;
     h+=`<div class="card" style="text-align:center"><div class="xs mut b" style="letter-spacing:1px">${reached?'META ALCANZADA':'AYUNANDO'}</div>
       <div class="fring" style="--p:${pct.toFixed(1)};--c:${reached?'var(--ok)':'var(--ac)'}"><div><div class="tick-fast" data-long="1" style="font-size:30px;font-weight:900;font-variant-numeric:tabular-nums">${fmtHMl(el)}</div><div class="xs mut">${goal?`de ${goal} h · ${plan.n}`:'ayuno libre'}</div></div></div>
-      <div class="sm mut">Empezaste ${new Date(a.start).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})} ${new Date(a.start).toDateString()!==new Date().toDateString()?'de ayer':''}${goal?` · terminas ${new Date(a.start+goal*3600000).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})}`:''}</div>
+      ${fastLinea(el,goal)}<div class="sm mut">Empezaste ${new Date(a.start).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})} ${new Date(a.start).toDateString()!==new Date().toDateString()?'de ayer':''}${goal?` · terminas ${new Date(a.start+goal*3600000).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})}`:''}</div>
       <div class="row" style="gap:8px;margin-top:14px"><button class="btn ${reached?'ok':'pri'} grow" data-a="fastEnd">Terminar ayuno</button><button class="btn" data-a="fastAdjust">${I('edit',16)} Hora de inicio</button></div>
       <button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="fastUnwell">Me siento mal</button></div>`;
   } else {
     h+=`<div class="card" style="text-align:center"><div class="xs mut b" style="letter-spacing:1px">VENTANA DE COMIDA</div><div style="font-size:15px;margin:8px 0 12px;line-height:1.45">${plan.h?`Plan ${plan.n}: ayunas ${plan.h} h y comes en ${24-plan.h} h.`:'Ayuno libre: inícialo cuando termines tu última comida.'}</div>
-      <button class="btn pri big" data-a="fastStart">${I('play',18)} Empezar ayuno ahora</button>${(lm=>lm?`<button class="btn wide" style="margin-top:10px" data-a="fastFromDiary">${I('note',18)} ${tx('Desde mi última comida','Since my last meal')} (${hhmm(lm)})</button>`:'')(lastMealTs())}<button class="btn wide" style="margin-top:10px" data-a="fastStartPast">${I('timer',18)} Empecé antes: elegir hora</button>${fastWindowHtml()}</div>`;
+      ${fastHorarioHtml(plan)}<button class="btn pri big" data-a="fastStart">${I('play',18)} Empezar ayuno ahora</button>${(lm=>lm?`<button class="btn wide" style="margin-top:10px" data-a="fastFromDiary">${I('note',18)} ${tx('Desde mi última comida','Since my last meal')} (${hhmm(lm)})</button>`:'')(lastMealTs())}<button class="btn wide" style="margin-top:10px" data-a="fastStartPast">${I('timer',18)} Empecé antes: elegir hora</button>${fastWindowHtml()}</div>`;
   }
   return h+fastAdvice()+fastHistory();
 }
@@ -8894,6 +8908,7 @@ function fastAdvice(){
   const plan=FAST_PLANS[f.plan]||{};
   const KF=kb('ayuno.prudencia');
   if (f.history.length<KF.inicioN && plan.h>=KF.inicioMaxH) msgs.push('Para empezar te sugiero 12:12 o 14:10 y subir de a poco cuando te sientas cómodo.');
+  if (plan.h>=23 && f.history.filter(x=>x.ok&&(x.end-x.start)/3600000>=16).length<3) msgs.push(tx('Antes de un 23:1, completa al menos 3 ayunos de 16 h o más. Comer una sola vez al día hace difícil llegar a tu proteína.','Before 23:1, complete at least 3 fasts of 16 h or more. Eating once a day makes it hard to reach your protein.'));
   if (p.fitness==='sedentario' && plan.h>=KF.sedentarioMaxH) msgs.push('Con poca actividad física, un plan de 20:4 es muy exigente. Prueba con 16:8.');
   const today=trainedToday();
   if (f.active && today.some(s=>(s.intensity||0)>=8)) msgs.push('Hoy entrenaste fuerte: rompe el ayuno con una comida rica en proteína para recuperarte.');
@@ -8904,9 +8919,9 @@ function fastAdvice(){
   return `<div class="card">${msgs.map(m=>`<div class="row sm" style="align-items:flex-start;padding:4px 0;line-height:1.45"><span style="color:var(--ac)">${I('spark',15)}</span><span>${esc(m)}</span></div>`).join('')}</div>`;
 }
 function fastHistory(){
-  const hs=nut().fast.history.slice(-7).reverse(); if (!hs.length) return '';
-  let streak=0; for (const x of nut().fast.history.slice().reverse()){ if (x.ok) streak++; else break; }
-  return `<div class="row" style="margin:16px 2px 8px"><span class="sec grow" style="margin:0">Últimos ayunos</span>${streak?`<span class="tag ok">${streak} seguidos ✓</span>`:''}</div><div class="card" style="padding:4px 14px">${hs.map(x=>`<div class="kv"><span class="mut">${fmtDate(x.start)}</span><span><b>${fmtHM((x.end-x.start)/3600000)} h</b> ${x.goalH?`<span class="xs ${x.ok?'':'mut'}" style="${x.ok?'color:var(--ok)':''}">${x.ok?'✓ meta':`meta ${x.goalH} h`}</span>`:''}</span></div>`).join('')}</div>`;
+  const H=nut().fast.history, hs=H.map((x,i)=>[x,i]).slice(-5).reverse(); const R=fastRachas();
+  return `<div class="row" style="margin:16px 2px 8px"><span class="sec grow" style="margin:0">${tx('Últimos ayunos','Latest fasts')}</span>${R.act?`<span class="tag ok">${tx(`${R.act} seguidos ✓`,`${R.act} in a row ✓`)}</span>`:''}</div>${hs.length?`<div class="card" style="padding:4px 14px">${hs.map(([x,i])=>fastFila(x,i)).join('')}</div>`:''}
+  <div class="row" style="gap:8px;margin-top:8px"><button class="btn sm grow" data-a="fastStats">${I('chart',16)} ${tx('Estadísticas e historial','Stats and history')}</button><button class="btn sm" data-a="fastEdit" data-v="nuevo">${I('plus',16)} ${tx('Añadir','Add')}</button></div>`;
 }
 A.fastScreen=()=>{
   const sel=new Set();
@@ -8937,11 +8952,159 @@ function fastTimePicker(adjust){
     <button class="btn pri big" data-a="cbm" data-v="${okK}">${adjust?'Guardar hora':'Empezar ayuno'}</button></div>`);
 }
 A.fastEnd=()=>{ const f=nut().fast, a=f.active; if(!a) return; const end=Date.now(); const el=(end-a.start)/3600000;
-  f.history.push({start:a.start,end,goalH:a.goalH,ok:!a.goalH||el>=a.goalH}); f.history=f.history.slice(-60); f.active=null; save(); render.keep=true; render();
+  f.history.push({start:a.start,end,goalH:a.goalH,ok:!a.goalH||el>=a.goalH}); f.history=f.history.slice(-400); f.active=null; save(); render.keep=true; render(); if (el>=4) setTimeout(()=>{ if (!MODALS.length) A.fastSentir(f.history.length-1); },1600);
   toast(a.goalH&&el>=a.goalH?'✓ ¡Ayuno completado! Rompe con proteína y verduras.':'Ayuno terminado. Cada paso cuenta.'); };
 A.fastUnwell=()=>confirmBox({title:'Escucha a tu cuerpo',text:'Si sientes mareo, debilidad, dolor de cabeza fuerte o malestar, lo recomendable es <b>terminar el ayuno ahora</b> y comer algo con hidratos y proteína. Si los síntomas son intensos o no pasan, busca atención médica.',okText:'Terminar ayuno y comer',ok:()=>A.fastEnd(),noText:'Ya me siento mejor'});
 function fastTick(){ const f=S&&S.nutri&&S.nutri.fast&&S.nutri.fast.active; if(!f) return; const el=document.querySelectorAll('.tick-fast'); if(!el.length) return; const hh=(Date.now()-f.start)/3600000; el.forEach(e=>e.textContent=e.dataset.long?fmtHMl(hh):fmtHM(hh)); }
 setInterval(fastTick,10000);
+
+/* ---------- 1.5 · Ayuno completo ----------
+   Fases en una línea bajo el anillo (antes solo en la app instalada), estadísticas con calendario,
+   historial que se puede corregir, horario fijo, cómo te sentiste y el plan 23:1. */
+const FAST_FASES=[
+  {h:0, n:['Ayuno iniciado','Fast started'], t:['Tu cuerpo usa la energía de tu última comida.','Your body is using the energy from your last meal.']},
+  {h:4, n:['Azúcar estable','Stable blood sugar'], t:['El azúcar en sangre se estabiliza. Bebe agua.','Your blood sugar is levelling out. Drink some water.']},
+  {h:8, n:['Reservas en uso','Using reserves'], t:['Tu cuerpo empieza a tirar de sus reservas de glucógeno.','Your body starts drawing on its glycogen stores.']},
+  {h:12,n:['Estado de ayuno','Fasted state'], t:['La insulina baja y el cuerpo usa más grasa como energía.','Insulin drops and your body uses more fat for energy.']},
+  {h:16,n:['Más grasa como energía','More fat for energy'], t:['Estás en la zona del 16:8. ¡Buen trabajo!','You are in the 16:8 zone. Great job!']},
+  {h:18,n:['Cetosis leve','Mild ketosis'], t:['Puede empezar una cetosis leve. Escucha a tu cuerpo.','Mild ketosis may begin. Listen to your body.']},
+  {h:24,n:['Ayuno largo','Long fast'], t:['No hay beneficios extra en alargarlo. Considera romperlo con proteína y verduras.','There is no extra benefit in going longer. Consider breaking it with protein and vegetables.']}];
+function fastFases(){ return FAST_FASES.map(x=>({h:x.h,n:tx(x.n[0],x.n[1]),t:tx(x.t[0],x.t[1])})); }
+window.fastPhaseAt=hrs=>{ const L=fastFases(); let p=L[0]; for (const x of L) if (hrs>=x.h) p=x; return p; };
+window.fastNextPhase=hrs=>fastFases().find(x=>x.h>hrs)||null;
+function fastLinea(hrs,goal){ const L=fastFases(), max=Math.max(24,goal||0), p=fastPhaseAt(hrs), nx=fastNextPhase(hrs), pc=v=>Math.min(100,v/max*100);
+  return `<div class="fline"><div class="fl-bar"><i style="width:${pc(hrs).toFixed(1)}%"></i>${L.filter(x=>x.h).map(x=>`<b class="${hrs>=x.h?'on':''}" style="left:${pc(x.h).toFixed(1)}%"></b>`).join('')}${goal?`<em style="left:${pc(goal).toFixed(1)}%">${goal} h</em>`:''}</div>
+  <div class="tag ac" style="font-size:12.5px;margin-top:20px">${I('flame',13)} ${esc(p.n)}</div><div class="xs mut" style="margin-top:6px;line-height:1.4">${esc(p.t)}${nx?`<br>${tx('Siguiente','Next')}: ${esc(nx.n)} ${tx('a las','at')} ${nx.h} h`:''}</div>
+  <div class="xs mut" style="margin-top:4px;opacity:.75">${tx('Tiempos aproximados: cada cuerpo es distinto. Información general, no consejo médico.','Approximate times: every body is different. General information, not medical advice.')}</div></div>`; }
+// ----- horario fijo -----
+const fastUltHora=hhmmS=>{ const [H,M]=String(hhmmS||'20:00').split(':').map(Number); const d=new Date(); d.setHours(H,M||0,0,0); if (d.getTime()>Date.now()) d.setTime(d.getTime()-DAY); return d.getTime(); };
+function fastHorarioHtml(plan){ const f=nut().fast, hz=f.horario; if (!plan.h) return '';
+  if (!hz||!hz.on) return `<button class="link sm" style="display:block;margin:0 auto 12px" data-a="fastHorario">${I('timer',14)} ${tx('Poner un horario fijo','Set a fixed schedule')}</button>`;
+  const ini=fastUltHora(hz.hora), fin=ini+plan.h*3600000, dentro=Date.now()<fin;
+  let h=`<div class="sm" style="margin:-4px 0 12px;line-height:1.45">${tx(`Tu horario: ayunas desde las <b>${hz.hora}</b> hasta las <b>${hhmm(ini+plan.h*3600000)}</b>.`,`Your schedule: you fast from <b>${hz.hora}</b> until <b>${hhmm(ini+plan.h*3600000)}</b>.`)} <button class="link xs" data-a="fastHorario">${tx('Cambiar','Change')}</button></div>`;
+  if (dentro) h+=`<button class="btn pri big" style="margin-bottom:10px" data-a="fastDesdeHorario">${I('play',18)} ${tx(`Empezar desde las ${hhmm(fastHorarioIni())}`,`Start from ${hhmm(fastHorarioIni())}`)}</button>`;
+  return h; }
+function fastHorarioIni(){ const f=nut().fast, ini=fastUltHora(f.horario&&f.horario.hora), lm=lastMealTs(); return lm&&lm>ini&&lm<=Date.now()?lm:ini; }
+A.fastDesdeHorario=()=>{ const f=nut().fast; if (f.active) return; const s=fastHorarioIni(); f.active={start:s,goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast(tx(`Ayuno desde las ${hhmm(s)}`,`Fasting since ${hhmm(s)}`)); };
+A.fastHorario=()=>{ const f=nut().fast, hz=f.horario||{on:false,hora:'20:00'};
+  const ok=cb(()=>{ const v=MV.fhH; if (!/^\d\d:\d\d$/.test(v||'')) return toast(tx('Elige una hora','Pick a time')); f.horario={on:true,hora:v};
+    S.settings.notif=Object.assign(S.settings.notif||{},{fastDaily:true,fastDailyTime:v}); save(); render.keep=true; render(); toast(tx(`Horario guardado: te avisamos cada día a las ${v}`,`Schedule saved: we will remind you every day at ${v}`)); });
+  const off=cb(()=>{ f.horario={on:false,hora:hz.hora}; if (S.settings.notif) S.settings.notif.fastDaily=false; save(); render.keep=true; render(); toast(tx('Horario fijo quitado','Fixed schedule removed')); });
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Horario fijo','Fixed schedule')}</h3><p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">${tx('¿A qué hora sueles terminar tu última comida? Cada día te avisamos a esa hora y puedes empezar el ayuno desde ella con un toque, aunque abras la app más tarde.','What time do you usually finish your last meal? We remind you every day at that time and you can start the fast from it with one tap, even if you open the app later.')}</p>
+    <div class="field"><label>${tx('Empiezo a ayunar a las','I start fasting at')}</label><input id="fhH" class="inp" type="time" value="${hz.hora}"></div>
+    <button class="btn pri big" data-a="cbm" data-v="${ok}">${tx('Guardar horario','Save schedule')}</button>${hz.on?`<button class="btn ghost wide" style="margin-top:6px" data-a="cbm" data-v="${off}">${tx('Quitar el horario fijo','Remove the fixed schedule')}</button>`:''}</div>`); };
+// ----- cómo te sentiste -----
+const FAST_SENS=[['h',['Hambre','Hunger'],[['Poca','Little'],['Normal','Normal'],['Mucha','A lot']]],['e',['Energía','Energy'],[['Baja','Low'],['Normal','Normal'],['Alta','High']]],['a',['Ánimo','Mood'],[['Bajo','Low'],['Normal','Normal'],['Bueno','Good']]]];
+let FS_TMP=null;
+function fastSentirHtml(){ const s=FS_TMP.s; return `<div class="sheet"><div class="grab"></div><h3>${tx('¿Cómo te sentiste?','How did you feel?')}</h3><p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">${tx('Con varios ayunos anotados, PandarIA te dice qué duración te sienta mejor.','After a few logged fasts, PandarIA tells you which length suits you best.')}</p>
+  ${FAST_SENS.map(([k,l,o])=>`<div class="field"><label>${tx(l[0],l[1])}</label><div class="seg">${o.map((x,i)=>`<button class="${s[k]===i+1?'on':''}" data-a="fsS" data-v="${k}|${i+1}">${tx(x[0],x[1])}</button>`).join('')}</div></div>`).join('')}
+  <button class="btn pri big" data-a="fsOk">${tx('Guardar','Save')}</button><button class="btn ghost wide" style="margin-top:6px" data-a="closeModal">${tx('Ahora no','Not now')}</button></div>`; }
+A.fastSentir=i=>{ const x=nut().fast.history[+i]; if (!x) return; FS_TMP={i:+i,s:Object.assign({},x.s||{})}; openModal(fastSentirHtml()); };
+A.fsS=v=>{ const [k,n]=v.split('|'); FS_TMP.s[k]=+n; const m=MODALS[MODALS.length-1]; if (m){ m.html=fastSentirHtml(); const box=document.querySelector('#modals .scrim:last-child'); if (box) box.innerHTML=m.html; } };
+A.fsOk=()=>{ const x=nut().fast.history[FS_TMP.i]; if (x && Object.keys(FS_TMP.s).length){ x.s=FS_TMP.s; save(); toast(tx('Anotado','Saved')); } closeModal(); render.keep=true; render(); };
+function fastSensInsight(){ const H=nut().fast.history.filter(x=>x.s&&x.s.e), lar=H.filter(x=>(x.end-x.start)/3600000>=16), cor=H.filter(x=>(x.end-x.start)/3600000<16);
+  if (lar.length<3||cor.length<3) return null; const m=(L,k)=>L.reduce((a,x)=>a+(x.s[k]||2),0)/L.length;
+  const dE=m(lar,'e')-m(cor,'e'), dH=m(lar,'h')-m(cor,'h');
+  if (Math.abs(dE)<0.5 && Math.abs(dH)<0.5) return tx(`Tu energía y tu hambre son parecidas en ayunos cortos y largos (${H.length} anotados): elige el que te resulte más cómodo.`,`Your energy and hunger are similar in short and long fasts (${H.length} logged): pick whichever feels easiest.`);
+  if (dE<=-0.5) return tx('En tus ayunos de 16 h o más tu energía suele ser más baja que en los cortos. Si te cuesta, un plan de 14:10 puede sentarte mejor.','In your fasts of 16 h or more your energy tends to be lower than in shorter ones. If it is hard, a 14:10 plan may suit you better.');
+  if (dE>=0.5) return tx('En tus ayunos de 16 h o más tu energía suele ser igual o mejor que en los cortos: te sientan bien.','In your fasts of 16 h or more your energy tends to be as good or better than in shorter ones: they suit you.');
+  return dH>=0.5?tx('En los ayunos largos pasas bastante más hambre. Rompe con proteína y fibra para llegar mejor al siguiente.','You get much hungrier in long fasts. Break with protein and fibre to handle the next one better.'):tx('En los ayunos largos no pasas más hambre que en los cortos.','You are not hungrier in long fasts than in short ones.'); }
+// ----- historial: corregir, borrar y añadir -----
+A.fastEdit=v=>{ const f=nut().fast, nuevo=v==='nuevo', x=nuevo?{start:Date.now()-16*3600000,end:Date.now()-3600000,goalH:(FAST_PLANS[f.plan]||{}).h||null}:f.history[+v]; if (!x) return;
+  const ok=cb(()=>{ const s=new Date(MV.feS).getTime(), e=new Date(MV.feE).getTime();
+    if (isNaN(s)||isNaN(e)) return toast(tx('Elige fechas y horas válidas','Pick valid dates and times')); if (e<=s) return toast(tx('El final debe ser después del inicio','The end must be after the start'));
+    if (e>Date.now()) return toast(tx('El final no puede ser futuro','The end cannot be in the future')); if ((e-s)/3600000>72) return toast(tx('Como máximo 72 horas','72 hours at most'));
+    if (f.active && e>f.active.start) return toast(tx('Se cruza con el ayuno que tienes en marcha','It overlaps the fast you have running'));
+    const y=Object.assign({},x,{start:s,end:e}); y.ok=!y.goalH||(e-s)/3600000>=y.goalH; if (nuevo) f.history.push(y); else f.history[+v]=y;
+    f.history.sort((a,b)=>a.start-b.start); f.history=f.history.slice(-400); save(); render.keep=true; render(); refreshTop(); toast(nuevo?tx('Ayuno añadido','Fast added'):tx('Ayuno corregido','Fast updated')); });
+  const del=nuevo?'':cb(()=>confirmBox({title:tx('Borrar este ayuno','Delete this fast'),text:tx('No se puede deshacer.','This cannot be undone.'),okText:tx('Borrar','Delete'),danger:true,ok:()=>{ f.history.splice(+v,1); save(); render.keep=true; render(); refreshTop(); toast(tx('Ayuno borrado','Fast deleted')); }}));
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${nuevo?tx('Añadir un ayuno olvidado','Add a forgotten fast'):tx('Corregir ayuno','Edit fast')}</h3>
+    <div class="field"><label>${tx('Empezó','Started')}</label><input id="feS" class="inp" type="datetime-local" value="${toLocalInput(x.start)}" max="${toLocalInput(Date.now())}"></div>
+    <div class="field"><label>${tx('Terminó','Ended')}</label><input id="feE" class="inp" type="datetime-local" value="${toLocalInput(x.end)}" max="${toLocalInput(Date.now())}"></div>
+    <button class="btn pri big" data-a="cbm" data-v="${ok}">${tx('Guardar','Save')}</button>${nuevo?'':`<button class="btn ghost wide" style="margin-top:6px;color:var(--bad)" data-a="cbm" data-v="${del}">${I('trash',16)} ${tx('Borrar este ayuno','Delete this fast')}</button>`}
+    ${nuevo?'':`<button class="btn ghost wide" style="margin-top:2px" data-a="cbm" data-v="${cb(()=>A.fastSentir(v))}">${tx('Cómo me sentí','How I felt')}</button>`}</div>`); };
+// ----- estadísticas -----
+function fastRachas(){ const H=nut().fast.history; let act=0, mej=0, c=0; for (const x of H){ if (x.ok){ c++; mej=Math.max(mej,c); } else c=0; } for (let i=H.length-1;i>=0&&H[i].ok;i--) act++; return {act,mej}; }
+A.fastStats=()=>openLayer('fastStats',{y:new Date().getFullYear(),m:new Date().getMonth()});
+A.fsNav=v=>{ const t=LAYERS[LAYERS.length-1]; if (!t) return; const d=new Date(t.p.y,t.p.m+(+v),1); if (d>new Date()) return; t.p.y=d.getFullYear(); t.p.m=d.getMonth(); refreshTop(); };
+SCREENS.fastStats=p=>{ const f=nut().fast, H=f.history, d30=H.filter(x=>x.end>=Date.now()-30*DAY), R=fastRachas();
+  const durs=d30.map(x=>(x.end-x.start)/3600000), tot=durs.reduce((a,b)=>a+b,0);
+  let b=`<div class="stats"><div class="stat"><div class="v">${d30.length}</div><div class="l">${tx('Ayunos (30 días)','Fasts (30 days)')}</div></div><div class="stat"><div class="v">${d30.length?(m=>`${Math.floor(m/60)} h ${String(m%60).padStart(2,'0')}`)(Math.round(tot/d30.length*60)):'—'}</div><div class="l">${tx('Duración media','Average length')}</div></div><div class="stat"><div class="v">${Math.round(tot)} h</div><div class="l">${tx('Horas en 30 días','Hours in 30 days')}</div></div></div>
+  <div class="stats" style="margin-top:8px"><div class="stat"><div class="v">${d30.filter(x=>x.goalH).length?Math.round(d30.filter(x=>x.ok&&x.goalH).length/d30.filter(x=>x.goalH).length*100)+' %':'—'}</div><div class="l">${tx('Metas cumplidas','Goals met')}</div></div><div class="stat"><div class="v">${R.act}</div><div class="l">${tx('Racha actual','Current streak')}</div></div><div class="stat"><div class="v">${R.mej}</div><div class="l">${tx('Mejor racha','Best streak')}</div></div></div>`;
+  const first=new Date(p.y,p.m,1), st=(first.getDay()+6)%7, days=new Date(p.y,p.m+1,0).getDate(), hoy=new Date().toDateString(), dia={};
+  H.forEach(x=>{ const k=new Date(x.end).toDateString(); dia[k]=dia[k]||x.ok; });
+  let cal=(EN_LANG()?['M','T','W','T','F','S','S']:['L','M','X','J','V','S','D']).map(d=>`<div class="dh">${d}</div>`).join(''); for (let i=0;i<st;i++) cal+='<div></div>';
+  for (let d=1;d<=days;d++){ const k=new Date(p.y,p.m,d).toDateString(); cal+=`<div class="d ${dia[k]===true?'on':''} ${k===hoy?'today':''}" ${dia[k]===false?'style="background:var(--card2)"':''}>${d}</div>`; }
+  const ahora=new Date(), esteMes=p.y===ahora.getFullYear()&&p.m===ahora.getMonth();
+  b+=`<div class="card" style="margin-top:12px"><div class="row" style="margin-bottom:10px"><button class="ibtn" data-a="fsNav" data-v="-1">${I('back',20)}</button><div class="grow b" style="text-align:center;text-transform:capitalize">${EN_LANG()?first.toLocaleDateString('en-US',{month:'long'}):mesN(p.m)} ${p.y}</div><button class="ibtn" data-a="fsNav" data-v="1" ${esteMes?'disabled style="opacity:.3"':''}>${I('right',20)}</button></div><div class="cal">${cal}</div>
+  <div class="xs mut" style="margin-top:8px">${tx('Naranja: meta cumplida · gris: ayuno más corto que tu meta','Orange: goal met · grey: fast shorter than your goal')}</div></div>`;
+  const ult=H.slice(-14); if (ult.length>=2) b+=`<div class="sec">${tx('Últimos ayunos (horas)','Latest fasts (hours)')}</div><div class="card">${barChart(ult.map(x=>Math.round((x.end-x.start)/360000)/10),ult.map(x=>String(new Date(x.end).getDate())),{fmt:v=>String(v).replace('.',EN_LANG()?'.':',')})}</div>`;
+  const ins=fastSensInsight(), nS=H.filter(x=>x.s&&x.s.e).length;
+  b+=`<div class="sec">${tx('Cómo te sientan','How they suit you')}</div><div class="card sm" style="line-height:1.45">${ins?(premOK()?`<div class="row" style="align-items:flex-start;gap:8px"><span style="color:var(--ac)">${I('spark',15)}</span><span>${esc(ins)}</span></div>`:`<button class="row" style="width:100%;text-align:left;gap:8px" data-a="cqPay"><span>🔒</span><span class="grow">${tx('PandarIA ya puede decirte qué duración te sienta mejor (Premium).','PandarIA can now tell you which length suits you best (Premium).')}</span></button>`):`<span class="mut">${tx(`Anota cómo te sentiste al terminar cada ayuno. Con 3 ayunos cortos y 3 de 16 h o más, PandarIA los compara (llevas ${nS}).`,`Log how you felt after each fast. With 3 short fasts and 3 of 16 h or more, PandarIA compares them (${nS} so far).`)}</span>`}</div>`;
+  b+=`<div class="row" style="margin:16px 2px 8px"><span class="sec grow" style="margin:0">${tx('Historial','History')}</span><button class="link sm" style="white-space:nowrap" data-a="fastEdit" data-v="nuevo">${I('plus',14)} ${tx('Añadir uno olvidado','Add a forgotten one')}</button></div>`;
+  b+=H.length?`<div class="card" style="padding:4px 14px">${H.map((x,i)=>[x,i]).reverse().slice(0,60).map(([x,i])=>fastFila(x,i)).join('')}</div>`:`<div class="card sm mut">${tx('Todavía no terminaste ningún ayuno.','You have not finished any fast yet.')}</div>`;
+  return lhdr(tx('Tus ayunos','Your fasts'))+`<div class="lbody">${b}</div>`; };
+const FS_EMO={e:['🪫','🙂','⚡']};
+function fastFila(x,i){ const hh=(x.end-x.start)/3600000;
+  return `<button class="kv" style="width:100%;text-align:left" data-a="fastEdit" data-v="${i}"><span class="mut">${fmtDate(x.start)} · ${hhmm(x.start)}</span><span><b>${fmtHM(hh)} h</b> ${x.goalH?`<span class="xs ${x.ok?'':'mut'}" style="${x.ok?'color:var(--ok)':''}">${x.ok?tx('✓ meta','✓ goal'):tx(`meta ${x.goalH} h`,`goal ${x.goalH} h`)}</span>`:''}${x.s&&x.s.e?` <span title="${tx('Energía','Energy')}">${FS_EMO.e[x.s.e-1]}</span>`:''}</span></button>`; }
+
+/* ---------- 1.5 · Agua completa ----------
+   Tus recipientes, la lista del día con hora (borrar o añadir con otra hora), día de calor o mucho sudor
+   y estadísticas del mes con racha. */
+const vasos=()=>{ const n=nut(); if (!Array.isArray(n.vasos)||!n.vasos.length) n.vasos=[{n:tx('Vaso','Glass'),ml:250},{n:tx('Botella','Bottle'),ml:500}]; return n.vasos; };
+const wLog=k=>((nut().waterLog||{})[k||dayKey()])||[];
+function waterExtraHoy(){ return ((nut().waterExtra||{})[dayKey()])||0; }
+function wGoalDia(k){ const n=nut(); if (k===dayKey()) return waterGoal(); return ((n.waterGoalDia||{})[k])||waterGoalBase(); }
+function waterGoalBase(){ const w=bodyWeight(), K=kb('agua'), sx=(S.profile||{}).sex, ref=K.ref[sx==='h'?'h':sx==='m'?'m':'x']; return Math.round(Math.min(ref*K.max, Math.max(ref*K.min, K.mlkg*w))/50)*50; }
+function wGuardaMeta(){ const n=nut(); n.waterGoalDia=n.waterGoalDia||{}; n.waterGoalDia[dayKey()]=waterGoal(); const ks=Object.keys(n.waterGoalDia).sort(); if (ks.length>120) ks.slice(0,ks.length-120).forEach(k=>delete n.waterGoalDia[k]); }
+function aguaHoyHtml(){ const n=nut(), k=dayKey(), L=wLog(k), sum=L.reduce((a,x)=>a+x.ml,0), resto=Math.max(0,((n.water||{})[k]||0)-sum), ex=waterExtraHoy();
+  let h=`<div class="row" style="margin:16px 2px 8px"><span class="sec grow" style="margin:0">${tx('Hoy','Today')}</span><button class="link sm" style="white-space:nowrap" data-a="wHora">${I('plus',14)} ${tx('Con otra hora','At another time')}</button></div>`;
+  h+=`<div class="card" style="padding:4px 14px;margin-bottom:8px"><button class="srow" style="width:100%" data-a="wCalor"><span class="grow"><div class="b sm">${tx('Día de calor o de mucho sudor','Hot day or heavy sweating')}</div><div class="xs mut">${ex?tx(`Meta de hoy +${ex} ml`,`Today's goal +${ex} ml`):tx(`Suma ${kb('agua.calor').ml} ml a la meta de hoy`,`Adds ${kb('agua.calor').ml} ml to today's goal`)}</div></span><span class="toggle ${ex?'on':''}"></span></button><div class="xs" style="padding:0 0 10px">${kbLink('agua.calor',tx('Por qué medio litro','Why half a litre'))}</div></div>`;
+  if (!L.length && !resto) return h+`<div class="card sm mut">${tx('Todavía no registraste agua hoy.','You have not logged any water today.')}</div>`;
+  return h+`<div class="card" style="padding:4px 14px">${L.map((x,i)=>[x,i]).reverse().map(([x,i])=>`<div class="kv"><span>${I('drop',14)} <b>${x.ml} ml</b>${x.n?` <span class="mut xs">${esc(x.n)}</span>`:''}</span><span class="row" style="gap:6px"><span class="mut sm">${hhmm(x.t)}</span><button class="ibtn" style="width:32px;height:32px" data-a="wDel" data-v="${i}" aria-label="${tx('Borrar','Delete')}">${I('close',16)}</button></span></div>`).join('')}
+    ${resto?`<div class="kv"><span>${I('drop',14)} <b>${resto} ml</b></span><span class="mut xs">${tx('sin hora (widget o aviso)','no time (widget or notification)')}</span></div>`:''}</div>`; }
+A.wDel=i=>{ const n=nut(), k=dayKey(), L=wLog(k), x=L[+i]; if (!x) return; L.splice(+i,1); n.water[k]=Math.max(0,(n.water[k]||0)-x.ml); save(); render.keep=true; render(); toast(tx(`${x.ml} ml borrados`,`${x.ml} ml removed`)); };
+A.wCalor=()=>{ const n=nut(), k=dayKey(); n.waterExtra=n.waterExtra||{}; if (n.waterExtra[k]) delete n.waterExtra[k]; else n.waterExtra[k]=kb('agua.calor').ml;
+  Object.keys(n.waterExtra).forEach(x=>{ if (x<dayKey(Date.now()-30*DAY)) delete n.waterExtra[x]; }); save(); render.keep=true; render(); };
+A.wHora=()=>{ const V=vasos(); const ok=cb(()=>{ const [H,M]=String(MV.whT||'').split(':').map(Number), ml=Math.round(+MV.whM); if (isNaN(H)) return toast(tx('Elige una hora','Pick a time'));
+    if (!(ml>=20&&ml<=3000)) return toast(tx('Entre 20 y 3000 ml','Between 20 and 3000 ml')); const d=new Date(); d.setHours(H,M||0,0,0); if (d.getTime()>Date.now()) return toast(tx('La hora no puede ser futura','The time cannot be in the future'));
+    wAdd(ml,d.getTime()); });
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Añadir agua de antes','Add earlier water')}</h3>
+    <div class="chips" style="margin-bottom:12px">${V.map(v=>`<button class="chip" data-a="whPick" data-v="${v.ml}">${esc(v.n)} · ${v.ml} ml</button>`).join('')}</div>
+    <div class="row" style="gap:10px"><div class="field grow"><label>${tx('Cantidad (ml)','Amount (ml)')}</label><input id="whM" class="inp" type="number" inputmode="numeric" value="${V[0].ml}"></div><div class="field grow"><label>${tx('Hora','Time')}</label><input id="whT" class="inp" type="time" value="${hhmm(Date.now()-3600000)}"></div></div>
+    <button class="btn pri big" data-a="cbm" data-v="${ok}">${tx('Añadir','Add')}</button></div>`); };
+A.whPick=v=>{ const el=document.getElementById('whM'); if (el) el.value=v; };
+function wAdd(ml,t,nom){ const n=nut(), k=dayKey(t); n.waterLog=n.waterLog||{}; (n.waterLog[k]=n.waterLog[k]||[]).push({t,ml,...(nom?{n:nom}:{})}); n.waterLog[k].sort((a,b)=>a.t-b.t);
+  Object.keys(n.waterLog).forEach(x=>{ if (x<dayKey(Date.now()-60*DAY)) delete n.waterLog[x]; });
+  const b0=waterToday(k); n.water[k]=(n.water[k]||0)+ml; if (k===dayKey()) wGuardaMeta(); save(); render.keep=true; render(); if (k===dayKey() && waterToday(k)>=waterGoal() && b0<waterGoal()) toast(tx('💧 ¡Meta de agua cumplida!','💧 Water goal reached!')); }
+A.wVaso=i=>{ const v=vasos()[+i]; if (v) A.water(v.ml,v.n); };
+A.wVasos=()=>{ const V=vasos().map(v=>Object.assign({},v)); const fila=(v,i)=>`<div class="row" style="gap:8px;margin-bottom:8px"><input id="wvN${i}" class="inp grow" maxlength="18" value="${esc(v.n)}" placeholder="${tx('Nombre','Name')}"><input id="wvM${i}" class="inp" style="width:96px" type="number" inputmode="numeric" value="${v.ml}"><span class="xs mut">ml</span></div>`;
+  const ok=cb(()=>{ const out=[]; for (let i=0;i<6;i++){ const nm=(MV['wvN'+i]||'').trim(), ml=Math.round(+MV['wvM'+i]); if (nm&&ml>=20&&ml<=3000) out.push({n:nm.slice(0,18),ml}); }
+    if (!out.length) return toast(tx('Deja al menos un recipiente','Keep at least one container')); nut().vasos=out.slice(0,4); save(); render.keep=true; render(); toast(tx('Recipientes guardados','Containers saved')); });
+  while (V.length<4) V.push({n:'',ml:''});
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Tus recipientes','Your containers')}</h3><p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">${tx('Tu taza, tu termo, tu botella del gimnasio… Hasta 4, cada uno con un toque. Deja vacío el nombre para quitar uno.','Your mug, your flask, your gym bottle… Up to 4, one tap each. Leave the name empty to remove one.')}</p>
+    ${V.slice(0,4).map(fila).join('')}<button class="btn pri big" style="margin-top:6px" data-a="cbm" data-v="${ok}">${tx('Guardar','Save')}</button></div>`); };
+// estadísticas del agua
+function wDiaMl(k){ return waterToday(k); }
+function wRachas(){ let act=0, mej=0, c=0; const hoy=dayKey(), dias=[...Array(120).keys()].reverse().map(i=>dayKey(Date.now()-i*DAY));
+  dias.forEach(k=>{ if (wDiaMl(k)>=wGoalDia(k)){ c++; mej=Math.max(mej,c); } else if (k!==hoy) c=0; });
+  for (let i=0;i<120;i++){ const k=dayKey(Date.now()-i*DAY); if (wDiaMl(k)>=wGoalDia(k)) act++; else if (k!==hoy) break; } return {act,mej}; }
+A.aguaStats=()=>openLayer('aguaStats',{y:new Date().getFullYear(),m:new Date().getMonth()});
+SCREENS.aguaStats=p=>{ const D=n=>[...Array(n).keys()].map(i=>dayKey(Date.now()-(i+1)*DAY)), med=L=>{ const v=L.map(wDiaMl).filter(x=>x>0); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+  const d30=D(30), ok30=d30.filter(k=>wDiaMl(k)>0&&wDiaMl(k)>=wGoalDia(k)).length, R=wRachas(), L1=v=>v?(Math.round(v/100)/10).toLocaleString(LOC())+' L':'—';
+  let b=`<div class="stats"><div class="stat"><div class="v">${L1(med(D(7)))}</div><div class="l">${tx('Media 7 días','7-day average')}</div></div><div class="stat"><div class="v">${L1(med(d30))}</div><div class="l">${tx('Media 30 días','30-day average')}</div></div><div class="stat"><div class="v">${ok30}</div><div class="l">${tx('Metas en 30 días','Goals in 30 days')}</div></div></div>
+  <div class="stats" style="margin-top:8px"><div class="stat"><div class="v">${R.act}</div><div class="l">${tx('Racha actual (días)','Current streak (days)')}</div></div><div class="stat"><div class="v">${R.mej}</div><div class="l">${tx('Mejor racha','Best streak')}</div></div></div>`;
+  const first=new Date(p.y,p.m,1), st=(first.getDay()+6)%7, days=new Date(p.y,p.m+1,0).getDate(), hoy=dayKey();
+  let cal=(EN_LANG()?['M','T','W','T','F','S','S']:['L','M','X','J','V','S','D']).map(d=>`<div class="dh">${d}</div>`).join(''); for (let i=0;i<st;i++) cal+='<div></div>';
+  for (let d=1;d<=days;d++){ const t=new Date(p.y,p.m,d).getTime(), k=dayKey(t); const ml=t<=Date.now()?wDiaMl(k):0, okd=ml>0&&ml>=wGoalDia(k);
+    cal+=`<div class="d ${okd?'on':''} ${k===hoy?'today':''}" style="${okd?'background:var(--blue);color:#fff':ml>0?'background:var(--blues)':''}">${d}</div>`; }
+  const ahora=new Date(), esteMes=p.y===ahora.getFullYear()&&p.m===ahora.getMonth();
+  b+=`<div class="card" style="margin-top:12px"><div class="row" style="margin-bottom:10px"><button class="ibtn" data-a="fsNav" data-v="-1">${I('back',20)}</button><div class="grow b" style="text-align:center;text-transform:capitalize">${EN_LANG()?first.toLocaleDateString('en-US',{month:'long'}):mesN(p.m)} ${p.y}</div><button class="ibtn" data-a="fsNav" data-v="1" ${esteMes?'disabled style="opacity:.3"':''}>${I('right',20)}</button></div><div class="cal">${cal}</div>
+  <div class="xs mut" style="margin-top:8px">${tx('Azul: meta cumplida · celeste: bebiste, pero menos que la meta','Blue: goal met · light blue: you drank, but less than the goal')}</div></div>`;
+  const d14=[...Array(14).keys()].reverse().map(i=>dayKey(Date.now()-i*DAY));
+  b+=`<div class="sec">${tx('Últimos 14 días (litros)','Last 14 days (litres)')}</div><div class="card">${barChart(d14.map(k=>Math.round(wDiaMl(k)/100)/10),d14.map(k=>String(+k.slice(-2))),{fmt:v=>v.toLocaleString(LOC())})}</div>`;
+  return lhdr(tx('Tu agua','Your water'))+`<div class="lbody">${b}</div>`; };
+
 
 /* ============ Historial ampliado, compartir y experiencia ============ */
 /* ---------- Series por músculo semana a semana ---------- */
@@ -9837,11 +10000,12 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.4';
+const APP_VERSION='1.5';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas']},
  {v:'1.4',t:'Retos y Consulta a PandarIA',items:['Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale', 'Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)', 'Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos', 'Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores', 'Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir', 'Tarjeta del entreno renovada, con el panda y tus récords', 'Versión para iPhone y iPad (se instala con AltStore desde el PC)', 'Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)']},
  {v:'1.3',t:'Comer, dormir y ayunar',items:['Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua', 'Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano', 'Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado', 'Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)', 'Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)', 'Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)', 'Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)', 'Notificación del entreno con la serie siguiente y el botón «✓ Hecha»', 'Biblioteca de evidencia 1.6: 4 reglas nuevas']},
  {v:'1.2',t:'PandarIA v2 y temas',items:['PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno', 'PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores', 'PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo', 'PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión', 'PandarIA v2 · Aprende de tus cambios: si cambias un ejercicio a mano, lo tiene en cuenta al proponer ejercicios', 'Temas: Automático, Claro, Oscuro gris (pantallas LCD) y Negro puro (pantallas OLED)', 'Tamaño del texto: Normal, Grande y Muy grande', 'Biblioteca de evidencia 1.5: 2 reglas nuevas']},
@@ -9880,7 +10044,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.4 · Retos y Consulta a PandarIA", "Consulta a PandarIA (experimental)", "Retos del mes y retos con amigos", "Tu mes y Tu año en PandarIA", "Versión para iPhone y iPad", "Más teléfonos compatibles en Google Play"];
+const NOTAS_VERSION=["1.5 · Ayuno y agua completos", "Fases del ayuno, estadísticas y horario fijo", "Corrige o añade ayunos olvidados", "Cómo te sienta cada ayuno", "Agua: tus recipientes y la lista del día", "Día de calor y estadísticas del agua"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -10496,7 +10660,7 @@ function applyAnim(){ document.documentElement.dataset.fx=ANIM_ON()?'on':'off'; 
   checkAch=function(){ const out=ca0(); if (out.length) setTimeout(()=>sfx('ach'),900); return out; };
   // agua
   const w0=A.water;
-  A.water=v=>{ const n=nut(), k=dayKey(), before=n.water[k]||0; w0(v); if (+v>0){ sfx('water'); anim(document.querySelector('.wring'),'fx-splash');
+  A.water=(v,nom)=>{ const n=nut(), k=dayKey(), before=n.water[k]||0; w0(v,nom); if (+v>0){ sfx('water'); anim(document.querySelector('.wring'),'fx-splash');
       if (before<waterGoal() && (n.water[k]||0)>=waterGoal()){ setTimeout(()=>sfx('success'),180); burstAt(document.querySelector('.wring'),{colors:['#3f9cff','#8fd0ff','#ffffff','#35c46b'],n:60}); } } else sfx('soft'); };
   // ayuno
   const fs0=A.fastStart;
@@ -12172,6 +12336,19 @@ Suplementos con prudencia|Supplements with caution
 Fibra diaria|Daily fibre
 Sodio diario|Daily sodium
 Ayuno conectado con el diario|Fasting linked to the diary
+Agua extra con calor o sudor|Extra water with heat or sweating
+Ayuno y agua completos|Complete fasting and water
+Ayuno: las fases en una línea bajo el anillo, también en la versión web|Fasting: the phases on a line under the ring, also in the web version
+Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas|Fasting stats: monthly calendar, average length, hours, goals met and streaks
+Corrige, borra o añade un ayuno que olvidaste|Edit, delete or add a fast you forgot
+Horario fijo: aviso diario y empezar desde tu hora con un toque|Fixed schedule: daily reminder and start from your time with one tap
+Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)|How you felt at the end: PandarIA tells you which length suits you best (Premium)
+Plan 23:1 (una comida al día) con avisos de prudencia|23:1 plan (one meal a day) with safety warnings
+Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora|Water: your containers, the day's list with times, undo and add at another time
+Día de calor o de mucho sudor: medio litro más en la meta|Hot or sweaty day: half a litre more on the goal
+Estadísticas del agua: calendario, medias y rachas|Water stats: calendar, averages and streaks
+Una sola comida al día. Muy exigente.|One meal a day. Very demanding.
+Meta de agua del día|Daily water goal
 Modo viaje|Travel mode
 Ejercicios de alto impacto|High-impact exercises
 Fuerza en menores|Strength training for minors

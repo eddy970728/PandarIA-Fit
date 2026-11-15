@@ -253,19 +253,10 @@
   let notifOk = false, exactOk = false, nT = null;
 
   // Fases del ayuno (aproximadas; varían según la persona)
-  const FAST_PHASES0 = [
-    {h:0,  n:'Ayuno iniciado',     t:'Tu cuerpo usa la energía de tu última comida.', en:['Fast started','Your body is using the energy from your last meal.']},
-    {h:4,  n:'Azúcar estable',     t:'El azúcar en sangre se estabiliza. Bebe agua.', en:['Stable blood sugar','Your blood sugar is levelling out. Drink some water.']},
-    {h:8,  n:'Reservas en uso',    t:'Tu cuerpo empieza a tirar de sus reservas de glucógeno.', en:['Using reserves','Your body starts drawing on its glycogen stores.']},
-    {h:12, n:'Estado de ayuno',    t:'La insulina baja y el cuerpo usa más grasa como energía.', en:['Fasted state','Insulin drops and your body uses more fat for energy.']},
-    {h:16, n:'Más quema de grasa', t:'Estás en la zona del 16:8. ¡Buen trabajo!', en:['More fat burning','You are in the 16:8 zone. Great job!']},
-    {h:18, n:'Cetosis leve',       t:'Puede empezar una cetosis leve. Escucha a tu cuerpo.', en:['Mild ketosis','Mild ketosis may begin. Listen to your body.']},
-    {h:24, n:'Ayuno largo',        t:'No hay beneficios extra en alargarlo. Considera romperlo con proteína y verduras.', en:['Long fast','There is no extra benefit in going longer. Consider breaking it with protein and vegetables.']}
-  ];
+  // 1.5: las fases están en index.html (FAST_FASES) para que el anillo y los avisos digan lo mismo
+  const FAST_PHASES0 = FAST_FASES.map(x => ({h:x.h, n:x.n[0], t:x.t[0], en:[x.n[1], x.t[1]]}));
   // los textos de las fases salen en el idioma elegido (también en los avisos, que no pasan por la pantalla)
   const FAST_PHASES = new Proxy(FAST_PHASES0, {get:(a, k) => { const v = a[k]; return v && typeof v === 'object' && v.en && EN_LANG() ? Object.assign({}, v, {n: v.en[0], t: v.en[1]}) : v; }});
-  window.fastPhaseAt = hrs => { let p = FAST_PHASES[0]; for (const x of FAST_PHASES) if (hrs >= x.h) p = x; return p; };
-  window.fastNextPhase = hrs => FAST_PHASES.find(x => x.h > hrs) || null;
 
   async function refreshPerm(){
     if (!LN) return;
@@ -504,20 +495,7 @@
 
   // Agua: recuerda cuándo bebiste por última vez (agua inteligente)
   const _water = A.water;
-  A.water = v => { if (+v > 0){ nut().waterLast = Date.now(); } _water(v); };
-
-  // Fase del ayuno en el anillo
-  const _fastCard = fastCard;
-  fastCard = function(){
-    let h = _fastCard.apply(this, arguments);
-    const f = S.nutri && S.nutri.fast;
-    if (f && f.active){
-      const hrs = (Date.now() - f.active.start) / 3600000, p = fastPhaseAt(hrs), nx = fastNextPhase(hrs);
-      const box = `<div style="margin:2px 0 10px"><div class="tag ac" style="font-size:12.5px">${I('flame',13)} ${esc(p.n)}</div><div class="xs mut" style="margin-top:6px;line-height:1.4">${esc(p.t)}${nx ? `<br>Siguiente: ${esc(nx.n)} a las ${nx.h} h` : ''}</div><div class="xs mut" style="margin-top:4px;opacity:.75">Tiempos aproximados · información general, no consejo médico</div></div>`;
-      h = h.replace('<div class="sm mut">Empezaste', box + '<div class="sm mut">Empezaste');
-    }
-    return h;
-  };
+  A.water = (v, nom) => { if (+v > 0){ nut().waterLast = Date.now(); } _water(v, nom); };
 
   /* ----- Pantallas: Notificaciones y Próximos avisos ----- */
   const DS = ['D','L','M','X','J','V','S'], DL = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -884,7 +862,7 @@
       HC.saveSample({dataType:'dietaryEnergyConsumed', value: kc, startDate: iso(t0), endDate: iso(t0 + 60000), metadata: {source:'PandarIA Fit', food: String(e.n || '').slice(0, 60)}}).catch(() => {}); });
   };
   const _wHc = A.water;
-  A.water = v => { _wHc(v); const s = HCS(); if (HC && s.on && s.writeWater && isPrem() && +v > 0){ const t0 = Date.now() - 60000;
+  A.water = (v, nom) => { _wHc(v, nom); const s = HCS(); if (HC && s.on && s.writeWater && isPrem() && +v > 0){ const t0 = Date.now() - 60000;
     HC.saveSample({dataType:'dietaryWater', value: (+v) / 1000, startDate: iso(t0), endDate: iso(t0 + 60000), metadata: {source:'PandarIA Fit'}}).catch(() => {}); } };
   // PandarIA ajusta tus calorías con tus pasos (Premium)
   const _cn = calcNutrition;

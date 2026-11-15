@@ -623,6 +623,25 @@ if (fs.existsSync(COPIA07)) {
     out.rival=JSON.stringify(S.retos.amigos[0].rivales.map(x=>[x.n,x.v]));
     // Tu mes y Tu año
     const D=periodoDatos('ano'); out.ano={entrenos:D.entrenos, dias:D.dias, racha:D.racha};
+    // 1.5 · Ayuno completo
+    const f5=nut().fast; f5.screened=true; f5.blocked=false; f5.plan='16:8'; f5.history=[]; f5.active={start:Date.now()-13*3600000,goalH:16};
+    out.f5linea=/fl-bar/.test(fastCard()) && fastPhaseAt(13).h===12 && fastNextPhase(13).h===16 && (fastCard().match(/Estado de ayuno/g)||[]).length===1;
+    out.f5omad=!!FAST_PLANS['23:1'] && FAST_PLANS['23:1'].h===23;
+    f5.active=null; for (let i=8;i>=1;i--){ const s=Date.now()-i*DAY, d=(i%2?17:13)*3600000; f5.history.push({start:s,end:s+d,goalH:16,ok:d>=16*3600000,s:{h:2,e:i%2?1:3,a:2}}); }
+    out.f5racha=JSON.stringify(fastRachas());
+    out.f5sens=/energía suele ser más baja/.test(fastSensInsight()||'');
+    const cbOk=(s,e)=>{ A.fastEdit('nuevo'); const k=document.querySelector('#modals .scrim:last-child [data-a="cbm"]').dataset.v; MODALS.length=0; renderModals(); MV={feS:toLocalInput(s),feE:toLocalInput(e)}; CB[k](); };
+    cbOk(Date.now()-40*3600000, Date.now()-20*3600000); out.f5anade=f5.history.length===9 && f5.history.some(x=>Math.round((x.end-x.start)/3600000)===20);
+    cbOk(Date.now()-2*3600000, Date.now()-5*3600000); out.f5rechaza=f5.history.length===9; MODALS.length=0; renderModals();
+    LAYERS.push({t:'fastStats',p:{y:new Date().getFullYear(),m:new Date().getMonth()}}); renderLayers(); out.f5stats=/Racha actual/.test(document.querySelector('.layer:last-child').textContent) && document.querySelectorAll('.layer:last-child .cal .d').length>=28; LAYERS.length=0; renderLayers();
+    f5.horario={on:true,hora:'00:00'}; const ini=fastHorarioIni(); A.fastDesdeHorario(); out.f5horario=!!f5.active && f5.active.start===ini && ini<=Date.now(); f5.active=null; f5.horario={on:false,hora:'20:00'};
+    // 1.5 · Agua completa
+    const n5=nut(), k5=dayKey(); n5.water[k5]=300; n5.waterLog={}; n5.waterExtra={}; const g0=waterGoal();
+    A.water(330,'Taza'); A.water(500); out.a5log=wLog(k5).length===2 && wLog(k5)[0].n==='Taza' && n5.water[k5]===1130;
+    A.water(-250); out.a5deshacer=wLog(k5).length===1 && n5.water[k5]===630;
+    A.wDel(0); out.a5borrar=wLog(k5).length===0 && n5.water[k5]===300;
+    A.wCalor(); out.a5calor=waterGoal()===g0+500; A.wCalor(); out.a5calorOff=waterGoal()===g0;
+    LAYERS.push({t:'aguaStats',p:{y:new Date().getFullYear(),m:new Date().getMonth()}}); renderLayers(); out.a5stats=/Media 7 días/.test(document.querySelector('.layer:last-child').textContent); LAYERS.length=0; renderLayers();
     return JSON.stringify(out); })()`));
   comprobar('Consulta a PandarIA: 30 preguntas o más en las 9 secciones, todas responden con sus datos y su regla', r.consulta.preguntas >= 30 && r.consulta.secciones === 9 && !r.consulta.malos.length, JSON.stringify(r.consulta));
   comprobar('Consulta: ve el estancamiento del press de banca y calcula la proteína (2 g/kg al bajar… 1,6 al mantener: 128 g)', /no sube desde hace/.test(r.estanco) && /128 g/.test(r.proteina), JSON.stringify([r.estanco, r.proteina]));
@@ -636,6 +655,13 @@ if (fs.existsSync(COPIA07)) {
   comprobar('retos del mes: metas según el plan (3 días por semana)', /^entrenos:\d+:\d+ agua:\d+:\d+/.test(r.retosMes), r.retosMes);
   comprobar('retos con amigos: código PFR dentro de un mensaje, sin duplicados y rechazando códigos malos', r.retoImport && r.retoDuplicado && r.retoMalo);
   comprobar('retos con amigos: el progreso PFP de un amigo se actualiza (no se repite)', r.rival === '[["Ana",9]]', r.rival);
+  comprobar('ayuno 1.5: línea de fases en el anillo (una sola vez) y plan 23:1', r.f5linea && r.f5omad);
+  comprobar('ayuno 1.5: rachas, y PandarIA compara cómo te sientan los ayunos largos', r.f5racha === '{"act":1,"mej":1}' && r.f5sens, r.f5racha);
+  comprobar('ayuno 1.5: añadir un ayuno olvidado y rechazar uno que termina antes de empezar', r.f5anade && r.f5rechaza);
+  comprobar('ayuno 1.5: estadísticas con calendario y empezar desde el horario fijo', r.f5stats && r.f5horario);
+  comprobar('agua 1.5: lista del día con nombre, deshacer el último y borrar uno', r.a5log && r.a5deshacer && r.a5borrar, JSON.stringify([r.a5log,r.a5deshacer,r.a5borrar]));
+  comprobar('agua 1.5: día de calor suma 500 ml a la meta y se quita', r.a5calor && r.a5calorOff);
+  comprobar('agua 1.5: estadísticas del agua', r.a5stats);
   comprobar('Tu año: entrenos, días y racha de semanas', r.ano.entrenos === 6 && r.ano.dias === 6 && r.ano.racha >= 1, JSON.stringify(r.ano));
   a.cerrar();
   const nat = fs.readFileSync(path.join(DIR, '..', 'www', 'native.js'), 'utf8');
