@@ -669,6 +669,11 @@ if (fs.existsSync(COPIA07)) {
   comprobar('iPhone: native.js salta en iOS el servicio del entreno, el botón atrás y los canales de Android', /const PN = IOS \? null/.test(nat) && /if \(!IOS\) App\.addListener\('backButton'/.test(nat) && /if \(!IOS\)\{ for \(const old/.test(nat));
   comprobar('iPhone: las compras del App Store usan un producto por plan', /IOS_IDS = \{mensual: 'com\.pandaria\.fit\.premium\.mensual'/.test(prem));
   const ex = fs.readFileSync(path.join(DIR, '..', 'scripts', 'android-extra.mjs'), 'utf8');
+  comprobar('widgets 1.5: Check-in, Mi día y Calorías registrados, con sus diseños y toques sin abrir la app',
+    ['WidgetCheckin', 'WidgetDia', 'WidgetKcal'].every(c => ex.includes(`widget('${c}'`) && ex.includes(`"java/${c}.java"`)) &&
+    ['pf_widget_checkin', 'pf_widget_dia', 'pf_widget_kcal', 'pf_widget_chip'].every(f => ex.includes(f + '.xml"')) && /a\.startsWith\(Widgets\.ACT\)/.test(ex) && /pending\\", \\"\[\]\\"\)\)\) prefs/.test(ex));
+  comprobar('widgets 1.5: la app aplica agua, deshacer, ayuno y check-in del widget, y les manda los textos traducidos',
+    ['water', 'wundo', 'fastStart', 'fastEnd', 'chk'].every(t => nat.includes(`a.type === '${t}'`)) && /window\.pfWidgetApply/.test(nat) && /kMac:/.test(nat) && /'widgetAction'/.test(nat));
   comprobar('Google Play: símbolos nativos en el AAB y la cámara no es obligatoria', /debugSymbolLevel 'SYMBOL_TABLE'/.test(ex) && /'android\.hardware\.camera'/.test(ex) && /android:required="false" tools:replace/.test(ex));
 }
 

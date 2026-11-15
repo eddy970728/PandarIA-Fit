@@ -682,7 +682,7 @@
       else if ((a === 'ipause' && intRunning() && !INT.paused) || (a === 'iresume' && intRunning() && INT.paused)) A.intPause();
       else if (a === 'iskip' && intRunning()) intNext(true);
       else if (a === 'idone' && intRunning()){ intCatchUp(INT.ph.length); intFinish(); }
-      else if (a === 'widgetWater') consumeWidget();
+      else if (a === 'widgetWater' || a === 'widgetAction') consumeWidget();
     }catch(e){} }, 60);
   }
 
@@ -700,14 +700,41 @@
     else if (r) today = {label:tx('HOY','TODAY'), title:tx('Día de descanso','Rest day'), sub:tx('Próxima: ','Next: ') + r.name, rid:''};
     else if (anyR) today = {label:tx('TUS RUTINAS','YOUR ROUTINES'), title: anyR.name, sub:tx('Toca para empezar','Tap to start'), rid: anyR.id};
     else today = {label:tx('HOY TOCA','UP TODAY'), title:tx('Crea tu primera rutina','Create your first routine'), sub:tx('Toca para abrir la app','Tap to open the app'), rid:''};
+    if (today.rid === undefined) today.rid = '';
+    today.done = done;
     const f = S.nutri && S.nutri.fast;
-    const planN = f ? trN((FAST_PLANS[f.plan] || {}).n || '') : '';
-    const fast = f && f.active ? {active: true, start: f.active.start, goalH: f.active.goalH || 0, plan: planN} : {active: false, plan: planN};
-    const water = {ml: (S.nutri && S.nutri.water && S.nutri.water[dayKey()]) || 0, goal: waterGoal(), day: dayKey()};
+    const planO = f ? (FAST_PLANS[f.plan] || {}) : {}, planN = f ? trN(planO.n || '') : '';
+    const canStart = !!(f && f.screened && !f.blocked && f.plan !== '5:2');
+    let desde = 0; try{ if (f && f.horario && f.horario.on && planO.h && typeof fastHorarioIni === 'function'){ const s = fastHorarioIni(); if (Date.now() < s + planO.h * 3600000) desde = s; } }catch(e){}
+    const phases = typeof fastFases === 'function' ? fastFases().map(x => ({h: x.h, n: x.n})) : [];
+    const fast = f && f.active ? {active: true, start: f.active.start, goalH: f.active.goalH || 0, plan: planN, canStart, planH: planO.h || 0, phases}
+      : {active: false, plan: planN, canStart, planH: planO.h || 0, desde, phases};
+    // 1.5: el agua del widget es la misma que la de la app (con las bebidas del diario y el día de calor)
+    const V = typeof vasos === 'function' ? vasos() : [{n:'', ml:250}, {n:'', ml:500}];
+    const L0 = typeof wLog === 'function' ? wLog(dayKey()) : [];
+    const water = {ml: typeof waterToday === 'function' ? waterToday() : ((S.nutri && S.nutri.water && S.nutri.water[dayKey()]) || 0), goal: waterGoal(), day: dayKey(),
+      v1: V[0] || {n:'', ml:250}, v2: V[1] || V[0] || {n:'', ml:500}, lastMl: L0.length ? L0[L0.length - 1].ml : 0};
     const wk = weekKey(Date.now());
     const doneW = new Set(S.sessions.filter(s => weekKey(s.end) === wk).map(s => new Date(s.end).toDateString())).size;
     const streak = prem ? {weeks: streakWeeks(), done: doneW, target: S.plan && S.plan.days.length ? S.plan.days.length : 1} : {locked: true};
-    return {today, fast, water, streak};
+    const cd = S.checkinDia && S.checkinDia.day === dayKey() ? S.checkinDia : null;
+    const checkin = prem ? Object.assign({day: dayKey()}, cd ? {sleep: cd.sleep, energy: cd.energy, sore: cd.sore} : {}) : {locked: true};
+    if (cd) ['sleep', 'energy', 'sore'].forEach(k => { if (cd[k] == null) delete checkin[k]; });
+    let kcal = {locked: true};
+    try{ if (prem && typeof calcNutrition === 'function' && typeof dayTotals === 'function'){ const N = calcNutrition(), T = dayTotals(dayKey());
+      if (N && N.kcal) kcal = {day: dayKey(), k: Math.round(T.k), kGoal: Math.round(N.kcal), p: Math.round(T.p), pGoal: Math.round(N.prot), c: Math.round(T.c), cGoal: Math.round(N.carbs), g: Math.round(T.g), gGoal: Math.round(N.fat)}; } }catch(e){}
+    const L = {dec: EN_LANG() ? '.' : ',', lockSub: tx('Toca para ver PandarIA Fit Premium', 'Tap to see PandarIA Fit Premium'), tTitle: tx('Hoy toca', 'Up today'), tStart: tx('Empezar', 'Start'),
+      fActive: tx('AYUNANDO', 'FASTING'), fIdle: tx('AYUNO', 'FAST'), fNone: tx('Sin ayuno en curso', 'No fast running'), fPlan: tx('Plan {x}', '{x} plan'), fGoal: tx('meta {x} h', 'goal {x} h'),
+      fStart: tx('Empezar', 'Start'), fEnd: tx('Terminar', 'End'), fFrom: tx('Desde {x}', 'From {x}'),
+      wDone: tx('¡Meta cumplida! 💧', 'Goal reached! 💧'), wLeft: tx('Faltan {x} L', '{x} L to go'),
+      sWeek: tx('semana', 'week'), sWeeks: tx('semanas', 'weeks'), sThis: tx('Esta semana {x} de {y}', 'This week {x} of {y}'), sLock: tx('Racha · Premium', 'Streak · Premium'),
+      cTitle: tx('¿Cómo llegas hoy?', 'How are you today?'), cSub: tx('Un toque en cada fila', 'One tap per row'), cDone: tx('Listo: PandarIA lo tendrá en cuenta hoy', 'Done: PandarIA will use it today'),
+      cl0: tx('Sueño', 'Sleep'), cl1: tx('Energía', 'Energy'), cl2: tx('Agujetas', 'Soreness'),
+      c00: tx('Mal', 'Bad'), c01: tx('Regular', 'OK'), c02: tx('Bien', 'Good'), c10: tx('Baja', 'Low'), c11: tx('Normal', 'Normal'), c12: tx('Alta', 'High'),
+      c20: tx('Muchas', 'A lot'), c21: tx('Algunas', 'Some'), c22: tx('Nada', 'None'),
+      kLabel: tx('CALORÍAS DE HOY', "TODAY'S CALORIES"), kLeft: tx('{x} kcal restantes', '{x} kcal left'), kOver: tx('{x} kcal de más', '{x} kcal over'),
+      kMac: tx('Quedan P {p} g · C {c} g · G {g} g', 'Left P {p} g · C {c} g · F {g} g')};
+    return {today, fast, water, streak, checkin, kcal, L};
   }
   function pushWidgets(now){
     if (!PN) return;
@@ -716,15 +743,36 @@
     if (now) go(); else wT = setTimeout(go, 1500);
   }
   window.pushWidgets = pushWidgets;
+  let wBusy = false;
   async function consumeWidget(){
-    if (!PN) return;
+    if (!PN || wBusy) return;
+    wBusy = true;
     try{
-      const r = await PN.consumeWidgetActions(), acts = r.actions || [];
-      let ml = 0;
-      acts.forEach(a => { if (a.type === 'water'){ const k = dayKey(a.at || Date.now()); const n = nut(); n.water[k] = (n.water[k] || 0) + (+a.ml || 250); n.waterLast = Math.max(n.waterLast || 0, a.at || 0); ml += +a.ml || 250; } });
-      if (ml){ save(); render.keep = true; render(); toast(`💧 +${ml} ml desde el widget`); }
+      const r = await PN.consumeWidgetActions();
+      widgetApply(r.actions || []);
     }catch(e){}
+    wBusy = false;
+    if (window.pushWidgets) pushWidgets(true);
   }
+  // aplica los toques guardados por los widgets (también lo usan las pruebas)
+  function widgetApply(acts){
+      const msgs = [];
+      let ml = 0;
+      acts.forEach(a => { try{
+        if (a.type === 'water'){ const at = a.at || Date.now(), k = dayKey(at), n = nut(), add = +a.ml || 250;
+          n.waterLog = n.waterLog || {}; (n.waterLog[k] = n.waterLog[k] || []).push(Object.assign({t: at, ml: add}, a.n ? {n: String(a.n).slice(0, 18)} : {}));
+          n.waterLog[k].sort((x, y) => x.t - y.t); n.water[k] = (n.water[k] || 0) + add; n.waterLast = Math.max(n.waterLast || 0, at); ml += add; }
+        else if (a.type === 'wundo'){ const k = dayKey(a.at || Date.now()), n = nut(), L = (n.waterLog || {})[k] || []; const x = L.pop(); if (x){ n.water[k] = Math.max(0, (n.water[k] || 0) - x.ml); ml -= x.ml; } }
+        else if (a.type === 'fastStart'){ const f = nut().fast; if (!f.active && f.screened && !f.blocked){ f.active = {start: Math.min(Date.now(), a.at || Date.now()), goalH: (FAST_PLANS[f.plan] || {}).h || null}; msgs.push(tx('Ayuno empezado desde el widget', 'Fast started from the widget')); } }
+        else if (a.type === 'fastEnd'){ const f = nut().fast, x = f.active; if (x){ const end = Math.max(x.start + 60000, a.at || Date.now()), el = (end - x.start) / 3600000;
+          f.history.push({start: x.start, end, goalH: x.goalH, ok: !x.goalH || el >= x.goalH}); f.history = f.history.slice(-400); f.active = null; msgs.push(tx('Ayuno terminado desde el widget', 'Fast ended from the widget')); } }
+        else if (a.type === 'chk'){ const day = a.day || dayKey(); if (!S.checkinDia || S.checkinDia.day !== day) S.checkinDia = {day, sleep: null, energy: null, sore: null};
+          if (['sleep', 'energy', 'sore'].includes(a.k)) S.checkinDia[a.k] = +a.v; }
+      }catch(e){} });
+      if (ml > 0) msgs.unshift(tx(`💧 +${ml} ml desde el widget`, `💧 +${ml} ml from the widget`));
+      if (acts.length){ save(); render.keep = true; render(); if (msgs.length) toast(msgs.join(' · ')); }
+  }
+  window.pfWidgetData = widgetData; window.pfWidgetApply = widgetApply;
 
   /* ---------- 12. Enlaces, accesos directos y tema (Fase 7) ---------- */
   const PAGES = 'https://eddy970728.github.io/PandarIA-Fit/';
@@ -748,7 +796,9 @@
         A.tab('ayuno'); const f = nut().fast;
         if (path === 'ayuno/empezar'){ if (!f.screened) A.fastScreen(); else if (f.blocked) toast('El ayuno no es recomendable para ti sin supervisión'); else if (!f.active) A.fastStart(); }
         else if (path === 'ayuno/terminar' && f.active) A.fastEnd();
-      } else if (path === 'historial') A.tab('historial');
+      } else if (path === 'rutinas') A.tab('rutinas');
+      else if (path === 'comida'){ NSEG = 'comida'; A.tab('nutricion'); if (typeof A.dAdd === 'function') A.dAdd(); }
+      else if (path === 'historial') A.tab('historial');
       else if (path === 'premium'){ const c = q.get('c'); A.openPremium(); if (c) setTimeout(() => { const el = $('#pfcode'); if (el){ el.value = c; A.pfActivate(); } }, 400); }
       else if (path === 'rutina'){ const c = q.get('c'); if (c) importRoutineCode(c); }
     }catch(e){} }, 450);
