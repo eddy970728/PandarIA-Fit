@@ -565,6 +565,61 @@ if (fs.existsSync(COPIA07)) {
   comprobar('Premium: el candado de calorías usa la marca de fin del objetivo (no depende de que el agua esté debajo)', /h\.indexOf\('<!--fin-objetivo-->'\)/.test(prem));
 }
 
+/* ---------- 1.4: Consulta a PandarIA, retos, Tu mes / Tu año, iPhone y Google Play ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={};
+    window.isPremium=()=>true;
+    // datos: 6 entrenos con press de banca subiendo y luego estancado
+    S.sessions=[0,1,2,3,4,5].map(i=>({id:'s'+i,routineId:'r',routineName:'A',start:Date.now()-(30-i*5)*86400000-3600000,end:Date.now()-(30-i*5)*86400000,intensity:7,
+      items:[{exId:'press_banca',sets:[{t:'n',kg:[60,62.5,65,65,65,65][i],reps:8,done:true}]}]}));
+    // Consulta: cada pregunta con cada opción responde sin errores, sin «undefined» ni «NaN», y su regla existe
+    const malos=[]; let n=0;
+    for (const q of CQ){ const ops=q.p?CQ_PARAMS[q.p].ops():[[null]];
+      for (const [v] of ops){ const pr={}; if (q.p) pr[q.p]=v; n++;
+        try{ const R=q.f(pr), t=JSON.stringify(R), kbId=R.kb!==undefined?R.kb:q.kb;
+          if (!R.corta || /undefined|NaN/.test(t) || (kbId && !KB[kbId])) malos.push(q.id+':'+v);
+          (R.acciones||[]).forEach(([x])=>{ if (!['tab','hseg','cqPay'].includes(x) && typeof A[x]!=='function') malos.push(q.id+' acción '+x); });
+        }catch(e){ malos.push(q.id+':'+v+' '+e.message); } } }
+    out.consulta={preguntas:CQ.length, secciones:new Set(CQ.map(q=>q.s)).size, respuestas:n, malos};
+    out.estanco=CQ.find(q=>q.id==='estanco').f({ej:'press_banca'}).corta;
+    out.proteina=CQ.find(q=>q.id==='proteina').f({}).corta;
+    out.buscar=cqBuscar(null,'creatina').map(q=>q.id)[0];
+    const pq=SCREENS.consultaQ({id:'proteina',p:{}}); out.premCompleto=/Tu caso/.test(pq) && /Basado en/.test(pq) && !/data-a="cqPay"/.test(pq);
+    window.isPremium=()=>false; const fq=SCREENS.consultaQ({id:'proteina',p:{}}); out.gratis=/RESPUESTA CORTA/.test(fq) && /data-a="cqPay"/.test(fq) && /blur/.test(fq); window.isPremium=()=>true;
+    out.experimental=/experimental/i.test(SCREENS.consulta({q:''})) && /experimental/i.test(viewRutinas());
+    // Retos del mes y con amigos
+    S.plan={days:[1,3,5],order:['r']};
+    const rm=retosMes(); out.retosMes=rm.map(x=>x.id+':'+x.meta+':'+x.v).join(' ');
+    const rt={id:'abc',n:'Diciembre',t:'entrenos',m:12,d0:Date.now()-86400000,d1:Date.now()+29*86400000};
+    const cod=retoCodigo(rt); S.retos={logros:{},amigos:[]}; retoImportar('mira esto '+cod+' ¡vamos!'); out.retoImport=S.retos.amigos.length===1 && S.retos.amigos[0].m===12;
+    retoImportar(cod); out.retoDuplicado=S.retos.amigos.length===1;
+    retoImportar('PFR-'+b64u.enc({v:1,id:'x',n:'Malo',t:'nada',m:5,d0:1,d1:2})); out.retoMalo=S.retos.amigos.length===1;
+    retoImportar('PFP-'+b64u.enc({v:1,id:'abc',n:'Ana',val:7,at:Date.now()})); retoImportar('PFP-'+b64u.enc({v:1,id:'abc',n:'Ana',val:9,at:Date.now()}));
+    out.rival=JSON.stringify(S.retos.amigos[0].rivales.map(x=>[x.n,x.v]));
+    // Tu mes y Tu año
+    const D=periodoDatos('ano'); out.ano={entrenos:D.entrenos, dias:D.dias, racha:D.racha};
+    return JSON.stringify(out); })()`));
+  comprobar('Consulta a PandarIA: 30 preguntas o más en las 9 secciones, todas responden con sus datos y su regla', r.consulta.preguntas >= 30 && r.consulta.secciones === 9 && !r.consulta.malos.length, JSON.stringify(r.consulta));
+  comprobar('Consulta: ve el estancamiento del press de banca y calcula la proteína (2 g/kg al bajar… 1,6 al mantener: 128 g)', /no sube desde hace/.test(r.estanco) && /128 g/.test(r.proteina), JSON.stringify([r.estanco, r.proteina]));
+  comprobar('Consulta: el buscador encuentra «creatina»', r.buscar === 'creatina', r.buscar);
+  comprobar('Consulta: con Premium el informe completo; gratis solo la respuesta corta con candado', r.premCompleto && r.gratis);
+  comprobar('Consulta: marcada como experimental en su pantalla y en Mis rutinas', r.experimental);
+  comprobar('retos del mes: metas según el plan (3 días por semana)', /^entrenos:\d+:\d+ agua:\d+:\d+/.test(r.retosMes), r.retosMes);
+  comprobar('retos con amigos: código PFR dentro de un mensaje, sin duplicados y rechazando códigos malos', r.retoImport && r.retoDuplicado && r.retoMalo);
+  comprobar('retos con amigos: el progreso PFP de un amigo se actualiza (no se repite)', r.rival === '[["Ana",9]]', r.rival);
+  comprobar('Tu año: entrenos, días y racha de semanas', r.ano.entrenos === 6 && r.ano.dias === 6 && r.ano.racha >= 1, JSON.stringify(r.ano));
+  a.cerrar();
+  const nat = fs.readFileSync(path.join(DIR, '..', 'www', 'native.js'), 'utf8');
+  const prem = fs.readFileSync(path.join(DIR, '..', 'www', 'premium.js'), 'utf8');
+  comprobar('iPhone: native.js salta en iOS el servicio del entreno, el botón atrás y los canales de Android', /const PN = IOS \? null/.test(nat) && /if \(!IOS\) App\.addListener\('backButton'/.test(nat) && /if \(!IOS\)\{ for \(const old/.test(nat));
+  comprobar('iPhone: las compras del App Store usan un producto por plan', /IOS_IDS = \{mensual: 'com\.pandaria\.fit\.premium\.mensual'/.test(prem));
+  const ex = fs.readFileSync(path.join(DIR, '..', 'scripts', 'android-extra.mjs'), 'utf8');
+  comprobar('Google Play: símbolos nativos en el AAB y la cámara no es obligatoria', /debugSymbolLevel 'SYMBOL_TABLE'/.test(ex) && /'android\.hardware\.camera'/.test(ex) && /android:required="false" tools:replace/.test(ex));
+}
+
 /* ---------- Comparación con los resultados guardados ---------- */
 if (ACTUALIZAR) {
   fs.writeFileSync(ESPERADO, JSON.stringify(resultados, null, 1) + '\n');

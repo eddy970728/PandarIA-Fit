@@ -9,16 +9,22 @@
         FS = P('Filesystem'), Share = P('Share'), TTS = P('TextToSpeech'), Awake = P('KeepAwake');
   const safe = (fn) => { try { const r = fn(); if (r && r.catch) r.catch(()=>{}); return r; } catch(e){} };
   const BACKUP = 'pandaria-backup.json', BACKUP_PREV = 'pandaria-backup-anterior.json';
-  document.documentElement.classList.add('native-android');
+  // 1.4: la misma app corre en iPhone/iPad (Capacitor iOS). Lo exclusivo de Android (servicio del entreno, widgets,
+  // canales de notificación, botón atrás) se salta; Health Connect pasa a ser Apple Salud (el mismo plugin usa HealthKit).
+  const IOS = !!(C.getPlatform && C.getPlatform() === 'ios');
+  window.PF_IOS = IOS;
+  document.documentElement.classList.add(IOS ? 'native-ios' : 'native-android');
 
   /* ---------- 14. Cuenta de Google para la copia en Drive (0.9) ---------- */
   // Inicio de sesión con el sistema de Android (Credential Manager) y permiso drive.appdata:
   // solo la carpeta oculta de la app en el Drive del usuario. El ID de cliente web no es secreto.
-  const SL = P('SocialLogin');
+  // En iPhone, Google pide además un ID de cliente de iOS (no secreto). Mientras esté vacío, la copia en Drive no aparece en iPhone.
+  const GOOGLE_IOS_ID = '';
+  const SL = IOS && !GOOGLE_IOS_ID ? null : P('SocialLogin');
   const GOOGLE_WEB_ID = '879792644217-pd24e4p8954m522jvjf1mhj0skg74t2u.apps.googleusercontent.com';
   const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
   let slInit = null, tok = null, tokAt = 0;
-  const slReady = () => slInit || (slInit = SL.initialize({google: {webClientId: GOOGLE_WEB_ID, mode: 'online'}}).catch(e => { slInit = null; throw e; }));
+  const slReady = () => slInit || (slInit = SL.initialize({google: IOS ? {webClientId: GOOGLE_WEB_ID, iOSClientId: GOOGLE_IOS_ID, iOSServerClientId: GOOGLE_WEB_ID, mode: 'online'} : {webClientId: GOOGLE_WEB_ID, mode: 'online'}}).catch(e => { slInit = null; throw e; }));
   const claims = jwt => { try{ const b = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4))))); }catch(e){ return {}; } };
   safe(() => { const D = P('Device'); return D && D.getInfo().then(i => { window.PF_MODELO = [i.manufacturer, i.model].filter(Boolean).join(' '); }); });
   if (SL) window.PFCloud = {
@@ -196,7 +202,7 @@
     const opts = {path: 'PandarIA Fit/' + name, directory: 'DOCUMENTS', data, recursive: true};
     if (!isBase64) opts.encoding = 'utf8';
     await FS.writeFile(opts);
-    toast('Guardado en Documentos › PandarIA Fit');
+    toast(IOS ? 'Guardado en Archivos › En mi iPhone › PandarIA Fit' : 'Guardado en Documentos › PandarIA Fit');
   }
   const fail = () => toast('No se pudo completar. Prueba con Compartir.');
   const backupText = () => typeof window.datosCompletosJSON === 'function' ? window.datosCompletosJSON() : JSON.stringify(S);
@@ -293,12 +299,13 @@
   async function setupNotif(){
     if (!LN) return;
     try{
-      for (const old of ['entreno','recordatorios','ayuno','agua','pandaria']) { try{ await LN.deleteChannel({id: old}); }catch(e){} }
+      if (!IOS){ for (const old of ['entreno','recordatorios','ayuno','agua','pandaria']) { try{ await LN.deleteChannel({id: old}); }catch(e){} }
       await LN.createChannel({id:CHN.entreno, name:tx('Entreno en curso','Workout in progress'), description:tx('Fin del descanso y de las series','End of rests and timed sets'), importance:5, vibration:true, visibility:1});
       await LN.createChannel({id:CHN.recordatorios, name:tx('Recordatorios de entreno','Workout reminders'), description:tx('Cuándo toca entrenar y racha','When to train and your streak'), importance:4, vibration:true, visibility:1});
       await LN.createChannel({id:CHN.ayuno, name:tx('Ayuno','Fasting'), description:tx('Fases, meta y ventana de comida','Phases, goal and eating window'), importance:4, vibration:true, visibility:1});
       await LN.createChannel({id:CHN.agua, name:tx('Agua','Water'), description:tx('Recordatorios para beber agua','Reminders to drink water'), importance:4, vibration:true, visibility:1});
       await LN.createChannel({id:CHN.pandaria, name:tx('PandarIA, informes y copias','PandarIA, reports and backups'), description:tx('Sugerencias, informe semanal y copias de seguridad','Suggestions, weekly report and backups'), importance:3, visibility:1});
+      }
       await LN.registerActionTypes({types:[
         {id:'EMPEZAR', actions:[{id:'start', title:tx('Empezar','Start')}]},
         {id:'AGUA', actions:[{id:'w250', title:'+250 ml'}, {id:'w500', title:'+500 ml'}]},
@@ -319,9 +326,9 @@
   }
   async function enableNotifs(){
     try{ notifOk = (await LN.requestPermissions()).display === 'granted'; }catch(e){}
-    if (!notifOk){ toast('Sin permiso no podemos avisarte. Actívalo en Ajustes de Android › Aplicaciones › PandarIA Fit.'); return; }
+    if (!notifOk){ toast(IOS ? 'Sin permiso no podemos avisarte. Actívalo en Ajustes del iPhone › PandarIA Fit › Notificaciones.' : 'Sin permiso no podemos avisarte. Actívalo en Ajustes de Android › Aplicaciones › PandarIA Fit.'); return; }
     await refreshPerm(); rescheduleAll(); refreshNotifUI();
-    if (!exactOk) askExact();
+    if (!exactOk && !IOS) askExact();
   }
   function askExact(){
     confirmBox({title:'Avisos a la hora exacta', text:'Para que los avisos lleguen justo a tiempo, Android necesita el permiso <b>Alarmas y recordatorios</b>. Se abrirá la pantalla para activarlo; luego vuelve con el botón atrás.',
@@ -446,7 +453,9 @@
     const del = pend.filter(x => x.id !== ID.rest && x.id !== ID.timer && x.id !== 9999).map(x => ({id: x.id}));
     try{ if (del.length) await LN.cancel({notifications: del}); }catch(e){}
     if (!notifOk || !n.on) return;
-    const list = buildList();
+    let list = buildList();
+    // iOS solo guarda 64 avisos pendientes: se quedan los más próximos (deja sitio para el fin del descanso)
+    if (IOS && list.length > 60) list = list.sort((a, b) => +a.schedule.at - +b.schedule.at).slice(0, 60);
     try{ if (list.length) await LN.schedule({notifications: list}); }catch(e){}
   }
 
@@ -525,11 +534,11 @@
   SCREENS.nfMenu = () => {
     const n = NS(), prem = premium(), rem = S.settings.reminders;
     let b = '';
-    if (!notifOk) b += `<div class="banner"><span class="ic">${I('bell',20)}</span><div class="grow sm">Las notificaciones están desactivadas en Android.<br><button class="link sm" style="margin-top:8px" data-a="nfEnable">Activarlas</button></div></div>`;
-    else if (!exactOk) b += `<div class="banner blue"><span class="ic">${I('timer',20)}</span><div class="grow sm">Permite <b>Alarmas y recordatorios</b> para que los avisos lleguen a su hora exacta.<br><button class="link sm" style="margin-top:8px" data-a="nfExact">Permitir</button></div></div>`;
+    if (!notifOk) b += `<div class="banner"><span class="ic">${I('bell',20)}</span><div class="grow sm">Las notificaciones están desactivadas en ${IOS ? 'el iPhone' : 'Android'}.<br><button class="link sm" style="margin-top:8px" data-a="nfEnable">Activarlas</button></div></div>`;
+    else if (!exactOk && !IOS) b += `<div class="banner blue"><span class="ic">${I('timer',20)}</span><div class="grow sm">Permite <b>Alarmas y recordatorios</b> para que los avisos lleguen a su hora exacta.<br><button class="link sm" style="margin-top:8px" data-a="nfExact">Permitir</button></div></div>`;
     b += `<div class="card" style="padding:0 12px">${nTg('on','Notificaciones','Interruptor general de todos los avisos')}</div>`;
     if (n.on){
-      b += `<div class="row" style="gap:8px;margin-bottom:6px"><button class="btn grow sm" data-a="nfNext">${I('list',16)} Próximos avisos</button><button class="btn grow sm" data-a="nfBattery">${I('info',16)} Que lleguen siempre</button></div>`;
+      b += `<div class="row" style="gap:8px;margin-bottom:6px"><button class="btn grow sm" data-a="nfNext">${I('list',16)} Próximos avisos</button><button class="btn grow sm" data-a="nfBattery"${IOS ? ' hidden' : ''}>${I('info',16)} Que lleguen siempre</button></div>`;
       b += card('moon','Horas de silencio', null, nTg('quiet','Silenciar por la noche','Agua y fases del ayuno no suenan; el resto se mueve al final. El fin del descanso siempre avisa.') + (n.quiet ? nTime('quietFrom','Desde') + nTime('quietTo','Hasta') : ''));
       b += card('dumbbell','Entreno','train', nTg('train','Recordatorio de entreno', rem.days.length ? `${rem.days.length === 7 ? 'Todos los días' : rem.days.map(d => DS[d]).join(' ')} a las ${rem.time}` : 'Elige los días abajo') +
         (n.train ? `<button class="srow" data-a="nfRemAuto"><span class="grow"><div class="b">${tx('A tu hora habitual','At your usual time')}${prem ? '' : ' 🔒'}</div><div class="xs mut">${(h => rem.auto && prem ? (h ? tx(`Sueles empezar a las ${h.hora}: aviso a las ${h.aviso}${S.plan ? ', los días de tu plan' : ''}`, `You usually start at ${h.hora}: reminder at ${h.aviso}${S.plan ? ', on your plan days' : ''}`) : tx('Con 5 entrenos aprende tu hora habitual','After 5 workouts it learns your usual time')) : tx('PandarIA aprende a qué hora sueles entrenar','PandarIA learns when you usually train'))(typeof horaHabitual === 'function' ? horaHabitual() : null)}</div></span><span class="toggle ${rem.auto && prem ? 'on' : ''}"></span></button>` : '') +
@@ -612,7 +621,7 @@
   };
 
   /* ---------- 10. Entreno con la pantalla apagada (Fase 3) ---------- */
-  const PN = P('PandaNative');
+  const PN = IOS ? null : P('PandaNative');
   let svcOn = false, svcSig = '', intSkips = 0;
   const intRunning = () => typeof INT !== 'undefined' && !!INT;
   // Mientras el servicio nativo lleva el tiempo, los pitidos, la voz y la vibración los pone él (sin duplicados)
@@ -964,7 +973,7 @@
   function init(){
     syncBars();
     if (App){
-      App.addListener('backButton', onBack);
+      if (!IOS) App.addListener('backButton', onBack);
       App.addListener('pause', () => { save(true); writeBackup(); onPauseNotif(); svcSync(true); pushWidgets(true); });
       App.addListener('resume', () => { onResumeNotif(); svcResync(); consumeWidget(); hcSync(false); if (S.active || (typeof INT !== 'undefined' && INT)) { awakeOn = false; keepAwake(); } render.keep = true; render(); if (LAYERS.length && !capaConCampos()) refreshTop(); });
     }

@@ -2,7 +2,7 @@
   "name": "pandaria-fit",
   "version": "1.0.0",
   "private": true,
-  "description": "PandarIA Fit para Android",
+  "description": "PandarIA Fit para Android, iPhone y iPad",
   "dependencies": {
     "@capacitor-community/keep-awake": "^8.0.1",
     "@capacitor-community/text-to-speech": "^8.0.2",
@@ -13,6 +13,7 @@
     "@capacitor/device": "^8.0.3",
     "@capacitor/filesystem": "^8.1.5",
     "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.0.0",
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/share": "^8.0.3",
     "@capacitor/splash-screen": "^8.0.2",

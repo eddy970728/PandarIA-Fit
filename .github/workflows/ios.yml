@@ -1,0 +1,87 @@
+name: Compilar app de iPhone (IPA sin firmar)
+
+# 1.4 · La app de iPhone y iPad se compila en un Mac de GitHub y sale como PandarIA-Fit.ipa SIN FIRMAR.
+# Se instala con AltStore (o Sideloadly) desde Windows: AltStore la firma con tu Apple ID gratuito.
+# No usa ningún secreto: ni la firma de Android ni la clave de los códigos de Premium.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['www/**', 'scripts/**', 'assets/**', 'package.json', 'capacitor.config.json', '.github/workflows/ios.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Capacitor
+        run: npm install
+
+      - name: Leer la version de la app
+        run: |
+          node -e "const h=require('fs').readFileSync('www/index.html','utf8');const v=h.match(/const APP_VERSION='([^']+)'/)[1];const p=(h.match(/const APP_PARCHE='([^']*)'/)||[])[1]||'';require('fs').appendFileSync(process.env.GITHUB_ENV,'VER='+v+'\nVNOM='+v+(p?'.'+p:'')+'\n')"
+
+      - name: Pruebas automaticas (si fallan, no se compila)
+        run: |
+          npm install --no-save jsdom@25
+          node tests/pruebas.mjs
+
+      - name: Preparar el HTML para iPhone
+        run: |
+          node -e "
+          const fs=require('fs');let h=fs.readFileSync('www/index.html','utf8');
+          if(!h.includes('<script src=\"premium.js\">')) h=h.replace('</body>','<script src=\"native.js\"></script><script src=\"premium.js\"></script></body>');
+          if(!h.includes('<script src=\"native.js\"></script><script src=\"premium.js\"></script></body>')){console.error('ERROR: native.js o premium.js no quedaron conectados');process.exit(1);}
+          h=h.replace('<head>','<head><script>window.PF_BUILD=${{ github.run_number }}</script>');
+          fs.writeFileSync('www/index.html',h);"
+          # sin avisos ni descargas de GitHub (en iPhone no se puede instalar un APK) y con los nombres de Apple
+          node scripts/version-play.mjs www/index.html
+          node scripts/version-ios.mjs
+
+      - name: Crear proyecto iOS (CocoaPods)
+        run: |
+          npx cap add ios --packagemanager CocoaPods
+          npx @capacitor/assets generate --ios --iconBackgroundColor '#12151a' --splashBackgroundColor '#12151a' --splashBackgroundColorDark '#12151a'
+          node scripts/ios-extra.mjs
+          npx cap sync ios
+
+      - name: Compilar (sin firmar)
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            MARKETING_VERSION=${{ env.VNOM }} CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tail -n 80
+
+      - name: Empaquetar PandarIA-Fit.ipa
+        run: |
+          APP=build/Build/Products/Release-iphoneos/App.app
+          test -d "$APP" || { echo "ERROR: no se generó App.app"; exit 1; }
+          # firma provisional (ad hoc) solo para guardar dentro el permiso de HealthKit; AltStore la vuelve a firmar con tu Apple ID
+          if [ -d "$APP/Frameworks" ]; then for f in "$APP"/Frameworks/*; do codesign --force --sign - "$f"; done; fi
+          codesign --force --sign - --entitlements ios-entitlements.plist "$APP"
+          codesign -d --entitlements - "$APP" | grep -q healthkit || { echo "ERROR: falta el permiso de HealthKit"; exit 1; }
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Info.plist"
+          mkdir Payload && cp -R "$APP" Payload/
+          zip -qry PandarIA-Fit.ipa Payload
+          ls -lh PandarIA-Fit.ipa
+          printf 'PandarIA Fit %s.%s para iPhone y iPad (sin firmar).\nSe instala con AltStore o Sideloadly desde el PC: ver docs/iphone.md\n' "${{ env.VNOM }}" "${{ github.run_number }}" > LEEME-iPhone.txt
+
+      - name: Guardar la IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: PandarIA-Fit-iPhone-${{ env.VNOM }}.${{ github.run_number }}
+          path: |
+            PandarIA-Fit.ipa
+            LEEME-iPhone.txt
+          retention-days: 30

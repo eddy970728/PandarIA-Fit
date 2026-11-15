@@ -113,6 +113,8 @@ const OTROS_QUITAR = ['com.google.android.gms.permission.AD_ID', 'android.permis
 if (!/xmlns:tools=/.test(m)) m = m.replace(/<manifest\b/, '<manifest xmlns:tools="http://schemas.android.com/tools"');
 const quitar = [...HC_QUITAR.map(p => 'android.permission.health.' + p), ...OTROS_QUITAR];
 m = m.replace('</manifest>', quitar.map(p => `    <uses-permission android:name="${p}" tools:node="remove" />`).join('\n') + '\n</manifest>');
+// 1.4: la cámara no es obligatoria (el escáner de códigos es opcional): así Play no excluye teléfonos ni tablets sin cámara
+m = m.replace('</manifest>', ['android.hardware.camera', 'android.hardware.camera.autofocus', 'android.hardware.camera.any'].map(f => `    <uses-feature android:name="${f}" android:required="false" tools:replace="android:required" />`).join('\n') + '\n</manifest>');
 writeFileSync(mf, m);
 
 // 4) Health Connect necesita Android 8 o superior
@@ -134,7 +136,7 @@ const ab = 'android/app/build.gradle';
 let bg = readFileSync(ab, 'utf8');
 const rel = /(release\s*\{[^}]*?)minifyEnabled\s+false/;
 if (!rel.test(bg)) throw new Error('android-extra: no se encontró minifyEnabled false en el bloque release');
-bg = bg.replace(rel, '$1minifyEnabled true').replace("getDefaultProguardFile('proguard-android.txt')", "getDefaultProguardFile('proguard-android-optimize.txt')");
+bg = bg.replace(rel, "$1minifyEnabled true\n            // 1.4: símbolos del código nativo dentro del AAB (Play los usa para explicar los cierres)\n            ndk { debugSymbolLevel 'SYMBOL_TABLE' }").replace("getDefaultProguardFile('proguard-android.txt')", "getDefaultProguardFile('proguard-android-optimize.txt')");
 if (!/minifyEnabled true/.test(bg) || !/proguard-android-optimize\.txt/.test(bg)) throw new Error('android-extra: no se pudo activar R8');
 writeFileSync(ab, bg);
 const REGLAS = `

@@ -13,6 +13,11 @@
      Producto «premium» con dos planes base: «mensual» y «trimestral» (con prueba de 3 días configurada en Play Console).
      Sin servidor: se mira en el teléfono si la suscripción está activa y se recuerda por si no hay internet. */
   const SUB_ID = 'premium', PLANS = ['mensual', 'trimestral'], LSS = 'pf-suscripcion';
+  // 1.4 · iPhone/iPad: el App Store usa un producto por plan (mismo grupo de suscripción). El código está listo, pero
+  // mientras la app no esté publicada en el App Store no hay productos que cargar y se muestra un aviso.
+  const IOS = native && C.getPlatform && C.getPlatform() === 'ios';
+  const IOS_IDS = {mensual: 'com.pandaria.fit.premium.mensual', trimestral: 'com.pandaria.fit.premium.trimestral'};
+  const iosActiva = x => Object.values(IOS_IDS).includes(x.productIdentifier) && (x.isActive === true || (!!x.expirationDate && Date.parse(x.expirationDate) > Date.now()));
   let SUB = null; try{ SUB = JSON.parse(localStorage.getItem(LSS) || 'null'); }catch(e){}
   let PRODS = null, BUSY = false;
   const saveSub = () => { try{ localStorage.setItem(LSS, JSON.stringify(SUB)); }catch(e){} };
@@ -25,7 +30,7 @@
     if (!NP) return;
     try{
       const r = await NP.getPurchases({productType:'subs'});
-      const p = (r.purchases || []).find(x => x.productIdentifier === SUB_ID && String(x.purchaseState) === '1');
+      const p = (r.purchases || []).find(x => IOS ? iosActiva(x) : (x.productIdentifier === SUB_ID && String(x.purchaseState) === '1'));
       const was = subOk();
       SUB = {active: !!p, at: Date.now()}; saveSub();
       if (was !== subOk() && typeof render === 'function'){ render.keep = true; render(); if (LAYERS.length) refreshTop(); if (typeof scheduleNotifs === 'function') scheduleNotifs(); }
@@ -34,9 +39,9 @@
   async function loadProducts(){
     if (!NP) return;
     try{
-      const r = await NP.getProducts({productIdentifiers:[SUB_ID], productType:'subs'});
+      const r = await NP.getProducts({productIdentifiers: IOS ? Object.values(IOS_IDS) : [SUB_ID], productType:'subs'});
       const L = r.products || [], out = {};
-      PLANS.forEach(pl => { const os = L.filter(x => x.identifier === pl); if (!os.length) return;
+      PLANS.forEach(pl => { const os = L.filter(x => x.identifier === (IOS ? IOS_IDS[pl] : pl)); if (!os.length) return;
         const o = os.find(x => x.introductoryPrice) || os.find(x => !x.offerId) || os[0];
         out[pl] = {plan: pl, price: o.price, priceString: o.priceString, offerToken: o.offerToken, trial: !!o.introductoryPrice}; });
       PRODS = out;
@@ -170,6 +175,7 @@
     pandaria:'Las rutinas diseñadas por PandarIA son parte de Premium.', explore:'Esta rutina es parte de Premium.', intervals:'Este modo de intervalos es parte de Premium.',
     history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.', diario:'Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.', alimProp:'En la versión gratis puedes crear hasta 10 alimentos y recetas propios.', calidad:'La calidad del día (fibra, sodio y proteína por comida) es parte de Premium.', menu:'Los ejemplos de menú hechos con tus calorías y tus preferencias son parte de Premium.',
     scan:'Escanear códigos de barras es parte de Premium.',
+    consulta:'El análisis completo de Consulta a PandarIA (tu caso, explicación, ejemplos y qué hacer) es parte de Premium.',
     customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
   SCREENS.premium = p => {
@@ -184,6 +190,7 @@
       b += `<div class="sec">${tx('Suscripción','Subscription')}</div><div class="card">`;
       if (!NP) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción se compra en la app instalada desde Google Play.','The subscription is bought in the app installed from Google Play.')}</p>`;
       else if (!PRODS) b += `<p class="sm mut" style="margin:0">${tx('Cargando precios…','Loading prices…')}</p>`;
+      else if (!Object.keys(PRODS).length && IOS) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('En iPhone y iPad la suscripción llegará cuando PandarIA Fit esté en el App Store. Mientras tanto puedes pedir Premium con tu código (abajo).','On iPhone and iPad the subscription will arrive when PandarIA Fit is on the App Store. Meanwhile you can ask for Premium with your code (below).')}</p>`;
       else if (!Object.keys(PRODS).length) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción no está disponible ahora. Revisa tu conexión y vuelve a intentarlo.','The subscription is not available right now. Check your connection and try again.')}</p>`;
       else {
         const m = PRODS.mensual, q = PRODS.trimestral;
@@ -219,7 +226,8 @@
     const o = PRODS && PRODS[plan]; if (!NP || !o || BUSY) return;
     BUSY = true; refreshTop();
     try{
-      await NP.purchaseProduct({productIdentifier: SUB_ID, planIdentifier: plan, offerToken: o.offerToken, productType: 'subs'});
+      if (IOS) await NP.purchaseProduct({productIdentifier: IOS_IDS[plan], productType: 'subs'});
+      else await NP.purchaseProduct({productIdentifier: SUB_ID, planIdentifier: plan, offerToken: o.offerToken, productType: 'subs'});
       await subRefresh();
       if (subOk()){ if (typeof sfx === 'function') sfx('finish'); if (typeof confetti === 'function') confetti({n:150}); toast(tx('🎉 ¡Premium activado! Gracias por apoyar el proyecto','🎉 Premium activated! Thanks for supporting the project')); }
     }catch(e){ const m = String(e && (e.message || e)); if (!/cancel/i.test(m)) toast(tx('No se pudo completar la compra.','The purchase could not be completed.')); }
