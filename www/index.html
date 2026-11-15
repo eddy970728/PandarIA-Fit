@@ -85,7 +85,7 @@ svg{display:block}
 button.chip,button.link,[data-a=kbOpen]{position:relative}
 button.chip::after{content:'';position:absolute;left:-2px;right:-2px;top:-5px;bottom:-5px}
 button.link::after,[data-a=kbOpen]::after{content:'';position:absolute;left:-6px;right:-6px;top:-9px;bottom:-9px}
-[data-a=dPrefs]{width:42px!important;height:42px!important}
+.ibtn[data-a=dPrefs]{width:42px!important;height:42px!important}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
 .chips.scroll::-webkit-scrollbar{display:none}
@@ -922,14 +922,15 @@ const ACHIEVEMENTS = [
      consejo → cualquier otra fuente: solo tomamos el consejo, con nuestras palabras, y la citamos.
      propio  → criterio de PandarIA, cuando no hay una fuente que dé el número exacto.
    Evidencia: solida · moderada · limitada · contradictoria.  'rev' = revisar antes de esa fecha. */
-const KB_VER='1.5';
+const KB_VER='1.6';
 const KB_LOG=[
   {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'},
   {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'},
   {v:'1.2', d:'2026-11-12', app:'0.8.4', t:'Suplementos (creatina, cafeína, beta-alanina y proteína en polvo) con su dosis, su evidencia y para quién no son; calidad de la dieta (fibra, sodio y proteína por comida); ejemplos de menú; bebidas y cafeína en el agua del día; más agua en los entrenos largos; ayuno conectado con el diario y modo viaje sin equipo.'},
   {v:'1.3', d:'2026-11-12', app:'1.0', t:'Métodos especiales (superseries, series descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y método Bilbo), cada uno con su evidencia y la aclaración de que no está comprobado que sea mejor; codo y cadera como zonas sensibles.'},
   {v:'1.4', d:'2026-11-13', app:'1.0.1', t:'PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína que queda corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación; el informe semanal suma agua, ayuno y proteína.'},
-  {v:'1.5', d:'2026-11-14', app:'1.2', t:'Recuperación por músculo (cuánto se recuperó cada músculo, en un mapa) y aprender de tus cambios de ejercicio. Son criterios propios de PandarIA y no cambian ningún resultado anterior.'}
+  {v:'1.5', d:'2026-11-14', app:'1.2', t:'Recuperación por músculo (cuánto se recuperó cada músculo, en un mapa) y aprender de tus cambios de ejercicio. Son criterios propios de PandarIA y no cambian ningún resultado anterior.'},
+  {v:'1.6', d:'2026-11-14', app:'1.3', t:'Tendencia de peso suavizada con fecha estimada de tu meta, ideas para completar la proteína del día, y el sueño y la variabilidad del pulso de Health Connect como señales de recuperación. No cambian ningún resultado anterior.'}
 ];
 const KB_LIC={pd:'Dominio público, con crédito', consejo:'Consejo de la fuente, con nuestras palabras', propio:'Criterio propio de PandarIA'};
 const KB_EV={solida:'Evidencia sólida', moderada:'Evidencia moderada', limitada:'Evidencia limitada', contradictoria:'Evidencia contradictoria'};
@@ -1111,6 +1112,14 @@ const KB_RULES=[
     t:'PandarIA estima cuánto se recuperó cada músculo con lo que entrenaste en los últimos 4 días. Con 6 series hacen falta unas 48 h; con menos series, menos tiempo (desde 24 h); con muchas más, hasta 72 h. Una sesión muy exigente (intensidad 8 o más) suma un 15 %, sin pasar de 96 h. Los músculos secundarios cuentan la mitad. Es una guía orientativa: cada persona se recupera a su ritmo.', usa:'Recuperación por músculo', rev:'2028-11-01', desde:'1.2'},
   {id:'gustos.cambios', area:'entreno', n:'Aprender de tus cambios', v:{quita:1.2, pone:0.8, max:3}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
     t:'Cuando cambias un ejercicio por otro a mano, PandarIA propone menos el que quitaste y un poco más el que elegiste, al crear rutinas y al buscar alternativas. Cuenta hasta 3 cambios de cada ejercicio, y puedes borrarlos en Ajustes › PandarIA.', usa:'Rutinas de PandarIA y alternativas', rev:'2028-11-01', desde:'1.2'},
+  {id:'peso.tendencia', area:'nutricion', n:'Tendencia de peso', v:{dias:7, minMedidas:3, minDias:14, minRitmo:0.05}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'El peso de cada día sube y baja con el agua, la sal o lo que comiste. PandarIA calcula una tendencia suavizada (media móvil exponencial de unos 7 días, que tiene en cuenta los días entre medidas) a partir de 3 medidas. Con 2 semanas de datos muestra cuánto cambias por semana y, si tienes una meta de peso, la fecha aproximada a ese ritmo.', usa:'Mi historial › Cuerpo', rev:'2028-11-01', desde:'1.3'},
+  {id:'proteina.ideas', area:'nutricion', n:'Ideas para completar la proteína', v:{minFalta:20, hasta:0.8, desdeHora:12, densidad:8, cats:['lacteo','huevo','ave','pescado','carne','legumbre']}, src:['issn2017','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos que entrenan',
+    t:'Desde el mediodía, si te faltan 20 g o más de proteína y llevas menos del 80 % de tu meta, PandarIA propone hasta 3 alimentos con al menos 8 g de proteína por cada 100 kcal: primero los que ya sueles comer y luego lácteos, huevo, aves, pescado, carnes o legumbres, sin tus alergias ni lo que no comes.', usa:'Nutrición › Comida', rev:'2028-11-01', desde:'1.3'},
+  {id:'conexion.sueno', area:'recuperacion', n:'Noche corta', v:{horas:6}, src:['aasm2015','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos sanos con Health Connect',
+    t:'Se recomienda dormir 7 horas o más. Si Health Connect registra que anoche dormiste menos de 6 horas, PandarIA lo cuenta como una señal más de cansancio para tu recuperación, igual que el check-in.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.3'},
+  {id:'conexion.hrv', area:'recuperacion', n:'Variabilidad del pulso más baja de lo normal', v:{min:5, pct:15}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos con Health Connect',
+    t:'La variabilidad del pulso (RMSSD) suele bajar con el cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si la de hoy está un 15 % o más por debajo de tu media (con al menos 5 medidas anteriores), PandarIA la cuenta como una señal más de cansancio.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.3'},
   {id:'conexion.pulso', area:'recuperacion', n:'Pulso en reposo más alto de lo normal', v:{min:4, lpm:7}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos con Health Connect',
     t:'Un pulso en reposo claramente más alto que tu media puede ser una señal de cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si el de hoy está 7 latidos o más por encima de tu media (con al menos 4 medidas anteriores), PandarIA lo cuenta como una señal más, igual que el check-in.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.0.1'},
 ];
@@ -1132,6 +1141,10 @@ const KB_EN_T={
  'conexion.proteina':'Daily protein helps you recover and build muscle with training. If on 2 of your last 3 days with a food diary you stayed below 70 % of your goal, PandarIA tells you next to your workouts. In the weekly report, a day counts as met from 90 % of the goal.',
  'recuperacion.mapa':'PandarIA estimates how recovered each muscle is from what you trained in the last 4 days. With 6 sets it takes about 48 h; with fewer sets, less time (from 24 h); with many more, up to 72 h. A very hard session (intensity 8 or more) adds 15 %, never past 96 h. Secondary muscles count half. It is a rough guide: everyone recovers at their own pace.',
  'gustos.cambios':'When you swap an exercise for another by hand, PandarIA suggests the one you removed less often and the one you chose a bit more often, when building routines and looking for alternatives. It counts up to 3 swaps per exercise, and you can clear them in Settings › PandarIA.',
+ 'peso.tendencia':'Your daily weight goes up and down with water, salt or what you ate. PandarIA works out a smoothed trend (an exponential moving average of about 7 days that takes the days between measurements into account) from 3 measurements. With 2 weeks of data it shows how much you change per week and, if you have a weight goal, the approximate date at that pace.',
+ 'proteina.ideas':'From midday, if you are 20 g or more short on protein and under 80 % of your target, PandarIA suggests up to 3 foods with at least 8 g of protein per 100 kcal: first the ones you usually eat, then dairy, eggs, poultry, fish, meat or legumes, without your allergies or what you do not eat.',
+ 'conexion.sueno':'Sleeping 7 hours or more is recommended. If Health Connect records that you slept less than 6 hours last night, PandarIA counts it as one more fatigue signal for your recovery, just like the check-in.',
+ 'conexion.hrv':'Heart rate variability (RMSSD) tends to drop with fatigue, although it also changes with sleep, stress or illness. If today’s is 15 % or more below your average (with at least 5 earlier readings), PandarIA counts it as one more fatigue signal.',
  'conexion.pulso':'A resting heart rate clearly above your average can be a sign of fatigue, although it also changes with sleep, stress or illness. If today’s is 7 beats or more above your average (with at least 4 earlier readings), PandarIA counts it as one more signal, just like the check-in.',
  'metodo.avanzados':'Special methods (drop sets, rest-pause, pyramids, German volume training…) do not build more muscle than normal sets with the same effort. They save time or add variety. PandarIA offers them as an option, never as a proven improvement.',
  'metodo.seguridad':'Methods that go close to failure (drop sets, rest-pause and myo-reps) are for intermediate or advanced lifters. PandarIA does not apply them to barbell squats or deadlifts, or to exercises that load a sensitive area.',
@@ -5493,13 +5506,13 @@ function promptBox(o){
 /* ---------- Render ---------- */
 function render(){
   const v=$('#view'); const st=v.scrollTop;
-  v.innerHTML = TAB==='rutinas'?viewRutinas(): TAB==='explorar'?viewExplorar(): TAB==='nutricion'?viewNutricion(): TAB==='historial'?viewHistorial(): viewAjustes();
+  v.innerHTML = TAB==='rutinas'?viewRutinas(): TAB==='explorar'?viewExplorar(): TAB==='nutricion'?viewNutricion(): TAB==='ayuno'?viewAyuno(): TAB==='historial'?viewHistorial(): viewAjustes();
   if (render.keep) v.scrollTop=st; render.keep=false;
   renderNav(); renderMini(); startAnims();
 }
 function renderNav(){
   const anySugg=premOK() && S.routines.some(r=>!r.archived && (r.sugg||[]).length);
-  const tabs=[['rutinas','Mis rutinas','dumbbell'],['explorar','Explorar','compass'],['nutricion','Nutrición','leaf'],['historial','Mi historial','history'],['ajustes','Ajustes','settings']];
+  const tabs=[['rutinas',tx('Rutinas','Routines'),'dumbbell'],['explorar','Explorar','compass'],['nutricion','Nutrición','leaf'],['ayuno',tx('Ayuno','Fasting'),'timer'],['historial',tx('Historial','History'),'history'],['ajustes','Ajustes','settings']];
   $('#nav').innerHTML=tabs.map(([k,n,ic])=>`<button class="${TAB===k?'on':''}" data-a="tab" data-v="${k}"><span class="pill">${I(ic,22)}</span>${n}${k==='rutinas'&&anySugg?'<span class="dot"></span>':''}</button>`).join('');
 }
 function renderMini(){
@@ -7004,6 +7017,7 @@ function histCuerpo(){
   if (!ms.length) return h+`<div class="empty"><div class="big">📏</div>Registra tu peso y medidas para ver tu evolución. También puedes guardar fotos de progreso.</div>`;
   const wp=ms.filter(m=>m.peso).map(m=>({x:m.date,y:+m.peso}));
   if (wp.length>1) h+=`<div class="sec">Peso corporal</div><div class="card">${lineChart(wp,{unit:'kg'})}</div>`;
+  h+=pesoTendenciaHtml();
   const F=[['peso','Peso','kg'],['cintura','Cintura','cm'],['pecho','Pecho','cm'],['brazo','Brazo','cm'],['cadera','Cadera','cm'],['muslo','Muslo','cm'],['grasa','Grasa corporal','%']];
   const last={}, first={};
   ms.forEach(m=>F.forEach(([k])=>{ if(m[k]){ if(first[k]==null) first[k]=+m[k]; last[k]=+m[k]; } }));
@@ -7263,6 +7277,8 @@ function recoveryState(r){
   const ck=S.sessions.slice(-3).filter(s=>s.checkin); if (ck.length>=2 && ck.filter(s=>s.checkin.sleep===0||s.checkin.energy===0).length>=2){ pts+=2; msgs.push(tx('varios días con poco descanso','several days with little rest')); }
   const ay=ayunoCarga(); if (ay){ pts++; msgs.push(ay); }
   const pu=pulsoAlto(); if (pu){ pts++; msgs.push(tx(`pulso en reposo de ${pu.last} lpm, ${pu.last-pu.avg} sobre tu media`,`resting heart rate ${pu.last} bpm, ${pu.last-pu.avg} above your average`)); }
+  const su=suenoCorto(); if (su){ pts++; msgs.push(tx(`dormiste ${Math.floor(su.last/60)} h ${String(su.last%60).padStart(2,'0')}`,`you slept ${Math.floor(su.last/60)} h ${String(su.last%60).padStart(2,'0')}`)); }
+  const hv=hrvBaja(); if (hv){ pts++; msgs.push(tx(`variabilidad del pulso de ${hv.last} ms, un ${hv.pct} % bajo tu media`,`heart rate variability ${hv.last} ms, ${hv.pct} % below your average`)); }
   return {lvl:pts>=2?'baja':pts===1?'media':'buena', msgs};
 }
 
@@ -7315,6 +7331,16 @@ function recMusculos(){
       const prev=out[m]; if (!prev||pct<prev.pct) out[m]={pct, listo:s.end+h*3600000}; });
   });
   return out;
+}
+// 1.3 · Sueño y variabilidad del pulso de Health Connect (Premium): dos señales más para la recuperación
+function suenoCorto(){ if (!premOK()) return null; const z=window.PF_SUENO, K=kb('conexion.sueno'); if (!z||!z.last||Date.now()-z.at>20*3600000) return null; return z.last<K.horas*60?z:null; }
+function hrvBaja(){ if (!premOK()) return null; const z=window.PF_HRV, K=kb('conexion.hrv'); if (!z||!z.avg||z.n<K.min||Date.now()-z.at>36*3600000) return null; const pct=Math.round((1-z.last/z.avg)*100); return pct>=K.pct?Object.assign({pct},z):null; }
+// 1.3 · Hora habitual de entreno (Premium): la mediana de las horas de inicio de tus últimos entrenos, y el aviso 30 minutos antes
+function horaHabitual(){
+  const L=S.sessions.filter(s=>s.start && s.routineId!=='__int').slice(-12); if (L.length<5) return null;
+  const m=L.map(s=>{ const d=new Date(s.start); return d.getHours()*60+d.getMinutes(); }).sort((a,b)=>a-b);
+  const med=m[Math.floor(m.length/2)], av=Math.max(6*60,med-30), hh=x=>`${String(Math.floor(x/60)).padStart(2,'0')}:${String(Math.round(x%60)).padStart(2,'0')}`;
+  return {hora:hh(med), aviso:hh(av)};
 }
 A.recuMapa=()=>{ if (!premOK()) return pfPay('pandaria'); openLayer('recuMapa',{}); };
 SCREENS.recuMapa=()=>{
@@ -7683,6 +7709,9 @@ function nutAdapt(tdeeF, w){
 function viewNutricion(){
   const n=nut(), c=calcNutrition();
   let h=`<div class="hdr"><h1>Nutrición</h1></div>`;
+  // 1.3: dos subpestañas fijas arriba, para no tener que deslizar hasta el agua
+  h+=`<div class="seg" style="margin-bottom:14px">${[['comida',tx('Comida','Food')],['agua',tx('Agua','Water')]].map(([k,t])=>`<button class="${NSEG===k?'on':''}" data-a="nseg" data-v="${k}">${t}</button>`).join('')}</div>`;
+  if (NSEG!=='agua'){
   if (S.settings.lang!=='en') h+=`<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--ok)">${I('leaf',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO NUTRICIONAL DEL DÍA</div><div class="sm" style="margin-top:4px;line-height:1.45">${(t=>esc(t)+kbLink(tipRule(t)))(tipOfDay('nut'))}</div></div></div>`;
   h+=diarioCard();
   if (habitos()){ h+=`<div class="sec">Objetivo</div><div class="card sm mut" style="line-height:1.45">Estás en modo hábitos: PandarIA no muestra calorías ni números. Puedes cambiarlo en las preferencias del diario.</div>`; }
@@ -7701,7 +7730,11 @@ function viewNutricion(){
     ${c.notes.map(t=>`<div class="sm" style="margin-top:8px;color:var(--blue);line-height:1.4">${esc(t)}</div>`).join('')}</div>`;
   }
   }
+  h+='<!--fin-objetivo-->';
+  h+=supCardsHtml();
+  }
   // agua
+  if (NSEG==='agua'){
   const wg=waterGoal(), dd=diaryDrinks(dayKey()), wv=waterToday(), pct=Math.min(100,Math.round(wv/wg*100));
   const days=[...Array(7).keys()].reverse().map(i=>waterToday(dayKey(Date.now()-i*DAY)));
   const tt=trainedToday(), ttMin=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0), KA=kb('agua');
@@ -7712,9 +7745,21 @@ function viewNutricion(){
     ${cafLine(dd.caf)}
     <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
     <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>${days.filter(v=>v>0).length<2?`<div class="xs mut" style="margin-top:6px;text-align:center">${tx('Registra agua varios días para ver tu semana aquí.','Log water on a few days to see your week here.')}</div>`:''}</div>`;
-  h+=supCardsHtml();
-  h+=fastCard();
+  }
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
+  return h;
+}
+let NSEG='comida';
+// 1.3: Ajustes › Objetivo nutricional abre el selector (antes solo cambiaba de pestaña)
+A.nGoalPick=()=>sheet(tx('Objetivo nutricional','Nutrition goal'),Object.entries(NGOALS).map(([k,v])=>({icon:nut().goal===k?'check':'target',label:v,fn:()=>{ A.nGoal(k); toast(tx(`Objetivo: ${v}`,`Goal: ${v}`)); }})));
+A.nseg=v=>{ NSEG=v==='agua'?'agua':'comida'; render(); };
+// abre Nutrición › Agua (widgets, notificaciones y accesos directos)
+A.irAgua=()=>{ NSEG='agua'; A.tab('nutricion'); };
+// 1.3: el ayuno tiene su propia pestaña
+function viewAyuno(){
+  let h=`<div class="hdr"><h1>${tx('Ayuno','Fasting')}</h1></div>`;
+  h+=fastCard();
+  h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">${tx('El ayuno no es para todo el mundo. Si tienes una condición de salud, estás embarazada, das el pecho o tuviste problemas con la comida, consúltalo antes con un profesional.','Fasting is not for everyone. If you have a health condition, are pregnant, breastfeeding or have had problems with food, check with a professional first.')}</p>`;
   return h;
 }
 A.nGoal=v=>{ nut().goal=v; delete nut().ritmo; save(); render.keep=true; render(); };
@@ -8466,6 +8511,50 @@ const fmtK = k => Math.round(k).toLocaleString(LOC())+' kcal';
 const porTxt = e => !e.por ? fmtG(e.gr) : (!e.q||e.q===1) ? `${e.por} · ${fmtG(e.gr)}` : `${fmtNum(e.q)} × ${/^1 /.test(e.por)?e.por.slice(2):e.por} · ${fmtG(e.gr)}`;
 
 /* ---------- Tarjeta del diario en Nutrición ---------- */
+
+/* ---------- 1.3 · Tendencia de peso (Premium) ----------
+   El peso del día sube y baja con el agua, la sal o la comida. La tendencia lo suaviza (media móvil exponencial
+   que tiene en cuenta los días entre medidas, regla peso.tendencia) y muestra cuánto cambias por semana y,
+   si tienes una meta de peso, cuándo llegarías a este ritmo. */
+function pesoTendencia(){
+  const K=kb('peso.tendencia'), pts=S.measures.filter(m=>+m.peso>0 && m.date).map(m=>({x:m.date,y:+m.peso})).sort((a,b)=>a.x-b.x);
+  if (pts.length<K.minMedidas) return null;
+  const tr=[]; let t=pts[0].y, x0=pts[0].x;
+  pts.forEach(p=>{ const dt=Math.max(0,(p.x-x0)/DAY); const a=1-Math.exp(-dt/K.dias); t=tr.length?t+a*(p.y-t):p.y; x0=p.x; tr.push({x:p.x,y:Math.round(t*10)/10}); });
+  const last=tr[tr.length-1], span=(last.x-tr[0].x)/DAY; if (span<K.minDias) return {tr, now:last.y, rate:null};
+  const ref=tr.slice().reverse().find(p=>(last.x-p.x)/DAY>=K.minDias)||tr[0];
+  const rate=(last.y-ref.y)/Math.max(1,(last.x-ref.x)/DAY)*7;
+  const g=(S.goals||[]).find(x=>x.type==='peso' && x.target!=null && !x.done);
+  let eta=null; if (g && Math.abs(rate)>=K.minRitmo){ const dif=+g.target-last.y; if (Math.sign(dif)===Math.sign(rate)) eta=Date.now()+dif/rate*7*DAY; }
+  return {tr, now:last.y, rate:Math.round(rate*100)/100, goal:g?+g.target:null, eta};
+}
+function pesoTendenciaHtml(){
+  if (!premOK()){ return S.measures.filter(m=>m.peso).length>=3?`<button class="link xs" style="margin:-4px 0 12px;display:block" data-a="pfGo" data-v="pandaria">🔒 ${tx('Tendencia de peso y fecha estimada de tu meta · Premium','Weight trend and estimated date for your goal · Premium')}</button>`:''; }
+  const T=pesoTendencia(); if (!T) return '';
+  const r=T.rate;
+  let b=`<div class="sec">${tx('Tendencia de peso','Weight trend')}</div><div class="card"><div class="stats"><div class="stat"><div class="v">${fmtNum(T.now)} kg</div><div class="l">${tx('Tendencia','Trend')}</div></div><div class="stat"><div class="v">${r==null?'—':(r>0?'+':'')+fmtNum(r)+' kg'}</div><div class="l">${tx('Por semana','Per week')}</div></div></div>`;
+  if (T.tr.length>1) b+=lineChart(T.tr,{unit:'kg'});
+  if (r==null) b+=`<div class="xs mut" style="margin-top:8px">${tx('Con 2 semanas de medidas verás cuánto cambias por semana.','With 2 weeks of measurements you will see how much you change per week.')}</div>`;
+  if (T.goal!=null) b+=`<div class="sm" style="margin-top:8px;line-height:1.45">${T.eta?tx(`A este ritmo llegarías a ${fmtNum(T.goal)} kg hacia el ${fmtDate(T.eta)}.`,`At this pace you would reach ${fmtNum(T.goal)} kg around ${fmtDate(T.eta)}.`):tx(`Tu meta es ${fmtNum(T.goal)} kg. Con la tendencia actual todavía no se puede estimar la fecha.`,`Your goal is ${fmtNum(T.goal)} kg. With the current trend the date cannot be estimated yet.`)}</div>`;
+  b+=`<div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('La tendencia suaviza los cambios de un día a otro por agua, sal o comida.','The trend smooths out day-to-day changes from water, salt or food.')}${kbLink('peso.tendencia',tx('Cómo se calcula','How it is calculated'))}</div></div>`;
+  return b;
+}
+
+/* ---------- 1.3 · Ideas para completar la proteína (Premium) ----------
+   Si a partir del mediodía te falta bastante proteína, se proponen hasta 3 alimentos: primero los que ya sueles comer
+   y luego alimentos de la biblioteca con mucha proteína por caloría, sin tus alergias ni lo que no comes. */
+function protIdeas(k){
+  const c=calcNutrition(); if (!c||!c.prot||habitos()||!premOK()) return null;
+  const T=dayTotals(k), falta=Math.round(c.prot-T.p), K=kb('proteina.ideas');
+  if (falta<K.minFalta || T.p>=c.prot*K.hasta || new Date().getHours()<K.desdeHora) return null;
+  const dens=f=>f&&f.k>0&&f.p!=null?f.p/f.k*100:0, ok=f=>f && dens(f)>=K.densidad && !alimConflicts(f).length;
+  const cuenta={}; for (let i=0;i<30;i++) dayItems(dayKey(Date.now()-i*DAY)).forEach(e=>{ if (e.fid) cuenta[e.fid]=(cuenta[e.fid]||0)+1; });
+  const ya=new Set(dayItems(k).map(e=>e.fid)), out=[];
+  Object.keys(cuenta).sort((a,b)=>cuenta[b]-cuenta[a]).forEach(id=>{ const f=alimGet(id); if (out.length<3 && !ya.has(id) && ok(f)) out.push(id); });
+  if (out.length<3) Object.keys(ALIM).map(id=>ALIM[id]).filter(f=>K.cats.includes(f.cat) && ok(f) && !ya.has(f.id) && !out.includes(f.id)).sort((a,b)=>dens(b)-dens(a)).slice(0,3-out.length).forEach(f=>out.push(f.id));
+  return out.length?{falta, ids:out}:null;
+}
+A.pIdea=id=>{ const f=alimGet(id); if (!f) return; amountModal(f,{m:mealNow()}); };
 function diarioCard(){
   const n=nd(), k=dayKeyOf(), items=dayItems(k), T=dayTotals(k), hab=habitos();
   const isToday=k===dayKey(), isY=k===dayKey(Date.now()-DAY);
@@ -8482,6 +8571,8 @@ function diarioCard(){
         h+=`<div class="mac" style="margin-top:10px"><div class="mbar"><div style="width:${pct}%;background:${T.k>c.kcal*1.05?'var(--bad)':'var(--ok)'}"></div></div></div>
         <div class="xs mut" style="margin-top:6px">${left>=0?`Te quedan ${fmtK(left)} de ${fmtK(c.kcal)}`:`${fmtK(-left)} por encima de tu objetivo de ${fmtK(c.kcal)}`}</div>
         <div class="macros" style="margin-top:8px">${[['Proteína',T.p,c.prot,'#ff7a1a'],['Carbohidratos',T.c,c.carbs,'#3f9cff'],['Grasas',T.g,c.fat,'#f5b82e']].map(([l,v,t,col])=>`<div class="mac"><div class="mbar"><div style="width:${Math.min(100,Math.round(v/Math.max(1,t)*100))}%;background:${col}"></div></div><div class="row xs"><span class="grow">${l}</span><span>${fmtNum(v)} / ${t} g</span></div></div>`).join('')}</div>`;
+        const pi=isToday?protIdeas(k):null;
+        if (pi) h+=`<div class="banner" style="margin-top:10px"><span class="ic">🥩</span><div class="grow sm" style="line-height:1.45">${tx(`Te faltan ${pi.falta} g de proteína hoy. Ideas:`,`You are ${pi.falta} g short on protein today. Ideas:`)}<div class="chips" style="margin-top:8px;flex-wrap:wrap">${pi.ids.map(id=>`<button class="chip" data-a="pIdea" data-v="${esc(id)}">+ ${esc(alimGet(id).n)}</button>`).join('')}</div></div></div>`;
       } else h+=`<div class="xs mut" style="margin-top:8px">Completa tu perfil para comparar con tu objetivo.</div>`;
     } else h+=`<button class="link xs" style="margin-top:8px" data-a="dPay">🔒 Compara con tu objetivo y mira tu semana · Premium</button>`;
   }
@@ -8576,7 +8667,7 @@ SCREENS.alimBuscar=p=>{
   const ml=(MEALS.find(x=>x[0]===p.m)||[0,'Comida'])[1];
   const tabs=[['todo','Buscar'],['recientes','Recientes'],['favoritos','Favoritos'],['propios','Mis alimentos'],['comidas','Comidas guardadas']];
   return lhdr(p.receta?'Añadir ingrediente':'Añadir a '+ml.toLowerCase())+`<div class="lbody" style="padding-top:12px">
-    <div class="search">${I('search',20)}<input class="inp" placeholder="Buscar: palta, frijoles, pan…" value="${esc(p.q)}" data-in="alQ"></div>
+    <div class="row" style="gap:8px"><div class="search grow">${I('search',20)}<input class="inp" placeholder="Buscar: palta, frijoles, pan…" value="${esc(p.q)}" data-in="alQ"></div><button class="ibtn" style="flex:0 0 auto;background:var(--card2)" data-a="alScan" aria-label="${tx('Escanear código de barras','Scan barcode')}">${I('camera',22)}</button></div>
     ${p.receta?'':`<div class="chips scroll" style="margin-top:12px">${MEALS.map(([m,l])=>`<button class="chip ${p.m===m?'on':''}" data-a="alMeal" data-v="${m}">${l}</button>`).join('')}</div>`}
     <div class="chips scroll" style="margin-top:8px">${tabs.filter(t=>!(p.receta&&t[0]==='comidas')).map(([k,l])=>`<button class="chip ${p.tab===k&&!p.q?'on':''}" data-a="alTab" data-v="${k}">${l}</button>`).join('')}</div>
     <div id="allist" style="margin-top:6px">${alList(p)}</div></div>
@@ -8635,9 +8726,49 @@ function amountModal(f, o){
 function recIngHtml(f){ return `<div class="xs mut" style="margin:10px 4px 0;line-height:1.45">${tx(`Receta típica calculada por PandarIA con ingredientes del USDA (dominio público), para ${f.rac} porciones:`,`Typical recipe calculated by PandarIA from USDA ingredients (public domain), for ${f.rac} servings:`)} ${f.ing.map(([i,g])=>`${Math.round(g)} g ${tx('de','of')} ${esc(EN_LANG()&&ALIM_EN[i]?ALIM_EN[i]:ALIM[i].n)}`).join(', ')}. ${tx('Cada casa la hace distinto: si la tuya lleva otras cantidades, créala en Mis recetas.','Every home makes it differently: if yours uses other amounts, create it in My recipes.')}</div>`; }
 /* ---------- Alimentos propios ---------- */
 const alimRoom = () => prem() || nd().alim.length+nd().recetas.length < ALIM_FREE;
+
+/* ---------- 1.3 · Código de barras (Premium) ----------
+   El escáner de Google (Google Play Services) no necesita permiso de cámara: la imagen se procesa en el teléfono.
+   1) Si ya guardaste ese código, se usa tu alimento.  2) Si no, se consulta Open Food Facts (solo se envía el número del código)
+   y se abre «Crear alimento» con sus datos para que los revises.  3) Si no está, lo escribes una vez y queda guardado con su código.
+   Datos de Open Food Facts con licencia ODbL: se cita la fuente y solo se guardan en tu teléfono los productos que escaneas. */
+const OFF_URL='https://world.openfoodfacts.org/api/v2/product/';
+function capPlugin(n){ const C=window.Capacitor; return C&&C.isNativePlatform&&C.isNativePlatform()?((C.Plugins&&C.Plugins[n])||null):null; }
+async function offBuscar(code){
+  const H=capPlugin('CapacitorHttp'); if (!H) return {error:'web'};
+  try{
+    const r=await H.get({url:OFF_URL+encodeURIComponent(code)+'?fields=product_name,product_name_es,brands,nutriments,serving_size,serving_quantity', headers:{'User-Agent':`PandarIAFit/${APP_VERSION} (lunadoggybrustudios@gmail.com)`,'Accept':'application/json'}, connectTimeout:8000, readTimeout:8000});
+    const d=typeof r.data==='string'?JSON.parse(r.data):r.data;
+    if (!d||d.status!==1||!d.product) return {none:true};
+    const P=d.product, N=P.nutriments||{}, num=v=>{ const x=parseFloat(v); return isFinite(x)?x:null; };
+    let kcal=num(N['energy-kcal_100g']); if (kcal==null && num(N['energy_100g'])!=null) kcal=Math.round(num(N['energy_100g'])/4.184);
+    if (kcal==null) return {none:true};
+    const nom=[(P.product_name_es||P.product_name||'').trim(), (P.brands||'').split(',')[0].trim()].filter(Boolean).join(' · ').slice(0,50);
+    const r1=v=>v==null?'':String(Math.round(v*10)/10);
+    return {d:{n:nom, porl:'100 g', porg:100, k:r1(kcal), p:r1(num(N.proteins_100g)), c:r1(num(N.carbohydrates_100g)), g:r1(num(N.fat_100g)), f:r1(num(N.fiber_100g)), a:r1(num(N.sugars_100g)), na:N.sodium_100g!=null?String(Math.round(num(N.sodium_100g)*1000)):'', fl:'', animal:false}};
+  }catch(e){ return {error:'red'}; }
+}
+A.alScan=async()=>{
+  if (!premOK()) return payFor('scan');
+  const B=capPlugin('BarcodeScanner'); if (!B) return toast(tx('El escáner funciona en la app instalada','The scanner works in the installed app'));
+  let code=null;
+  try{
+    const m=await B.isGoogleBarcodeScannerModuleAvailable(); if (m && m.available===false){ toast(tx('Preparando el escáner… (solo la primera vez)','Preparing the scanner… (first time only)')); await B.installGoogleBarcodeScannerModule(); }
+    const r=await B.scan({formats:['EAN_13','EAN_8','UPC_A','UPC_E']}); code=r&&r.barcodes&&r.barcodes[0]&&r.barcodes[0].rawValue;
+  }catch(e){ if (!/cancel/i.test(String(e&&(e.message||e)))) toast(tx('No se pudo abrir el escáner. Prueba de nuevo en unos segundos.','The scanner could not open. Try again in a few seconds.')); return; }
+  if (!code) return;
+  const n=nd(); n.codigos=n.codigos||{};
+  const ya=n.codigos[code]; if (ya && alimGet(ya)) return A.alPick(ya);
+  toast(tx('Buscando el producto…','Looking up the product…'));
+  const r=await offBuscar(code);
+  if (r.d) return openLayer('alimNuevo',{d:Object.assign(r.d,{codigo:code,fuente:'off'})});
+  openLayer('alimNuevo',{d:{n:'',porl:'1 porción',porg:100,k:'',p:'',c:'',g:'',f:'',a:'',na:'',fl:'',animal:false,codigo:code}});
+  toast(r.error==='red'?tx('Sin conexión: escribe los datos de la etiqueta y el código quedará guardado','No connection: type the label data and the code will be saved'):tx('No está en Open Food Facts: escribe los datos de la etiqueta una vez y quedará guardado','Not in Open Food Facts: type the label data once and it will be saved'));
+};
 A.alNew=()=>{ if (!alimRoom()) return payFor('alimProp'); openLayer('alimNuevo',{d:{n:'',porl:'1 porción',porg:100,k:'',p:'',c:'',g:'',f:'',a:'',na:'',fl:'',animal:false}}); };
 SCREENS.alimNuevo=p=>{ const d=p.d; const fld=(k,l,ph,mode)=>`<div class="field grow"><label>${l}</label><input id="an_${k}" class="inp" type="${mode||'number'}" inputmode="decimal" value="${esc(d[k])}" placeholder="${ph||''}" data-in="anF" data-k="${k}"></div>`;
   return lhdr('Crear alimento')+`<div class="lbody"><p class="sm mut" style="margin-top:0;line-height:1.45">Copia los datos de la etiqueta. Si la etiqueta da los valores por porción, escribe cuántos gramos tiene esa porción.</p>
+    ${d.codigo?`<div class="banner ${d.fuente==='off'?'blue':''}" style="margin-bottom:12px"><span class="ic">${I('camera',20)}</span><div class="grow sm" style="line-height:1.45">${tx('Código','Code')} ${esc(d.codigo)}. ${d.fuente==='off'?tx('Datos de Open Food Facts (licencia ODbL), escritos por sus usuarios: revísalos con la etiqueta antes de guardar.','Data from Open Food Facts (ODbL licence), written by its users: check them against the label before saving.'):tx('Al guardar, la próxima vez que lo escanees aparecerá solo.','Once saved, it will come up on its own next time you scan it.')}</div></div>`:''}
     ${fld('n','Nombre','Ej.: Barrita de avena de mi marca','text')}
     <div class="row" style="gap:10px">${fld('porl','Porción','1 porción','text')}${fld('porg','Gramos de esa porción','100')}</div>
     <div class="xs mut b" style="letter-spacing:1px;margin:6px 0 8px">POR PORCIÓN</div>
@@ -8657,8 +8788,9 @@ A.anSave=()=>{ const d=alP().d; const num=v=>{ const x=parseFloat(String(v).repl
   const per=v=>v==null?null:Math.round(v/pg*100*10)/10;
   let fl=d.fl; if (d.animal) fl+='A'; else if (/[LH]/.test(fl)) fl+='V';
   const food={id:'p'+uid(),n:n.slice(0,50),k:per(num(d.k)),p:per(num(d.p))||0,c:per(num(d.c))||0,g:per(num(d.g))||0,f:per(num(d.f)),a:per(num(d.a)),na:per(num(d.na)),fl:[...new Set(fl)].sort().join(''),por:[[(d.porl||'1 porción').slice(0,30),pg]]};
+  if (d.codigo){ food.code=d.codigo; if (d.fuente==='off') food.src='off'; }
   if (!alimRoom()) return payFor('alimProp');
-  nd().alim.push(food); save(); closeLayer(); toast('Alimento creado'); const t=LAYERS[LAYERS.length-1]; if (t&&t.t==='alimBuscar'){ t.p.tab='propios'; t.p.q=''; refreshTop(); } };
+  nd().alim.push(food); if (d.codigo){ const n0=nd(); n0.codigos=n0.codigos||{}; n0.codigos[d.codigo]=food.id; } save(); closeLayer(); toast('Alimento creado'); const t=LAYERS[LAYERS.length-1]; if (t&&t.t==='alimBuscar'){ t.p.tab='propios'; t.p.q=''; refreshTop(); } };
 
 /* ---------- Recetas ---------- */
 A.recNew=()=>{ if (!alimRoom()) return payFor('alimProp'); openLayer('receta',{r:{id:'r'+uid(),n:'',rac:2,items:[]},isNew:true}); };
@@ -9116,11 +9248,12 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.2';
+const APP_VERSION='1.3';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.3',t:'Comer, dormir y ayunar',items:['Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua', 'Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano', 'Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado', 'Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)', 'Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)', 'Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)', 'Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)', 'Notificación del entreno con la serie siguiente y el botón «✓ Hecha»', 'Biblioteca de evidencia 1.6: 4 reglas nuevas']},
  {v:'1.2',t:'PandarIA v2 y temas',items:['PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno', 'PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores', 'PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo', 'PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión', 'PandarIA v2 · Aprende de tus cambios: si cambias un ejercicio a mano, lo tiene en cuenta al proponer ejercicios', 'Temas: Automático, Claro, Oscuro gris (pantallas LCD) y Negro puro (pantallas OLED)', 'Tamaño del texto: Normal, Grande y Muy grande', 'Biblioteca de evidencia 1.5: 2 reglas nuevas']},
  {v:'1.1.01',t:'Arreglos',items:['La parte de arriba de la pantalla ya no muestra restos de la imagen de inicio','Al elegir una foto de progreso ya no se borran las medidas que escribiste y la foto se guarda']},
  {v:'1.1',t:'Base sólida',items:['Pantalla de borde a borde en todas las versiones de Android y código optimizado para Google Play', 'Las fotos de progreso se guardan aparte: mucho más espacio para tus datos', 'Seguridad: la app solo puede conectarse con Google (y con GitHub en la versión de GitHub) y los avisos se muestran siempre como texto', 'Premium: la suscripción se vuelve a comprobar con Google Play al menos cada 7 días', 'Prueba gratis: la pantalla Premium aclara que los 3 días gratis son para tu primera suscripción', 'Los códigos de regalo no se alargan cambiando la fecha del teléfono', 'Textos más grandes (mínimo 12 px) y zonas táctiles más amplias en los botones pequeños', 'Los estiramientos, la movilidad y el yoga ya no cuentan como récords', 'Progreso y agua explican qué falta cuando todavía hay pocos datos']},
@@ -9157,7 +9290,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.2 · PandarIA v2 y temas", "Fuerza estimada (1RM) y tu fuerza por músculo", "Recuperación por músculo en un mapa", "Esfuerzo por serie en las rutinas de PandarIA", "Temas Automático, Claro, Oscuro gris y Negro puro", "Tamaño del texto en tres niveles"];
+const NOTAS_VERSION=["1.3 · Comer, dormir y ayunar", "Pestaña de Ayuno y Nutrición con Comida y Agua", "Código de barras con Open Food Facts", "Tendencia de peso e ideas de proteína", "Sueño y variabilidad del pulso en tu recuperación", "Avisos a tu hora habitual y serie hecha desde la notificación"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -9551,7 +9684,8 @@ function viewAjustes(){
     ${S.gustos&&Object.keys(S.gustos.quita||{}).length?nav('gustosReset','swap','Olvidar mis cambios de ejercicio',Object.keys(S.gustos.quita).length):''}
   </div>
   <div class="sec">Nutrición y ayuno</div><div class="card" style="padding:0 12px">
-    ${nav('tab','leaf','Objetivo nutricional',NGOALS[nut().goal],'nutricion')}
+    ${nav('nGoalPick','target','Objetivo nutricional',NGOALS[nut().goal])}
+    ${nav('dPrefs','settings','Preferencias de comida','')}
     ${nav('fastScreen','timer','Revisar aptitud para el ayuno',nut().fast.screened?(nut().fast.blocked?'No recomendado':'Apto'):'Pendiente')}
   </div>
   <div class="sec">Durante el entreno</div><div class="card" style="padding:0 12px">
@@ -11519,7 +11653,7 @@ No hay beneficios extra en alargarlo. Considera romperlo con proteína y verdura
 Crear rutina para estos músculos|Create a routine for these muscles
 Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.|Sets per muscle. For muscle growth, 10–20 per week are recommended.
 Rosé wine|Rosé wine`;
-const KB_LOG_EN={'1.5':'Recovery by muscle (how recovered each muscle is, on a map) and learning from your exercise swaps. They are PandarIA’s own criteria and do not change any earlier result.','1.4':'PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and the resting heart rate from Health Connect count towards your recovery; the weekly report adds water, fasting and protein.','1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
+const KB_LOG_EN={'1.6':'Smoothed weight trend with the estimated date for your goal, ideas to complete your protein for the day, and sleep and heart rate variability from Health Connect as recovery signals. They do not change any earlier result.','1.5':'Recovery by muscle (how recovered each muscle is, on a map) and learning from your exercise swaps. They are PandarIA’s own criteria and do not change any earlier result.','1.4':'PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and the resting heart rate from Health Connect count towards your recovery; the weekly report adds water, fasting and protein.','1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
  '1.1':'Rules that change results: 2 minutes of rest on weighted compound lifts for muscle; weight-loss pace of 0.5 to 1 % of body weight per week instead of a fixed 15 %; a calorie target that adjusts with your diary and weight; a lighter load if you arrive poorly rested; water goal recalibrated with the EFSA reference; alternatives of similar difficulty.',
  '1.3':'Special methods (supersets, drop sets, rest-pause, myo-reps, pyramids, clusters, German volume training and the Bilbo method), each with its evidence and a note that it is not proven to be better; elbow and hip as sensitive areas.',
  '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
@@ -12130,7 +12264,30 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno|PandarIA v2 · Estimated strength (1RM) for every weighted exercise, with its chart and a strength record alert during the workout
+const EN_09 = `Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua|Fasting gets its own tab, and Nutrition has two sub-tabs: Food and Water
+Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano|Settings › Nutrition and fasting: choose your nutrition goal right there, with your food preferences close at hand
+Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado|Barcode (Premium): scan a product without giving camera permission; it looks up its data in Open Food Facts and, if it is not there, you type it once and it is saved
+Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)|Ideas to complete your protein for the day with foods you already eat (Premium)
+Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)|Smoothed weight trend, how much you change per week and the estimated date for your goal (Premium)
+Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)|Health Connect: sleep and heart rate variability as recovery signals (Premium)
+Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)|Workout reminder at your usual time, on your weekly plan days (Premium)
+Notificación del entreno con la serie siguiente y el botón «✓ Hecha»|Workout notification with the next set and a «✓ Done» button
+Biblioteca de evidencia 1.6: 4 reglas nuevas|Evidence library 1.6: 4 new rules
+1.3 · Comer, dormir y ayunar|1.3 · Eat, sleep and fast
+Pestaña de Ayuno y Nutrición con Comida y Agua|Fasting tab and Nutrition with Food and Water
+Código de barras con Open Food Facts|Barcode with Open Food Facts
+Tendencia de peso e ideas de proteína|Weight trend and protein ideas
+Sueño y variabilidad del pulso en tu recuperación|Sleep and heart rate variability in your recovery
+Avisos a tu hora habitual y serie hecha desde la notificación|Reminders at your usual time and set done from the notification
+Comer, dormir y ayunar|Eat, sleep and fast
+Tendencia de peso|Weight trend
+Ideas para completar la proteína|Ideas to complete your protein
+Variabilidad del pulso más baja de lo normal|Heart rate variability lower than usual
+Noche corta|Short night
+Mi historial › Cuerpo|My history › Body
+Nutrición › Comida|Nutrition › Food
+Comida|Food
+PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno|PandarIA v2 · Estimated strength (1RM) for every weighted exercise, with its chart and a strength record alert during the workout
 PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores|PandarIA v2 · Your strength by muscle: the last 4 weeks compared with the 4 before
 PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo|PandarIA v2 · Recovery by muscle: a map with each muscle’s percentage and when it will be ready
 PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión|PandarIA v2 · PandarIA routines ask how many reps you had left in each set, to adjust the next session

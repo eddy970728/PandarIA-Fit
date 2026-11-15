@@ -341,12 +341,15 @@
     };
     // Recordatorio de entreno (14 días)
     const rem = S.settings.reminders;
-    if (n.train && rem.days.length){
+    // 1.3: con «A tu hora habitual» (Premium) el aviso llega antes de la hora a la que sueles empezar, los días de tu plan semanal
+    const auto = rem.auto && premium() && typeof horaHabitual === 'function' ? horaHabitual() : null;
+    const remTime = auto ? auto.aviso : rem.time, remDays = auto && S.plan && S.plan.days.length ? S.plan.days : rem.days;
+    if (n.train && remDays.length){
       const nx = typeof nextInPlan === 'function' ? nextInPlan() : null, r = nx && nx.r;
       let k = 0;
       for (let d = 0; d < 14; d++){
-        const t = atTime(now + d * DAYMS, rem.time); t.setMinutes(t.getMinutes() - (+n.trainLead || 0));
-        if (!rem.days.includes(atTime(now + d * DAYMS, rem.time).getDay())) continue;
+        const t = atTime(now + d * DAYMS, remTime); t.setMinutes(t.getMinutes() - (+n.trainLead || 0));
+        if (!remDays.includes(atTime(now + d * DAYMS, remTime).getDay())) continue;
         if (d === 0 && trainedToday().length) continue;
         const title = EN_LANG() ? (r ? `${userName()}${userName() ? 'time' : 'Time'} for ${r.name}!` : `${userName()}${userName() ? 'time' : 'Time'} to train!`) : r ? `${userName() ? userName() + '¡hoy toca ' : '¡Hoy toca '}${r.name}!` : `${userName() ? userName() + '¡hoy toca entrenar!' : '¡Hoy toca entrenar!'}`;
         push(mk(ID.train + k++, title, r ? tx(`${routineMinutes(r)} min. Tu rutina te espera: toca Empezar y a darle.`, `${routineMinutes(r)} min. Your routine is waiting: tap Start and go for it.`) : tx('Elige una rutina y dale. Unos minutos ya cuentan.', 'Pick a routine and go. A few minutes still count.'), t, 'recordatorios', {go:'train', rid: r && r.id}, r ? 'EMPEZAR' : null), 'none');
@@ -475,13 +478,14 @@
     const x = (ev && ev.notification && ev.notification.extra) || {}, act = ev && ev.actionId;
     setTimeout(() => { try{
       if (act === 'w250' || act === 'w500'){ A.water(act === 'w250' ? 250 : 500); toast('💧 Agua añadida'); return; }
-      if (act === 'faststart'){ if (!nut().fast.active) A.fastStart(); A.tab('nutricion'); return; }
-      if (act === 'fastend'){ if (nut().fast.active) A.fastEnd(); A.tab('nutricion'); return; }
+      if (act === 'faststart'){ if (!nut().fast.active) A.fastStart(); A.tab('ayuno'); return; }
+      if (act === 'fastend'){ if (nut().fast.active) A.fastEnd(); A.tab('ayuno'); return; }
       if (act === 'start' && x.rid && findR(x.rid)){ A.startWorkout(x.rid); return; }
       switch (x.go){
         case 'workout': if (S.active && !LAYERS.some(l => l.t === 'workout')) openLayer('workout'); break;
         case 'train': A.tab('rutinas'); break;
-        case 'water': case 'fast': A.tab('nutricion'); break;
+        case 'water': A.irAgua(); break;
+        case 'fast': A.tab('ayuno'); break;
         case 'report': HSEG = 'informes'; A.tab('historial'); break;
         case 'routine': if (x.rid && findR(x.rid)) A.openRoutine(x.rid); break;
         case 'backup': A.tab('ajustes'); A.exportData(); break;
@@ -528,6 +532,7 @@
       b += `<div class="row" style="gap:8px;margin-bottom:6px"><button class="btn grow sm" data-a="nfNext">${I('list',16)} Próximos avisos</button><button class="btn grow sm" data-a="nfBattery">${I('info',16)} Que lleguen siempre</button></div>`;
       b += card('moon','Horas de silencio', null, nTg('quiet','Silenciar por la noche','Agua y fases del ayuno no suenan; el resto se mueve al final. El fin del descanso siempre avisa.') + (n.quiet ? nTime('quietFrom','Desde') + nTime('quietTo','Hasta') : ''));
       b += card('dumbbell','Entreno','train', nTg('train','Recordatorio de entreno', rem.days.length ? `${rem.days.length === 7 ? 'Todos los días' : rem.days.map(d => DS[d]).join(' ')} a las ${rem.time}` : 'Elige los días abajo') +
+        (n.train ? `<button class="srow" data-a="nfRemAuto"><span class="grow"><div class="b">${tx('A tu hora habitual','At your usual time')}${prem ? '' : ' 🔒'}</div><div class="xs mut">${(h => rem.auto && prem ? (h ? tx(`Sueles empezar a las ${h.hora}: aviso a las ${h.aviso}${S.plan ? ', los días de tu plan' : ''}`, `You usually start at ${h.hora}: reminder at ${h.aviso}${S.plan ? ', on your plan days' : ''}`) : tx('Con 5 entrenos aprende tu hora habitual','After 5 workouts it learns your usual time')) : tx('PandarIA aprende a qué hora sueles entrenar','PandarIA learns when you usually train'))(typeof horaHabitual === 'function' ? horaHabitual() : null)}</div></span><span class="toggle ${rem.auto && prem ? 'on' : ''}"></span></button>` : '') +
         (n.train ? `<div class="xs mut" style="padding:8px 4px 0">Días de entreno</div><div class="chips" style="padding:6px 0 10px;gap:6px">${[1,2,3,4,5,6,0].map(d => `<button class="chip ${rem.days.includes(d) ? 'on' : ''}" style="width:36px;justify-content:center;padding:0" data-a="nfRemDay" data-v="${d}">${DS[d]}</button>`).join('')}</div>
           <div class="row" style="padding:4px 4px 10px;gap:10px"><span class="grow sm">Hora</span><input type="time" class="inp" style="width:148px;height:42px" value="${rem.time}" data-ch="nfRemTime"></div>
           <div class="xs mut" style="padding:0 4px">Avisar</div>${nChips('trainLead',[0,15,30], v => +v ? `${v} min antes` : 'En punto')}` : '') +
@@ -559,6 +564,7 @@
   A.nfSet = v => { const [k, val] = v.split('|'); NS()[k] = isNaN(+val) ? val : +val; reN(); };
   A.nfDay = v => { const [k, d] = v.split('|'); const a = NS()[k], i = a.indexOf(+d); if (i >= 0){ if (a.length > 1) a.splice(i, 1); } else a.push(+d); reN(); };
   A.nfPhase = h => { const fp = NS().fastPhases; fp[h] = !fp[h]; reN(); };
+  A.nfRemAuto = () => { if (!premium()) return typeof pfPay === 'function' ? pfPay('notif') : null; const r = S.settings.reminders; r.auto = !r.auto; reN(); };
   A.nfRemDay = d => { const a = S.settings.reminders.days, i = a.indexOf(+d); if (i >= 0) a.splice(i, 1); else a.push(+d); reN(); };
   CH.nfRemTime = el => { if (el.value){ S.settings.reminders.time = el.value; reN(); } };
   CH.nfTime = el => { if (el.value){ NS()[el.dataset.k] = el.value; reN(); } };
@@ -628,6 +634,9 @@
     if (!S.active) return {mode:'none'};
     const a = S.active;
     Object.assign(base, {mode:'workout', title: a.name, startedAt: a.start});
+    // 1.3: la notificación muestra la serie siguiente y un botón para marcarla hecha (solo series con peso o repeticiones)
+    if (!a.rest && !a.timer){ const np = nextPending(); if (np){ const ex = getEx(np.it.exId), s1 = np.it.sets[np.i];
+      if (ex.mode !== 't'){ const kg = s1.kg ?? s1.sk, reps = s1.reps ?? s1.sr; base.next = {label: tx('Siguiente','Next'), btn: tx('✓ Hecha','✓ Done'), text: `${EN_LANG() ? trN(ex.n) : ex.n} · ${kg ? fmtNum(toUnit(kg)) + ' ' + S.settings.unit + ' × ' : ''}${reps || '?'}`}; } } }
     if (a.timer){
       const it = wkItem(a.timer.uid), n = it ? trN(getEx(it.exId).n) : tx('Serie', 'Set');
       base.rest = {kind:'set', end: a.timer.end, total: a.timer.total, title: tx(`Serie por tiempo · ${n}`, `Timed set · ${n}`), text: a.name, doneTitle: tx('✅ Tiempo cumplido', '✅ Time is up'), doneText: n, say: tx('Tiempo', 'Time')};
@@ -682,6 +691,7 @@
     setTimeout(() => { try{
       if (a === 'skip' && S.active && S.active.rest) A.wkRestAdj('skip');
       else if (a === 'plus30' && S.active && S.active.rest) A.wkRestAdj('30');
+      else if (a === 'setdone' && S.active && !S.active.rest){ const np = nextPending(); if (np) A.wkCheck(`${np.it.uid}|${np.i}`); }
       else if ((a === 'ipause' && intRunning() && !INT.paused) || (a === 'iresume' && intRunning() && INT.paused)) A.intPause();
       else if (a === 'iskip' && intRunning()) intNext(true);
       else if (a === 'idone' && intRunning()){ intCatchUp(INT.ph.length); intFinish(); }
@@ -746,9 +756,9 @@
         const r = (rid && findR(rid)) || (nx && nx.r) || S.routines.find(x => !x.archived);
         A.tab('rutinas'); if (r) A.startWorkout(r.id); else toast('Crea una rutina para empezar');
       } else if (path.startsWith('agua')){
-        A.tab('nutricion'); if (path === 'agua/250'){ A.water(250); toast('💧 +250 ml'); }
+        A.irAgua(); if (path === 'agua/250'){ A.water(250); toast('💧 +250 ml'); }
       } else if (path.startsWith('ayuno')){
-        A.tab('nutricion'); const f = nut().fast;
+        A.tab('ayuno'); const f = nut().fast;
         if (path === 'ayuno/empezar'){ if (!f.screened) A.fastScreen(); else if (f.blocked) toast('El ayuno no es recomendable para ti sin supervisión'); else if (!f.active) A.fastStart(); }
         else if (path === 'ayuno/terminar' && f.active) A.fastEnd();
       } else if (path === 'historial') A.tab('historial');
@@ -771,9 +781,9 @@
 
   /* ---------- 13. Health Connect (Fase 6) ---------- */
   const HC = P('Health');
-  const HCS = () => (S.settings.hc = Object.assign({on:false, steps:true, weight:true, hr:true, writeWeight:true, writeWorkouts:true, writeFood:false, writeWater:false, useInPandaria:true, lastWeightTs:0}, S.settings.hc || {}));
-  const HC_READ = ['steps','weight','heartRate','restingHeartRate'], HC_WRITE = ['weight','calories','dietaryEnergyConsumed','dietaryWater'];
-  const HD = {available: null, reason: '', steps: null, steps7: null, weight: null, weightAt: 0, hr: null, hrKind: '', lastSync: 0};
+  const HCS = () => (S.settings.hc = Object.assign({on:false, steps:true, weight:true, hr:true, sleep:true, hrv:true, writeWeight:true, writeWorkouts:true, writeFood:false, writeWater:false, useInPandaria:true, lastWeightTs:0}, S.settings.hc || {}));
+  const HC_READ = ['steps','weight','heartRate','restingHeartRate','sleep','heartRateVariability'], HC_WRITE = ['weight','calories','dietaryEnergyConsumed','dietaryWater'];
+  const HD = {available: null, reason: '', steps: null, steps7: null, weight: null, weightAt: 0, hr: null, hrKind: '', sleep: null, hrv: null, lastSync: 0};
   const isPrem = () => typeof isPremium === 'function' ? isPremium() : true;
   async function hcAvail(){ try{ const r = await HC.isAvailable(); HD.available = !!r.available; HD.reason = r.reason || ''; }catch(e){ HD.available = false; } return HD.available; }
   async function hcConnect(){
@@ -781,7 +791,7 @@
     if (!(await hcAvail())){ confirmBox({title:'Falta Health Connect', text:'Instala <b>Health Connect</b> de Google desde Play Store (en Android 14 o superior ya viene incluido) y vuelve a intentarlo.', okText:'Entendido', ok:() => {}}); return; }
     try{
       await HC.requestAuthorization({read: HC_READ, write: HC_WRITE});
-      const s0 = HCS(); s0.on = true; s0.writeFood = s0.writeWater = true; save(); await hcSync(true); refreshHc(); toast('Health Connect conectado');
+      const s0 = HCS(); s0.on = true; s0.perm13 = true; s0.writeFood = s0.writeWater = true; save(); await hcSync(true); refreshHc(); toast('Health Connect conectado');
     }catch(e){ toast('No se pudo conectar. Revisa los permisos en Health Connect.'); }
   }
   const iso = d => new Date(d).toISOString();
@@ -817,6 +827,25 @@
         const prev = L.slice(1), at = Date.parse(x.startDate);
         window.PF_RHR = prev.length && now - at < 36 * 3600000 ? {last: Math.round(+x.value), avg: Math.round(prev.reduce((a, y) => a + (+y.value), 0) / prev.length), n: prev.length, at} : null; }
       else { r = await HC.readSamples({dataType:'heartRate', startDate: iso(now - 86400000), endDate: iso(now), limit: 1}); x = (r.samples || [])[0]; if (x){ HD.hr = Math.round(x.value); HD.hrKind = 'última medida'; } }
+    }catch(e){}
+    // 1.3: sueño (minutos por noche) y variabilidad del pulso (RMSSD, ms) para la recuperación de PandarIA (Premium)
+    if (s.sleep) try{
+      const r = await HC.readSamples({dataType:'sleep', startDate: iso(now - 15 * 86400000), endDate: iso(now), limit: 60});
+      const noches = {};
+      (r.samples || []).forEach(x => { const fin = Date.parse(x.endDate || x.startDate), min = +x.value; if (!(min > 30 && min < 960)) return;
+        const d = new Date(fin - 12 * 3600000).toDateString(); noches[d] = noches[d] || {min: 0, fin: 0}; noches[d].min += min; noches[d].fin = Math.max(noches[d].fin, fin); });
+      const L = Object.values(noches).sort((a, b) => b.fin - a.fin);
+      HD.sleep = L.length && now - L[0].fin < 20 * 3600000 ? Math.round(L[0].min) : null;
+      const prev = L.slice(1, 15);
+      window.PF_SUENO = HD.sleep != null ? {last: HD.sleep, avg: prev.length ? Math.round(prev.reduce((a, y) => a + y.min, 0) / prev.length) : null, n: prev.length, at: L[0].fin} : null;
+    }catch(e){}
+    if (s.hrv) try{
+      const r = await HC.readSamples({dataType:'heartRateVariability', startDate: iso(now - 28 * 86400000), endDate: iso(now), limit: 60});
+      const L = (r.samples || []).filter(y => +y.value > 5 && +y.value < 300).sort((a, b) => Date.parse(b.startDate) - Date.parse(a.startDate));
+      const x = L[0];
+      if (x){ HD.hrv = Math.round(+x.value); const prev = L.slice(1), at = Date.parse(x.startDate);
+        window.PF_HRV = prev.length && now - at < 36 * 3600000 ? {last: Math.round(+x.value), avg: Math.round(prev.reduce((a, y) => a + (+y.value), 0) / prev.length), n: prev.length, at} : null; }
+      else { HD.hrv = null; window.PF_HRV = null; }
     }catch(e){}
   }
   function refreshHc(){ if (LAYERS.length && LAYERS[LAYERS.length - 1].t === 'hcMenu') refreshTop(); else { render.keep = true; render(); } }
@@ -868,8 +897,10 @@
       const fmtN = n => n == null ? '—' : n.toLocaleString(window.LOC?LOC():'es');
       b += `<div class="stats"><div class="stat"><div class="v">${fmtN(HD.steps)}</div><div class="l">Pasos hoy</div></div><div class="stat"><div class="v">${fmtN(HD.steps7)}</div><div class="l">Media 7 días</div></div></div>
         <div class="stats"><div class="stat"><div class="v">${HD.weight ? fmtNum(HD.weight) + ' kg' : '—'}</div><div class="l">Peso${HD.weightAt ? ' · ' + fmtDate(HD.weightAt) : ''}</div></div><div class="stat"><div class="v">${HD.hr ? HD.hr + ' lpm' : '—'}</div><div class="l">Pulso${HD.hrKind ? ' ' + HD.hrKind : ''}</div></div></div>
+        <div class="stats"><div class="stat"><div class="v">${HD.sleep != null ? Math.floor(HD.sleep / 60) + ' h ' + String(HD.sleep % 60).padStart(2, '0') : '—'}</div><div class="l">${tx('Sueño anoche','Sleep last night')}</div></div><div class="stat"><div class="v">${HD.hrv ? HD.hrv + ' ms' : '—'}</div><div class="l">${tx('Variabilidad del pulso','Heart rate variability')}</div></div></div>
+        ${s.perm13 ? '' : `<div class="banner blue"><span class="ic">${I('spark',20)}</span><div class="grow sm" style="line-height:1.45">${tx('Nuevo: PandarIA puede tener en cuenta tu sueño y la variabilidad del pulso para tu recuperación.','New: PandarIA can take your sleep and heart rate variability into account for your recovery.')}<br><button class="link sm" style="margin-top:8px" data-a="hcPerm13">${tx('Dar permiso','Allow')}</button></div></div>`}
         <button class="btn wide" data-a="hcSyncNow">${I('refresh',18)} Actualizar ahora</button>
-        <div class="sec">Leer de Health Connect</div><div class="card" style="padding:4px 12px">${tg('steps','Pasos','Hoy y media de 7 días')}${tg('weight','Peso','Se añade solo a Mi historial › Cuerpo')}${tg('hr','Pulso','En reposo o la última medida')}</div>
+        <div class="sec">Leer de Health Connect</div><div class="card" style="padding:4px 12px">${tg('steps','Pasos','Hoy y media de 7 días')}${tg('weight','Peso','Se añade solo a Mi historial › Cuerpo')}${tg('hr','Pulso','En reposo o la última medida')}${tg('sleep',tx('Sueño','Sleep'),tx('Horas de la última noche','Hours last night'))}${tg('hrv',tx('Variabilidad del pulso','Heart rate variability'),tx('Una señal más de recuperación','One more recovery signal'))}</div>
         <div class="sec">Guardar en Health Connect</div><div class="card" style="padding:4px 12px">${tg('writeWorkouts','Entrenos','Como calorías activas estimadas por duración e intensidad', true)}${tg('writeWeight','Peso','Cuando registras tu peso en Cuerpo', true)}${tg('writeFood','Comidas','Las calorías de lo que añades hoy a tu diario', true)}${tg('writeWater','Agua','Cada vaso o botella que sumas', true)}</div>
         <div class="xs mut" style="margin:-4px 4px 8px;line-height:1.4">Si quitas algo del diario o del agua, bórralo también en Health Connect: PandarIA solo añade.</div>
         <div class="sec">PandarIA</div><div class="card" style="padding:4px 12px">${tg('useInPandaria','Usar mis pasos en las recomendaciones','Ajusta tus calorías diarias según tu actividad', true)}</div>
@@ -880,6 +911,8 @@
   };
   A.hcMenu = () => { openLayer('hcMenu'); if (HCS().on) hcSync(true).then(refreshHc); };
   A.hcConnect = () => hcConnect();
+  // 1.3: pide los permisos nuevos (sueño y variabilidad del pulso) a quien ya tenía Health Connect conectado
+  A.hcPerm13 = async () => { try{ await HC.requestAuthorization({read: HC_READ, write: HC_WRITE}); }catch(e){} const s = HCS(); s.perm13 = true; save(); await hcSync(true); refreshHc(); };
   A.hcTog = async k => { const s = HCS(); s[k] = !s[k]; save(); refreshTop();
     if (s[k] && (k === 'writeFood' || k === 'writeWater')) try{ await HC.requestAuthorization({read: HC_READ, write: HC_WRITE}); }catch(e){ s[k] = false; save(); refreshTop(); toast('Falta el permiso en Health Connect'); } };
   A.hcSyncNow = async () => { toast('Actualizando…'); await hcSync(true); refreshHc(); };

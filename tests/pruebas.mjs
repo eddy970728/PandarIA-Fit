@@ -281,7 +281,7 @@ if (fs.existsSync(COPIA07)) {
   const PELIGRO = /wipe|del|Del|Remove|import|export|Export|share|Share|Url|Mail|upd(Download|Open)|hcPrivacy|Discard|kbUrl|copy|Copy|photo|Photo|mPhoto|backup|Backup|xjump|mFile/;
   for (const lang of ['es', 'en']) {
     let toques = 0; const fallosR = [], sinTraducir = new Set();
-    for (const t of ['rutinas', 'explorar', 'nutricion', 'historial', 'ajustes']) {
+    for (const t of ['rutinas', 'explorar', 'nutricion', 'agua', 'ayuno', 'historial', 'ajustes']) { // 1.3: Nutrición › Agua y la pestaña Ayuno
       const a = abrir({ 'pandaria-fit-v1': fs.readFileSync(COPIA07, 'utf8') });
       await espera(900);
       const w = a.w;
@@ -291,7 +291,7 @@ if (fs.existsSync(COPIA07)) {
       if (lang === 'en') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
         if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán|Jesús/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
-      const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); TAB=${JSON.stringify(t)}; render();`);
+      const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); TAB=${JSON.stringify(t === 'agua' ? 'nutricion' : t)}; NSEG=${JSON.stringify(t === 'agua' ? 'agua' : 'comida')}; render();`);
       const botones = () => [...w.document.querySelectorAll('[data-a]')].map(e => [e.dataset.a, e.dataset.v || '']).filter(([x]) => !PELIGRO.test(x) && x !== 'tab');
       const tocar = (x, v) => { const e = [...w.document.querySelectorAll('[data-a]')].find(e => e.dataset.a === x && (e.dataset.v || '') === v); if (!e) return false; ultimo = null; const n0 = a.errores.length;
         try { e.click(); } catch (er) { ultimo = er.message; } if (!ultimo && a.errores.length > n0) ultimo = a.errores[a.errores.length - 1]; return true; };
@@ -436,10 +436,10 @@ if (fs.existsSync(COPIA07)) {
   // Health Connect: los permisos que deja el manifiesto son justo los que usa native.js
   const nat = fs.readFileSync(path.join(DIR, '..', 'www', 'native.js'), 'utf8'), ext = fs.readFileSync(path.join(DIR, '..', 'scripts', 'android-extra.mjs'), 'utf8');
   const lista = re => (nat.match(re) || ['', ''])[1].match(/'([a-zA-Z]+)'/g).map(x => x.slice(1, -1));
-  const TIPO = { steps: 'STEPS', weight: 'WEIGHT', heartRate: 'HEART_RATE', restingHeartRate: 'RESTING_HEART_RATE', calories: 'ACTIVE_CALORIES_BURNED', dietaryEnergyConsumed: 'NUTRITION', dietaryWater: 'HYDRATION' };
+  const TIPO = { steps: 'STEPS', weight: 'WEIGHT', heartRate: 'HEART_RATE', restingHeartRate: 'RESTING_HEART_RATE', sleep: 'SLEEP', heartRateVariability: 'HEART_RATE_VARIABILITY', calories: 'ACTIVE_CALORIES_BURNED', dietaryEnergyConsumed: 'NUTRITION', dietaryWater: 'HYDRATION' };
   const usa = [...lista(/HC_READ = \[([^\]]*)\]/).map(t => 'READ_' + TIPO[t]), ...lista(/HC_WRITE = \[([^\]]*)\]/).map(t => 'WRITE_' + TIPO[t])].sort();
   const deja = ((ext.match(/HC_USA = \[([^\]]*)\]/) || ['', ''])[1].match(/'([A-Z_]+)'/g) || []).map(x => x.slice(1, -1)).sort();
-  comprobar('Health Connect: el manifiesto deja solo los 8 permisos que usa la app', usa.length === 8 && JSON.stringify(usa) === JSON.stringify(deja), `usa ${usa.join(',')} · deja ${deja.join(',')}`);
+  comprobar('Health Connect: el manifiesto deja solo los 10 permisos que usa la app', usa.length === 10 && JSON.stringify(usa) === JSON.stringify(deja), `usa ${usa.join(',')} · deja ${deja.join(',')}`);
 }
 
 /* ---------- 1.1: base sólida (Google Play, seguridad, fotos, Premium sin conexión, legibilidad) ---------- */
@@ -452,7 +452,7 @@ if (fs.existsSync(COPIA07)) {
   const faltan = reemplazos.filter(n => !new RegExp(`(function ${n}\\(|(let|var|const) ${n}\\s*=)`).test(html));
   comprobar(`reemplazos: las ${reemplazos.length} funciones que cambian native.js y premium.js existen en index.html`, reemplazos.length >= 15 && !faltan.length, faltan.join(', '));
   // Google Play: R8 y borde a borde
-  comprobar('R8: se activa con reglas que conservan Capacitor, los complementos y la app', /minifyEnabled true/.test(ext) && /-keep class com\.getcapacitor\.\*\*/.test(ext) && /-keep class com\.pandaria\.fit\.\*\*/.test(ext) && /-keep class ee\.forgr\.\*\*/.test(ext) && /-keep class app\.capgo\.\*\*/.test(ext));
+  comprobar('R8: se activa con reglas que conservan Capacitor, los complementos y la app', /minifyEnabled true/.test(ext) && /-keep class com\.getcapacitor\.\*\*/.test(ext) && /-keep class com\.pandaria\.fit\.\*\*/.test(ext) && /-keep class ee\.forgr\.\*\*/.test(ext) && /-keep class app\.capgo\.\*\*/.test(ext) && /-keep class io\.capawesome\.\*\*/.test(ext));
   comprobar('borde a borde: sin el complemento StatusBar ni setBackgroundColor; EdgeToEdge activado', !pkg.dependencies['@capacitor/status-bar'] && !/StatusBar|setBackgroundColor/.test(nat) && /EdgeToEdge\.enable\(this\)/.test(ext) && /SystemBars\.setStyle/.test(nat) && cfg.plugins.SystemBars);
   // Seguridad
   const csp = (html.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/) || [])[1] || '';
@@ -522,6 +522,47 @@ if (fs.existsSync(COPIA07)) {
   fs.rmSync(tmpw, { recursive: true, force: true });
   comprobar('versión web: docs/web está al día (si falla: node scripts/version-web.mjs)', alDia);
   comprobar('versión web: lleva premium.js (Premium bloqueado) y nada de GitHub', /<script src="premium\.js"><\/script>/.test(wh) && !/api\.github\.com|PandarIA-Fit\.apk/.test(wh));
+}
+
+/* ---------- 1.3: Nutrición (Comida | Agua), pestaña Ayuno, proteína, peso, sueño, variabilidad y hora habitual ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; const H=3600000;
+    window.isPremium=()=>true;
+    NSEG='comida'; const vc=viewNutricion(); NSEG='agua'; const va=viewNutricion(); NSEG='comida';
+    out.comida=/Diario de comidas/.test(vc) && !/data-a="water"/.test(vc) && vc.includes('<!--fin-objetivo-->');
+    out.agua=/data-a="water"/.test(va) && !/Diario de comidas/.test(va);
+    out.ayuno=/Ayuno/.test(viewAyuno()) && !/data-a="fastStart"/.test(vc+va);
+    TAB='ayuno'; render(); out.nav=document.querySelectorAll('#nav button').length; out.navOn=document.querySelector('#nav button.on').dataset.v; TAB='rutinas';
+    const aj=SCREENS.ajGrupo({g:'nutri'}); out.ajustes=/data-a="nGoalPick"/.test(aj) && /data-a="dPrefs"/.test(aj);
+    // proteína: a las 20 h con 30 g de 150 g
+    __setNow(Date.UTC(2026,10,12,20,0,0)); const n=nd(); n.diario[dayKey()]=[{id:'a',fid:'09003',n:'Manzana',gr:150,m:'almuerzo',k:80,p:0.4,c:20,g:0.2,t:Date.now()-3600000}];
+    const pi=protIdeas(dayKey()); out.prot=!!pi && pi.ids.length===3 && pi.ids.every(id=>{ const f=alimGet(id); return f.p/f.k*100>=8; });
+    window.isPremium=()=>false; out.protGratis=protIdeas(dayKey())===null; window.isPremium=()=>true; __setNow(${NOW});
+    // peso: de 82 a 80 en 28 días, meta 78
+    S.measures=[0,7,14,21,28].map((d,i)=>({id:'w'+i,date:Date.now()-(28-d)*86400000,peso:82-i*0.5})); S.goals=[{id:'g',type:'peso',target:78,deadline:Date.now()+200*86400000}];
+    const T=pesoTendencia(); out.peso={now:T.now, rate:T.rate, eta:T.eta?Math.round((T.eta-Date.now())/86400000):null};
+    // sueño y variabilidad
+    window.PF_SUENO={last:330,avg:420,n:6,at:Date.now()-5*H}; out.sueno=!!suenoCorto(); window.PF_SUENO={last:400,avg:420,n:6,at:Date.now()-5*H}; out.suenoOk=!suenoCorto();
+    window.PF_HRV={last:40,avg:50,n:6,at:Date.now()-5*H}; out.hrv=hrvBaja()&&hrvBaja().pct; window.PF_HRV={last:47,avg:50,n:6,at:Date.now()-5*H}; out.hrvOk=!hrvBaja();
+    window.PF_SUENO=null; window.PF_HRV=null;
+    // hora habitual: 5 entrenos empezando a las 18:00-18:40 (hora local del navegador simulado = UTC)
+    S.sessions=[0,10,20,30,40].map((m,i)=>({id:'s'+i,routineId:'r',start:Date.UTC(2026,10,1+i,18,m),end:Date.UTC(2026,10,1+i,19,m),items:[]}));
+    out.hora=horaHabitual();
+    return JSON.stringify(out); })()`));
+  comprobar('Nutrición: Comida y Agua por separado, y el ayuno ya no está en Nutrición', r.comida && r.agua && r.ayuno, JSON.stringify([r.comida, r.agua, r.ayuno]));
+  comprobar('barra de abajo: 6 pestañas con Ayuno', r.nav === 6 && r.navOn === 'ayuno', JSON.stringify([r.nav, r.navOn]));
+  comprobar('Ajustes › Nutrición y ayuno: objetivo nutricional y preferencias de comida', r.ajustes);
+  comprobar('proteína: 3 ideas con 8 g o más por 100 kcal, solo con Premium', r.prot && r.protGratis);
+  comprobar('peso: tendencia suavizada, ritmo semanal y fecha estimada de la meta', r.peso.now > 80 && r.peso.now < 81.5 && r.peso.rate < -0.3 && r.peso.eta > 0, JSON.stringify(r.peso));
+  comprobar('sueño: menos de 6 h cuenta; 6 h 40 no', r.sueno && r.suenoOk);
+  comprobar('variabilidad del pulso: un 20 % bajo la media cuenta; un 6 % no', r.hrv === 20 && r.hrvOk, JSON.stringify([r.hrv, r.hrvOk]));
+  comprobar('hora habitual: mediana 18:20, aviso 17:50', r.hora && r.hora.hora === '18:20' && r.hora.aviso === '17:50', JSON.stringify(r.hora));
+  a.cerrar();
+  const prem = fs.readFileSync(path.join(DIR, '..', 'www', 'premium.js'), 'utf8');
+  comprobar('Premium: el candado de calorías usa la marca de fin del objetivo (no depende de que el agua esté debajo)', /h\.indexOf\('<!--fin-objetivo-->'\)/.test(prem));
 }
 
 /* ---------- Comparación con los resultados guardados ---------- */

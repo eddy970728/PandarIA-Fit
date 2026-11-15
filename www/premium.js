@@ -169,6 +169,7 @@
   const REASONS = {
     pandaria:'Las rutinas diseñadas por PandarIA son parte de Premium.', explore:'Esta rutina es parte de Premium.', intervals:'Este modo de intervalos es parte de Premium.',
     history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.', diario:'Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.', alimProp:'En la versión gratis puedes crear hasta 10 alimentos y recetas propios.', calidad:'La calidad del día (fibra, sodio y proteína por comida) es parte de Premium.', menu:'Los ejemplos de menú hechos con tus calorías y tus preferencias son parte de Premium.',
+    scan:'Escanear códigos de barras es parte de Premium.',
     customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
   SCREENS.premium = p => {
@@ -336,7 +337,8 @@
   viewNutricion = function(){
     let h = _vn.apply(this, arguments);
     if (!locked()) return h;
-    const a = h.indexOf('<div class="sec">Tu objetivo diario</div>'), b = h.indexOf('<div class="sec">Agua</div>');
+    // 1.3: Comida y Agua son subpestañas; el bloque de calorías termina en la marca <!--fin-objetivo-->
+    const a = h.indexOf('<div class="sec">Tu objetivo diario</div>'), b = h.indexOf('<!--fin-objetivo-->');
     if (a < 0 || b < 0) return h;
     return h.slice(0, a) + `<div class="pf-lockwrap" style="min-height:300px"><div class="pf-blur">${h.slice(a, b)}</div>${lockCard('Calorías y macros', 'nutrition')}</div>` + h.slice(b);
   };
