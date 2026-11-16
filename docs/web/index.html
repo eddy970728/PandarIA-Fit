@@ -118,6 +118,15 @@ button.link::after,[data-a=kbOpen]::after{content:'';position:absolute;left:-6px
 /* Routine card */
 .rcard .exs{color:var(--mut);font-size:13.5px;line-height:1.45;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ndot{width:9px;height:9px;border-radius:50%;background:var(--ac);display:inline-block}
+.uiprev{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:10px;background:var(--bg);height:112px;overflow:hidden}
+.uiprev i{display:block;height:9px;border-radius:4px;background:var(--card2)}
+.uiprev i.l{height:7px;background:var(--mut2)} .uiprev i.w60{width:60%} .uiprev i.o{background:var(--acs);border:1px solid var(--ac)}
+.uiprev i.h10{height:10px} .uiprev i.h18{height:18px} .uiprev i.h24{height:24px} .uiprev i.h36{height:36px}
+.uiopt.on{border:2px solid var(--ac)}
+.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.ibtn.pri{background:var(--ac);color:#1a0d02}
+.rplay{background:var(--acs);color:var(--ac);flex:none}
+.tip1 .ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .newbtn{display:flex;align-items:center;gap:12px;width:100%;padding:16px;border-radius:var(--r);background:var(--ac);color:#1a0d02;font-weight:800;font-size:16px;margin-bottom:16px}
 .newbtn .pl{width:34px;height:34px;border-radius:10px;background:rgba(0,0,0,.14);display:grid;place-items:center}
 /* Banner */
@@ -5608,42 +5617,61 @@ document.addEventListener('change',e=>{ const el=e.target.closest('[data-ch]'); 
 const IN={}, CH={};
 
 /* =================== MIS RUTINAS =================== */
+/* ---------- 1.6 · Mis rutinas en dos modos: Completa y Minimalista ----------
+   Completa: todo a la vista pero ordenado (consejo del día, Hoy compacto, avisos juntos, rutinas en dos líneas).
+   Minimalista: solo lo esencial; el detalle se abre con un toque. Se cambia en cualquier momento (cabecera o Ajustes). */
+const uiMini=()=>S.settings.ui==='mini';
+A.setUi=v=>{ S.settings.ui=v==='mini'?'mini':'completa'; save(); render.keep=true; render(); };
+A.uiToggle=()=>{ A.setUi(uiMini()?'completa':'mini'); toast(uiMini()?tx('Vista minimalista','Minimal view'):tx('Vista completa','Full view')); };
+let HOY_MAS=false, AVISOS_ABIERTOS=false;
+A.hoyMas=()=>{ HOY_MAS=!HOY_MAS; render.keep=true; render(); };
+A.avisosTog=()=>{ AVISOS_ABIERTOS=!AVISOS_ABIERTOS; render.keep=true; render(); };
 function viewRutinas(){
-  const rs=S.routines.filter(r=>!r.archived);
-  let h=`<div class="hdr"><div class="grow"><div class="brand xs mut">PandarIA <b>Fit</b></div><h1>Mis rutinas</h1></div>
-    <button class="ibtn soft" data-a="openIntervals" title="Modo intervalos">${I('timer',22)}</button><button class="ibtn soft" data-a="openLib" title="Biblioteca">${I('book',22)}</button></div>`;
-  h+=updCard()+banners()+reportBanner()+hoyCard();
-  h+=`<button class="newbtn" data-a="newRoutine"><span class="pl">${I('plus',22)}</span>Nueva rutina</button>`;
-  h+=tipCard()+balanceBanner();
+  const rs=S.routines.filter(r=>!r.archived), mini=uiMini();
+  let h=`<div class="hdr"><div class="grow"><div class="brand xs mut">PandarIA <b>Fit</b></div><h1>${tx('Mis rutinas','My routines')}</h1></div>
+    <button class="ibtn soft" data-a="uiToggle" title="${mini?tx('Vista completa','Full view'):tx('Vista minimalista','Minimal view')}" aria-label="${tx('Cambiar vista','Switch view')}">${I(mini?'layers':'list',22)}</button><button class="ibtn soft" data-a="openIntervals" title="${tx('Modo intervalos','Interval mode')}">${I('timer',22)}</button><button class="ibtn soft" data-a="openLib" title="${tx('Biblioteca','Library')}">${I('book',22)}</button><button class="ibtn pri" data-a="newRoutine" title="${tx('Nueva rutina','New routine')}" aria-label="${tx('Nueva rutina','New routine')}">${I('plus',22)}</button></div>`;
+  // el entreno en curso siempre va primero y entero: es lo más importante
+  if (S.active) h+=`<div class="banner" data-a="resumeWorkout" style="cursor:pointer"><span class="ic">${I('play',20)}</span><div class="grow"><div class="b">${tx('Tienes un entreno en curso','You have a workout in progress')}</div><div class="sm mut">${esc(S.active.name)} · ${tx('toca para volver','tap to go back')}</div></div></div>`;
+  h+=tipCard(mini);
+  h+=mini?hoyMini():hoyCard();
+  h+=avisosHtml(mini);
   if (!rs.length){
-    h+=`<div class="empty"><div class="big">🏋️</div><div class="ttl" style="color:var(--tx)">Aún no tienes rutinas</div><p>Crea la tuya, deja que PandarIA la diseñe o elige una en Explorar.</p><button class="btn" data-a="tab" data-v="explorar">${I('compass',20)} Ir a Explorar</button></div>`;
+    h+=`<div class="empty"><div class="big">🏋️</div><div class="ttl" style="color:var(--tx)">${tx('Aún no tienes rutinas','You have no routines yet')}</div><p>${tx('Crea la tuya, deja que PandarIA la diseñe o elige una en Explorar.','Create your own, let PandarIA design one or pick one in Explore.')}</p><div class="row" style="gap:8px;justify-content:center"><button class="btn pri" data-a="newRoutine">${I('plus',20)} ${tx('Nueva rutina','New routine')}</button><button class="btn" data-a="tab" data-v="explorar">${I('compass',20)} ${tx('Explorar','Explore')}</button></div></div>`;
     return h;
   }
   const progs={};
   rs.forEach(r=>{ const k=r.programId||'_'; (progs[k]=progs[k]||[]).push(r); });
   Object.entries(progs).forEach(([k,list])=>{
     if (k!=='_') h+=`<div class="sec row" style="gap:6px">${I('spark',16)} ${esc(list[0].programName||'Plan PandarIA')}</div>`;
-    else if (Object.keys(progs).length>1) h+=`<div class="sec">Rutinas</div>`;
-    list.forEach(r=>h+=routineCard(r));
+    else h+=`<div class="sec">${Object.keys(progs).length>1?tx('Rutinas','Routines'):tx('Tus rutinas','Your routines')}</div>`;
+    h+=mini?`<div class="card" style="padding:2px 14px">${list.map(routineRow).join('')}</div>`:list.map(r=>routineCard(r)).join('');
   });
   return h;
 }
+// Completa: dos líneas y botón de empezar; la lista de ejercicios se ve al abrir la rutina
 function routineCard(r){
-  const ex=r.items.filter(i=>!i.warm&&!i.cool).map(i=>getEx(i.exId).n);
+  const n=r.items.filter(i=>!i.warm&&!i.cool).length;
   const ns=premOK()?(r.sugg||[]).length:0;
-  return `<div class="card tap rcard" data-a="openRoutine" data-v="${r.id}">
-    <div class="row"><div class="grow"><div class="ttl ell">${esc(r.name)}</div>
-    <div class="row xs mut" style="gap:8px;margin-top:5px;flex-wrap:wrap">${pIA(r)?`<span class="tag ac">${I('spark',12)} PandarIA</span>`:''}<span>${plural(ex.length,'ejercicio','ejercicios')}</span><span>· ~${routineMinutes(r)} min</span><span>· ${ago(r.lastDone)}</span></div></div>
-    ${ns?`<span class="tag ac"><span class="ndot"></span> ${ns}</span>`:''}${I('right',20)}</div>
-    <div class="exs">${esc(ex.join(' · '))||'Sin ejercicios'}</div></div>`;
+  return `<div class="card tap rcard" data-a="openRoutine" data-v="${r.id}"><div class="row" style="gap:10px">
+    <div class="grow" style="min-width:0"><div class="ttl ell">${esc(r.name)}</div>
+    <div class="row xs mut" style="gap:6px;margin-top:5px;flex-wrap:wrap">${pIA(r)?`<span class="tag ac">${I('spark',12)} PandarIA</span>`:''}<span>${plural(n,'ejercicio','ejercicios')} · ~${routineMinutes(r)} min · ${ago(r.lastDone)}</span>${ns?`<span class="tag ac"><span class="ndot"></span> ${ns}</span>`:''}</div></div>
+    <button class="ibtn rplay" data-a="startWorkout" data-v="${r.id}" aria-label="${tx('Empezar','Start')} ${esc(r.name)}">${I('play',18)}</button></div></div>`;
 }
+// Minimalista: una línea por rutina
+function routineRow(r,i){
+  return `<div class="srow" style="${i?'':'border-top:0'};gap:10px"><button class="grow" style="text-align:left;min-width:0" data-a="openRoutine" data-v="${r.id}"><div class="b ell">${esc(r.name)}</div><div class="xs mut">~${routineMinutes(r)} min · ${ago(r.lastDone)}</div></button><button class="ibtn rplay" data-a="startWorkout" data-v="${r.id}" aria-label="${tx('Empezar','Start')}">${I('play',16)}</button></div>`;
+}
+// Avisos juntos: uno se ve entero; varios, en una línea con contador que se abre al tocarla
+function avisosLista(){ return [updCard(),banners(),reportBanner(),balanceBanner()].join('').match(/<div class="(?:banner|card tap)[\s\S]*?(?=<div class="(?:banner|card tap)|$)/g)||[]; }
+function avisosHtml(mini){ const L=avisosLista(); if (!L.length) return '';
+  if (L.length===1 && !mini) return L[0];
+  return `<button class="card row avisos" data-a="avisosTog" style="width:100%;gap:10px;padding:12px 14px"><span style="color:var(--ac)">${I('bell',18)}</span><span class="grow b sm" style="text-align:left">${tx(`${L.length} ${L.length===1?'aviso':'avisos'}`,`${L.length} ${L.length===1?'notice':'notices'}`)}</span><span class="tag ac">${L.length}</span>${I(AVISOS_ABIERTOS?'up':'down',18)}</button>${AVISOS_ABIERTOS?L.join(''):''}`; }
 function banners(){
   let h='';
-  if (S.active) h+=`<div class="banner" data-a="resumeWorkout" style="cursor:pointer"><span class="ic">${I('play',20)}</span><div class="grow"><div class="b">Tienes un entreno en curso</div><div class="sm mut">${esc(S.active.name)} · toca para volver</div></div></div>`;
   if (deloadActive()) h+=`<div class="banner blue"><span class="ic">${I('refresh',22)}</span><div class="grow"><div class="b">Semana de descarga activa</div><div class="sm mut">PandarIA sugiere pesos más livianos hasta el ${fmtDate(S.deload.until)}. Tu cuerpo se recupera y vuelve más fuerte.</div></div></div>`;
   const rem=S.settings.reminders;
   const today=new Date();
-  if (rem.days.includes(today.getDay()) && !S.sessions.some(s=>new Date(s.end).toDateString()===today.toDateString()) && !S.dismissed['rem-'+today.toDateString()])
+  if (!(S.plan && planRoutines().length) && rem.days.includes(today.getDay()) && !S.sessions.some(s=>new Date(s.end).toDateString()===today.toDateString()) && !S.dismissed['rem-'+today.toDateString()])
     h+=`<div class="banner"><span class="ic">${I('bell',22)}</span><div class="grow"><div class="b">Hoy toca entrenar</div><div class="sm mut">Elige una rutina y dale. Unos minutos ya cuentan.</div></div><button class="ibtn" data-a="dismiss" data-v="rem-${today.toDateString()}">${I('x',18)}</button></div>`;
   const ld=lastTrainedDays();
   if (ld!==null && ld>=14 && premOK()) h+=`<div class="banner blue"><span class="ic">${I('info',22)}</span><div class="grow"><div class="b">¡Qué bueno verte de vuelta!</div><div class="sm mut">Pasaron ${Math.round(ld)} días. PandarIA ajustará los pesos para que retomes sin riesgo.</div></div></div>`;
@@ -5739,7 +5767,19 @@ function boot(){
   if (!S.settings.onboarded) setTimeout(()=>openLayer('onboard',{step:0,level:'principiante',preset:null}),300);
   try{ updInit(); }catch(e){}
   setTimeout(()=>{ try{ cloudBoot(); }catch(e){} },0);
+  uiPreguntar();
 }
+// 1.6: una sola vez (al estrenar la versión o tras la bienvenida) se ofrecen los dos modos con su vista previa
+function uiPreguntar(){ let n=0; const t=setInterval(()=>{ n++; if (n>240 || S.settings.ui){ clearInterval(t); return; }
+  if (!S.settings.onboarded || MODALS.length || LAYERS.length || TAB!=='rutinas') return; clearInterval(t); A.uiElegir(); },2500); }
+const uiPrev=mini=>`<div class="uiprev">${mini?
+  `<i class="l w60"></i><i class="b h18"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class="b"></i>`:
+  `<i class="l w60"></i><i class="b h18 o"></i><i class="b h36"></i><i class="b h10"></i><i class="b h24"></i><i class="b h24"></i>`}</div>`;
+A.uiElegir=()=>{ const cur=S.settings.ui||'completa';
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('¿Cómo prefieres ver la app?','How do you prefer to see the app?')}</h3><p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">${tx('Puedes cambiarlo cuando quieras con el botón de vista en Mis rutinas o en Ajustes.','You can change it any time with the view button in My routines or in Settings.')}</p>
+    <div class="row" style="gap:10px;align-items:stretch">${[['completa',tx('Completa','Full'),tx('Todo a la vista, ordenado','Everything in view, organised')],['mini',tx('Minimalista','Minimal'),tx('Solo lo esencial','Just the essentials')]].map(([k,n,d])=>`<button class="card uiopt ${cur===k?'on':''}" style="flex:1;margin:0;text-align:left" data-a="uiElige" data-v="${k}">${uiPrev(k==='mini')}<div class="b" style="margin-top:10px">${n}</div><div class="xs mut">${d}</div></button>`).join('')}</div>
+    <button class="btn pri big" style="margin-top:14px" data-a="uiElige" data-v="${cur}">${tx('Continuar','Continue')}</button></div>`,{locked:true}); };
+A.uiElige=v=>{ S.settings.ui=v==='mini'?'mini':'completa'; save(); closeModal(); render.keep=true; render(); };
 if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 
 /* ============ Pantallas ============ */
@@ -7303,16 +7343,29 @@ function hoyCard(){
   if (trainedToday) body=`<div class="b" style="font-size:18px">¡Hoy ya entrenaste!</div><div class="sm mut" style="margin-top:4px">Próxima: ${esc(nx.r.name)}. Descansa, hidrátate y come proteína.</div>`;
   else if (S.plan.days.includes(dow)) body=`<div class="xs mut b" style="letter-spacing:1px">HOY TOCA</div><div class="b" style="font-size:20px;margin-top:2px">${esc(nx.r.name)}</div>
     <div class="sm mut" style="margin-top:4px">~${routineMinutes(nx.r)} min · ${plural(nx.r.items.filter(i=>!i.warm&&!i.cool).length,'ejercicio','ejercicios')}${ph?` · ${tx(`Bloque ${ph.n.toLowerCase()} (${ph.d})`,`${{Volumen:'Volume',Intensidad:'Intensity',Descarga:'Deload'}[ph.n]||ph.n} block (${ph.d.replace(/semanas?/,x=>x==='semana'?'week':'weeks').replace(' de ',' of ')})`)}`:''}</div>
-    ${nx.swapped?`<div class="xs" style="color:var(--blue);margin-top:6px">PandarIA adelantó esta rutina: los músculos de ${esc(nx.swapped.name)} aún se recuperan.</div>`:''}
-    ${(x=>x?`<div class="xs" style="color:var(--gold);margin-top:6px;line-height:1.4">🥩 ${esc(protCortaTxt(x))}${kbLink('conexion.proteina',tx('Por qué','Why'))}</div>`:'')(protCorta())}
-    ${(rs=>rs.lvl==='buena'||!premOK()?'':`<div class="xs" style="color:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'};margin-top:6px;line-height:1.4">${tx('Recuperación '+rs.lvl,(rs.lvl==='baja'?'Low':'Medium')+' recovery')}: ${esc(rs.msgs.join(' · '))}${kbLink('recuperacion.ajuste',tx('Por qué','Why'))}</div>`)(recoveryState(nx.r))}
-    <div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${pIA(nx.r)&&recoveryState(nx.r).lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">${tx('Suave','Easy')}</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
-    <button class="link xs" style="margin-top:8px" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}${premOK()?'':' 🔒'}</button>
-    <button class="link xs" style="margin-top:8px;display:block" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>`;
+    ${(()=>{ // 1.6: los detalles van plegados; un aviso corto dice si hay algo que mirar
+      const rs=premOK()?recoveryState(nx.r):{lvl:'buena',msgs:[]}, pc=protCorta();
+      const det=(nx.swapped?`<div class="xs" style="color:var(--blue);margin-top:6px">PandarIA adelantó esta rutina: los músculos de ${esc(nx.swapped.name)} aún se recuperan.</div>`:'')
+        +(pc?`<div class="xs" style="color:var(--gold);margin-top:6px;line-height:1.4">🥩 ${esc(protCortaTxt(pc))}${kbLink('conexion.proteina',tx('Por qué','Why'))}</div>`:'')
+        +(rs.lvl==='buena'?'':`<div class="xs" style="color:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'};margin-top:6px;line-height:1.4">${tx('Recuperación '+rs.lvl,(rs.lvl==='baja'?'Low':'Medium')+' recovery')}: ${esc(rs.msgs.join(' · '))}${kbLink('recuperacion.ajuste',tx('Por qué','Why'))}</div>`)
+        +`<button class="link xs" style="margin-top:8px;display:block" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}${premOK()?'':' 🔒'}</button>`
+        +`<button class="link xs" style="margin-top:8px;display:block" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>`;
+      const avisos=(nx.swapped?1:0)+(pc?1:0)+(rs.lvl!=='buena'?1:0);
+      return `<div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${pIA(nx.r)&&rs.lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">${tx('Suave','Easy')}</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
+      <button class="link xs" style="margin-top:10px;display:flex;align-items:center;gap:6px" data-a="hoyMas">${avisos?`<span class="ndot" style="background:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'}"></span>`:''}${HOY_MAS?tx('Ocultar detalles','Hide details'):avisos?tx(`${avisos===1?'Un detalle':avisos+' detalles'} para hoy`,`${avisos===1?'One note':avisos+' notes'} for today`):tx('Más opciones','More options')} ${I(HOY_MAS?'up':'down',14)}</button>${HOY_MAS?det:''}`; })()}`;
   else { let k=1; while(k<8 && !S.plan.days.includes((dow+k)%7)) k++;
     body=`<div class="xs mut b" style="letter-spacing:1px">HOY</div><div class="b" style="font-size:20px;margin-top:2px">Día de descanso</div><div class="sm mut" style="margin-top:4px">Próximo entreno: ${k===1?'mañana':DAYS_LONG[(dow+k)%7]} · ${esc(nx.r.name)}</div>
     <button class="link sm" style="margin-top:10px" data-a="hoyChange">Entrenar igual hoy</button>`; }
   return `<div class="card hoy">${strip}<div style="margin-top:12px">${body}</div><button class="xs mut" style="margin-top:10px" data-a="openPlan">${I('edit',12).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} Editar plan semanal</button></div>`;
+}
+// 1.6 · Minimalista: la rutina de hoy en una línea con Empezar
+function hoyMini(){
+  if (!S.plan || !planRoutines().length) return '';
+  const dow=new Date().getDay(), wk=weekKey(Date.now()), hecho=S.sessions.some(s=>weekKey(s.end)===wk&&new Date(s.end).getDay()===dow), nx=nextInPlan();
+  if (hecho) return `<div class="card row" style="gap:10px;padding:12px 14px"><span style="color:var(--ok)">${I('check',20)}</span><div class="grow sm"><b>${tx('Hoy ya entrenaste','You trained today')}</b> · <span class="mut">${tx('Próxima','Next')}: ${esc(nx.r.name)}</span></div></div>`;
+  if (!S.plan.days.includes(dow)) return `<div class="card row" style="gap:10px;padding:12px 14px"><span class="mut">${I('moon',20)}</span><div class="grow sm"><b>${tx('Día de descanso','Rest day')}</b> · <span class="mut">${esc(nx.r.name)} ${tx('es la próxima','is next')}</span></div><button class="link sm" data-a="hoyChange">${tx('Entrenar','Train')}</button></div>`;
+  const rs=premOK()?recoveryState(nx.r):{lvl:'buena'};
+  return `<div class="card hoy row" style="gap:12px;padding:12px 14px"><div class="grow" style="min-width:0"><div class="xs mut b" style="letter-spacing:1px">${tx('HOY TOCA','UP TODAY')}${rs.lvl!=='buena'?` <span class="ndot" style="background:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'}"></span>`:''}</div><div class="b ell" style="font-size:17px">${esc(nx.r.name)}</div><div class="xs mut">~${routineMinutes(nx.r)} min</div></div><button class="btn pri" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} ${tx('Empezar','Start')}</button></div>`;
 }
 function recoveryState(r){
   const KR=kb('recuperacion.ajuste'), msgs=[]; let pts=0;
@@ -7666,11 +7719,14 @@ function tipOfDay(cat){
 }
 const tipRule = text => { const t=TIPS.find(x=>x[1]===text); return t&&t[2]&&KB[t[2]]?t[2]:null; };
 const kbLink = (id, label) => id&&KB[id]?` <button class="link xs" style="white-space:nowrap" data-a="kbOpen" data-v="${id}">${label||'Ver fuente'}</button>`:'';
-function tipCard(){
+function tipCard(mini){
   if (S.settings.tips===false || S.settings.lang==='en') return '';
   const k='tip-'+new Date().toDateString(); if (S.dismissed[k]) return '';
-  return `<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--gold)">${I('spark',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO DEL DÍA</div><div class="sm" style="margin-top:4px;line-height:1.45">${(t=>esc(t)+kbLink(tipRule(t)))(tipOfDay())}</div></div><button class="ibtn" style="width:30px;height:30px" data-a="dismiss" data-v="${k}">${I('x',16)}</button></div>`;
+  const t=tipOfDay();
+  if (mini) return `<div class="card row tip1" style="gap:10px;padding:10px 12px"><span style="color:var(--gold)">${I('spark',18)}</span><button class="grow sm ell" style="text-align:left;min-width:0" data-a="tipVer">${esc(t)}</button><button class="ibtn" style="width:28px;height:28px" data-a="dismiss" data-v="${k}" aria-label="${tx('Cerrar','Close')}">${I('x',16)}</button></div>`;
+  return `<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--gold)">${I('spark',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO DEL DÍA</div><div class="sm clamp2" style="margin-top:4px;line-height:1.45" data-a="tipVer">${esc(t)}</div>${kbLink(tipRule(t))}</div><button class="ibtn" style="width:30px;height:30px" data-a="dismiss" data-v="${k}" aria-label="${tx('Cerrar','Close')}">${I('x',18)}</button></div>`;
 }
+A.tipVer=()=>{ const t=tipOfDay(); openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Consejo del día','Tip of the day')}</h3><p style="line-height:1.55;margin:0 4px 12px">${esc(t)}</p><div style="margin:0 4px 14px">${kbLink(tipRule(t))}</div><button class="btn wide" data-a="closeModal">${tx('Cerrar','Close')}</button></div>`); };
 function reportBanner(){
   if (S.settings.report===false) return '';
   const lw=weekKey(Date.now())-7*DAY; const k='rep-'+lw; if (S.dismissed[k]) return '';
@@ -10064,11 +10120,12 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.5';
+const APP_VERSION='1.6';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.6',t:'Interfaz a tu gusto',items:['Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento', 'Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar']},
  {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas', 'Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno', 'Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar', 'Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)', 'Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno', 'Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer', 'Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos']},
  {v:'1.4',t:'Retos y Consulta a PandarIA',items:['Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale', 'Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)', 'Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos', 'Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores', 'Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir', 'Tarjeta del entreno renovada, con el panda y tus récords', 'Versión para iPhone y iPad (se instala con AltStore desde el PC)', 'Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)']},
  {v:'1.3',t:'Comer, dormir y ayunar',items:['Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua', 'Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano', 'Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado', 'Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)', 'Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)', 'Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)', 'Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)', 'Notificación del entreno con la serie siguiente y el botón «✓ Hecha»', 'Biblioteca de evidencia 1.6: 4 reglas nuevas']},
@@ -10468,6 +10525,9 @@ function viewAjustes(){
     ${tg('awake',st.awake!==false,'flame','Pantalla siempre encendida')}
   </div>
   <div class="sec">Apariencia y accesibilidad</div><div class="card" style="padding:0 12px">
+    <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('layers',20)}</span><span class="b grow">${tx('Interfaz','Interface')}</span></div>
+      <div class="seg">${[['completa',tx('Completa','Full')],['mini',tx('Minimalista','Minimal')]].map(([k,n])=>`<button class="${(st.ui==='mini'?'mini':'completa')===k?'on':''}" data-a="setUi" data-v="${k}">${n}</button>`).join('')}</div>
+      <div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('Completa: todo a la vista, ordenado. Minimalista: solo lo esencial; el resto se abre con un toque. También se cambia con el botón de vista en Mis rutinas.','Full: everything in view, organised. Minimal: just the essentials; the rest opens with a tap. You can also switch with the view button in My routines.')}</div></div>
     <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('moon',20)}</span><span class="b grow">Tema</span></div>
       <div class="seg">${[['system','Automático'],['light','Claro'],['dark','Oscuro'],['oled','Negro']].map(([k,n])=>`<button class="${(st.theme||'dark')===k?'on':''}" data-a="setThemeMode" data-v="${k}">${n}</button>`).join('')}</div>
       ${st.theme==='system'?`<div class="xs mut" style="margin:10px 0 6px">De noche usa</div><div class="seg">${[['dark','Oscuro gris'],['oled','Negro puro']].map(([k,n])=>`<button class="${(st.oscuroAuto||'dark')===k?'on':''}" data-a="setOscuroAuto" data-v="${k}">${n}</button>`).join('')}</div>`:''}
@@ -10512,7 +10572,7 @@ const AJ_GRUPOS=[
   {id:'avisos',ic:'bell',t:'Avisos y sonido',en:'Reminders and sound',d:'Notificaciones, sonido, vibración y voz',den:'Notifications, sound, vibration and voice',
    parts:[{keys:['nfMenu'],rest:['Notificaciones','Recordatorios'],whole:true},{sec:'Durante el entreno',keys:['toggleSet:sound','toggleSet:vibrate','toggleSet:voice','toggleSet:uiSound']}]},
   {id:'pantalla',ic:'moon',t:'Pantalla e idioma',en:'Display and language',d:'Idioma, tema, tamaño del texto y animaciones',den:'Language, theme, text size and animations',
-   parts:[{keys:['setLang','setThemeMode','setTexto','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
+   parts:[{keys:['setLang','setUi','setThemeMode','setTexto','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
   {id:'salud',ic:'heart',t:'Salud',en:'Health',d:'Health Connect',den:'Health Connect',parts:[{keys:[],rest:['Salud'],whole:true}]},
   {id:'acerca',ic:'info',t:'Acerca de',en:'About',d:'Ciencia, historial de cambios, créditos y versión',den:'Science, change history, credits and version',
    parts:[{sec:'Acerca de',whole:true,noHead:true},{html:()=>typeof A.hcPrivacy==='function'?`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" data-a="hcPrivacy"><span class="si">${I('lock',20)}</span><span class="grow b">${tx('Política de privacidad','Privacy policy')}</span><span class="mut" style="font-size:22px;line-height:1">›</span></button></div>`:''},{sec:'Créditos',whole:true},{otros:true}]}
@@ -13058,7 +13118,11 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)|PandarIA bubble: a small button with the app icon that opens a quick guide with questions about the screen you are on (you can drag it or turn it off in Settings)
+const EN_09 = `Interfaz a tu gusto|Your interface, your way
+Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento|Choose how to see the app: Full (everything in view, organised) or Minimal (just the essentials). Switch at any time
+Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar|Cleaner My routines: tip of the day on top, compact Today, notices together and routines with a start button
+Opcional. No cambia tu sesión, pero PandarIA lo tiene en cuenta para sus sugerencias.|Optional. It does not change your session, but PandarIA takes it into account for its suggestions.
+Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)|PandarIA bubble: a small button with the app icon that opens a quick guide with questions about the screen you are on (you can drag it or turn it off in Settings)
 Guía rápida flotante con preguntas de cada pantalla (experimental). Se puede arrastrar a cualquier borde|Floating quick guide with questions for each screen (experimental). You can drag it to any edge
 Pregúntale sobre entreno, comida, sueño o ayuno: responde con tus datos.|Ask about training, food, sleep or fasting: it answers with your data.
 Consulta a PandarIA|Ask PandarIA

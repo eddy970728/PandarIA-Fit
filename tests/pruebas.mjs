@@ -664,6 +664,13 @@ if (fs.existsSync(COPIA07)) {
       const last=S.sessions[S.sessions.length-1]; out.mdGuardada=!!(last&&last.ajuste&&last.ajuste.f===0.9);
       const nx=rr.items[0]; out.mdSiguiente=suggestSet(rr,nx,nx.sets.indexOf(nx.sets.find(x=>x.t!=='c'))).kg;
       S.active=null; S.sessions=S1; S.routines=R1; delete S.checkinDia; window.isPremium=ip; }
+    // 1.6 · Mis rutinas en dos modos
+    { const u0=S.settings.ui, T0=TAB, R0=S.routines; S.routines=R0.concat([newRoutine({name:'Prueba UI',items:[buildItem('press_banca','musculo',2)]})]); TAB='rutinas'; MODALS.length=0; renderModals(); LAYERS.length=0; renderLayers();
+      A.setUi('completa'); const vc=document.querySelector('#view');  out.uiComp=!!vc.querySelector('.rcard [data-a="startWorkout"]') && !vc.querySelector('.newbtn') && !!vc.querySelector('.hdr [data-a="newRoutine"]') && !vc.querySelector('.rcard .exs');
+      A.setUi('mini'); out.uiMini=!!vc.querySelector('[data-a="openRoutine"]') && !vc.querySelector('.rcard') && !!vc.querySelector('.hdr [data-a="uiToggle"]');
+      A.uiToggle(); out.uiToggle=S.settings.ui==='completa';
+      delete S.settings.ui; A.uiElegir(); out.uiElegir=MODALS.length===1 && document.querySelectorAll('#modals [data-a="uiElige"]').length===3; A.uiElige('mini'); out.uiElige=S.settings.ui==='mini' && !MODALS.length;
+      S.settings.ui=u0||'completa'; S.routines=R0; TAB=T0; render(); }
     // 1.5 · Agua completa
     const n5=nut(), k5=dayKey(); n5.water[k5]=300; n5.waterLog={}; n5.waterExtra={}; const g0=waterGoal();
     A.water(330,'Taza'); A.water(500); out.a5log=wLog(k5).length===2 && wLog(k5)[0].n==='Taza' && n5.water[k5]===1130;
@@ -693,6 +700,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('borrar 1.5: quitar una comida tiene Deshacer y funciona', r.dzComida && r.dzDeshacer);
   comprobar('limpiar 1.5: detecta un entreno de 20 segundos y un ayuno de 2 minutos y los borra', r.dzDetecta && r.dzLimpia);
   comprobar('mal día (flujo completo): el check-in de la mañana aplica 10 % menos (92,5 kg en vez de 102,5), la sesión se guarda aligerada y la siguiente sube desde 100 kg', r.mdAjuste && r.mdKg === 92.5 && r.mdGuardada && r.mdSiguiente === 102.5, JSON.stringify([r.mdAjuste, r.mdKg, r.mdGuardada, r.mdSiguiente, r.mdErr]));
+  comprobar('1.6: Mis rutinas en modo completo (tarjetas con empezar, + en la cabecera) y minimalista (una línea), se cambia con un toque y se elige una vez', r.uiComp && r.uiMini && r.uiToggle && r.uiElegir && r.uiElige, JSON.stringify([r.uiComp,r.uiMini,r.uiToggle,r.uiElegir,r.uiElige]));
   comprobar('agua 1.5: lista del día con nombre, deshacer el último y borrar uno', r.a5log && r.a5deshacer && r.a5borrar, JSON.stringify([r.a5log,r.a5deshacer,r.a5borrar]));
   comprobar('agua 1.5: día de calor suma 500 ml a la meta y se quita', r.a5calor && r.a5calorOff);
   comprobar('agua 1.5: estadísticas del agua', r.a5stats);
