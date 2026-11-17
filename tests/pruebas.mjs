@@ -671,6 +671,14 @@ if (fs.existsSync(COPIA07)) {
       A.uiToggle(); out.uiToggle=S.settings.ui==='completa';
       delete S.settings.ui; A.uiElegir(); out.uiElegir=MODALS.length===1 && document.querySelectorAll('#modals [data-a="uiElige"]').length===3; A.uiElige('mini'); out.uiElige=S.settings.ui==='mini' && !MODALS.length;
       S.settings.ui=u0||'completa'; S.routines=R0; TAB=T0; render(); }
+    // 1.7 · El panda como centro de avisos
+    { const ip=window.isPremium, R0=S.routines, P0=S.panda, b0=S.settings.burbuja; window.isPremium=true; S.panda=null; S.settings.burbuja=true; MODALS.length=0; renderModals(); LAYERS.length=0; renderLayers();
+      const rp=newRoutine({name:'Prueba panda',items:[buildItem('press_banca','musculo',2)]}); rp.sugg=[{t:'x'}]; S.routines=R0.concat([rp]);
+      out.pEst=pandaEstado().prop===1; bubSync(); out.pBlink=document.getElementById('pfBub').classList.contains('blink');
+      A.guiaAbrir(); out.pHub=!!document.querySelector('#modals .pprop [data-a="pandaNo"]');
+      A.pandaNo(document.querySelector('#modals .pprop [data-a="pandaNo"]').dataset.v); out.pNo=pandaEstado().prop===0 && !document.querySelector('#modals .pprop');
+      MODALS.length=0; renderModals(); out.pAvisos=avisosHtml(false)==='';
+      S.routines=R0; S.panda=P0; S.settings.burbuja=b0; window.isPremium=ip; render(); }
     // 1.5 · Agua completa
     const n5=nut(), k5=dayKey(); n5.water[k5]=300; n5.waterLog={}; n5.waterExtra={}; const g0=waterGoal();
     A.water(330,'Taza'); A.water(500); out.a5log=wLog(k5).length===2 && wLog(k5)[0].n==='Taza' && n5.water[k5]===1130;
@@ -700,6 +708,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('borrar 1.5: quitar una comida tiene Deshacer y funciona', r.dzComida && r.dzDeshacer);
   comprobar('limpiar 1.5: detecta un entreno de 20 segundos y un ayuno de 2 minutos y los borra', r.dzDetecta && r.dzLimpia);
   comprobar('mal día (flujo completo): el check-in de la mañana aplica 10 % menos (92,5 kg en vez de 102,5), la sesión se guarda aligerada y la siguiente sube desde 100 kg', r.mdAjuste && r.mdKg === 92.5 && r.mdGuardada && r.mdSiguiente === 102.5, JSON.stringify([r.mdAjuste, r.mdKg, r.mdGuardada, r.mdSiguiente, r.mdErr]));
+  comprobar('1.7: el panda parpadea con una propuesta, la muestra al abrirlo, «Ahora no» la calla y los avisos salen de Mis rutinas', r.pEst && r.pBlink && r.pHub && r.pNo && r.pAvisos, JSON.stringify([r.pEst,r.pBlink,r.pHub,r.pNo,r.pAvisos]));
   comprobar('1.6: Mis rutinas en modo completo (tarjetas con empezar, + en la cabecera) y minimalista (una línea), se cambia con un toque y se elige una vez', r.uiComp && r.uiMini && r.uiToggle && r.uiElegir && r.uiElige, JSON.stringify([r.uiComp,r.uiMini,r.uiToggle,r.uiElegir,r.uiElige]));
   comprobar('agua 1.5: lista del día con nombre, deshacer el último y borrar uno', r.a5log && r.a5deshacer && r.a5borrar, JSON.stringify([r.a5log,r.a5deshacer,r.a5borrar]));
   comprobar('agua 1.5: día de calor suma 500 ml a la meta y se quita', r.a5calor && r.a5calorOff);
@@ -720,6 +729,8 @@ if (fs.existsSync(COPIA07)) {
     comprobar('1.6: ningún texto se corta con «…» (regla de la casa)', !/text-overflow:\s*ellipsis/.test(ix) && !/line-clamp/.test(ix.replace(/\.rcard \.exs\{[^}]*\}/,'')));
     comprobar('1.6: iPhone con estilo propio (barras translúcidas, interruptores de Apple) y el audio se recrea tras una interrupción de iOS', /html\.native-ios #nav\{[^}]*backdrop-filter/.test(ix) && /#34c759/.test(ix) && /audioCtx\.state!=='running' && ACTX_T/.test(ix) && !/audioCtx=audioCtx\|\|new/.test(ix));
     comprobar('1.6: el escáner no usa en iPhone la comprobación de Google (solo existe en Android) y se puede escribir el código', /if \(!window\.PF_IOS\)\{ try\{ const m=await B\.isGoogleBarcodeScannerModuleAvailable/.test(ix) && /A\.alCodigo=/.test(ix) && /async function alPorCodigo/.test(ix));
+    comprobar('1.7: iPhone vuelve atrás deslizando desde el borde izquierdo (solo en iPhone, sin ventanas abiertas)', /if \(!window\.PF_IOS \|\| !LAYERS\.length \|\| MODALS\.length/.test(ix) && /goBack\(\); requestAnimationFrame/.test(ix));
+    comprobar('1.7: en iPhone dice «del iPhone» y no «de el iPhone»', fs.readFileSync(new URL('../scripts/version-ios.mjs', import.meta.url), 'utf8').includes("'del iPhone, del Apple Watch u otras apps'"));
     comprobar('1.6: Salud en iPhone explica el motivo real si no conecta', /No se pudo conectar con Salud/.test(nat)); }
   comprobar('Google Play: símbolos nativos en el AAB y la cámara no es obligatoria', /debugSymbolLevel 'SYMBOL_TABLE'/.test(ex) && /'android\.hardware\.camera'/.test(ex) && /android:required="false" tools:replace/.test(ex));
 }

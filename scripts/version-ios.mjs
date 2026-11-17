@@ -20,7 +20,7 @@ nat = cambiar(nat, "confirmBox({title:'Falta Health Connect', text:'Instala <b>H
 nat = cambiar(nat, 'A.hcSettings = () => { try{ HC.openHealthConnectSettings(); }catch(e){} };',
   "A.hcSettings = () => confirmBox({title:'Permisos de Apple Health', text:'Abre la app <b>Salud</b> › tu foto (arriba a la derecha) › <b>Apps</b> › <b>PandarIA Fit</b> y elige qué datos compartes.', okText:'Entendido', ok:() => {}});", 'permisos de Health Connect');
 for (const [a, b] of [
-  ['Samsung Health u otras apps', 'el iPhone, el Apple Watch u otras apps'],
+  ['de Samsung Health u otras apps', 'del iPhone, del Apple Watch u otras apps'],
   ['Samsung Health or other apps', 'your iPhone, Apple Watch or other apps'],
   ['Pasos, peso y pulso de Samsung Health', 'Pasos, peso y pulso del iPhone o del Apple Watch'],
   ['Steps, weight and heart rate from Samsung Health', 'Steps, weight and heart rate from your iPhone or Apple Watch']
