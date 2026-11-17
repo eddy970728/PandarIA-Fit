@@ -704,6 +704,8 @@
     else today = {label:tx('HOY TOCA','UP TODAY'), title:tx('Crea tu primera rutina','Create your first routine'), sub:tx('Toca para abrir la app','Tap to open the app'), rid:''};
     if (today.rid === undefined) today.rid = '';
     today.done = done;
+    // 1.8: el estado del día también en el widget Mi día
+    try { const E = prem && !done && typeof estadoDia === 'function' ? estadoDia() : null; today.estado = E && E.score != null ? `${E.score} · ${E.word}` : ''; } catch (e) { today.estado = ''; }
     const f = S.nutri && S.nutri.fast;
     const planO = f ? (FAST_PLANS[f.plan] || {}) : {}, planN = f ? trN(planO.n || '') : '';
     const canStart = !!(f && f.screened && !f.blocked && f.plan !== '5:2');

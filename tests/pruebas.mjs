@@ -735,6 +735,126 @@ if (fs.existsSync(COPIA07)) {
   comprobar('Google Play: símbolos nativos en el AAB y la cámara no es obligatoria', /debugSymbolLevel 'SYMBOL_TABLE'/.test(ex) && /'android\.hardware\.camera'/.test(ex) && /android:required="false" tools:replace/.test(ex));
 }
 
+/* ---------- 1.8: Parte A (Nutrición, Ayuno, Historial), PandarIA v3 (Parte C) y arreglos invisibles (Parte D) ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; const H=3600000; window.isPremium=()=>true;
+    // Parte A
+    TAB='historial'; HSEG='informes'; render(); const vh=document.querySelector('#view');
+    out.h4=vh.querySelectorAll('.seg [data-a="hgrp"]').length===4 && vh.querySelector('.seg .on').dataset.v==='g:resumen' && !!vh.querySelector('.chip.on[data-v="informes"]');
+    A.hgrp('g:progreso'); out.h4b=HSEG==='progreso'; A.hgrp('g:resumen'); out.h4c=HSEG==='informes';
+    TAB='nutricion'; NSEG='comida'; render(); out.nutHdr=!!document.querySelector('#view .hdr [data-a="nutMas"]') && !document.querySelector('#view [data-a="openSup"]');
+    NSEG='agua'; render(); out.aguaSin=!document.querySelector('#view svg.chart'); NSEG='comida';
+    const f=nut().fast; f.screened=true; f.plan='20:4'; f.history=[]; TAB='ayuno'; render(); const va=document.querySelector('#view');
+    out.ayBtn=!!va.querySelector('[data-a="fastPlanPick"]') && !va.querySelector('[data-a="fastPlan"]'); out.ayUno=(fastAdvice().match(/class="row sm"/g)||[]).length===1;
+    A.fastPlanPick(); out.aySel=document.querySelectorAll('#modals .opt').length===Object.keys(FAST_PLANS).length; closeModal();
+    // estado del día
+    S.sessions=[]; S.checkinDia=null; out.eSin=estadoDia().score===null;
+    S.checkinDia={day:dayKey(),sleep:2,energy:2,sore:2}; const e1=estadoDia(); out.eBien=e1.score===100&&e1.w==='listo';
+    S.checkinDia={day:dayKey(),sleep:0,energy:0,sore:0}; const e2=estadoDia(); out.eMal=e2.score===60&&e2.w==='normal'&&e2.top.length===3;
+    window.PF_SUENO={last:300,avg:420,n:10,at:Date.now()}; window.PF_HRV={last:40,avg:60,n:10,at:Date.now()}; const e3=estadoDia(); out.eSuave=e3.score===38&&e3.w==='descansa'&&e3.soft;
+    window.PF_SUENO=null; window.PF_HRV=null; S.checkinDia=null;
+    // tu línea base: con menos de 14 días no compara
+    const n=nut(); n.water={}; for (let i=1;i<=10;i++) n.water[dayKey(Date.now()-i*86400000)]=2000; out.lbFalta=lineaBase().find(o=>o.id==='agua').falta===4;
+    for (let i=11;i<=20;i++) n.water[dayKey(Date.now()-i*86400000)]=2000; n.water[dayKey()]=2500; const lb=lineaBase().find(o=>o.id==='agua'); out.lbOk=!lb.falta&&lb.n0===20&&lb.pct===25;
+    // cansancio acumulado: 3 señales distintas, 2 días o más cada una
+    window.PF_HRV={last:40,avg:60,n:10,at:Date.now()}; window.PF_RHR={last:60,avg:50,n:10,at:Date.now()}; S.diaLog={};
+    for (let i=0;i<3;i++) S.diaLog[dayKey(Date.now()-i*86400000)]={hrv:40,rhr:60,su:300};
+    out.caSi=(cansancioAcum()||{tipos:[]}).tipos.length===3;
+    S.lastDeload=Date.now()-5*86400000; out.caNo=cansancioAcum()===null; S.lastDeload=null;
+    // la propuesta llega por el panda y se aplica con permiso
+    S.panda=null; S.settings.burbuja=true; const I0=pandaItems(); out.pProp=I0.prop.length===1&&I0.prop[0].v3&&/descarga/i.test(I0.prop[0].t);
+    A.guiaAbrir(); out.pBtn=!!document.querySelector('#modals [data-a="pandaAplicar"]'); A.pandaAplicar(I0.prop[0].k); out.pAplica=deloadActive()&&!MODALS.length;
+    out.pDia=pandaItems().prop.length===0;
+    window.PF_HRV=null; window.PF_RHR=null; S.diaLog={}; S.deload=null; S.lastDeload=null; S.panda=null;
+    // tus hábitos: siempre saltas los miércoles y entrenas los sábados
+    S.routines=[newRoutine({name:'A',items:[buildItem('press_banca','musculo',2)]})]; S.plan={days:[1,3,5],order:[S.routines[0].id]};
+    S.sessions=[]; const wk0=weekKey(Date.now());
+    for (let w=1;w<=6;w++) [0,4,5].forEach(d=>{ const t=wk0-w*7*86400000+d*86400000+18*H; S.sessions.push({id:'h'+w+d,routineId:S.routines[0].id,start:t-H,end:t,items:[],intensity:6}); });
+    const hb=habitosPlan(); out.hab=!!(hb&&hb.salta&&hb.salta.d===3&&hb.salta.por===6);
+    const pr=v3Propuestas().find(x=>/^dia-/.test(x.k)); pr.fn(); out.habAplica=S.plan.days.join()==='1,5,6';
+    // aprender cómo respondes: semanas con más series de pecho progresan más
+    S.sessions=[]; S.plan=null; let kg=60;
+    for (let w=10;w>=1;w--){ const alto=w%2===0, t=wk0-w*7*86400000+2*86400000+18*H; S.sessions.push({id:'a'+w,routineId:'x',start:t-H,end:t,intensity:7,items:[{exId:'press_banca',sets:Array.from({length:alto?16:8},()=>({t:'n',kg,reps:8,done:true}))}]});
+      S.sessions.push({id:'b'+w,routineId:'x',start:t+86400000-H,end:t+86400000,intensity:7,items:[]}); kg=Math.round(kg*(alto?1.03:1.0)*10)/10; }
+    const ap=aprendeSeries(); out.apr=ap.length===1&&ap[0].m==='pecho'&&ap[0].dir===1;
+    // predicciones con margen: un rango de meses, solo con tendencia clara
+    S.measures=[]; for (let i=40;i>=0;i-=2) S.measures.push({id:'p'+i,date:Date.now()-i*86400000,peso:90-(40-i)*0.07}); S.goals=[{id:'g',type:'peso',target:84}];
+    const pp=pesoPrediccion(); out.pred=!!(pp&&pp.desde&&pp.hasta);
+    S.measures=S.measures.map((m,i)=>Object.assign({},m,{peso:90+(i%2?0.4:-0.4)})); out.predNo=pesoPrediccion()===null;
+    // mirar el diario no crea datos
+    delete S.nutri.diario; diaDiario(dayKey()); out.diarioRO=!('diario' in S.nutri);
+    // datos que crecen: se compactan solo avisos con fecha y el detalle de vasos de hace más de un año
+    S.dismissed={'tip-Mon Jan 05 2026':1,['tip-'+new Date().toDateString()]:1,'upd-12':1}; n.waterLog={'2025-01-01':[{t:1,ml:250}],[dayKey()]:[{t:2,ml:250}]}; n.water['2025-01-01']=250; S.compactado=null;
+    const nc=compactarDatos(); out.comp=nc===2&&!S.dismissed['tip-Mon Jan 05 2026']&&S.dismissed['upd-12']&&!n.waterLog['2025-01-01']&&n.water['2025-01-01']===250;
+    out.uso=typeof usoDatos().pct==='number';
+    return JSON.stringify(out); })()`));
+  a.cerrar();
+  comprobar('1.8: Historial en 4 pestañas con subpestañas (nada se pierde)', r.h4 && r.h4b && r.h4c, JSON.stringify([r.h4, r.h4b, r.h4c]));
+  comprobar('1.8: Nutrición con suplementos y menús en la cabecera, y la gráfica del agua en Estadísticas', r.nutHdr && r.aguaSin, JSON.stringify([r.nutHdr, r.aguaSin]));
+  comprobar('1.8: Ayuno con el plan en un botón (selector con explicación) y un solo consejo', r.ayBtn && r.ayUno && r.aySel, JSON.stringify([r.ayBtn, r.ayUno, r.aySel]));
+  comprobar('1.8: estado del día (sin datos no da número; check-in, sueño y variabilidad restan lo que dice la regla)', r.eSin && r.eBien && r.eMal && r.eSuave, JSON.stringify([r.eSin, r.eBien, r.eMal, r.eSuave]));
+  comprobar('1.8: tu línea base solo con 14 días de datos y frente a tu propia media', r.lbFalta && r.lbOk, JSON.stringify([r.lbFalta, r.lbOk]));
+  comprobar('1.8: cansancio acumulado con 3 señales repetidas, nunca justo después de una descarga', r.caSi && r.caNo, JSON.stringify([r.caSi, r.caNo]));
+  comprobar('1.8: la propuesta llega por el panda, se aplica solo con «Aplicar» y como mucho una al día', r.pProp && r.pBtn && r.pAplica && r.pDia, JSON.stringify([r.pProp, r.pBtn, r.pAplica, r.pDia]));
+  comprobar('1.8: tus hábitos (el día que siempre saltas se cambia por el que de verdad entrenas)', r.hab && r.habAplica, JSON.stringify([r.hab, r.habAplica]));
+  comprobar('1.8: aprender cómo respondes (más series de pecho cuando con más progresas más)', r.apr, JSON.stringify(r.apr));
+  comprobar('1.8: predicción de tu meta como rango de meses, y ninguna si el peso sube y baja', r.pred && r.predNo, JSON.stringify([r.pred, r.predNo]));
+  comprobar('1.8: mirar el diario no crea datos vacíos', r.diarioRO);
+  comprobar('1.8: datos que crecen: se compactan avisos viejos y vasos de hace más de un año, sin tocar los totales', r.comp && r.uso, JSON.stringify([r.comp, r.uso]));
+  const nat = fs.readFileSync(new URL('../www/native.js', import.meta.url), 'utf8'), ex = fs.readFileSync(new URL('../scripts/android-extra.mjs', import.meta.url), 'utf8');
+  comprobar('1.8: el widget Mi día muestra el estado del día', /today\.estado = E && E\.score != null/.test(nat) && ex.includes('optString(\\"estado\\"'));
+}
+
+/* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */
+{
+  const dirC = new URL('./copias/', import.meta.url), fallosC = [];
+  const files = fs.existsSync(dirC) ? fs.readdirSync(dirC).filter(f => /^copia-[\d.]+\.json$/.test(f)) : [];
+  for (const fn of files) {
+    const raw = fs.readFileSync(new URL(fn, dirC), 'utf8'), d0 = JSON.parse(raw);
+    const a = abrir({ 'pandaria-fit-v1': raw }); await espera(1200);
+    const st = JSON.parse(a.w.eval('JSON.stringify(S)'));
+    const igual = k => JSON.stringify(st[k]) === JSON.stringify(d0[k]);
+    let tabs = ''; for (const t of ['rutinas', 'explorar', 'nutricion', 'ayuno', 'historial', 'ajustes']) { try { a.w.eval(`TAB='${t}'; render();`); } catch (e) { tabs += t + ' '; } }
+    a.w.eval(`S=DEF(); save(true); confirmBox=o=>o.ok(); importText(${JSON.stringify(raw)});`);
+    const st2 = JSON.parse(a.w.eval('JSON.stringify(S)'));
+    const mal = [!igual('routines') && 'rutinas', !igual('sessions') && 'entrenos', !igual('measures') && 'medidas', st.v !== a.w.eval('DATA_VER') && 'versión', tabs && 'pestañas: ' + tabs, a.errores.length && 'errores: ' + a.errores[0],
+      JSON.stringify(st2.sessions) !== JSON.stringify(d0.sessions) && 'importar'].filter(Boolean);
+    if (mal.length) fallosC.push(fn + ' → ' + mal.join(', '));
+    a.cerrar();
+  }
+  comprobar(`1.8: las copias de seguridad de todas las versiones (${files.length}) se abren e importan sin perder nada`, files.length >= 10 && !fallosC.length, fallosC.join(' | ') || `solo ${files.length} copias`);
+}
+
+/* ---------- 1.8: 3 años de uso intenso: espacio y velocidad ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; window.isPremium=()=>true; const D=86400000;
+    const rs=[0,1,2].map(i=>newRoutine({name:'R'+i,items:['press_banca','sentadilla','remo_barra','press_militar','peso_muerto','curl_barra'].map(id=>buildItem(id,'musculo',3))})); S.routines=rs; S.plan={days:[1,3,5],order:rs.map(r=>r.id)};
+    const n=nut(); nd(); n.waterLog={};
+    for (let d=3*365; d>=1; d--){ const t=Date.now()-d*D, k=dayKey(t);
+      if ([1,3,5].includes(new Date(t).getDay())){ const r=rs[d%3]; S.sessions.push({id:'s'+d,routineId:r.id,routineName:r.name,start:t-3600000,end:t,intensity:7,checkin:{sleep:2,energy:1,sore:2},items:r.items.map(it=>({exId:it.exId,note:'',sets:[1,2,3].map(()=>({t:'n',kg:60,reps:10,done:true,rir:2}))})),prs:[],vol:5400}); }
+      n.diario[k]=[1,2,3,4,5,6].map(j=>({id:'d'+j,fid:'09003',n:'Manzana con piel',gr:150,m:'desayuno',t:t+j*3600000,k:78,p:0.5,c:20,g:0.3,f:3,a:15,na:2}));
+      n.water[k]=2400; n.waterLog[k]=[1,2,3,4,5,6,7,8].map(j=>({t:t+j*3600000,ml:300}));
+      if (d%7===0) S.measures.push({id:'m'+d,date:t,peso:80+Math.sin(d/30)});
+      n.fast.history.push({start:t-16*3600000,end:t,goalH:16,ok:true}); }
+    n.fast.history=n.fast.history.slice(-400);
+    save(true); const antes=usoDatos().c; S.compactado=null; compactarDatos(); save(true); out.antesMB=Math.round(antes/1048576*100)/100; out.despuesMB=Math.round(usoDatos().c/1048576*100)/100;
+    out.ms={}; for (const t of ['rutinas','explorar','nutricion','ayuno','historial','ajustes']){ TAB=t; const t0=performance.now(); render(); out.ms[t]=Math.round(performance.now()-t0); }
+    const t1=performance.now(); A.guiaAbrir(); out.ms.panda=Math.round(performance.now()-t1); closeModal();
+    const t2=performance.now(); A.estadoVer(); out.ms.estado=Math.round(performance.now()-t2);
+    return JSON.stringify(out); })()`));
+  a.cerrar();
+  const lento = Object.entries(r.ms).filter(([, v]) => v > 1500);
+  console.log(`3 años de uso: ${r.antesMB} MB → ${r.despuesMB} MB tras compactar · pantallas (ms): ${Object.entries(r.ms).map(([k, v]) => k + ' ' + v).join(', ')}`);
+  comprobar('1.8: 3 años de uso intenso caben con margen (menos del 70 % del espacio)', r.despuesMB < 3.5, `${r.despuesMB} MB`);
+  comprobar('1.8: con 3 años de datos cada pantalla se dibuja en menos de 1,5 s (en el simulador, más lento que un teléfono)', !lento.length, JSON.stringify(lento));
+}
+
 /* ---------- Comparación con los resultados guardados ---------- */
 if (ACTUALIZAR) {
   fs.writeFileSync(ESPERADO, JSON.stringify(resultados, null, 1) + '\n');

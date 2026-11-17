@@ -332,7 +332,7 @@
     if (!locked()) return h;
     Object.keys(HLOCK).forEach(k => { h = h.replace(new RegExp(`(data-v="${k}">)([^<]+)<`), `$1$2 🔒<`); });
     if (!HLOCK[HSEG]) return h;
-    const a = h.indexOf('<div class="chips scroll"'), b = h.indexOf('</div>', a) + 6;
+    const b = h.indexOf('<!--hist-tabs-->'); if (b < 0) return h;
     return h.slice(0, b) + `<div class="pf-lockwrap"><div class="pf-blur">${h.slice(b)}</div>${lockCard(HLOCK[HSEG], 'history')}</div>`;
   };
 
@@ -348,7 +348,8 @@
     // 1.3: Comida y Agua son subpestañas; el bloque de calorías termina en la marca <!--fin-objetivo-->
     const a = h.indexOf('<div class="sec">Tu objetivo diario</div>'), b = h.indexOf('<!--fin-objetivo-->');
     if (a < 0 || b < 0) return h;
-    return h.slice(0, a) + `<div class="pf-lockwrap" style="min-height:300px"><div class="pf-blur">${h.slice(a, b)}</div>${lockCard('Calorías y macros', 'nutrition')}</div>` + h.slice(b);
+    // 1.8: una tarjeta de una línea con candado en vez del bloque borroso
+    return h.slice(0, a) + `<button class="card row tap pf-lockline" style="width:100%;gap:10px;padding:12px 14px;text-align:left" data-a="pfGo" data-v="nutrition"><span style="font-size:18px">🔒</span><div class="grow"><div class="b sm">Calorías y macros</div><div class="xs mut">Tu objetivo diario y tu diario comparado con él · Premium</div></div><span class="mut">›</span></button>` + h.slice(b);
   };
 
   // Rutinas: hasta 3 en la versión gratis, contando las archivadas (para crear más hay que eliminar alguna)

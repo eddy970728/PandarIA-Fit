@@ -44,6 +44,13 @@ svg{display:block}
 /* Nav */
 #pfBub{position:fixed;z-index:40;width:42px;height:42px;border-radius:12px;border:0;padding:0;background:#12151a;box-shadow:0 4px 14px rgba(0,0,0,.35);opacity:.88;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:22px;transition:left .18s,right .18s,top .18s,transform .15s}
 #pfBub img{width:100%;height:100%;border-radius:12px;pointer-events:none}
+/* 1.8 · estado del día */
+.estchip{display:inline-flex;align-items:baseline;gap:4px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--ec) 16%,transparent);color:var(--ec);font-size:12px;font-weight:700;letter-spacing:0;white-space:nowrap}
+.estchip b{font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+.estrow{padding:8px 10px;border-radius:12px;background:var(--card2)}
+.estbig{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ec)}
+.estbig b{font-size:56px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.estbig span{font-size:17px;font-weight:800}
 #pfBub .pdot{display:none;position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg)}
 #pfBub.dot-o .pdot{display:block;background:var(--ac)} #pfBub.dot-v .pdot{display:block;background:var(--ok)}
 #pfBub.blink{opacity:1;animation:pblink 1.6s ease-in-out infinite}
@@ -986,7 +993,7 @@ const ACHIEVEMENTS = [
      consejo → cualquier otra fuente: solo tomamos el consejo, con nuestras palabras, y la citamos.
      propio  → criterio de PandarIA, cuando no hay una fuente que dé el número exacto.
    Evidencia: solida · moderada · limitada · contradictoria.  'rev' = revisar antes de esa fecha. */
-const KB_VER='1.6';
+const KB_VER='1.7';
 const KB_LOG=[
   {v:'1.0', d:'2026-11-12', app:'0.8.1', t:'Primera versión: los números que ya usaba PandarIA, comprobados con su fuente original. No cambia ningún resultado.'},
   {v:'1.1', d:'2026-11-12', app:'0.8.3', t:'Reglas que cambian resultados: 2 minutos de descanso en los multiarticulares con peso para ganar músculo; ritmo de pérdida de 0,5 a 1 % del peso por semana en vez de un 15 % fijo; objetivo de calorías que se ajusta con tu diario y tu peso; carga más suave si llegas con poco descanso; meta de agua recalibrada con la referencia de la EFSA; alternativas de dificultad parecida.'},
@@ -994,7 +1001,8 @@ const KB_LOG=[
   {v:'1.3', d:'2026-11-12', app:'1.0', t:'Métodos especiales (superseries, series descendentes, rest-pause, myo-reps, pirámide, clúster, volumen alemán y método Bilbo), cada uno con su evidencia y la aclaración de que no está comprobado que sea mejor; codo y cadera como zonas sensibles.'},
   {v:'1.4', d:'2026-11-13', app:'1.0.1', t:'PandarIA conecta más datos: un ayuno largo o un día con pocas calorías, la proteína que queda corta varios días y el pulso en reposo de Health Connect cuentan para tu recuperación; el informe semanal suma agua, ayuno y proteína.'},
   {v:'1.5', d:'2026-11-14', app:'1.2', t:'Recuperación por músculo (cuánto se recuperó cada músculo, en un mapa) y aprender de tus cambios de ejercicio. Son criterios propios de PandarIA y no cambian ningún resultado anterior.'},
-  {v:'1.6', d:'2026-11-14', app:'1.3', t:'Tendencia de peso suavizada con fecha estimada de tu meta, ideas para completar la proteína del día, y el sueño y la variabilidad del pulso de Health Connect como señales de recuperación. No cambian ningún resultado anterior.'}
+  {v:'1.6', d:'2026-11-14', app:'1.3', t:'Tendencia de peso suavizada con fecha estimada de tu meta, ideas para completar la proteína del día, y el sueño y la variabilidad del pulso de Health Connect como señales de recuperación. No cambian ningún resultado anterior.'},
+  {v:'1.7', d:'2026-11-17', app:'1.8', t:'PandarIA junta y aprende: estado del día de 0 a 100, tu línea base de 4 semanas, cansancio acumulado, aprender con cuántas series progresas y qué días rindes mejor, ayuno y entreno juntos, agua y rendimiento, comida y progreso, tus hábitos y predicciones con margen. Lo que cambia tu plan llega siempre como propuesta. No cambia ningún resultado anterior.'},
 ];
 const KB_LIC={pd:'Dominio público, con crédito', consejo:'Consejo de la fuente, con nuestras palabras', propio:'Criterio propio de PandarIA'};
 const KB_EV={solida:'Evidencia sólida', moderada:'Evidencia moderada', limitada:'Evidencia limitada', contradictoria:'Evidencia contradictoria'};
@@ -1003,6 +1011,7 @@ const KB_SRC={
   acsm2009:{n:'Progression models in resistance training for healthy adults (posicionamiento del ACSM)', a:'Ratamess y col.', y:2009, pub:'Med Sci Sports Exerc 41(3):687–708', url:'https://pubmed.ncbi.nlm.nih.gov/19204579/', lic:'consejo'},
   schoenfeld2017:{n:'Dose-response relationship between weekly resistance training volume and increases in muscle mass', a:'Schoenfeld, Ogborn y Krieger', y:2017, pub:'J Sports Sci 35(11):1073–1082', url:'https://pubmed.ncbi.nlm.nih.gov/27433992/', lic:'consejo'},
   aird2018:{n:'Effects of fasted vs fed-state exercise on performance and post-exercise metabolism: a systematic review and meta-analysis', a:'Aird, Davies y Carson', y:2018, pub:'Scand J Med Sci Sports 28:1476-1493', url:'https://pubmed.ncbi.nlm.nih.gov/29315892/', lic:'consejo'},
+  meeusen2013:{n:'Prevention, diagnosis and treatment of the overtraining syndrome (consenso conjunto del ECSS y el ACSM)', a:'Meeusen y col.', y:2013, pub:'Med Sci Sports Exerc 45(1):186–205', url:'https://pubmed.ncbi.nlm.nih.gov/23247672/', lic:'consejo'},
   buchheit2014:{n:'Monitoring training status with HR measures: do all roads lead to Rome?', a:'Buchheit', y:2014, pub:'Front Physiol 5:73', url:'https://pubmed.ncbi.nlm.nih.gov/24578692/', lic:'consejo'},
   issn2017:{n:'ISSN Position Stand: protein and exercise', a:'Jäger y col.', y:2017, pub:'J Int Soc Sports Nutr 14:20', url:'https://pubmed.ncbi.nlm.nih.gov/28642676/', lic:'consejo'},
   morton2018:{n:'Effect of protein supplementation on resistance training-induced gains in muscle mass and strength (metaanálisis)', a:'Morton y col.', y:2018, pub:'Br J Sports Med 52:376–384', url:'https://doi.org/10.1136/bjsports-2017-097608', lic:'consejo'},
@@ -1188,6 +1197,24 @@ const KB_RULES=[
     t:'La variabilidad del pulso (RMSSD) suele bajar con el cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si la de hoy está un 15 % o más por debajo de tu media (con al menos 5 medidas anteriores), PandarIA la cuenta como una señal más de cansancio.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.3'},
   {id:'conexion.pulso', area:'recuperacion', n:'Pulso en reposo más alto de lo normal', v:{min:4, lpm:7}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos con Health Connect',
     t:'Un pulso en reposo claramente más alto que tu media puede ser una señal de cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si el de hoy está 7 latidos o más por encima de tu media (con al menos 4 medidas anteriores), PandarIA lo cuenta como una señal más, igual que el check-in.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.0.1'},
+  {id:'estado.dia', area:'recuperacion', n:'Estado del día', v:{p:{sueno0:15,sueno1:5,energia0:15,agujetas0:10,agujetas1:3,suenoCorto:10,hrv:12,pulso:10,musculos50:15,musculos85:6,intensa:8,ayuno:8,cansancio:15}, listo:80, normal:60, suave:40}, src:['pandaria','buchheit2014','aasm2015'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
+    t:'Un número de 0 a 100 que junta las señales de cansancio que PandarIA ya usa: el check-in, la recuperación de los músculos que tocan hoy, una sesión muy exigente, un ayuno largo y, con Salud, el sueño, el pulso en reposo y la variabilidad del pulso. Cada señal resta puntos según su peso (dormir mal, 15; energía baja, 15; músculos a menos de la mitad, 15; cansancio acumulado, 15; variabilidad baja, 12…). Con 80 o más, Listo; de 60 a 79, Normal; de 40 a 59, Suave (un 10 % menos de carga); menos de 40, Descansa. Sin ningún dato de hoy no muestra número.', usa:'Tarjeta de Hoy, estado del día y widget Mi día', rev:'2028-11-01', desde:'1.8'},
+  {id:'linea.base', area:'recuperacion', n:'Tu línea base', v:{dias:28, min:14}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
+    t:'Cada persona tiene su propio normal: un pulso de 60 puede ser alto para uno y bajo para otro. Por eso PandarIA compara cada dato (sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento) con tu media de las últimas 4 semanas y no con valores generales. Solo lo hace con 14 días de datos o más.', usa:'Estado del día', rev:'2028-11-01', desde:'1.8'},
+  {id:'cansancio.acumulado', area:'recuperacion', n:'Cansancio acumulado', v:{dias:7, minDias:2, minTipos:3, caida:0.03, trasDescarga:21}, src:['meeusen2013','buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
+    t:'Un día malo no es cansancio acumulado. PandarIA solo lo ve cuando en los últimos 7 días se repiten, al menos 2 días cada una, 3 señales distintas: variabilidad del pulso baja, pulso en reposo alto, noches cortas o malas y rendimiento un 3 % o más por debajo de tu mejor marca reciente. Entonces propone adelantar una semana de descarga (nunca si hiciste una hace menos de 3 semanas). El consenso europeo y americano sobre sobreentrenamiento recomienda vigilar varias señales juntas y descansar a tiempo.', usa:'Propuestas del panda y estado del día', rev:'2028-11-01', desde:'1.8'},
+  {id:'aprende.series', area:'entreno', n:'Aprender cómo respondes', v:{semanas:8, minSes:16, minSem:3, paso:2, dif:0.01, minDia:3, difDia:3}, src:['schoenfeld2017','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
+    t:'La respuesta al volumen cambia de una persona a otra. Con 8 semanas o más de entrenos, PandarIA compara tus semanas con más series de un músculo (2 o más sobre tu media) con las de menos series (2 o más por debajo), al menos 3 de cada. Si en unas progresas un 1 % o más por semana que en las otras, propone una serie más o una menos, sin salir del rango de 10 a 20 series semanales. También mira qué días de la semana rindes mejor (con 3 sesiones o más en cada día y una diferencia del 3 % o más).', usa:'Propuestas y novedades del panda', rev:'2028-11-01', desde:'1.8'},
+  {id:'ayuno.entreno', area:'nutricion', n:'Ayuno y entreno juntos', v:{desdeH:16, n:10, min:4, trasComerMin:60, antesCierreMin:60}, src:['aird2018','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos sanos que ayunan',
+    t:'Entrenar en ayunas no perjudica las sesiones cortas, pero en las largas rinde más quien comió antes. Con planes de 16 horas o más y al menos 4 ayunos completos, PandarIA mira a qué hora sueles abrir la ventana de comida y a qué hora entrenas. Si sueles entrenar en ayunas, te propone hacerlo entre una hora después de tu primera comida y una hora antes de cerrar la ventana, para comer antes y después.', usa:'Novedades del panda', rev:'2028-11-01', desde:'1.8'},
+  {id:'agua.rendimiento', area:'nutricion', n:'Agua y rendimiento', v:{semanas:8, poca:0.6, bien:0.9, min:3, dif:3}, src:['acsm2007','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
+    t:'Llegar al entreno con poca agua puede bajar el rendimiento. PandarIA compara, en las últimas 8 semanas, tus entrenos de días con menos del 60 % de tu meta de agua con los de días con el 90 % o más. Solo lo cuenta si hay al menos 3 de cada y la diferencia es del 3 % o más: una vez no es un patrón.', usa:'Novedades del panda', rev:'2028-11-01', desde:'1.8'},
+  {id:'comida.progreso', area:'nutricion', n:'Comida y progreso', v:{minSes:3, minSpan:14, minDias:5, deficit:0.9, adaptDif:150}, src:['helms2014','issn2017','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
+    t:'En déficit de calorías o con poca proteína cuesta más subir de peso en los ejercicios; mantener la fuerza ya es un buen resultado. Si un ejercicio lleva 3 sesiones (en 14 días o más) sin mejorar tu fuerza estimada y estás en déficit (por tu objetivo o porque en 5 días o más de diario comiste menos del 90 % de tu gasto) o con la proteína corta, PandarIA te lo explica así en vez de solo pedir más peso. Si apagaste el ajuste automático y tu gasto real se aleja 150 kcal o más, te propone volver a activarlo.', usa:'Novedades y propuestas del panda', rev:'2028-11-01', desde:'1.8'},
+  {id:'habitos.plan', area:'entreno', n:'Tus hábitos', v:{semanas:6, minSem:4, fallo:0.6, minOtro:2, difMin:60, saltaDe:4, saltaMin:3}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'Un plan que cumples rinde más que uno más largo. Con 4 semanas o más, si te saltas un día del plan en el 60 % de las semanas, PandarIA propone cambiarlo por el día en que de verdad entrenas fuera del plan (2 veces o más) o quitarlo. Si tu aviso de entreno está a una hora o más de tu hora real, propone moverlo. Y si saltas un ejercicio en 3 de tus 4 últimas sesiones de una rutina, propone quitarlo.', usa:'Propuestas del panda', rev:'2028-11-01', desde:'1.8'},
+  {id:'prediccion.margen', area:'nutricion', n:'Predicciones con margen', v:{corto:14, largo:28, margen:0.2, maxDias:540}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'Una fecha exacta promete más de lo que se sabe. PandarIA calcula tu ritmo de las últimas 2 y 4 semanas y, solo si los dos van en la misma dirección que tu meta, da un rango de meses con un 20 % de margen. Si la fecha queda a más de 18 meses, no la da.', usa:'Novedades del panda', rev:'2028-11-01', desde:'1.8'},
 ];
 const KB={};
 (function(){ const deep=o=>{ if (o && typeof o==='object'){ Object.values(o).forEach(deep); Object.freeze(o); } return o; };
@@ -1203,6 +1230,15 @@ const KB_WHY=[
 const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sueno.adultos'};
 // Textos de las reglas en inglés (pantalla Ciencia en inglés)
 const KB_EN_T={
+ 'estado.dia':'A number from 0 to 100 that brings together the fatigue signals PandarIA already uses: the check-in, recovery of the muscles you train today, a very hard session, a long fast and, with Health, sleep, resting heart rate and heart rate variability. Each signal takes away points by its weight (sleeping badly, 15; low energy, 15; muscles under half recovered, 15; built-up fatigue, 15; low variability, 12…). 80 or more, Ready; 60 to 79, Normal; 40 to 59, Easy (10 % less load); under 40, Rest. With no data from today it shows no number.',
+ 'linea.base':'Everyone has their own normal: a heart rate of 60 can be high for one person and low for another. So PandarIA compares each figure (sleep, heart rate, variability, water, calories, protein and performance) with your average over the last 4 weeks, not with general values. It only does so with 14 days of data or more.',
+ 'cansancio.acumulado':'One bad day is not built-up fatigue. PandarIA only sees it when, in the last 7 days, 3 different signals repeat on at least 2 days each: low heart rate variability, high resting heart rate, short or poor nights, and performance 3 % or more below your recent best. Then it suggests bringing forward a deload week (never if you did one less than 3 weeks ago). The European and American consensus on overtraining recommends watching several signals together and resting in time.',
+ 'aprende.series':'How people respond to volume varies. With 8 weeks of training or more, PandarIA compares your weeks with more sets for a muscle (2 or more above your average) with those with fewer (2 or more below), at least 3 of each. If you progress 1 % or more per week in one group than in the other, it suggests one more set or one fewer, staying within 10 to 20 weekly sets. It also looks at which weekdays you perform best (with 3 or more sessions on each day and a difference of 3 % or more).',
+ 'ayuno.entreno':'Training fasted does not hurt short sessions, but in long ones people who ate beforehand perform better. With plans of 16 hours or more and at least 4 completed fasts, PandarIA looks at when you usually open your eating window and when you train. If you usually train fasted, it suggests training between one hour after your first meal and one hour before the window closes, so you eat before and after.',
+ 'agua.rendimiento':'Arriving at a workout with little water can lower performance. Over the last 8 weeks, PandarIA compares your workouts on days under 60 % of your water goal with those on days at 90 % or more. It only counts it with at least 3 of each and a difference of 3 % or more: once is not a pattern.',
+ 'comida.progreso':'In a calorie deficit or with little protein it is harder to add weight to your lifts; keeping your strength is already a good result. If an exercise has gone 3 sessions (over 14 days or more) without improving your estimated strength and you are in a deficit (because of your goal, or because on 5 or more diary days you ate under 90 % of what you burn) or short on protein, PandarIA explains it that way instead of just asking for more weight. If you turned off the automatic adjustment and what you really burn moves 150 kcal or more away, it suggests turning it back on.',
+ 'habitos.plan':'A plan you keep pays off more than a longer one. With 4 weeks or more, if you skip a plan day in 60 % of weeks, PandarIA suggests swapping it for the day you actually train outside the plan (2 times or more) or removing it. If your workout reminder is an hour or more away from when you really train, it suggests moving it. And if you skip an exercise in 3 of your last 4 sessions of a routine, it suggests removing it.',
+ 'prediccion.margen':'An exact date promises more than is known. PandarIA works out your pace over the last 2 and 4 weeks and, only if both go in the direction of your goal, gives a range of months with a 20 % margin. If the date is more than 18 months away, it does not give one.',
  'conexion.ayuno':'Training fasted does not hurt short sessions, but in long ones people who ate beforehand perform better. So if you have been fasting for 18 hours or more, or ate less than 60 % of your target yesterday, “Up next” suggests starting easy.',
  'conexion.proteina':'Daily protein helps you recover and build muscle with training. If on 2 of your last 3 days with a food diary you stayed below 70 % of your goal, PandarIA tells you next to your workouts. In the weekly report, a day counts as met from 90 % of the goal.',
  'recuperacion.mapa':'PandarIA estimates how recovered each muscle is from what you trained in the last 4 days. With 6 sets it takes about 48 h; with fewer sets, less time (from 24 h); with many more, up to 72 h. A very hard session (intensity 8 or more) adds 15 %, never past 96 h. Secondary muscles count half. It is a rough guide: everyone recovers at their own pace.',
@@ -5581,11 +5617,14 @@ function promptBox(o){
 }
 
 /* ---------- Render ---------- */
+const PF_T0=(window.performance&&performance.now)?performance.now():0;
+const PF_PERF={boot:null, ult:null, max:0, n:0};
 function render(){
-  const v=$('#view'); const st=v.scrollTop;
+  const t0=performance.now(), v=$('#view'); const st=v.scrollTop;
   v.innerHTML = TAB==='rutinas'?viewRutinas(): TAB==='explorar'?viewExplorar(): TAB==='nutricion'?viewNutricion(): TAB==='ayuno'?viewAyuno(): TAB==='historial'?viewHistorial(): viewAjustes();
   if (render.keep) v.scrollTop=st; render.keep=false;
   renderNav(); renderMini(); startAnims();
+  const ms=Math.round(performance.now()-t0); PF_PERF.ult=ms; PF_PERF.n++; if (PF_PERF.n>1) PF_PERF.max=Math.max(PF_PERF.max,ms);
 }
 function renderNav(){
   const anySugg=premOK() && S.routines.some(r=>!r.archived && (r.sugg||[]).length);
@@ -5665,7 +5704,7 @@ function viewRutinas(){
   if (S.active) h+=`<div class="banner" data-a="resumeWorkout" style="cursor:pointer"><span class="ic">${I('play',20)}</span><div class="grow"><div class="b">${tx('Tienes un entreno en curso','You have a workout in progress')}</div><div class="sm mut">${esc(S.active.name)} · ${tx('toca para volver','tap to go back')}</div></div></div>`;
   h+=tipCard(mini);
   h+=mini?hoyMini():hoyCard();
-  h+=avisosHtml(mini);
+  h+=avisosHtml(mini)+pandaPropFuera();
   if (!rs.length){
     h+=`<div class="empty"><div class="big">🏋️</div><div class="ttl" style="color:var(--tx)">${tx('Aún no tienes rutinas','You have no routines yet')}</div><p>${tx('Crea la tuya, deja que PandarIA la diseñe o elige una en Explorar.','Create your own, let PandarIA design one or pick one in Explore.')}</p><div class="row" style="gap:8px;justify-content:center"><button class="btn pri" data-a="newRoutine">${I('plus',20)} ${tx('Nueva rutina','New routine')}</button><button class="btn" data-a="tab" data-v="explorar">${I('compass',20)} ${tx('Explorar','Explore')}</button></div></div>`;
     return h;
@@ -5699,6 +5738,7 @@ function avisosHtml(mini){ if (S.settings.burbuja!==false && S.settings.onboarde
   return `<button class="card row avisos" data-a="avisosTog" style="width:100%;gap:10px;padding:12px 14px"><span style="color:var(--ac)">${I('bell',18)}</span><span class="grow b sm" style="text-align:left">${tx(`${L.length} ${L.length===1?'aviso':'avisos'}`,`${L.length} ${L.length===1?'notice':'notices'}`)}</span><span class="tag ac">${L.length}</span>${I(AVISOS_ABIERTOS?'up':'down',18)}</button>${AVISOS_ABIERTOS?L.join(''):''}`; }
 function banners(){
   let h='';
+  try{ const u=usoDatos(); if (u.pct>=70 && !S.dismissed['espacio-'+weekKey(Date.now())]) h+=`<div class="banner" style="border-color:var(--bad)"><span class="ic" style="color:var(--bad)">${I('alert',22)}</span><div class="grow"><div class="b">${tx('Tus datos ocupan mucho','Your data takes up a lot of space')}</div><div class="sm mut">${tx(`Ya usas el ${u.pct} % del espacio. Exporta una copia de seguridad por si acaso.`,`You already use ${u.pct} % of the space. Export a backup just in case.`)}</div><button class="link sm" style="margin-top:6px" data-a="exportData">${tx('Exportar copia','Export backup')}</button></div><button class="ibtn" data-a="dismiss" data-v="espacio-${weekKey(Date.now())}">${I('x',18)}</button></div>`; }catch(e){}
   if (deloadActive()) h+=`<div class="banner blue"><span class="ic">${I('refresh',22)}</span><div class="grow"><div class="b">Semana de descarga activa</div><div class="sm mut">PandarIA sugiere pesos más livianos hasta el ${fmtDate(S.deload.until)}. Tu cuerpo se recupera y vuelve más fuerte.</div></div></div>`;
   const rem=S.settings.reminders;
   const today=new Date();
@@ -5786,13 +5826,28 @@ A.openAvoid=()=>openLayer('avoid');
 A.openLib=()=>openLayer('picker',{mode:'browse',q:'',m:'',mine:false});
 
 /* ---------- Inicio ---------- */
+/* ---------- 1.8 · Datos que crecen: se compacta lo que ya no se usa y se mide el espacio ----------
+   Nada de lo tuyo se pierde: entrenos, medidas, diario y totales de agua se guardan siempre. Solo se quitan
+   avisos cerrados de hace más de 60 días y el detalle de cada vaso de hace más de un año (el total del día queda). */
+// solo se tocan claves con fecha (tip-Mon Nov 17 2026, rem-2026-11-17)
+function compactarDatos(){ if (S.compactado===dayKey()) return 0; let n=0; const hoy=Date.now();
+  const D=S.dismissed||{}; Object.keys(D).forEach(k=>{ const m=k.match(/^[a-z]+-((?:[A-Z][a-z]{2} [A-Z][a-z]{2} \d{2} \d{4})|(?:\d{4}-\d{2}-\d{2}))$/); if (!m) return; const t=Date.parse(m[1]); if (!isNaN(t) && hoy-t>60*DAY){ delete D[k]; n++; } });
+  const wl=S.nutri&&S.nutri.waterLog; if (wl) Object.keys(wl).forEach(k=>{ const t=Date.parse(k); if (!isNaN(t) && hoy-t>365*DAY){ delete wl[k]; n++; } });
+  S.compactado=dayKey(); if (n) save(); return n; }
+// localStorage guarda unos 5 millones de caracteres por app; las fotos van aparte (IndexedDB)
+const DATOS_MAX=5*1024*1024;
+function usoDatos(){ let c=0; try{ c=(localStorage.getItem(KEY)||'').length; }catch(e){} return {c, pct:Math.round(c/DATOS_MAX*1000)/10}; }
+function usoDatosHtml(){ const u=usoDatos(), mb=v=>(Math.round(v/1024/1024*100)/100).toLocaleString(LOC());
+  return `<div class="srow" style="cursor:default"><span class="si">${I('chart',20)}</span><span class="grow"><span class="b">${tx('Espacio usado','Storage used')}</span><span class="xs mut" style="display:block">${tx(`${mb(u.c)} MB de unos 5 MB · las fotos van aparte`,`${mb(u.c)} MB of about 5 MB · photos are stored separately`)}</span></span><span class="b" style="color:${u.pct>=70?'var(--bad)':'var(--mut)'}">${String(u.pct).replace('.',EN_LANG()?'.':',')} %</span></div>`; }
+function velocidadHtml(){ if (PF_PERF.boot==null) return ''; return `<div class="xs mut" style="text-align:center;margin-top:6px">${tx(`Abre en ${PF_PERF.boot} ms · última pantalla en ${PF_PERF.ult} ms`,`Opens in ${PF_PERF.boot} ms · last screen in ${PF_PERF.ult} ms`)}</div>`; }
 function boot(){
   load();
   // v0.5: quien ya tenía equipo de gimnasio recibe los accesorios habituales nuevos
   if (!S.settings.eqV5){ const q=S.settings.equip||[]; if (q.includes('maq')&&q.includes('pol')&&q.includes('bar')) ['smi','ez','hex','lmn','fit','bal','esc'].forEach(k=>{ if(!q.includes(k)) q.push(k); }); S.settings.eqV5=true; save(); }
   applyTheme(); applyA11y(); if (typeof applyLang==='function') applyLang();
   document.getElementById('app').innerHTML=`<div id="view"></div><nav id="nav"></nav><div id="mini" class="minibar hide" data-a="resumeWorkout"></div><div id="layers"></div><div id="modals"></div>`;
-  render();
+  try{ compactarDatos(); }catch(e){}
+  render(); PF_PERF.boot=Math.round(performance.now()-PF_T0);
   setInterval(tick,250);
   scheduleReminder();
   if (!S.settings.onboarded) setTimeout(()=>openLayer('onboard',{step:0,level:'principiante',preset:null}),300);
@@ -7029,8 +7084,11 @@ function barChart(vals, labels, o){
 
 /* ---------- Pestaña Historial ---------- */
 function viewHistorial(){
-  const segs=[['resumen','Resumen'],['informes','Informes'],['metas','Metas'],['retos',tx('Retos','Challenges')],['records','Récords'],['progreso','Progreso'],['cuerpo','Cuerpo'],['logros','Logros']];
-  let h=`<div class="hdr"><h1>Mi historial</h1></div><div class="chips scroll" style="margin-bottom:14px">${segs.map(([k,n])=>`<button class="chip ${HSEG===k?'on':''}" data-a="hseg" data-v="${k}">${n}</button>`).join('')}</div>`;
+  // 1.8: de 8 pestañas a 4; cada una agrupa sus pantallas en subpestañas (no se quita ninguna)
+  const G=hGrupo(HSEG), sub=HGRUPOS[G].s;
+  let h=`<div class="hdr"><h1>Mi historial</h1></div><div class="seg" style="margin-bottom:${sub.length>1?8:14}px">${Object.entries(HGRUPOS).map(([k,g])=>`<button class="${G===k?'on':''}" data-a="hgrp" data-v="g:${k}">${g.n()}</button>`).join('')}</div>`;
+  if (sub.length>1) h+=`<div class="chips" style="margin-bottom:14px;flex-wrap:wrap">${sub.map(([k,n])=>`<button class="chip ${HSEG===k?'on':''}" data-a="hseg" data-v="${k}">${n()}</button>`).join('')}</div>`;
+  h+='<!--hist-tabs-->';
   if (HSEG==='resumen') h+=histResumen();
   else if (HSEG==='records') h+=histRecords();
   else if (HSEG==='progreso') h+=histProgreso();
@@ -7042,6 +7100,15 @@ function viewHistorial(){
   return h;
 }
 A.hseg=v=>{ HSEG=v; render(); };
+const HGRUPOS={
+  resumen:{n:()=>tx('Resumen','Summary'),s:[['resumen',()=>tx('Entrenos','Workouts')],['informes',()=>tx('Informes','Reports')]]},
+  progreso:{n:()=>tx('Progreso','Progress'),s:[['progreso',()=>tx('Gráficas','Charts')],['records',()=>tx('Récords','Records')],['metas',()=>tx('Metas','Goals')]]},
+  cuerpo:{n:()=>tx('Cuerpo','Body'),s:[['cuerpo',()=>tx('Cuerpo','Body')]]},
+  logros:{n:()=>tx('Logros','Achievements'),s:[['logros',()=>tx('Logros','Achievements')],['retos',()=>tx('Retos','Challenges')]]}};
+const hGrupo=k=>Object.keys(HGRUPOS).find(g=>HGRUPOS[g].s.some(x=>x[0]===k))||'resumen';
+// cada pestaña recuerda la última subpestaña que abriste
+const HULT={};
+A.hgrp=v=>{ const g=String(v).replace(/^g:/,''); if (!HGRUPOS[g]) return; HULT[hGrupo(HSEG)]=HSEG; HSEG=HULT[g]||HGRUPOS[g].s[0][0]; render(); };
 function histResumen(){
   const now=new Date(); if(!HM) HM={y:now.getFullYear(),m:now.getMonth()};
   const monthS=S.sessions.filter(s=>{const d=new Date(s.end);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
@@ -7382,12 +7449,12 @@ function hoyCard(){
         +`<button class="link xs" style="margin-top:8px;display:block" data-a="startTravel" data-v="${nx.r.id}">✈️ ${tx('Estoy de viaje: hacerla sin equipo','Travelling: do it without equipment')}${premOK()?'':' 🔒'}</button>`
         +`<button class="link xs" style="margin-top:8px;display:block" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>`;
       const avisos=(nx.swapped?1:0)+(pc?1:0)+(rs.lvl!=='buena'?1:0);
-      return `<div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${pIA(nx.r)&&rs.lvl!=='buena'?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">${tx('Suave','Easy')}</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
+      return `<div class="row" style="gap:8px;margin-top:12px"><button class="btn pri grow" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} Empezar</button>${pIA(nx.r)&&(rs.lvl!=='buena'||(premOK()&&(estadoDia()||{}).soft))?`<button class="btn" data-a="startSoft" data-v="${nx.r.id}">${tx('Suave','Easy')}</button>`:''}<button class="btn" data-a="hoyChange">Cambiar</button></div>
       <button class="link xs" style="margin-top:10px;display:flex;align-items:center;gap:6px" data-a="hoyMas">${avisos?`<span class="ndot" style="background:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'}"></span>`:''}${HOY_MAS?tx('Ocultar detalles','Hide details'):avisos?tx(`${avisos===1?'Un detalle':avisos+' detalles'} para hoy`,`${avisos===1?'One note':avisos+' notes'} for today`):tx('Más opciones','More options')} ${I(HOY_MAS?'up':'down',14)}</button>${HOY_MAS?det:''}`; })()}`;
   else { let k=1; while(k<8 && !S.plan.days.includes((dow+k)%7)) k++;
     body=`<div class="xs mut b" style="letter-spacing:1px">HOY</div><div class="b" style="font-size:20px;margin-top:2px">Día de descanso</div><div class="sm mut" style="margin-top:4px">Próximo entreno: ${k===1?'mañana':DAYS_LONG[(dow+k)%7]} · ${esc(nx.r.name)}</div>
     <button class="link sm" style="margin-top:10px" data-a="hoyChange">Entrenar igual hoy</button>`; }
-  return `<div class="card hoy">${strip}<div style="margin-top:12px">${body}</div><button class="xs mut" style="margin-top:10px" data-a="openPlan">${I('edit',12).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} Editar plan semanal</button></div>`;
+  return `<div class="card hoy">${strip}<div style="margin-top:12px">${body}</div>${trainedToday?'':estadoLinea()}<button class="xs mut" style="margin-top:10px" data-a="openPlan">${I('edit',12).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} Editar plan semanal</button></div>`;
 }
 // 1.6 · Minimalista: la rutina de hoy en una línea con Empezar
 function hoyMini(){
@@ -7396,7 +7463,7 @@ function hoyMini(){
   if (hecho) return `<div class="card row" style="gap:10px;padding:12px 14px"><span style="color:var(--ok)">${I('check',20)}</span><div class="grow sm"><b>${tx('Hoy ya entrenaste','You trained today')}</b> · <span class="mut">${tx('Próxima','Next')}: ${esc(nx.r.name)}</span></div></div>`;
   if (!S.plan.days.includes(dow)) return `<div class="card row" style="gap:10px;padding:12px 14px"><span class="mut">${I('moon',20)}</span><div class="grow sm"><b>${tx('Día de descanso','Rest day')}</b> · <span class="mut">${esc(nx.r.name)} ${tx('es la próxima','is next')}</span></div><button class="link sm" data-a="hoyChange">${tx('Entrenar','Train')}</button></div>`;
   const rs=premOK()?recoveryState(nx.r):{lvl:'buena'};
-  return `<div class="card hoy row" style="gap:12px;padding:12px 14px"><div class="grow" style="min-width:0"><div class="xs mut b" style="letter-spacing:1px">${tx('HOY TOCA','UP TODAY')}${rs.lvl!=='buena'?` <span class="ndot" style="background:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'}"></span>`:''}</div><div class="b ell" style="font-size:17px">${esc(nx.r.name)}</div><div class="xs mut">~${routineMinutes(nx.r)} min</div></div><button class="btn pri" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} ${tx('Empezar','Start')}</button></div>`;
+  return `<div class="card hoy row" style="gap:12px;padding:12px 14px"><div class="grow" style="min-width:0"><div class="xs mut b row" style="letter-spacing:1px;gap:6px">${tx('HOY TOCA','UP TODAY')}${(E=>E&&E.score!=null?`<button data-a="estadoVer">${estadoChip(E)}</button>`:rs.lvl!=='buena'?` <span class="ndot" style="background:${rs.lvl==='baja'?'var(--bad)':'var(--gold)'}"></span>`:'')(premOK()?estadoDia():null)}</div><div class="b ell" style="font-size:17px">${esc(nx.r.name)}</div><div class="xs mut">~${routineMinutes(nx.r)} min</div></div><button class="btn pri" data-a="startWorkout" data-v="${nx.r.id}">${I('play',18)} ${tx('Empezar','Start')}</button></div>`;
 }
 function recoveryState(r){
   const KR=kb('recuperacion.ajuste'), msgs=[]; let pts=0;
@@ -7644,6 +7711,8 @@ function weekReport(wk){
 }
 function histInformes(){
   let h=`<div class="row" style="gap:8px;margin-bottom:12px"><button class="btn grow" data-a="periodo" data-v="mes">📅 ${tx('Tu mes','Your month')}</button><button class="btn grow" data-a="periodo" data-v="ano">🏆 ${tx('Tu año','Your year')}</button></div>`, any=false; const k0=weekKey(Date.now());
+  // 1.8: lo que PandarIA aprendió de ti (agua y rendimiento, tus mejores días, ayuno y entreno, comida y progreso, tu meta)
+  if (premOK()){ const L=v3Novedades().filter(x=>x.a==='kbOpen'); if (L.length) h+=`<div class="sec">${tx('Lo que PandarIA aprendió de ti','What PandarIA learned about you')}</div><div class="card" style="padding:4px 14px">${L.map((x,i)=>`<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="b sm">${esc(x.t)}</div><div class="xs mut" style="margin-top:3px;line-height:1.45">${esc(x.d)}${kbLink(x.v,tx('Por qué','Why'))}</div></div>`).join('')}</div>`; }
   for (let i=0;i<8;i++){
     const wk=k0-i*7*DAY; const r=weekReport(wk); if (!r.n && i>0) continue; any=true;
     const bal=i<2?balanceReport(28).msgs:[];
@@ -7842,7 +7911,8 @@ function nutAdapt(tdeeF, w){
 }
 function viewNutricion(){
   const n=nut(), c=calcNutrition();
-  let h=`<div class="hdr"><h1>Nutrición</h1></div>`;
+  // 1.8: suplementos y menús pasan a un botón de la cabecera
+  let h=`<div class="hdr"><h1>Nutrición</h1><button class="ibtn soft" data-a="nutMas" aria-label="${tx('Suplementos y menús','Supplements and menus')}">${I('pill',20)}</button></div>`;
   // 1.3: dos subpestañas fijas arriba, para no tener que deslizar hasta el agua
   h+=`<div class="seg" style="margin-bottom:14px">${[['comida',tx('Comida','Food')],['agua',tx('Agua','Water')]].map(([k,t])=>`<button class="${NSEG===k?'on':''}" data-a="nseg" data-v="${k}">${t}</button>`).join('')}</div>`;
   if (NSEG!=='agua'){
@@ -7866,12 +7936,10 @@ function viewNutricion(){
   }
   }
   h+='<!--fin-objetivo-->';
-  h+=supCardsHtml();
   }
   // agua
   if (NSEG==='agua'){
   const wg=waterGoal(), dd=diaryDrinks(dayKey()), wv=waterToday(), pct=Math.min(100,Math.round(wv/wg*100));
-  const days=[...Array(7).keys()].reverse().map(i=>waterToday(dayKey(Date.now()-i*DAY)));
   const tt=trainedToday(), ttMin=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0), KA=kb('agua');
   const extraTxt=!tt.length?'':ttMin>KA.largo+29?tx(`, + agua extra por tu entreno de ${Math.round(ttMin)} min`,`, + extra water for your ${Math.round(ttMin)}-min workout`):tx(', + 500 ml porque hoy entrenaste',', + 500 ml because you trained today');
   h+=`<div class="sec">Agua</div><div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString(LOC(),{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString(LOC(),{maximumFractionDigits:1})} L</span></div></div>
@@ -7879,7 +7947,7 @@ function viewNutricion(){
     ${dd.n?`<div class="xs" style="margin-top:10px;color:var(--blue);line-height:1.4">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}
     ${cafLine(dd.caf)}
     <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}${waterExtraHoy()?tx(`, + ${waterExtraHoy()} ml por el calor`,`, + ${waterExtraHoy()} ml for the heat`):''}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
-    <div style="margin-top:10px">${barChart(days.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?'Hoy':DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>${days.filter(v=>v>0).length<2?`<div class="xs mut" style="margin-top:6px;text-align:center">${tx('Registra agua varios días para ver tu semana aquí.','Log water on a few days to see your week here.')}</div>`:''}<button class="btn sm wide" style="margin-top:10px" data-a="aguaStats">${I('chart',16)} ${tx('Estadísticas del agua','Water stats')}</button></div>`;
+<button class="btn sm wide" style="margin-top:10px" data-a="aguaStats">${I('chart',16)} ${tx('Estadísticas del agua','Water stats')}</button></div>`;
     h+=aguaHoyHtml();
   }
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
@@ -8615,7 +8683,8 @@ function alimGet(id){
 }
 function alimMac(f,g){ const o={}; MAC.forEach(m=>o[m]=f[m]==null?null:Math.round(f[m]*g/100*10)/10); o.k=Math.round(f.k*g/100); return o; }
 function dayKeyOf(){ return NUT_DAY||dayKey(); }
-function dayItems(k){ return nd().diario[k||dayKeyOf()]||[]; }
+// solo lectura: mirar el diario no debe crear datos vacíos (1.8)
+function dayItems(k){ const D=S.nutri&&S.nutri.diario; return (D&&D[k||dayKeyOf()])||[]; }
 function dayTotals(k){ const t={k:0,p:0,c:0,g:0,f:0,a:0,na:0}; dayItems(k).forEach(e=>MAC.forEach(m=>t[m]+=+e[m]||0)); MAC.forEach(m=>t[m]=Math.round(t[m]*10)/10); t.k=Math.round(t.k); return t; }
 function mealNow(){ const h=new Date().getHours(); return h<11?'desayuno':h<15?'almuerzo':h<19?'merienda':h<23?'cena':'snack'; }
 // Qué no encaja con tus preferencias
@@ -8997,7 +9066,8 @@ function fastCard(){
   if (f.blocked) return h+`<div class="card"><div class="sm" style="line-height:1.45">Por lo que nos indicaste, el ayuno intermitente no es recomendable sin supervisión profesional. Habla con tu médico o nutricionista antes de hacerlo.</div><button class="link sm" style="margin-top:10px" data-a="fastScreen">Revisar mis respuestas</button></div>`;
   if (!f.screened) return h+`<div class="card"><div class="b">Ayuno supervisado por PandarIA</div><div class="sm mut" style="margin-top:4px;line-height:1.45">Planes 12:12, 14:10, 16:8, 18:6, 20:4, 5:2 o libre, con temporizador, historial y consejos según tus entrenos.</div><button class="btn pri wide" style="margin-top:12px" data-a="fastScreen">Configurar ayuno</button></div>`;
   const plan=FAST_PLANS[f.plan]||FAST_PLANS.libre;
-  h+=`<div class="chips scroll" style="margin-bottom:10px">${Object.entries(FAST_PLANS).map(([k,v])=>`<button class="chip ${f.plan===k?'on':''}" data-a="fastPlan" data-v="${k}">${v.n}</button>`).join('')}</div>`;
+  // 1.8: el plan es un botón que abre el selector con la explicación de cada uno (antes una fila que se deslizaba de lado)
+  h+=`<button class="card row tap" style="width:100%;gap:10px;padding:11px 14px;text-align:left" data-a="fastPlanPick"><span style="color:var(--ac)">${I('timer',20)}</span><div class="grow"><div class="b">${tx('Plan','Plan')} ${esc(plan.n)}</div><div class="xs mut">${esc(fpDesc(plan.d))}</div></div><span class="xs mut b">${tx('Cambiar','Change')}</span></button>`;
   if (f.plan==='5:2'){
     const low=f.days52.includes(new Date().getDay());
     h+=`<div class="card"><div class="b">${low?'Hoy es día bajo en calorías':'Hoy es día normal'}</div><div class="sm mut" style="margin-top:4px;line-height:1.45">${low?'Apunta a 500–600 kcal, priorizando proteína y verduras. Evita entrenos intensos hoy.':'Come de forma equilibrada según tu objetivo.'}</div>
@@ -9041,7 +9111,8 @@ function fastAdvice(){
   if (n.goal==='bajar') msgs.push('El ayuno ayuda a ordenar las comidas, pero lo que más cuenta es el total de calorías del día.');
   if (n.goal==='ganar' && plan.h>=16) msgs.push('Para ganar músculo con ventanas cortas, asegúrate de llegar a tus calorías y proteína en la ventana de comida.');
   if (!msgs.length) msgs.push('Durante el ayuno puedes tomar agua, café o té sin azúcar.');
-  return `<div class="card">${msgs.map(m=>`<div class="row sm" style="align-items:flex-start;padding:4px 0;line-height:1.45"><span style="color:var(--ac)">${I('spark',15)}</span><span>${esc(m)}</span></div>`).join('')}</div>`;
+  // 1.8: un solo consejo, el más importante del momento (están ordenados de más a menos importante)
+  return `<div class="card">${msgs.slice(0,1).map(m=>`<div class="row sm" style="align-items:flex-start;padding:2px 0;line-height:1.45"><span style="color:var(--ac)">${I('spark',15)}</span><span>${esc(m)}</span></div>`).join('')}</div>`;
 }
 function fastHistory(){
   const H=nut().fast.history, hs=H.map((x,i)=>[x,i]).slice(-5).reverse(); const R=fastRachas();
@@ -9056,6 +9127,8 @@ A.fastScreen=()=>{
     ${items.map(([k,l])=>`<button class="srow" data-a="fsTog" data-v="${k}"><span class="check"></span><span class="grow sm">${l}</span></button>`).join('')}
     <button class="btn pri big" style="margin-top:14px" data-a="cbm" data-v="${cb(()=>{ const f=nut().fast; f.screened=true; f.blocked=sel.size>0; if (sel.has('tca')) nut().habitos=true; save(); render.keep=true; render(); toast(f.blocked?'El ayuno no es recomendable para ti sin supervisión':'¡Listo! Elige tu plan de ayuno'); })}">Continuar</button></div>`);
 };
+const fpDesc=d=>EN_LANG()?(trText(d)||d):d;
+A.fastPlanPick=()=>{ const f=nut().fast; sheet(tx('Plan de ayuno','Fasting plan'),Object.entries(FAST_PLANS).map(([k,v])=>({icon:f.plan===k?'check':'timer',label:(k==='libre'?tx('Libre','Free'):v.n)+(f.plan===k?tx(' · el tuyo',' · yours'):''),desc:fpDesc(v.d),fn:()=>A.fastPlan(k)}))); };
 A.fastPlan=v=>{ const f=nut().fast, P=FAST_PLANS[v]||{}, set=()=>{ f.plan=v; save(); render.keep=true; render(); };
   // 1.5: los planes muy exigentes (20 h o más) avisan antes de elegirse
   if (P.h>=20 && f.plan!==v){ const exp=f.history.filter(x=>x.ok&&(x.end-x.start)/3600000>=16).length;
@@ -9239,7 +9312,9 @@ function wRachas(){ let act=0, mej=0, c=0; const hoy=dayKey(), dias=[...Array(12
 A.aguaStats=()=>openLayer('aguaStats',{y:new Date().getFullYear(),m:new Date().getMonth()});
 SCREENS.aguaStats=p=>{ const D=n=>[...Array(n).keys()].map(i=>dayKey(Date.now()-(i+1)*DAY)), med=L=>{ const v=L.map(wDiaMl).filter(x=>x>0); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
   const d30=D(30), ok30=d30.filter(k=>wDiaMl(k)>0&&wDiaMl(k)>=wGoalDia(k)).length, R=wRachas(), L1=v=>v?(Math.round(v/100)/10).toLocaleString(LOC())+' L':'—';
-  let b=`<div class="stats"><div class="stat"><div class="v">${L1(med(D(7)))}</div><div class="l">${tx('Media 7 días','7-day average')}</div></div><div class="stat"><div class="v">${L1(med(d30))}</div><div class="l">${tx('Media 30 días','30-day average')}</div></div><div class="stat"><div class="v">${ok30}</div><div class="l">${tx('Metas en 30 días','Goals in 30 days')}</div></div></div>
+  const sem=[...Array(7).keys()].reverse().map(i=>waterToday(dayKey(Date.now()-i*DAY)));
+  let b=`<div class="card" style="margin-bottom:10px"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:4px">${tx('ÚLTIMOS 7 DÍAS (L)','LAST 7 DAYS (L)')}</div>${barChart(sem.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?tx('Hoy','Today'):DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>
+  <div class="stats"><div class="stat"><div class="v">${L1(med(D(7)))}</div><div class="l">${tx('Media 7 días','7-day average')}</div></div><div class="stat"><div class="v">${L1(med(d30))}</div><div class="l">${tx('Media 30 días','30-day average')}</div></div><div class="stat"><div class="v">${ok30}</div><div class="l">${tx('Metas en 30 días','Goals in 30 days')}</div></div></div>
   <div class="stats" style="margin-top:8px"><div class="stat"><div class="v">${R.act}</div><div class="l">${tx('Racha actual (días)','Current streak (days)')}</div></div><div class="stat"><div class="v">${R.mej}</div><div class="l">${tx('Mejor racha','Best streak')}</div></div></div>`;
   const first=new Date(p.y,p.m,1), st=(first.getDay()+6)%7, days=new Date(p.y,p.m+1,0).getDate(), hoy=dayKey();
   let cal=(EN_LANG()?['M','T','W','T','F','S','S']:['L','M','X','J','V','S','D']).map(d=>`<div class="dh">${d}</div>`).join(''); for (let i=0;i<st;i++) cal+='<div></div>';
@@ -9460,6 +9535,39 @@ const CQ_PARAMS={
 // ---------- Las preguntas ----------
 // q: [es, en] (con {ej}, {hora}, {zona}, {momento} donde va la opción) · alias: palabras para el buscador · f: el analizador
 const CQ=[
+/* ===== 1.8 · explicaciones de lo que estás viendo ===== */
+{id:'estado',s:'rec',q:['¿Qué es mi estado del día?','What is my state of the day?'],alias:'estado del dia numero listo normal suave descansa puntuacion',kb:'estado.dia',f:()=>{
+  const E=premOK()?estadoDia():null, caso=[];
+  if (E&&E.score!=null){ caso.push(tx(`Hoy: ${E.score} (${E.word}), con ${plural(E.n,'fuente de datos','fuentes de datos')}.`,`Today: ${E.score} (${E.word}), from ${E.n} data source${E.n===1?'':'s'}.`)); E.top.forEach(x=>caso.push(cap1es(x.t)+` (−${x.p})`)); }
+  else caso.push(tx('Hoy todavía no hay datos: haz el check-in.','There is no data for today yet: do the check-in.'));
+  return {corta:tx('Un número de 0 a 100 que junta tus señales de cansancio de hoy y te dice cómo encarar la sesión.','A number from 0 to 100 that brings together today\'s fatigue signals and tells you how to approach your session.'), caso,
+    exp:[tx('Empieza en 100 y cada señal resta según su peso: el check-in, los músculos que tocan hoy, una sesión muy exigente, un ayuno largo, el cansancio de varios días y, con Salud, el sueño y el pulso. Con 80 o más, Listo; de 60 a 79, Normal; de 40 a 59, Suave; menos de 40, Descansa.','It starts at 100 and each signal takes points away by its weight: the check-in, the muscles you train today, a very hard session, a long fast, fatigue over several days and, with Health, sleep and heart rate. 80 or more, Ready; 60 to 79, Normal; 40 to 59, Easy; under 40, Rest.')],
+    ej:[tx('Dormiste mal (−15) y tus piernas están a menos de la mitad de recuperación (−15): 70, Normal.','You slept badly (−15) and your legs are under half recovered (−15): 70, Normal.')],
+    hacer:[E&&E.soft?tx('Hoy, sesión suave con el botón «Suave».','Today, an easy session with the «Easy» button.'):tx('Haz tu sesión como está.','Do your session as planned.')], acciones:[['estadoVer','',tx('Ver mi estado del día','See my state of the day')]]};
+}},
+{id:'lineaBase',s:'rec',q:['¿Por qué me compara con mi propia media?','Why does it compare me with my own average?'],alias:'linea base media normal comparar promedio',kb:'linea.base',f:()=>{
+  const LB=premOK()?lineaBase():[], listos=LB.filter(o=>!o.falta);
+  return {corta:tx('Porque tu normal es solo tuyo: un mismo número puede ser bueno para ti y malo para otra persona.','Because your normal is yours alone: the same number can be good for you and bad for someone else.'),
+    caso:[listos.length?tx(`Ya tienes línea base en: ${listos.map(o=>o.n.toLowerCase()).join(', ')}.`,`You already have a baseline for: ${listos.map(o=>o.n.toLowerCase()).join(', ')}.`):tx('Todavía no tienes 14 días de datos en ningún apartado.','You do not have 14 days of data in any area yet.')],
+    exp:[tx('PandarIA usa tu media de las últimas 4 semanas, y solo con 14 días de datos o más. Así una noche de 6 horas cuenta distinto si sueles dormir 6 que si sueles dormir 8.','PandarIA uses your average over the last 4 weeks, and only with 14 days of data or more. That way a 6-hour night counts differently if you usually sleep 6 than if you usually sleep 8.')],
+    ej:[tx('Si tu pulso en reposo suele ser 52 y hoy es 60, PandarIA lo ve; un 60 general no diría nada.','If your resting heart rate is usually 52 and today it is 60, PandarIA notices; a general 60 would say nothing.')], hacer:[tx('Registra a diario lo que puedas: check-in, agua y, si puedes, conecta Salud.','Log what you can every day: check-in, water and, if possible, connect Health.')], acciones:[['estadoVer','',tx('Ver mi línea base','See my baseline')]]};
+}},
+{id:'colores',s:'rec',q:['¿Qué significan los colores del mapa?','What do the map colours mean?'],alias:'colores mapa rojo amarillo verde recuperacion musculo',kb:'recuperacion.mapa',f:()=>{
+  const R0=recMusculos(), ms=Object.entries(R0).filter(([,o])=>o.pct<1), rojo=ms.filter(([,o])=>o.pct<0.5).map(([m])=>mN(m)), am=ms.filter(([,o])=>o.pct>=0.5&&o.pct<0.85).map(([m])=>mN(m));
+  return {corta:tx('Rojo: menos de la mitad de recuperación. Amarillo: entre el 50 y el 85 %. Verde: casi listo. Sin color: recuperado.','Red: under half recovered. Yellow: 50 to 85 %. Green: almost ready. No colour: recovered.'),
+    caso:[rojo.length?tx(`En rojo ahora: ${rojo.join(', ')}.`,`Red now: ${rojo.join(', ')}.`):tx('Ahora no tienes ningún músculo en rojo.','You have no muscles in red right now.')].concat(am.length?[tx(`En amarillo: ${am.join(', ')}.`,`Yellow: ${am.join(', ')}.`)]:[]),
+    exp:[tx('Cada sesión de los últimos 4 días cansa los músculos que trabajó: con 6 series hacen falta unas 48 h, con menos, menos tiempo, y una sesión muy exigente suma un 15 %. Es una estimación: tu cuerpo manda.','Each session in the last 4 days tires the muscles it worked: with 6 sets it takes about 48 h, with fewer, less time, and a very hard session adds 15 %. It is an estimate: your body has the final say.')],
+    ej:[tx('Si hiciste 8 series de pecho ayer a las 19:00, hoy a la misma hora el pecho estará en amarillo.','If you did 8 sets of chest yesterday at 19:00, today at the same time your chest will be yellow.')], hacer:[tx('Si un músculo está en rojo, entrena otros o haz esa zona más suave.','If a muscle is red, train others or go easier on that area.')], acciones:[]};
+}},
+{id:'pesoCambio',s:'ent',q:['¿Por qué cambió el peso que me sugiere?','Why did the suggested weight change?'],alias:'peso sugerido cambio bajo subio sugerencia carga',kb:'carga.subida',f:()=>{
+  const caso=[], aj=S.active&&S.active.ajuste;
+  if (aj) caso.push(tx(`Hoy tienes un ${Math.round((1-aj.f)*100)} % menos de carga por cómo llegas.`,`Today you have ${Math.round((1-aj.f)*100)} % less load because of how you feel.`));
+  if (deloadActive()) caso.push(tx(`Semana de descarga activa hasta el ${fmtDate(S.deload.until)}: pesos más livianos.`,`Deload week on until ${fmtDate(S.deload.until)}: lighter weights.`));
+  if (!caso.length) caso.push(tx('Hoy no hay ajustes especiales: el peso sale de tu última sesión de cada ejercicio.','No special adjustments today: the weight comes from your last session of each exercise.'));
+  return {corta:tx('PandarIA mira tu última sesión de ese ejercicio y cómo llegas hoy.','PandarIA looks at your last session of that exercise and how you are today.'), caso,
+    exp:[tx('Si completaste todas las series en el máximo de repeticiones, sube el peso; si dos sesiones seguidas no llegaste al mínimo, lo baja un 10 %; si la sesión anterior fue muy dura, lo mantiene; si volviste tras una pausa, lo baja según el tiempo; y si llegas con poco descanso o en descarga, aligera.','If you completed all sets at the top of the rep range, it adds weight; if you missed the minimum two sessions in a row, it lowers it by 10 %; if the last session was very hard, it keeps it; if you came back after a break, it lowers it by how long; and if you are poorly rested or deloading, it goes lighter.')],
+    ej:[tx('3 × 12 con 40 kg (rango 8–12): la próxima vez, 42,5 kg a 8 repeticiones.','3 × 12 with 40 kg (range 8–12): next time, 42.5 kg for 8 reps.')], hacer:[tx('Toca el «por qué» bajo el ejercicio para ver el motivo exacto.','Tap the «why» under the exercise to see the exact reason.')], acciones:[]};
+}},
 /* ===== Entreno y progreso ===== */
 {id:'estanco',s:'ent',q:['¿Por qué no avanzo en {ej}?','Why am I not progressing on {ej}?'],p:'ej',alias:'estancado estancamiento no subo peso plateau atascado',kb:'carga.doble',f:p=>{
   const ex=getEx(p.ej), h=e1Hist(p.ej,10), KV=kb('volumen.hipertrofia'), ms=muscleSets(7), m=ex.prim[0], ser=Math.round(ms[m]||0);
@@ -9792,9 +9900,9 @@ SCREENS.consultaQ=p=>{ const q=CQ.find(x=>x.id===p.id); if (!q) return lhdr('')+
    guía flotante: preguntas de la pantalla en la que estás, temas y un buscador entre las preguntas preparadas.
    Responde con la respuesta corta (el informe completo con Premium). No hay texto libre ni envíos por correo. */
 const BUB_OCULTA=['workout','onboard','intervals','intRun','editor','consulta','consultaSec','consultaQ','premium','updNew','updWhatsNew','photoCmp','wizPandaria','wizGrupo','alimNuevo','retoNuevo','createEx','goalForm','measure','receta','profile'];
-const CQ_CTX={rutinas:['hoy','series','descarga','estanco'],explorar:['pesoUsar','calentar','series'],nutricion:['proteina','calorias','despues','polvo'],
+const CQ_CTX={rutinas:['estado','hoy','series','descarga','estanco'],estadoDia:['estado','lineaBase','hoy'],explorar:['pesoUsar','calentar','series'],nutricion:['proteina','calorias','despues','polvo'],
   agua:['cuantaAgua','aguaEntreno','cafeAgua'],ayuno:['planAyuno','romper','ayunasEntreno','ayunoMusculo'],historial:['noBajo','estanco','pesarme','ritmo'],ajustes:['datos','premium','progresion','recuCalc'],
-  exercise:['pesoUsar','estanco','molestia'],session:['hoy','agujetas','despues'],recuMapa:['hoy','agujetas','recuCalc'],plan:['dias','descarga'],suplementos:['creatina','polvo','cafeina'],
+  exercise:['pesoUsar','estanco','molestia'],session:['pesoCambio','hoy','agujetas','despues'],workout:['pesoCambio','hoy','agujetas'],recuMapa:['colores','hoy','agujetas','recuCalc'],plan:['dias','descarga'],suplementos:['creatina','polvo','cafeina'],
   periodo:['estanco','noBajo','dias'],menu:['proteina','calorias','antes']};
 function cqContexto(){ const top=LAYERS.length?LAYERS[LAYERS.length-1]:null;
   let k=top&&CQ_CTX[top.t]?top.t:(TAB==='nutricion'&&typeof NSEG!=='undefined'&&NSEG==='agua'?'agua':TAB);
@@ -9814,16 +9922,237 @@ function bubSync(){ let b=document.getElementById('pfBub');
   let e={prop:0,nov:0,logro:0}; try{ e=pandaEstado(); }catch(err){}
   b.classList.toggle('blink',!!e.prop); b.classList.toggle('dot-o',!e.prop&&!!e.nov); b.classList.toggle('dot-v',!e.prop&&!e.nov&&!!e.logro); }
 
+/* ============ 1.8 · PandarIA v3: estado del día, tu línea base, cansancio acumulado y aprender de ti (Premium) ============
+   Reglas de la casa: cada conclusión necesita un mínimo de datos, dice cuántos usa y enseña la regla de la que sale.
+   Nada se aplica sin permiso: lo que cambia tu plan llega como propuesta por el panda (Aplicar o Ahora no). */
+const mN=m=>{ const n=MUSCLES[m]||m; return ((EN_LANG()&&EN_MAP.get(n))||n).toLowerCase(); };
+const DIAS_N=d=>EN_LANG()?['Sundays','Mondays','Tuesdays','Wednesdays','Thursdays','Fridays','Saturdays'][d]:['domingos','lunes','martes','miércoles','jueves','viernes','sábados'][d];
+const hhmmMin=x=>`${String(Math.floor(x/60)%24).padStart(2,'0')}:${String(Math.round(x%60)).padStart(2,'0')}`;
+// ----- registro diario (para la línea base): sueño, pulso, variabilidad y check-in de cada día; 120 días como máximo -----
+function v3Log(){ S.diaLog=S.diaLog||{}; const k=dayKey(), d=S.diaLog[k]=S.diaLog[k]||{};
+  const su=window.PF_SUENO, rh=window.PF_RHR, hv=window.PF_HRV, fresco=(z,h)=>z&&z.last&&Date.now()-(z.at||0)<h*3600000;
+  if (fresco(su,20)) d.su=su.last; if (fresco(rh,36)) d.rhr=rh.last; if (fresco(hv,36)) d.hrv=hv.last;
+  const ck=v3Checkin(); if (ck) d.ck=ck;
+  const ks=Object.keys(S.diaLog); if (ks.length>120) ks.sort().slice(0,ks.length-120).forEach(x=>delete S.diaLog[x]);
+  return S.diaLog; }
+function v3Checkin(){ const c=S.checkinDia&&S.checkinDia.day===dayKey()?S.checkinDia:null;
+  const a=S.active&&S.active.checkin&&new Date(S.active.start).toDateString()===new Date().toDateString()?S.active.checkin:null;
+  const t=S.sessions.slice(-2).map(s=>s.checkin&&new Date(s.start).toDateString()===new Date().toDateString()?s.checkin:null).filter(Boolean).pop();
+  const x=a||c||t; if (!x || ['sleep','energy','sore'].every(k=>x[k]==null)) return null; return {sleep:x.sleep, energy:x.energy, sore:x.sore}; }
+// ----- rendimiento de una sesión: su fuerza estimada frente a tu mejor marca de las 6 semanas anteriores en cada ejercicio -----
+let PERF_C={k:'',m:null};
+function perfMapa(){ const k=S.sessions.length+'|'+((S.sessions[S.sessions.length-1]||{}).end||0); if (PERF_C.k===k) return PERF_C.m;
+  const por={}, out={}; S.sessions.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s=>{ const rs=[];
+    s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.mode!=='p'||ex.missing) return; const e=e1Sesion(it.sets.filter(x=>x.done&&x.t!=='c')); if (!e) return;
+      const H=(por[it.exId]=por[it.exId]||[]), prev=H.filter(p=>s.end-p.t<42*DAY&&p.t<s.end); if (prev.length) rs.push(e/Math.max(...prev.map(p=>p.e))); H.push({t:s.end,e}); });
+    if (rs.length) out[s.id||s.end]=rs.reduce((a,b)=>a+b,0)/rs.length; });
+  PERF_C={k,m:out}; return out; }
+const perfDe=s=>perfMapa()[s.id||s.end];
+// ----- tu línea base: cada dato frente a tu media de 4 semanas (solo con 14 días de datos o más) -----
+function lineaBase(){ const K=kb('linea.base'), L=v3Log(), hoy=dayKey(), dias=[...Array(K.dias).keys()].map(i=>dayKey(Date.now()-(i+1)*DAY));
+  const fila=(id,n,unit,hoyV,serie,mejorArriba,fmt)=>{ const v=serie.filter(x=>x!=null&&x>0); const o={id,n,unit,n0:v.length,falta:Math.max(0,K.min-v.length),mejorArriba,fmt:fmt||(x=>fmtNum(Math.round(x*10)/10))};
+    if (v.length>=K.min){ o.avg=v.reduce((a,b)=>a+b,0)/v.length; if (hoyV!=null&&hoyV>0){ o.hoy=hoyV; o.pct=Math.round((hoyV/o.avg-1)*100); } } return o; };
+  const c=habitos()?null:calcNutrition(), out=[];
+  out.push(fila('su',tx('Sueño','Sleep'),'h',L[hoy]&&L[hoy].su?L[hoy].su/60:null,dias.map(k=>L[k]&&L[k].su?L[k].su/60:null),true,x=>`${Math.floor(x)} h ${String(Math.round(x*60)%60).padStart(2,'0')}`));
+  out.push(fila('rhr',tx('Pulso en reposo','Resting heart rate'),tx('lpm','bpm'),L[hoy]&&L[hoy].rhr,dias.map(k=>L[k]&&L[k].rhr),false,x=>Math.round(x)));
+  out.push(fila('hrv',tx('Variabilidad del pulso','Heart rate variability'),'ms',L[hoy]&&L[hoy].hrv,dias.map(k=>L[k]&&L[k].hrv),true,x=>Math.round(x)));
+  out.push(fila('agua',tx('Agua','Water'),'L',waterToday()/1000,dias.map(k=>waterToday(k)/1000),true));
+  if (c){ out.push(fila('kcal',tx('Calorías','Calories'),'kcal',diaDiario(hoy)?dayTotals(hoy).k:null,dias.map(k=>diaDiario(k)?dayTotals(k).k:null),null,x=>Math.round(x).toLocaleString(LOC())));
+    out.push(fila('prot',tx('Proteína','Protein'),'g',diaDiario(hoy)?dayTotals(hoy).p:null,dias.map(k=>diaDiario(k)?dayTotals(k).p:null),true,x=>Math.round(x))); }
+  // rendimiento: la última sesión frente a la media de tus sesiones de 4 semanas (con 4 sesiones o más en 14 días o más)
+  const ss=S.sessions.filter(s=>s.end&&Date.now()-s.end<K.dias*DAY&&perfDe(s)!=null), span=ss.length?(Date.now()-Math.min(...ss.map(s=>s.end)))/DAY:0;
+  const pr={id:'perf',n:tx('Rendimiento','Performance'),unit:'%',n0:ss.length,falta:span>=K.min&&ss.length>=4?0:Math.max(1,K.min-Math.round(span)),mejorArriba:true,fmt:x=>Math.round(x*100)};
+  if (!pr.falta){ const last=ss[ss.length-1], rest=ss.slice(0,-1); pr.avg=rest.reduce((a,s)=>a+perfDe(s),0)/rest.length; pr.hoy=perfDe(last); pr.pct=Math.round((pr.hoy/pr.avg-1)*100); }
+  out.push(pr);
+  return out; }
+// ----- cansancio acumulado: varias señales a la vez, varios días seguidos -----
+function cansancioAcum(){ if (!premOK()) return null; const K=kb('cansancio.acumulado'), L=v3Log(), dias=[...Array(K.dias).keys()].map(i=>dayKey(Date.now()-i*DAY));
+  const rh=window.PF_RHR, hv=window.PF_HRV, cuenta={hrv:0,rhr:0,sueno:0,rend:0};
+  dias.forEach(k=>{ const d=L[k]||{};
+    if (hv&&hv.avg&&hv.n>=kb('conexion.hrv').min&&d.hrv&&d.hrv<=hv.avg*(1-kb('conexion.hrv').pct/100)) cuenta.hrv++;
+    if (rh&&rh.avg&&rh.n>=kb('conexion.pulso').min&&d.rhr&&d.rhr-rh.avg>=kb('conexion.pulso').lpm) cuenta.rhr++;
+    if ((d.su&&d.su<kb('conexion.sueno').horas*60)||(d.ck&&d.ck.sleep===0)) cuenta.sueno++; });
+  S.sessions.filter(s=>s.end&&Date.now()-s.end<K.dias*DAY).forEach(s=>{ const p=perfDe(s); if (p!=null&&p<=1-K.caida) cuenta.rend++; });
+  const tipos=Object.entries(cuenta).filter(([,n])=>n>=K.minDias).map(([t])=>t);
+  if (tipos.length<K.minTipos) return null;
+  if (deloadActive() || (S.lastDeload && Date.now()-S.lastDeload<K.trasDescarga*DAY)) return null;
+  const nom={hrv:tx('variabilidad del pulso baja','low heart rate variability'),rhr:tx('pulso en reposo alto','high resting heart rate'),sueno:tx('noches cortas o malas','short or poor nights'),rend:tx('rendimiento por debajo de lo tuyo','performance below your usual')};
+  return {tipos, cuenta, txt:tipos.map(t=>`${nom[t]} (${t==='rend'?plural(cuenta[t],tx('sesión','session'),tx('sesiones','sessions')):plural(cuenta[t],tx('día','day'),tx('días','days'))})`)}; }
+// ----- estado del día: de 0 a 100 con una palabra, las tres cosas que más pesan y cómo cambia la sesión -----
+// se calcula una vez por cambio de datos (varias partes de la pantalla lo piden a la vez)
+var EST_C={k:null,v:null};
+function estadoDia(){ if (!premOK()) return null; const z=o=>o?o.last+'/'+o.at:'', a=nut().fast.active, ls=S.sessions[S.sessions.length-1];
+  const k=[S.sessions.length,ls&&ls.end,JSON.stringify(S.checkinDia||''),S.active?S.active.start:0,a?a.start:0,z(window.PF_SUENO),z(window.PF_HRV),z(window.PF_RHR),dayKey(),new Date().getHours(),S.deload?S.deload.until:0,EN_LANG()?'en':'es'].join('|');
+  if (EST_C.k===k) return EST_C.v; const v=estadoDiaCalc(); EST_C={k,v}; return v; }
+function estadoDiaCalc(){ const K=kb('estado.dia'), P=K.p, f=[]; let n=0; const pen=(p,t)=>f.push({p,t});
+  const ck=v3Checkin(); if (ck){ n++;
+    if (ck.sleep===0) pen(P.sueno0,tx('dormiste mal','you slept badly')); else if (ck.sleep===1) pen(P.sueno1,tx('dormiste regular','you slept so-so'));
+    if (ck.energy===0) pen(P.energia0,tx('energía baja','low energy'));
+    if (ck.sore===0) pen(P.agujetas0,tx('muchas agujetas','very sore')); else if (ck.sore===1) pen(P.agujetas1,tx('algunas agujetas','a bit sore')); }
+  const su=suenoCorto(); if (window.PF_SUENO&&window.PF_SUENO.last) n++; if (su) pen(P.suenoCorto,tx(`dormiste ${Math.floor(su.last/60)} h ${String(su.last%60).padStart(2,'0')}`,`you slept ${Math.floor(su.last/60)} h ${String(su.last%60).padStart(2,'0')}`));
+  if (window.PF_HRV&&window.PF_HRV.last) n++; const hv=hrvBaja(); if (hv) pen(P.hrv,tx(`variabilidad ${hv.pct} % bajo tu media`,`variability ${hv.pct} % below your average`));
+  if (window.PF_RHR&&window.PF_RHR.last) n++; const pu=pulsoAlto(); if (pu) pen(P.pulso,tx(`pulso ${pu.last-pu.avg} lpm sobre tu media`,`heart rate ${pu.last-pu.avg} bpm above your average`));
+  const nx=S.plan&&planRoutines().length?nextInPlan():null, r=nx&&nx.r;
+  if (S.sessions.some(s=>s.end&&Date.now()-s.end<14*DAY)){ n++;
+    const R0=recMusculos(), ms=r?[...new Set(r.items.flatMap(it=>{ const ex=getEx(it.exId); return conRecord(ex)?ex.prim:[]; }))].filter(m=>R0[m]):Object.keys(R0);
+    if (ms.length){ const avg=ms.reduce((a,m)=>a+R0[m].pct,0)/ms.length; if (avg<0.5) pen(P.musculos50,tx(`${ms.slice(0,2).map(mN).join(' y ')} a menos de la mitad de recuperación`,`${ms.slice(0,2).map(mN).join(' and ')} less than half recovered`)); else if (avg<0.85) pen(P.musculos85,tx('músculos de hoy aún recuperándose','today\'s muscles still recovering')); }
+    const last=S.sessions[S.sessions.length-1], KR=kb('recuperacion.ajuste'); if (last&&Date.now()-last.end<KR.horas*3600000&&(last.intensity||0)>=KR.intensa) pen(P.intensa,tx('tu última sesión fue muy exigente','your last session was very hard')); }
+  const ay=ayunoCarga(); if (ay) pen(P.ayuno,ay);
+  const ca=cansancioAcum(); if (ca) pen(P.cansancio,tx('cansancio acumulado de varios días','fatigue built up over several days'));
+  if (!n) return {score:null,n:0};
+  const score=Math.max(0,Math.min(100,100-f.reduce((a,x)=>a+x.p,0)));
+  const w=score>=K.listo?'listo':score>=K.normal?'normal':score>=K.suave?'suave':'descansa';
+  const W={listo:[tx('Listo','Ready'),'var(--ok)'],normal:[tx('Normal','Normal'),'var(--blue)'],suave:[tx('Suave','Easy'),'var(--gold)'],descansa:[tx('Descansa','Rest'),'var(--bad)']}[w];
+  const cambio={listo:tx('Tu sesión tal como está. Buen día para intentar una repetición más.','Your session as planned. A good day to try one more rep.'),normal:tx('Tu sesión tal como está.','Your session as planned.'),
+    suave:tx('Sesión suave: un 10 % menos de peso y una serie menos (botón «Suave»).','Easy session: 10 % less weight and one set fewer («Easy» button).'),descansa:tx('Mejor descanso o movilidad hoy. Si entrenas, que sea en modo suave.','Better rest or mobility today. If you train, keep it easy.')}[w];
+  return {score,w,word:W[0],col:W[1],top:f.sort((a,b)=>b.p-a.p).slice(0,3),n,cambio,soft:w==='suave'||w==='descansa',ca}; }
+function estadoChip(E,big){ if (!E||E.score==null) return ''; return `<span class="estchip${big?' big':''}" style="--ec:${E.col}"><b>${E.score}</b> ${esc(E.word)}</span>`; }
+function estadoLinea(){ if (!premOK()) return ''; let E=null; try{ E=estadoDia(); }catch(e){ return ''; } if (!E) return '';
+  if (E.score==null) return `<button class="link xs" style="margin-top:8px;display:block" data-a="estadoVer">${I('spark',13)} ${tx('Estado del día: haz el check-in para verlo','State of the day: do the check-in to see it')}</button>`;
+  return `<button class="row estrow" style="width:100%;gap:10px;margin-top:10px;text-align:left" data-a="estadoVer">${estadoChip(E)}<span class="xs mut grow" style="line-height:1.35">${E.top.length?esc(cap1es(E.top.map(x=>x.t).join(' · '))):tx('Sin señales de cansancio','No fatigue signals')}</span>${I('right',14)}</button>`; }
+A.estadoVer=()=>{ if (!premOK()) return pfPay('pandaria'); openLayer('estadoDia',{}); };
+SCREENS.estadoDia=()=>{ const E=estadoDia(), K=kb('linea.base'); let b='';
+  if (!E||E.score==null) b+=`<div class="card"><div class="b">${tx('Todavía no hay datos de hoy','No data for today yet')}</div><div class="sm mut" style="margin-top:4px;line-height:1.45">${tx('El estado del día sale del check-in, de tus últimos entrenos y, si lo conectas, del sueño y el pulso de Salud. Haz el check-in para verlo.','The state of the day comes from the check-in, your recent workouts and, if connected, sleep and heart rate from Health. Do the check-in to see it.')}</div><button class="btn pri wide" style="margin-top:12px" data-a="checkinHoy">${tx('Hacer el check-in','Do the check-in')}</button></div>`;
+  else { b+=`<div class="card" style="text-align:center"><div class="estbig" style="--ec:${E.col}"><b>${E.score}</b><span>${esc(E.word)}</span></div><div class="sm" style="margin-top:10px;line-height:1.45">${esc(E.cambio)}</div><div class="xs mut" style="margin-top:6px">${tx(`Con ${plural(E.n,'fuente de datos','fuentes de datos')} de hoy`,`From ${E.n} data source${E.n===1?'':'s'} today`)}${kbLink('estado.dia',tx('Cómo se calcula','How it is calculated'))}</div></div>`;
+    b+=`<div class="sec">${tx('Lo que más pesa hoy','What weighs most today')}</div><div class="card" style="padding:4px 14px">${E.top.length?E.top.map((x,i)=>`<div class="row sm" style="padding:10px 0;gap:10px;${i?'border-top:1px solid var(--line)':''}"><span class="grow">${esc(cap1es(x.t))}</span><b style="color:var(--bad)">−${x.p}</b></div>`).join(''):`<div class="sm" style="padding:10px 0">${tx('Nada resta hoy: ni cansancio, ni músculos sin recuperar, ni noches cortas.','Nothing takes away today: no fatigue, no unrecovered muscles, no short nights.')}</div>`}</div>`;
+    if (!v3Checkin()) b+=`<button class="btn wide" style="margin-top:8px" data-a="checkinHoy">${I('check',16)} ${tx('Hacer el check-in de hoy','Do today\'s check-in')}</button>`;
+    if (E.ca) b+=`<div class="banner" style="margin-top:10px;border-color:var(--gold)"><span class="ic" style="color:var(--gold)">${I('alert',18)}</span><div class="grow sm" style="line-height:1.45">${tx('Varias señales de cansancio se repiten estos días','Several fatigue signals keep repeating these days')}: ${esc(E.ca.txt.join(', '))}.${kbLink('cansancio.acumulado',tx('Por qué','Why'))}</div></div>`; }
+  // tu línea base
+  const LB=lineaBase();
+  b+=`<div class="sec">${tx('Tu línea base','Your baseline')}</div><div class="card" style="padding:4px 14px"><div class="xs mut" style="padding:10px 0 4px;line-height:1.4">${tx(`Cada dato frente a tu propia media de ${K.dias} días, no frente a valores generales.`,`Each figure compared with your own ${K.dias}-day average, not with general values.`)}${kbLink('linea.base',tx('Por qué','Why'))}</div>`;
+  b+=LB.map(o=>{ let der;
+    if (o.falta) der=`<span class="xs mut">${tx(`faltan ${plural(o.falta,'día','días')}`,`${o.falta} more day${o.falta===1?'':'s'}`)}</span>`;
+    else if (o.hoy==null) der=`<span class="xs mut">${tx('media','average')} ${o.fmt(o.avg)} ${o.unit}</span>`;
+    else { const bueno=o.mejorArriba==null?null:(o.pct>=0)===o.mejorArriba; const col=Math.abs(o.pct)<5||bueno==null?'var(--mut)':bueno?'var(--ok)':'var(--gold)';
+      der=`<span class="sm"><b>${o.fmt(o.hoy)} ${o.unit}</b> <span style="color:${col}">${o.pct>0?'+':''}${o.pct} %</span></span>`; }
+    return `<div class="row" style="padding:10px 0;border-top:1px solid var(--line);gap:8px"><span class="grow sm">${esc(o.n)}${o.falta?'':`<span class="xs mut"> · ${plural(o.n0,tx('dato','reading'),tx('datos','readings'))}</span>`}</span>${der}</div>`; }).join('')+`</div>`;
+  return lhdr(tx('Estado del día','State of the day'))+`<div class="lbody">${b}</div>`; };
+// check-in rápido (desde el estado del día o el aviso del panda); es el mismo que el del widget
+A.checkinHoy=()=>{ const c=Object.assign({sleep:null,energy:null,sore:null},S.checkinDia&&S.checkinDia.day===dayKey()?S.checkinDia:{});
+  const q=(k,label,opts)=>`<div style="margin-bottom:14px"><div class="b sm" style="margin-bottom:8px">${label}</div><div class="seg" id="ckh_${k}">${opts.map((o,i)=>`<button class="${c[k]===i?'on':''}" data-a="ckhSet" data-v="${k}|${i}">${o}</button>`).join('')}</div></div>`;
+  A.ckhSet=v=>{ const [k,i]=v.split('|'); c[k]=+i; document.querySelectorAll(`#ckh_${k} button`).forEach((b,j)=>b.classList.toggle('on',j===+i)); };
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('¿Cómo llegas hoy?','How are you today?')}</h3>
+    ${q('sleep',tx('¿Cómo dormiste?','How did you sleep?'),[tx('Mal','Badly'),tx('Regular','So-so'),tx('Bien','Well')])}${q('energy',tx('¿Cómo está tu energía?','How is your energy?'),[tx('Baja','Low'),tx('Normal','Normal'),tx('Alta','High')])}${q('sore',tx('¿Agujetas o molestias?','Soreness or aches?'),[tx('Muchas','A lot'),tx('Algunas','Some'),tx('Nada','None')])}
+    <button class="btn pri big" data-a="cbm" data-v="${cb(()=>{ S.checkinDia={day:dayKey(),sleep:c.sleep,energy:c.energy,sore:c.sore}; v3Log(); save(); render.keep=true; render(); refreshTop(); bubSync(); toast(tx('Check-in guardado: PandarIA lo tiene en cuenta hoy','Check-in saved: PandarIA will use it today')); })}">${tx('Guardar','Save')}</button></div>`); };
+
+/* ----- aprender cómo respondes: series por músculo y días en que rindes mejor (8 semanas o más) ----- */
+function aprendeSeries(){ if (!premOK()) return []; const K=kb('aprende.series'), KV=kb('volumen.hipertrofia'), wk0=weekKey(Date.now());
+  const first=S.sessions.length?Math.min(...S.sessions.map(s=>s.end||Date.now())):Date.now(); if ((Date.now()-first)/(7*DAY)<K.semanas || S.sessions.length<K.minSes) return [];
+  const sem=[...Array(K.semanas).keys()].map(i=>wk0-(i+1)*7*DAY).reverse(), out=[];
+  ['pecho','dorsales','hombros','cuadriceps','isquios','gluteos','biceps','triceps'].forEach(m=>{ if (!MUSCLES[m]) return;
+    const series=[], fuerza=[];
+    sem.forEach(w=>{ let n=0; const e={}; S.sessions.filter(s=>weekKey(s.end)===w).forEach(s=>s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.prim[0]!==m) return; const ds=it.sets.filter(x=>x.done&&x.t!=='c'); n+=ds.length; if (ex.mode==='p'){ const v=e1Sesion(ds); if (v) e[it.exId]=Math.max(e[it.exId]||0,v); } }));
+      series.push(n); fuerza.push(e); });
+    // progreso de cada semana a la siguiente, en los ejercicios que se repiten
+    const pasos=[]; for (let i=0;i<sem.length-1;i++){ const a=fuerza[i], b=fuerza[i+1], ids=Object.keys(a).filter(id=>b[id]); if (!ids.length) continue; pasos.push({s:series[i], d:ids.reduce((x,id)=>x+(b[id]/a[id]-1),0)/ids.length}); }
+    if (pasos.length<K.minSem*2) return; const med=pasos.reduce((a,p)=>a+p.s,0)/pasos.length;
+    const alto=pasos.filter(p=>p.s>=med+K.paso), bajo=pasos.filter(p=>p.s<=med-K.paso); if (alto.length<K.minSem||bajo.length<K.minSem) return;
+    const mA=alto.reduce((a,p)=>a+p.d,0)/alto.length, mB=bajo.reduce((a,p)=>a+p.d,0)/bajo.length, act=series.slice(-4).reduce((a,b)=>a+b,0)/4;
+    if (mA-mB>=K.dif && act+K.paso<=KV.max) out.push({m,dir:1,act:Math.round(act),pasos:pasos.length,dif:Math.round((mA-mB)*1000)/10});
+    else if (mB-mA>=K.dif && act-K.paso>=KV.min) out.push({m,dir:-1,act:Math.round(act),pasos:pasos.length,dif:Math.round((mB-mA)*1000)/10}); });
+  return out; }
+function mejoresDias(){ if (!premOK()) return null; const K=kb('aprende.series'), por={};
+  S.sessions.filter(s=>s.end&&Date.now()-s.end<K.semanas*7*DAY).forEach(s=>{ const p=perfDe(s); if (p==null) return; const d=new Date(s.start||s.end).getDay(); (por[d]=por[d]||[]).push(p); });
+  const L=Object.entries(por).filter(([,v])=>v.length>=K.minDia).map(([d,v])=>({d:+d,m:v.reduce((a,b)=>a+b,0)/v.length,n:v.length})).sort((a,b)=>b.m-a.m);
+  if (L.length<2) return null; const best=L[0], peor=L[L.length-1], dif=Math.round((best.m/peor.m-1)*100); return dif>=K.difDia?{best,peor,dif,n:L.reduce((a,x)=>a+x.n,0)}:null; }
+function aplicaSeries(m,dir){ let cambios=0; const rs=S.plan&&planRoutines().length?planRoutines():S.routines.filter(r=>!r.archived);
+  for (const r of rs){ if (cambios>=2) break; const it=r.items.find(x=>!x.warm&&!x.cool&&getEx(x.exId).prim[0]===m); if (!it) continue; const w=it.sets.filter(x=>x.t!=='c');
+    if (dir>0){ it.sets.push(Object.assign({},w[w.length-1]||{t:'n',reps:10})); cambios++; } else if (w.length>2){ const i=it.sets.lastIndexOf(w[w.length-1]); it.sets.splice(i,1); cambios++; } }
+  return cambios; }
+
+/* ----- ayuno y entreno, agua y rendimiento, comida y progreso ----- */
+function ayunoEntreno(){ if (!premOK()) return null; const f=nut().fast, plan=FAST_PLANS[f.plan]||{}, K=kb('ayuno.entreno'); if (!f.screened||f.blocked||!plan.h||plan.h<K.desdeH) return null;
+  const hh=horaHabitual(), H=(f.history||[]).filter(x=>x.ok).slice(-K.n); if (!hh||H.length<K.min) return null;
+  const fin=H.map(x=>{ const d=new Date(x.end); return d.getHours()*60+d.getMinutes(); }).sort((a,b)=>a-b)[Math.floor(H.length/2)], ven=(24-plan.h)*60;
+  const [th,tm]=hh.hora.split(':').map(Number), t=th*60+tm, dentro=((t-fin+1440)%1440)<=ven;
+  const desde=fin+K.trasComerMin, hasta=fin+ven-K.antesCierreMin; if (hasta<=desde) return null;
+  return {dentro, hora:hh.hora, desde:hhmmMin(desde), hasta:hhmmMin(hasta), abre:hhmmMin(fin), n:H.length}; }
+function aguaRendimiento(){ if (!premOK()) return null; const K=kb('agua.rendimiento'), poca=[], bien=[];
+  S.sessions.filter(s=>s.end&&Date.now()-s.end<K.semanas*7*DAY).forEach(s=>{ const p=perfDe(s); if (p==null) return; const k=dayKey(s.end), w=waterToday(k), g=wGoalDia(k); if (!w) return;
+    if (w<g*K.poca) poca.push(p); else if (w>=g*K.bien) bien.push(p); });
+  if (poca.length<K.min||bien.length<K.min) return null; const mP=poca.reduce((a,b)=>a+b,0)/poca.length, mB=bien.reduce((a,b)=>a+b,0)/bien.length, dif=Math.round((mB/mP-1)*100);
+  return dif>=K.dif?{dif,poca:poca.length,bien:bien.length}:null; }
+function enDeficit(){ if (habitos()) return null; const n=nut(), c=calcNutrition(); if (!c) return null; if (n.goal==='bajar') return {por:'objetivo'};
+  const K=kb('comida.progreso'), ds=[]; for (let i=1;i<=14;i++){ const k=dayKey(Date.now()-i*DAY); if (diaDiario(k)) ds.push(dayTotals(k).k); }
+  if (ds.length<K.minDias) return null; const m=ds.reduce((a,b)=>a+b,0)/ds.length; return m<c.tdee*K.deficit?{por:'diario',media:Math.round(m),n:ds.length,tdee:c.tdee}:null; }
+function estancadoCon(exId){ const K=kb('comida.progreso'), h=e1Hist(exId,10); if (h.length<K.minSes+1) return null; const ult=h.slice(-K.minSes).map(x=>x.y), antes=h.slice(0,-K.minSes).map(x=>x.y);
+  if (!antes.length || Math.max(...ult)>Math.max(...antes)*1.01) return null; if ((h[h.length-1].x-h[h.length-K.minSes].x)/DAY<K.minSpan) return null;
+  const d=enDeficit(), pc=protCorta(); if (!d&&!pc) return null; return {ex:getEx(exId), n:K.minSes, d, pc}; }
+function comidaProgresoTxt(o){ const p=[];
+  if (o.d) p.push(o.d.por==='objetivo'?tx('estás en déficit para bajar grasa: mantener la fuerza ya es un buen resultado','you are in a deficit to lose fat: keeping your strength is already a good result'):tx(`en tus últimos ${o.d.n} días con diario comiste de media ${o.d.media.toLocaleString(LOC())} kcal, por debajo de tu gasto (${o.d.tdee.toLocaleString(LOC())}): con menos energía cuesta subir`,`over your last ${o.d.n} logged days you ate ${o.d.media} kcal on average, below what you burn (${o.d.tdee}): with less energy it is harder to go up`));
+  if (o.pc) p.push(tx(`tu proteína quedó corta en ${o.pc.low} de ${o.pc.n} días`,`your protein fell short on ${o.pc.low} of ${o.pc.n} days`));
+  return tx(`${o.ex.n} lleva ${o.n} sesiones sin subir y no es por falta de esfuerzo: ${p.join(', y ')}.`,`${o.ex.n} has not gone up for ${o.n} sessions and it is not for lack of effort: ${p.join(', and ')}.`); }
+
+/* ----- tus hábitos: días que sueles saltarte y la hora a la que entrenas de verdad ----- */
+function habitosPlan(){ if (!premOK()||!S.plan||!planRoutines().length) return null; const K=kb('habitos.plan'), wk0=weekKey(Date.now()), out={};
+  const first=S.sessions.length?Math.min(...S.sessions.map(s=>s.end||Date.now())):Date.now(), sems=[...Array(K.semanas).keys()].map(i=>wk0-(i+1)*7*DAY).filter(w=>w>=weekKey(first));
+  if (sems.length<K.minSem) return null; const hechos=sems.map(w=>new Set(S.sessions.filter(s=>weekKey(s.end)===w).map(s=>new Date(s.end).getDay())));
+  const salta=S.plan.days.map(d=>({d,n:hechos.filter(h=>!h.has(d)).length})).filter(x=>x.n>=Math.ceil(sems.length*K.fallo)).sort((a,b)=>b.n-a.n)[0];
+  if (salta){ const otros=[0,1,2,3,4,5,6].filter(d=>!S.plan.days.includes(d)).map(d=>({d,n:hechos.filter(h=>h.has(d)).length})).filter(x=>x.n>=K.minOtro).sort((a,b)=>b.n-a.n)[0];
+    out.salta=Object.assign({sem:sems.length},salta,{por:otros?otros.d:null,porN:otros?otros.n:0}); }
+  const hh=horaHabitual(), r=S.settings.reminders; if (hh&&r&&r.days&&r.days.length&&r.time){ const [a,b]=r.time.split(':').map(Number), [c,d]=hh.aviso.split(':').map(Number); if (Math.abs((a*60+b)-(c*60+d))>=K.difMin) out.hora={actual:r.time,nueva:hh.aviso,habitual:hh.hora}; }
+  return out.salta||out.hora?out:null; }
+function ejercicioSaltado(){ if (!premOK()) return null; const K=kb('habitos.plan');
+  for (const r of S.routines.filter(x=>!x.archived)){ const ss=S.sessions.filter(s=>s.routineId===r.id).slice(-K.saltaDe); if (ss.length<K.saltaDe) continue;
+    for (const it of r.items){ if (it.warm||it.cool) continue; const veces=ss.filter(s=>!s.items.some(x=>x.exId===it.exId&&x.sets.some(y=>y.done))).length; if (veces>=K.saltaMin && r.items.filter(x=>!x.warm&&!x.cool).length>2) return {r,it,ex:getEx(it.exId),veces,de:ss.length}; } }
+  return null; }
+
+/* ----- predicciones con margen: la fecha de tu meta como un rango, solo con una tendencia clara ----- */
+function pesoPrediccion(){ if (!premOK()) return null; const T=pesoTendencia(), K=kb('prediccion.margen'); if (!T||T.goal==null||T.rate==null) return null;
+  const tr=T.tr, last=tr[tr.length-1], ref=d=>tr.slice().reverse().find(p=>(last.x-p.x)/DAY>=d); const a=ref(K.corto), b=ref(K.largo); if (!a||!b) return null;
+  const r1=(last.y-a.y)/((last.x-a.x)/DAY)*7, r2=(last.y-b.y)/((last.x-b.x)/DAY)*7, dif=T.goal-last.y;
+  if (Math.sign(r1)!==Math.sign(r2)||Math.sign(r1)!==Math.sign(dif)||Math.min(Math.abs(r1),Math.abs(r2))<kb('peso.tendencia').minRitmo) return null;
+  const rap=Math.max(Math.abs(r1),Math.abs(r2))*(1+K.margen), len=Math.min(Math.abs(r1),Math.abs(r2))*(1-K.margen); if (len<=0) return null;
+  const t1=Date.now()+Math.abs(dif)/rap*7*DAY, t2=Date.now()+Math.abs(dif)/len*7*DAY; if ((t2-Date.now())/DAY>K.maxDias) return null;
+  const d1=new Date(t1), d2=new Date(t2), y0=new Date().getFullYear(), de=EN_LANG()?' ':' de ';
+  const mismoA=d1.getFullYear()===d2.getFullYear(), anio=d=>d.getFullYear()!==y0?de+d.getFullYear():'';
+  const desde=mesN(d1.getMonth())+(mismoA?'':anio(d1)), hasta=mesN(d2.getMonth())+anio(d2), mismo=mismoA&&d1.getMonth()===d2.getMonth();
+  return {goal:T.goal, desde:mismo?hasta:desde, hasta, mismo, n:tr.length}; }
+
+/* ----- todo lo que llega por el panda ----- */
+function v3Propuestas(){ if (!premOK()) return []; const L=[], P=PANDA();
+  const ca=cansancioAcum(); if (ca) L.push({k:'descargaYa-'+weekKey(Date.now()),t:tx('Adelantar una semana de descarga','Bring forward a deload week'),d:tx(`Estos días se repiten varias señales: ${ca.txt.join(', ')}. Una semana más liviana ahora suele rendir más que forzar.`,`Several signals keep repeating: ${ca.txt.join(', ')}. A lighter week now usually pays off more than pushing through.`),kb:'cansancio.acumulado',ok:tx('Descarga activada hasta el ','Deload on until ')+fmtDate(Date.now()+7*DAY),fn:()=>{ S.deload={start:Date.now(),until:Date.now()+7*DAY}; S.lastDeload=Date.now(); }});
+  aprendeSeries().slice(0,1).forEach(o=>L.push({k:`series-${o.m}-${o.dir}-${weekKey(Date.now())}`,t:o.dir>0?tx(`Una serie más de ${mN(o.m)}`,`One more set of ${mN(o.m)}`):tx(`Una serie menos de ${mN(o.m)}`,`One fewer set of ${mN(o.m)}`),
+    d:tx(`En tus últimas ${o.pasos} semanas progresaste un ${String(o.dif).replace('.',',')} % más por semana con ${o.dir>0?'más':'menos'} series de ${mN(o.m)}. Ahora haces unas ${o.act} a la semana: PandarIA ${o.dir>0?'añade':'quita'} una serie en ${o.dir>0?'hasta 2 ejercicios':'hasta 2 ejercicios'} de tu plan, sin salir del rango recomendado.`,`Over your last ${o.pasos} weeks you progressed ${o.dif} % more per week with ${o.dir>0?'more':'fewer'} sets of ${mN(o.m)}. You now do about ${o.act} a week: PandarIA ${o.dir>0?'adds':'removes'} one set in up to 2 exercises of your plan, within the recommended range.`),
+    kb:'aprende.series',ok:tx('Series ajustadas en tu plan','Sets adjusted in your plan'),fn:()=>aplicaSeries(o.m,o.dir)}));
+  const hb=habitosPlan();
+  if (hb&&hb.salta){ const s=hb.salta, D=DAYS_LONG; L.push({k:`dia-${s.d}-${s.por}`,t:s.por!=null?tx(`Cambiar los ${DIAS_N(s.d)} por los ${DIAS_N(s.por)}`,`Swap ${DIAS_N(s.d)} for ${DIAS_N(s.por)}`):tx(`Quitar los ${DIAS_N(s.d)} de tu plan`,`Drop ${DIAS_N(s.d)} from your plan`),
+    d:s.por!=null?tx(`Te saltaste ${s.n} de los últimos ${s.sem} ${DIAS_N(s.d)} y entrenaste ${s.porN} ${DIAS_N(s.por)} fuera del plan.`,`You skipped ${s.n} of the last ${s.sem} ${DIAS_N(s.d)} and trained on ${s.porN} ${DIAS_N(s.por)} outside your plan.`):tx(`Te saltaste ${s.n} de los últimos ${s.sem} ${DIAS_N(s.d)}. Un plan que cumples rinde más que uno más largo.`,`You skipped ${s.n} of the last ${s.sem} ${DIAS_N(s.d)}. A plan you keep pays off more than a longer one.`),
+    kb:'habitos.plan',ok:tx('Plan semanal actualizado','Weekly plan updated'),fn:()=>{ const d=S.plan.days, i=d.indexOf(s.d); if (i<0) return; if (s.por!=null) d.splice(i,1,s.por); else if (d.length>2) d.splice(i,1); d.sort((a,b)=>((a+6)%7)-((b+6)%7)); void D; }}); }
+  if (hb&&hb.hora) L.push({k:`hora-${hb.hora.nueva}`,t:tx(`Mover tu aviso de entreno a las ${hb.hora.nueva}`,`Move your workout reminder to ${hb.hora.nueva}`),d:tx(`Sueles entrenar sobre las ${hb.hora.habitual} y tu aviso está a las ${hb.hora.actual}. Así te avisa media hora antes.`,`You usually train around ${hb.hora.habitual} and your reminder is at ${hb.hora.actual}. This way it reminds you half an hour before.`),kb:'habitos.plan',ok:tx('Aviso movido','Reminder moved'),fn:()=>{ S.settings.reminders.time=hb.hora.nueva; try{ scheduleReminder(); }catch(e){} }});
+  const sa=ejercicioSaltado(); if (sa) L.push({k:`salta-${sa.r.id}-${sa.it.exId}`,t:tx(`Quitar ${sa.ex.n} de «${sa.r.name}»`,`Remove ${sa.ex.n} from “${sa.r.name}”`),d:tx(`Lo saltaste en ${sa.veces} de tus últimas ${sa.de} sesiones de esta rutina. Si prefieres otro, cámbialo desde la rutina.`,`You skipped it in ${sa.veces} of your last ${sa.de} sessions of this routine. If you prefer another one, swap it from the routine.`),kb:'habitos.plan',ok:tx('Ejercicio quitado de la rutina','Exercise removed from the routine'),fn:()=>{ sa.r.items=sa.r.items.filter(x=>x!==sa.it); }});
+  // la duración de ayuno que mejor te sienta
+  const f=nut().fast, fi=fastSensInsight(); if (f.screened&&!f.blocked&&fi&&/14:10/.test(fi)&&(FAST_PLANS[f.plan]||{}).h>=16) L.push({k:'ayuno-14',t:tx('Probar el plan 14:10','Try the 14:10 plan'),d:fi,kb:'ayuno.prudencia',ok:tx('Plan de ayuno: 14:10','Fasting plan: 14:10'),fn:()=>{ f.plan='14:10'; }});
+  // calorías cuando el peso no se mueve como esperabas (si apagaste el ajuste automático)
+  const c=calcNutrition(), n=nut(); if (n.adaptOff&&c&&c.adapt&&c.adapt.ok&&Math.abs(c.adapt.obs-c.tdee)>=kb('comida.progreso').adaptDif) L.push({k:'adapt-'+Math.round(c.adapt.obs/50),t:tx('Ajustar tus calorías a tu gasto real','Adjust your calories to what you really burn'),d:tx(`En ${c.adapt.days} días comiste de media ${c.adapt.intake.toLocaleString(LOC())} kcal y tu peso cambió ${fmtNum(c.adapt.kgWeek)} kg por semana: tu gasto real ronda ${c.adapt.obs.toLocaleString(LOC())} kcal y no ${c.tdee.toLocaleString(LOC())}.`,`In ${c.adapt.days} days you ate ${c.adapt.intake} kcal on average and your weight changed ${c.adapt.kgWeek} kg a week: what you really burn is about ${c.adapt.obs} kcal, not ${c.tdee}.`),kb:'nut.adaptativo',ok:tx('Ajuste automático activado','Automatic adjustment on'),fn:()=>{ n.adaptOff=false; }});
+  void P; return L; }
+function v3Novedades(){ if (!premOK()) return []; const L=[], wk=weekKey(Date.now());
+  const ck=S.settings.checkin&&S.plan&&S.plan.days.includes(new Date().getDay())&&!v3Checkin()&&new Date().getHours()>=7&&!S.sessions.some(s=>new Date(s.end).toDateString()===new Date().toDateString());
+  if (ck) L.push({k:'ck-'+dayKey(),t:tx('Check-in de hoy','Today\'s check-in'),d:tx('Tres toques para que PandarIA ajuste tu sesión y tu estado del día.','Three taps so PandarIA can adjust your session and your state of the day.'),a:'checkinHoy'});
+  const ae=ayunoEntreno(); if (ae&&!ae.dentro) L.push({k:'ayent-'+wk,t:tx('Mejor hora para entrenar con tu ayuno','Best time to train with your fast'),d:tx(`Sueles entrenar a las ${ae.hora}, en ayunas. Con tu ventana (abre sobre las ${ae.abre}), entrena entre las ${ae.desde} y las ${ae.hasta}: con comida antes y una comida después.`,`You usually train at ${ae.hora}, fasted. With your window (it opens around ${ae.abre}), train between ${ae.desde} and ${ae.hasta}: with a meal before and one after.`),a:'kbOpen',v:'ayuno.entreno'});
+  const md=mejoresDias(); if (md) L.push({k:`dias-${md.best.d}-${wk}`,t:tx(`Rindes mejor los ${DIAS_N(md.best.d)}`,`You perform best on ${DIAS_N(md.best.d)}`),d:tx(`Un ${md.dif} % más que los ${DIAS_N(md.peor.d)}, con ${md.n} sesiones. Deja para ese día lo más exigente.`,`${md.dif} % more than on ${DIAS_N(md.peor.d)}, from ${md.n} sessions. Save your hardest session for that day.`),a:'kbOpen',v:'aprende.series'});
+  const ar=aguaRendimiento(); if (ar) L.push({k:'aguar-'+wk,t:tx('El agua se nota en tus entrenos','Water shows in your workouts'),d:tx(`Los días que bebiste poca agua rendiste un ${ar.dif} % menos (${ar.poca} entrenos frente a ${ar.bien}).`,`On days you drank little water you performed ${ar.dif} % worse (${ar.poca} workouts against ${ar.bien}).`),a:'kbOpen',v:'agua.rendimiento'});
+  const ids=[...new Set(S.sessions.slice(-6).flatMap(s=>s.items.map(it=>it.exId)))]; for (const id of ids){ const o=estancadoCon(id); if (o){ L.push({k:`est-${id}-${wk}`,t:tx(`Por qué ${o.ex.n} no sube`,`Why ${o.ex.n} is not going up`),d:comidaProgresoTxt(o),a:'kbOpen',v:'comida.progreso'}); break; } }
+  const pp=pesoPrediccion(); if (pp) L.push({k:`pred-${pp.desde}-${pp.hasta}`,t:tx(`Tu meta de ${fmtNum(pp.goal)} kg`,`Your ${pp.goal} kg goal`),d:pp.mismo?tx(`A este ritmo llegas en ${pp.desde}.`,`At this pace you get there in ${pp.desde}.`):tx(`A este ritmo llegas entre ${pp.desde} y ${pp.hasta}.`,`At this pace you get there between ${pp.desde} and ${pp.hasta}.`),a:'kbOpen',v:'prediccion.margen'});
+  return L; }
+A.pandaAplicar=k=>{ const x=v3Propuestas().find(p=>p.k===k); const P=PANDA(); P.no[k]=Date.now(); P.visto[k]=Date.now(); if (!x){ save(); bubSync(); guiaRender(); return; }
+  try{ x.fn(); }catch(e){} S.applied=(S.applied||0)+1; save(); closeModal(); render.keep=true; render(); bubSync(); toast(x.ok); };
+
 /* ---------- 1.7 · El panda como centro de sugerencias (Parte B) ----------
    Todo lo que PandarIA quiere decirte llega por el panda en vez de llenar las pantallas:
    propuestas (parpadea; nada se aplica sin tu permiso; «Ahora no» la calla 7 días; como mucho una a la vez),
    novedades (punto naranja: el consejo del día que cerraste, el informe y los avisos) y logros (punto verde). */
 const PANDA=()=>{ S.panda=S.panda||{visto:{},no:{}}; S.panda.visto=S.panda.visto||{}; S.panda.no=S.panda.no||{}; return S.panda; };
 const pHash=s=>{ let x=0; for (let i=0;i<s.length;i++) x=(x*31+s.charCodeAt(i))|0; return (x>>>0).toString(36); };
-function pandaItems(){ const P=PANDA(), hoy=new Date().toDateString(), dk=dayKey(), out={prop:[],nov:[],logro:[]};
+function pandaItems(){ const P=PANDA(), hoy=new Date().toDateString(), dk=dayKey(), out={prop:[],nov:[],logro:[]}; try{ v3Log(); }catch(e){}
   if (premOK()) S.routines.filter(r=>!r.archived&&(r.sugg||[]).length).forEach(r=>{ const k='sug-'+r.id+'-'+r.sugg.length; if (P.no[k] && Date.now()-P.no[k]<7*DAY) return;
     out.prop.push({k,t:tx(`PandarIA propone cambios en «${r.name}»`,`PandarIA suggests changes to “${r.name}”`),d:tx(`${plural(r.sugg.length,'propuesta','propuestas')}: revísalas y aplica solo las que quieras.`,`${r.sugg.length} ${r.sugg.length===1?'suggestion':'suggestions'}: review them and apply only the ones you want.`),a:'openRoutine',v:r.id}); });
+  // lo que viene de PandarIA v3 (descarga por cansancio, series, hábitos…) va antes que los cambios de rutina
+  out.prop=v3Propuestas().filter(x=>!(P.no[x.k] && Date.now()-P.no[x.k]<7*DAY)).map(x=>Object.assign({v3:1},x)).concat(out.prop);
+  // como mucho una propuesta al día: la primera que se muestra es la del día, aunque digas «Ahora no»
+  if (P.hoy && P.hoy.day===hoy) out.prop=out.prop.filter(x=>x.k===P.hoy.k); else if (out.prop.length){ P.hoy={day:hoy,k:out.prop[0].k}; }
   out.prop=out.prop.slice(0,1);
+  v3Novedades().forEach(x=>out.nov.push(x));
   if (S.dismissed&&S.dismissed['tip-'+hoy] && S.settings.lang!=='en') out.nov.push({k:'tip-'+hoy,t:tx('Consejo del día','Tip of the day'),d:tx('Lo cerraste en Mis rutinas: aquí lo tienes hasta mañana.','You closed it in My routines: here it is until tomorrow.'),a:'tipVer'});
   try{ avisosLista().forEach(html=>{ out.nov.push({k:'av-'+pHash(html.replace(/<[^>]+>/g,'')),html}); }); }catch(e){}
   try{ if (waterToday()>=waterGoal()) out.logro.push({k:'agua-'+dk,t:tx('💧 Meta de agua cumplida','💧 Water goal reached'),d:tx(`${(Math.round(waterToday()/100)/10).toLocaleString(LOC())} L hoy.`,`${(Math.round(waterToday()/100)/10).toLocaleString(LOC())} L today.`)}); }catch(e){}
@@ -9833,15 +10162,19 @@ function pandaItems(){ const P=PANDA(), hoy=new Date().toDateString(), dk=dayKey
 function pandaEstado(){ if (!S.settings.onboarded) return {prop:0,nov:0,logro:0}; const P=PANDA(), I0=pandaItems(), n=L=>L.filter(x=>!P.visto[x.k]).length; return {prop:n(I0.prop),nov:n(I0.nov),logro:n(I0.logro)}; }
 function pandaVisto(){ const P=PANDA(), I0=pandaItems(); [...I0.nov,...I0.logro].forEach(x=>{ P.visto[x.k]=Date.now(); });
   const ks=Object.keys(P.visto); if (ks.length>200) ks.sort((a,b)=>P.visto[a]-P.visto[b]).slice(0,ks.length-200).forEach(k=>delete P.visto[k]); save(); bubSync(); }
-A.pandaNo=k=>{ const P=PANDA(); P.no[k]=Date.now(); P.visto[k]=Date.now(); save(); bubSync(); guiaRender(); };
+A.pandaNo=k=>{ const P=PANDA(); P.no[k]=Date.now(); P.visto[k]=Date.now(); save(); bubSync(); guiaRender(); if (!MODALS.length){ render.keep=true; render(); } };
 A.pandaIr=v=>{ const i=v.indexOf('|'), a=v.slice(0,i), x=v.slice(i+1); const P=PANDA(); closeModal(); setTimeout(()=>{ if (A[a]) A[a](x===''?undefined:x); bubSync(); },90); };
+function pandaPropHtml(x,ir){ ir=ir||((a,v)=>`data-a="${esc(a)}" data-v="${esc(v==null?'':v)}"`);
+  return `<div class="card pprop"><div class="row" style="gap:8px;align-items:flex-start"><span style="color:var(--ac)">${I('spark',18)}</span><div class="grow"><div class="b sm">${esc(x.t)}</div><div class="xs mut" style="margin-top:3px;line-height:1.4">${esc(x.d)}${x.kb?kbLink(x.kb,tx('Por qué','Why')):''}</div></div></div>
+    <div class="row" style="gap:8px;margin-top:10px">${x.v3?`<button class="btn sm pri grow" data-a="pandaAplicar" data-v="${esc(x.k)}">${tx('Aplicar','Apply')}</button>`:`<button class="btn sm pri grow" ${ir(x.a,x.v)}>${tx('Ver la propuesta','See the suggestion')}</button>`}<button class="btn sm" data-a="pandaNo" data-v="${esc(x.k)}">${tx('Ahora no','Not now')}</button></div></div>`; }
+// con el panda apagado, la propuesta del día sale en Mis rutinas (nunca se pierde)
+function pandaPropFuera(){ if (S.settings.burbuja!==false || !S.settings.onboarded) return ''; let I0; try{ I0=pandaItems(); }catch(e){ return ''; } return I0.prop.length?pandaPropHtml(I0.prop[0]):''; }
 function pandaHubHtml(){ const I0=pandaItems(), P=PANDA(); if (!I0.prop.length && !I0.nov.length && !I0.logro.length) return '';
   const ir=(a,v)=>`data-a="pandaIr" data-v="${esc(a)}|${esc(v==null?'':v)}"`;
   // los avisos traen sus propios botones: pasan por pandaIr para cerrar antes el panel
   const avisoEnPanel=html=>html.replace(/data-a="([A-Za-z0-9_]+)"(?: data-v="([^"]*)")?/g,(m,a,v)=>`data-a="pandaIr" data-v="${a}|${v||''}"`);
   let h='';
-  I0.prop.forEach(x=>{ h+=`<div class="card pprop"><div class="row" style="gap:8px;align-items:flex-start"><span style="color:var(--ac)">${I('spark',18)}</span><div class="grow"><div class="b sm">${esc(x.t)}</div><div class="xs mut" style="margin-top:3px;line-height:1.4">${esc(x.d)}</div></div></div>
-    <div class="row" style="gap:8px;margin-top:10px"><button class="btn sm pri grow" ${ir(x.a,x.v)}>${tx('Ver la propuesta','See the suggestion')}</button><button class="btn sm" data-a="pandaNo" data-v="${x.k}">${tx('Ahora no','Not now')}</button></div></div>`; });
+  I0.prop.forEach(x=>{ h+=pandaPropHtml(x,ir); });
   if (I0.logro.length) h+=I0.logro.map(x=>`<div class="card row plogro" style="gap:10px;padding:10px 12px"><div class="grow"><div class="b sm">${esc(x.t)}</div><div class="xs mut">${esc(x.d)}</div></div>${P.visto[x.k]?'':'<span class="ndot" style="background:var(--ok)"></span>'}</div>`).join('');
   if (I0.nov.length){ h+=`<div class="pfg-t" style="margin-top:4px">${tx('Novedades','News')}</div>`;
     h+=I0.nov.map(x=>x.html?`<div class="pnov">${avisoEnPanel(x.html)}</div>`:`<button class="card row" style="width:100%;gap:10px;padding:10px 12px;text-align:left" ${ir(x.a,x.v)}><div class="grow"><div class="b sm">${esc(x.t)}</div><div class="xs mut">${esc(x.d)}</div></div>${I('right',16)}</button>`).join(''); }
@@ -10030,6 +10363,9 @@ function supCardsHtml(){
   <div class="card row tap" data-a="openMenu" style="gap:12px"><span style="color:var(--ok)">${I('leaf',24)}</span><div class="grow"><div class="b">${tx('Ejemplos de menú','Sample menus')}${prem()?'':' 🔒'}</div><div class="sm mut" style="line-height:1.4">${tx('Un día de comidas con tus calorías, tu alimentación y tus alergias.','A day of meals with your calories, your diet and your allergies.')}</div></div>${I('right',18)}</div>`;
 }
 A.openSup=()=>openLayer('suplementos',{});
+A.nutMas=()=>sheet(tx('Más para tu alimentación','More for your diet'),[
+  {icon:'pill',label:tx('Suplementos con evidencia','Evidence-based supplements'),fn:()=>A.openSup()},
+  {icon:'leaf',label:tx('Ejemplos de menú','Sample menus')+(prem()?'':' 🔒'),fn:()=>A.openMenu()}]);
 const SALUD_ITEMS=[['embarazo','Estoy embarazada o en lactancia','I am pregnant or breastfeeding'],['presion','Tengo la presión alta','I have high blood pressure'],['rinon','Tengo una enfermedad del riñón','I have kidney disease'],['corazon','Tengo una enfermedad del corazón o arritmias','I have heart disease or arrhythmias'],['medicacion','Tomo medicación de forma habitual','I take regular medication']];
 A.supSalud=k=>{ const s=nutSalud(); s[k]=!s[k]; save(); refreshTop(); };
 SCREENS.suplementos=()=>{
@@ -10221,11 +10557,12 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.7';
+const APP_VERSION='1.8';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.8',t:'PandarIA aprende de ti',items:['Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas']},
  {v:'1.7',t:'El panda te avisa',items:['El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros', 'Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)', 'iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple', 'iPhone: textos de Apple Health corregidos']},
  {v:'1.6',t:'Interfaz a tu gusto',items:['Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento', 'Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar', 'Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas', 'Ningún texto cortado: los consejos del día se leen enteros', 'iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta', 'Escribe el código de barras a mano si la cámara no puede leerlo']},
  {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas', 'Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno', 'Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar', 'Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)', 'Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno', 'Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer', 'Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos']},
@@ -10698,12 +11035,13 @@ function viewAjustes(){
     ${nav('exportCSV','list','Exportar entrenos a Excel (CSV)')}
     ${premigList().length?nav('premigOpen','history','Datos de antes de actualizar'):''}
     ${nav('limpiarPruebas','refresh',tx('Limpiar datos de prueba','Clean up test data'))}
+    ${usoDatosHtml()}
     <button class="srow" data-a="wipeData"><span class="si" style="color:var(--bad)">${I('trash',20)}</span><span class="grow b" style="color:var(--bad)">Borrar todos los datos</span></button>
   </div>
   <div class="sec">Acerca de</div><div class="card sm mut" style="line-height:1.5">PandarIA basa sus recomendaciones en guías del American College of Sports Medicine (ACSM) y la National Strength and Conditioning Association (NSCA) para fuerza, la Organización Mundial de la Salud (OMS) para actividad física y la International Society of Sports Nutrition (ISSN) para nutrición. No reemplaza a un profesional de la salud.
     <button class="btn wide" style="margin-top:12px" data-a="openCiencia">${I('book',18)} Ciencia de PandarIA</button></div>
   <div class="sec">Créditos</div>${creditsCard()}
-  <div class="mut xs" style="text-align:center;margin:16px 0 8px">Tus datos se guardan solo en este dispositivo.</div>
+  <div class="mut xs" style="text-align:center;margin:16px 0 8px">Tus datos se guardan solo en este dispositivo.</div>${velocidadHtml()}
   <input type="file" id="impfile" accept="application/json,.json" class="hide" data-ch="importFile">`;
 }
 /* ========== Ajustes por grupos (0.9.3) ==========
@@ -12666,7 +13004,7 @@ No hay beneficios extra en alargarlo. Considera romperlo con proteína y verdura
 Crear rutina para estos músculos|Create a routine for these muscles
 Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.|Sets per muscle. For muscle growth, 10–20 per week are recommended.
 Rosé wine|Rosé wine`;
-const KB_LOG_EN={'1.6':'Smoothed weight trend with the estimated date for your goal, ideas to complete your protein for the day, and sleep and heart rate variability from Health Connect as recovery signals. They do not change any earlier result.','1.5':'Recovery by muscle (how recovered each muscle is, on a map) and learning from your exercise swaps. They are PandarIA’s own criteria and do not change any earlier result.','1.4':'PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and the resting heart rate from Health Connect count towards your recovery; the weekly report adds water, fasting and protein.','1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
+const KB_LOG_EN={'1.7':'PandarIA brings it together and learns: a 0 to 100 state of the day, your 4-week baseline, built-up fatigue, learning how many sets you progress with and which days you perform best, fasting and training together, water and performance, food and progress, your habits and predictions with a margin. Anything that changes your plan always arrives as a suggestion. It does not change any earlier result.','1.6':'Smoothed weight trend with the estimated date for your goal, ideas to complete your protein for the day, and sleep and heart rate variability from Health Connect as recovery signals. They do not change any earlier result.','1.5':'Recovery by muscle (how recovered each muscle is, on a map) and learning from your exercise swaps. They are PandarIA’s own criteria and do not change any earlier result.','1.4':'PandarIA connects more data: a long fast or a low-calorie day, protein falling short for several days and the resting heart rate from Health Connect count towards your recovery; the weekly report adds water, fasting and protein.','1.0':'First version: the numbers PandarIA already used, checked against their original source. No result changes.',
  '1.1':'Rules that change results: 2 minutes of rest on weighted compound lifts for muscle; weight-loss pace of 0.5 to 1 % of body weight per week instead of a fixed 15 %; a calorie target that adjusts with your diary and weight; a lighter load if you arrive poorly rested; water goal recalibrated with the EFSA reference; alternatives of similar difficulty.',
  '1.3':'Special methods (supersets, drop sets, rest-pause, myo-reps, pyramids, clusters, German volume training and the Bilbo method), each with its evidence and a note that it is not proven to be better; elbow and hip as sensitive areas.',
  '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
@@ -13277,7 +13615,42 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `El panda te avisa|The panda lets you know
+const EN_09 = `PandarIA aprende de ti|PandarIA learns from you
+Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día|State of the day: a number from 0 to 100 with a word (Ready, Normal, Easy, Rest), what weighs most today and how your session changes. On the Today card and the My day widget
+Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas|Your baseline: sleep, heart rate, variability, water, calories, protein and performance compared with your own 4-week average
+PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más|PandarIA learns from you and suggests it through the panda (always with Apply or Not now): bring forward a deload for built-up fatigue, one more or one fewer set depending on how you respond, swap the day you always skip, move your reminder to your real time, remove an exercise you always skip and more
+Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses|News and in Reports: which days you perform best, the best time to train with your fast, whether water shows in your workouts, why a lift is not going up when you are in a deficit, and your goal date as a range of months
+El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido|The panda explains what you are looking at: your state of the day, your baseline, the recovery map colours and why the suggested weight changed
+Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)|History in 4 tabs: Summary (with Reports), Progress (with Records and Goals), Body and Achievements (with Challenges)
+Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo|Nutrition: supplements and menus in the header, the Premium lock on one line and the water chart in Stats. Fasting: the plan in one button with an explanation of each, and a single tip
+Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas|Under the hood: faster with lots of data, the space your data uses in Settings, clean-up of old notices and backups from every version tested
+Sin señales de cansancio|No fatigue signals
+Prevention, diagnosis and treatment of the overtraining syndrome (consenso conjunto del ECSS y el ACSM)|Prevention, diagnosis and treatment of the overtraining syndrome (joint consensus statement of the ECSS and ACSM)
+Empiezas y terminas cuando quieras.|You start and stop whenever you want.
+Ideal para empezar.|Ideal to get started.
+Paso siguiente, fácil de sostener.|Next step, easy to keep up.
+El más popular.|The most popular.
+Para quien ya tiene experiencia.|For those with experience.
+Exigente; no recomendado para empezar.|Demanding; not recommended to start with.
+5 días normales y 2 días de 500–600 kcal.|5 normal days and 2 days of 500–600 kcal.
+Tu objetivo diario y tu diario comparado con él · Premium|Your daily target and your diary compared with it · Premium
+Estado del día|State of the day
+Tu línea base|Your baseline
+Cansancio acumulado|Built-up fatigue
+Aprender cómo respondes|Learning how you respond
+Ayuno y entreno juntos|Fasting and training together
+Agua y rendimiento|Water and performance
+Comida y progreso|Food and progress
+Tus hábitos|Your habits
+Predicciones con margen|Predictions with a margin
+Tarjeta de Hoy, estado del día y widget Mi día|Today card, state of the day and My day widget
+Propuestas del panda y estado del día|Panda suggestions and state of the day
+Propuestas y novedades del panda|Panda suggestions and news
+Novedades del panda|Panda news
+Novedades y propuestas del panda|Panda news and suggestions
+Propuestas del panda|Panda suggestions
+Adultos sanos que ayunan|Healthy adults who fast
+El panda te avisa|The panda lets you know
 El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros|The panda is your notice center: it blinks when PandarIA suggests a change (you decide: See the suggestion or Not now), orange dot for news and green dot for achievements
 Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)|Notices no longer fill My routines: you read them inside the panda (if you turn the panda off in Settings they go back to the screen)
 iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple|iPhone: go back by swiping from the left edge, like in Apple's apps
