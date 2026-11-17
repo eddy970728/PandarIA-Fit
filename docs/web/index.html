@@ -46,6 +46,12 @@ svg{display:block}
 /* Nav */
 #pfBub{position:fixed;z-index:40;width:42px;height:42px;border-radius:12px;border:0;padding:0;background:#12151a;box-shadow:0 4px 14px rgba(0,0,0,.35);opacity:.88;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:22px;transition:left .18s,right .18s,top .18s,transform .15s}
 #pfBub img{width:100%;height:100%;border-radius:12px;pointer-events:none}
+#pfBub .pdot{display:none;position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg)}
+#pfBub.dot-o .pdot{display:block;background:var(--ac)} #pfBub.dot-v .pdot{display:block;background:var(--ok)}
+#pfBub.blink{opacity:1;animation:pblink 1.6s ease-in-out infinite}
+@keyframes pblink{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,.35),0 0 0 0 rgba(255,122,26,.55)}50%{box-shadow:0 4px 14px rgba(0,0,0,.35),0 0 0 8px rgba(255,122,26,0)}}
+.pprop{border-color:var(--ac)}
+.pnov .banner,.pnov .card{margin-bottom:8px}
 #pfBub.drag{transition:none;transform:scale(1.12);opacity:1}
 #pfBub[hidden]{display:none}
 .pfguia{width:calc(100% - 16px);max-width:480px;max-height:min(70vh,580px);margin-bottom:calc(8px + var(--safe-b));background:var(--bg2);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;animation:up .2s ease;box-shadow:0 18px 50px rgba(0,0,0,.45)}
@@ -5690,7 +5696,7 @@ function routineRow(r,i){
 }
 // Avisos juntos: uno se ve entero; varios, en una línea con contador que se abre al tocarla
 function avisosLista(){ return [updCard(),banners(),reportBanner(),balanceBanner()].join('').match(/<div class="(?:banner|card tap)[\s\S]*?(?=<div class="(?:banner|card tap)|$)/g)||[]; }
-function avisosHtml(mini){ const L=avisosLista(); if (!L.length) return '';
+function avisosHtml(mini){ if (S.settings.burbuja!==false && S.settings.onboarded) return ''; const L=avisosLista(); if (!L.length) return '';
   if (L.length===1 && !mini) return L[0];
   return `<button class="card row avisos" data-a="avisosTog" style="width:100%;gap:10px;padding:12px 14px"><span style="color:var(--ac)">${I('bell',18)}</span><span class="grow b sm" style="text-align:left">${tx(`${L.length} ${L.length===1?'aviso':'avisos'}`,`${L.length} ${L.length===1?'notice':'notices'}`)}</span><span class="tag ac">${L.length}</span>${I(AVISOS_ABIERTOS?'up':'down',18)}</button>${AVISOS_ABIERTOS?L.join(''):''}`; }
 function banners(){
@@ -9804,8 +9810,61 @@ function bubPos(b){ const P=S.settings.bubPos||{l:0,y:.62}; const H=innerHeight,
   const y=Math.max(70,Math.min(H-150,P.y*H)); b.style.top=y+'px'; b.style.left=P.l?'6px':''; b.style.right=P.l?'':'6px'; void W; }
 function bubSync(){ let b=document.getElementById('pfBub');
   if (!b){ b=document.createElement('button'); b.id='pfBub'; b.setAttribute('aria-label',tx('Guía de PandarIA (experimental)','PandarIA guide (experimental)'));
-    b.innerHTML=`<img src="${GUIA_IC}" alt="">`; document.body.appendChild(b); bubArrastre(b); }
-  b.hidden=!bubVisible(); if (!b.hidden) bubPos(b); }
+    b.innerHTML=`<img src="${GUIA_IC}" alt=""><i class="pdot"></i>`; document.body.appendChild(b); bubArrastre(b); }
+  b.hidden=!bubVisible(); if (b.hidden) return; bubPos(b);
+  // 1.7: el panda avisa: parpadea con una propuesta, punto naranja si hay algo que leer, punto verde si cumpliste algo
+  let e={prop:0,nov:0,logro:0}; try{ e=pandaEstado(); }catch(err){}
+  b.classList.toggle('blink',!!e.prop); b.classList.toggle('dot-o',!e.prop&&!!e.nov); b.classList.toggle('dot-v',!e.prop&&!e.nov&&!!e.logro); }
+
+/* ---------- 1.7 · El panda como centro de sugerencias (Parte B) ----------
+   Todo lo que PandarIA quiere decirte llega por el panda en vez de llenar las pantallas:
+   propuestas (parpadea; nada se aplica sin tu permiso; «Ahora no» la calla 7 días; como mucho una a la vez),
+   novedades (punto naranja: el consejo del día que cerraste, el informe y los avisos) y logros (punto verde). */
+const PANDA=()=>{ S.panda=S.panda||{visto:{},no:{}}; S.panda.visto=S.panda.visto||{}; S.panda.no=S.panda.no||{}; return S.panda; };
+const pHash=s=>{ let x=0; for (let i=0;i<s.length;i++) x=(x*31+s.charCodeAt(i))|0; return (x>>>0).toString(36); };
+function pandaItems(){ const P=PANDA(), hoy=new Date().toDateString(), dk=dayKey(), out={prop:[],nov:[],logro:[]};
+  if (premOK()) S.routines.filter(r=>!r.archived&&(r.sugg||[]).length).forEach(r=>{ const k='sug-'+r.id+'-'+r.sugg.length; if (P.no[k] && Date.now()-P.no[k]<7*DAY) return;
+    out.prop.push({k,t:tx(`PandarIA propone cambios en «${r.name}»`,`PandarIA suggests changes to “${r.name}”`),d:tx(`${plural(r.sugg.length,'propuesta','propuestas')}: revísalas y aplica solo las que quieras.`,`${r.sugg.length} ${r.sugg.length===1?'suggestion':'suggestions'}: review them and apply only the ones you want.`),a:'openRoutine',v:r.id}); });
+  out.prop=out.prop.slice(0,1);
+  if (S.dismissed&&S.dismissed['tip-'+hoy] && S.settings.lang!=='en') out.nov.push({k:'tip-'+hoy,t:tx('Consejo del día','Tip of the day'),d:tx('Lo cerraste en Mis rutinas: aquí lo tienes hasta mañana.','You closed it in My routines: here it is until tomorrow.'),a:'tipVer'});
+  try{ avisosLista().forEach(html=>{ out.nov.push({k:'av-'+pHash(html.replace(/<[^>]+>/g,'')),html}); }); }catch(e){}
+  try{ if (waterToday()>=waterGoal()) out.logro.push({k:'agua-'+dk,t:tx('💧 Meta de agua cumplida','💧 Water goal reached'),d:tx(`${(Math.round(waterToday()/100)/10).toLocaleString(LOC())} L hoy.`,`${(Math.round(waterToday()/100)/10).toLocaleString(LOC())} L today.`)}); }catch(e){}
+  try{ const f=nut().fast, x=f.history[f.history.length-1]; if (x&&x.ok&&x.goalH&&Date.now()-x.end<DAY) out.logro.push({k:'ay-'+x.end,t:tx('🌙 Ayuno completado','🌙 Fast complete'),d:tx(`${fmtHMl((x.end-x.start)/3600000)} de ${x.goalH} h.`,`${Math.round((x.end-x.start)/360000)/10} h of ${x.goalH} h.`)}); }catch(e){}
+  try{ const s=S.sessions[S.sessions.length-1]; const n=s&&Date.now()-s.end<DAY?s.items.reduce((a,it)=>a+it.sets.filter(x=>x.pr).length,0):0; if (n) out.logro.push({k:'pr-'+s.id,t:tx('🏆 Récord nuevo','🏆 New record'),d:tx(`${plural(n,'récord','récords')} en tu último entreno.`,`${n} ${n===1?'record':'records'} in your last workout.`)}); }catch(e){}
+  return out; }
+function pandaEstado(){ if (!S.settings.onboarded) return {prop:0,nov:0,logro:0}; const P=PANDA(), I0=pandaItems(), n=L=>L.filter(x=>!P.visto[x.k]).length; return {prop:n(I0.prop),nov:n(I0.nov),logro:n(I0.logro)}; }
+function pandaVisto(){ const P=PANDA(), I0=pandaItems(); [...I0.nov,...I0.logro].forEach(x=>{ P.visto[x.k]=Date.now(); });
+  const ks=Object.keys(P.visto); if (ks.length>200) ks.sort((a,b)=>P.visto[a]-P.visto[b]).slice(0,ks.length-200).forEach(k=>delete P.visto[k]); save(); bubSync(); }
+A.pandaNo=k=>{ const P=PANDA(); P.no[k]=Date.now(); P.visto[k]=Date.now(); save(); bubSync(); guiaRender(); };
+A.pandaIr=v=>{ const i=v.indexOf('|'), a=v.slice(0,i), x=v.slice(i+1); const P=PANDA(); closeModal(); setTimeout(()=>{ if (A[a]) A[a](x===''?undefined:x); bubSync(); },90); };
+function pandaHubHtml(){ const I0=pandaItems(), P=PANDA(); if (!I0.prop.length && !I0.nov.length && !I0.logro.length) return '';
+  const ir=(a,v)=>`data-a="pandaIr" data-v="${esc(a)}|${esc(v==null?'':v)}"`;
+  // los avisos traen sus propios botones: pasan por pandaIr para cerrar antes el panel
+  const avisoEnPanel=html=>html.replace(/data-a="([A-Za-z0-9_]+)"(?: data-v="([^"]*)")?/g,(m,a,v)=>`data-a="pandaIr" data-v="${a}|${v||''}"`);
+  let h='';
+  I0.prop.forEach(x=>{ h+=`<div class="card pprop"><div class="row" style="gap:8px;align-items:flex-start"><span style="color:var(--ac)">${I('spark',18)}</span><div class="grow"><div class="b sm">${esc(x.t)}</div><div class="xs mut" style="margin-top:3px;line-height:1.4">${esc(x.d)}</div></div></div>
+    <div class="row" style="gap:8px;margin-top:10px"><button class="btn sm pri grow" ${ir(x.a,x.v)}>${tx('Ver la propuesta','See the suggestion')}</button><button class="btn sm" data-a="pandaNo" data-v="${x.k}">${tx('Ahora no','Not now')}</button></div></div>`; });
+  if (I0.logro.length) h+=I0.logro.map(x=>`<div class="card row plogro" style="gap:10px;padding:10px 12px"><div class="grow"><div class="b sm">${esc(x.t)}</div><div class="xs mut">${esc(x.d)}</div></div>${P.visto[x.k]?'':'<span class="ndot" style="background:var(--ok)"></span>'}</div>`).join('');
+  if (I0.nov.length){ h+=`<div class="pfg-t" style="margin-top:4px">${tx('Novedades','News')}</div>`;
+    h+=I0.nov.map(x=>x.html?`<div class="pnov">${avisoEnPanel(x.html)}</div>`:`<button class="card row" style="width:100%;gap:10px;padding:10px 12px;text-align:left" ${ir(x.a,x.v)}><div class="grow"><div class="b sm">${esc(x.t)}</div><div class="xs mut">${esc(x.d)}</div></div>${I('right',16)}</button>`).join(''); }
+  return h+`<div class="pfg-t" style="margin-top:6px">${tx('Guía','Guide')}</div>`; }
+
+/* ---------- 1.7 · iPhone: volver atrás deslizando desde el borde izquierdo ----------
+   Como en las apps de Apple: la pantalla de encima sigue al dedo y, al soltar pasado un tercio (o con un gesto rápido), se cierra. */
+(function(){ let s=null;
+  const top=()=>{ const b=document.getElementById('layers'); return b&&b.lastElementChild; };
+  document.addEventListener('touchstart',e=>{ if (!window.PF_IOS || !LAYERS.length || MODALS.length || e.touches.length!==1) return;
+    const t=e.touches[0]; if (t.clientX>22) return; const el=top(); if (!el) return; s={x:t.clientX,y:t.clientY,t:Date.now(),el,dx:0,on:false}; },{passive:true});
+  document.addEventListener('touchmove',e=>{ if (!s) return; const t=e.touches[0], dx=t.clientX-s.x, dy=t.clientY-s.y;
+    if (!s.on){ if (Math.abs(dy)>12 && Math.abs(dy)>dx){ s=null; return; } if (dx<8) return; s.on=true; s.el.style.transition='none'; s.el.style.animation='none'; }
+    s.dx=Math.max(0,dx); s.el.style.transform=`translateX(${s.dx}px)`; s.el.style.boxShadow='-10px 0 30px rgba(0,0,0,.35)'; if (e.cancelable) e.preventDefault(); },{passive:false});
+  const fin=()=>{ if (!s) return; const st=s; s=null; if (!st.on) return;
+    const w=st.el.offsetWidth||innerWidth, v=st.dx/Math.max(1,Date.now()-st.t), cierra=st.dx>w*0.33||(v>0.45&&st.dx>40);
+    st.el.style.transition='transform .22s cubic-bezier(.2,.8,.2,1)'; st.el.style.transform=cierra?`translateX(${w}px)`:'translateX(0)';
+    setTimeout(()=>{ st.el.style.transition=''; st.el.style.boxShadow='';
+      if (cierra){ st.el.style.visibility='hidden'; const n=LAYERS.length; goBack(); requestAnimationFrame(()=>{ st.el.style.transform=''; st.el.style.visibility=''; }); if (LAYERS.length===n) st.el.style.transform=''; }
+      else st.el.style.transform=''; },230); };
+  document.addEventListener('touchend',fin); document.addEventListener('touchcancel',fin); })();
 function bubArrastre(b){ let st=null;
   b.addEventListener('pointerdown',e=>{ st={x:e.clientX,y:e.clientY,t0:b.offsetTop,mov:false}; try{ b.setPointerCapture(e.pointerId); }catch(_){} });
   b.addEventListener('pointermove',e=>{ if (!st) return; const dx=e.clientX-st.x, dy=e.clientY-st.y; if (!st.mov && Math.hypot(dx,dy)<8) return;
@@ -9823,7 +9882,7 @@ function bubArrastre(b){ let st=null;
 // Sin escribir preguntas libres ni enviar nada a nadie: solo temas, preguntas ya preparadas y un buscador entre ellas.
 let GUIA=null;
 const GUIA_IC='data:image/webp;base64,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';
-A.guiaAbrir=()=>{ const c=cqContexto(); GUIA={v:'inicio',ctx:c,q:'',hist:[]}; openModal(guiaHtml(),{guia:true}); };
+A.guiaAbrir=()=>{ const c=cqContexto(); GUIA={v:'inicio',ctx:c,q:'',hist:[]}; openModal(guiaHtml(),{guia:true}); pandaVisto(); };
 A.chatAbrir=A.guiaAbrir; // nombre anterior
 function guiaIr(n){ GUIA.hist.push({v:GUIA.v,s:GUIA.s,id:GUIA.id,p:GUIA.p}); Object.assign(GUIA,n); guiaRender(); }
 A.guiaAtras=()=>{ const h=GUIA&&GUIA.hist.pop(); if (!h) return closeModal(); Object.assign(GUIA,h); guiaRender(); };
@@ -9851,7 +9910,7 @@ function guiaCuerpo(){ const G=GUIA;
     if (rel.length) h+=`<div class="pfg-t" style="margin-top:14px">${tx('Relacionadas','Related')}</div>${rel.map(guiaFila).join('')}`;
     return h; }
   const ids=G.ctx.ids.map(id=>CQ.find(q=>q.id===id)).filter(Boolean);
-  return `<div class="search" style="margin:0 0 10px">${I('search',18)}<input class="inp" id="guiaB" placeholder="${tx('Buscar en la guía…','Search the guide…')}" value="${esc(G.q)}" autocomplete="off" data-in="guiaB"></div>
+  return pandaHubHtml()+`<div class="search" style="margin:0 0 10px">${I('search',18)}<input class="inp" id="guiaB" placeholder="${tx('Buscar en la guía…','Search the guide…')}" value="${esc(G.q)}" autocomplete="off" data-in="guiaB"></div>
   <div id="guiaL">${G.q?guiaLista():`<div class="pfg-t">${tx('En esta pantalla','On this screen')}</div>${ids.map(guiaFila).join('')}
   <div class="pfg-t" style="margin-top:14px">${tx('Temas','Topics')}</div><div class="pfg-s">${CQ_SECS.map(s=>`<button data-a="guiaSec" data-v="${s.id}"><span>${s.ic}</span>${tx(s.n,s.en)}</button>`).join('')}</div>`}</div>`; }
 function guiaHtml(){ const atras=GUIA.v!=='inicio';
@@ -10164,11 +10223,12 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.6';
+const APP_VERSION='1.7';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.7',t:'El panda te avisa',items:['El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros', 'Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)', 'iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple', 'iPhone: textos de Apple Health corregidos']},
  {v:'1.6',t:'Interfaz a tu gusto',items:['Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento', 'Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar', 'Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas', 'Ningún texto cortado: los consejos del día se leen enteros', 'iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta', 'Escribe el código de barras a mano si la cámara no puede leerlo']},
  {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas', 'Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno', 'Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar', 'Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)', 'Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno', 'Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer', 'Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos']},
  {v:'1.4',t:'Retos y Consulta a PandarIA',items:['Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale', 'Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)', 'Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos', 'Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores', 'Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir', 'Tarjeta del entreno renovada, con el panda y tus récords', 'Versión para iPhone y iPad (se instala con AltStore desde el PC)', 'Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)']},
@@ -10553,7 +10613,7 @@ function viewAjustes(){
     ${tg('period',st.period!==false,'layers','Periodización por bloques','Ciclos de volumen, intensidad y descarga')}
     ${tg('report',st.report!==false,'chart','Informe semanal','Aviso cada lunes con el resumen de tu semana')}
     ${tg('tips',st.tips!==false,'book','Consejos del día','En Mis rutinas')}
-    ${tg('burbuja',st.burbuja!==false,'spark','Burbuja de PandarIA','Guía rápida flotante con preguntas de cada pantalla (experimental). Se puede arrastrar a cualquier borde')}
+    ${tg('burbuja',st.burbuja!==false,'spark','Burbuja de PandarIA','Tu centro de avisos: parpadea si PandarIA te propone algo (nada se aplica sin tu permiso), punto naranja con novedades y verde con logros. Abre la guía de cada pantalla. Se puede arrastrar a cualquier borde')}
     ${S.gustos&&Object.keys(S.gustos.quita||{}).length?nav('gustosReset','swap','Olvidar mis cambios de ejercicio',Object.keys(S.gustos.quita).length):''}
   </div>
   <div class="sec">Nutrición y ayuno</div><div class="card" style="padding:0 12px">
@@ -13172,7 +13232,12 @@ Coordina con la respiración.|Coordinate with your breathing.
 Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
-const EN_09 = `Interfaz a tu gusto|Your interface, your way
+const EN_09 = `El panda te avisa|The panda lets you know
+El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros|The panda is your notice center: it blinks when PandarIA suggests a change (you decide: See the suggestion or Not now), orange dot for news and green dot for achievements
+Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)|Notices no longer fill My routines: you read them inside the panda (if you turn the panda off in Settings they go back to the screen)
+iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple|iPhone: go back by swiping from the left edge, like in Apple's apps
+iPhone: textos de Apple Health corregidos|iPhone: Apple Health texts fixed
+Interfaz a tu gusto|Your interface, your way
 Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas|The whole app more compact without smaller text: workout, calendars and stats
 Ningún texto cortado: los consejos del día se leen enteros|No cut-off text: the daily tips are shown in full
 iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta|iPhone: its own style, sound and voice no longer drop out, scanner fixed and a clear message if Health does not connect
@@ -13183,7 +13248,7 @@ Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo
 Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar|Cleaner My routines: tip of the day on top, compact Today, notices together and routines with a start button
 Opcional. No cambia tu sesión, pero PandarIA lo tiene en cuenta para sus sugerencias.|Optional. It does not change your session, but PandarIA takes it into account for its suggestions.
 Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)|PandarIA bubble: a small button with the app icon that opens a quick guide with questions about the screen you are on (you can drag it or turn it off in Settings)
-Guía rápida flotante con preguntas de cada pantalla (experimental). Se puede arrastrar a cualquier borde|Floating quick guide with questions for each screen (experimental). You can drag it to any edge
+Tu centro de avisos: parpadea si PandarIA te propone algo (nada se aplica sin tu permiso), punto naranja con novedades y verde con logros. Abre la guía de cada pantalla. Se puede arrastrar a cualquier borde|Your notice center: it blinks when PandarIA suggests something (nothing is applied without your permission), orange dot for news and green for achievements. Opens each screen's guide. Drag it to any edge
 Pregúntale sobre entreno, comida, sueño o ayuno: responde con tus datos.|Ask about training, food, sleep or fasting: it answers with your data.
 Consulta a PandarIA|Ask PandarIA
 Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale|Ask PandarIA (Premium, experimental): 34 questions in 9 topics that PandarIA answers with your data, offline, with examples, what to do and the rule behind it
