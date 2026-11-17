@@ -145,6 +145,8 @@
           await wait(700);
         }
       }
+      // 1.6: si la voz nativa falla tres veces (en iPhone pasa tras una interrupción del audio), se usa la voz del navegador
+      try{ if (window.speechSynthesis){ const u = new SpeechSynthesisUtterance(String(text)); u.lang = ttsLang.l || (EN_LANG() ? 'en-US' : 'es-ES'); speechSynthesis.cancel(); speechSynthesis.speak(u); } }catch(e){}
     })();
   };
 
@@ -829,7 +831,14 @@
     try{
       await HC.requestAuthorization({read: HC_READ, write: HC_WRITE});
       const s0 = HCS(); s0.on = true; s0.perm13 = true; s0.writeFood = s0.writeWater = true; save(); await hcSync(true); refreshHc(); toast('Health Connect conectado');
-    }catch(e){ toast('No se pudo conectar. Revisa los permisos en Health Connect.'); }
+    }catch(e){
+      // 1.6: en iPhone se dice el motivo real. Instalada con AltStore y un Apple ID gratuito, Apple no da el permiso de Salud a la app
+      const m = String(e && (e.message || e) || '');
+      if (IOS) confirmBox({title:'No se pudo conectar con Salud', text:(/entitlement|not authori[sz]ed to use|missing/i.test(m)
+          ? 'Esta instalación no tiene permiso de Apple para usar Salud. Pasa con las apps instaladas con <b>AltStore y un Apple ID gratuito</b>: Apple no permite Salud con esa firma. Funcionará en la versión del App Store.'
+          : 'Revisa en la app <b>Salud</b> › tu foto › <b>Apps</b> › <b>PandarIA Fit</b> que los permisos estén activados.') + '<br><br><span class="xs mut">Detalle: ' + esc(m.slice(0, 160)) + '</span>', okText:'Entendido', ok:() => {}});
+      else toast('No se pudo conectar. Revisa los permisos en Health Connect.');
+    }
   }
   const iso = d => new Date(d).toISOString();
   async function hcSync(force){
@@ -974,7 +983,8 @@
   viewHistorial = function(){
     let h = _vhN.apply(this, arguments);
     if (HSEG === 'resumen' && HCS().on && HD.steps != null){
-      const card = `<div class="card row" data-a="hcMenu" style="gap:12px;cursor:pointer"><span style="color:var(--bad)">${I('flame',22)}</span><div class="grow"><div class="b">${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy</div><div class="xs mut">Media 7 días: ${(HD.steps7 || 0).toLocaleString(window.LOC?LOC():'es')}${HD.hr ? ` · Pulso ${HD.hrKind}: ${HD.hr} lpm` : ''}</div></div>${I('right',18)}</div>`;
+      // 1.6: los pasos en una tarjeta baja
+      const card = `<div class="card row" data-a="hcMenu" style="gap:10px;cursor:pointer;padding:10px 14px"><span style="color:var(--bad)">${I('flame',18)}</span><div class="grow sm"><b>${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy</b> <span class="mut">· media ${(HD.steps7 || 0).toLocaleString(window.LOC?LOC():'es')}${HD.hr ? ` · pulso ${HD.hr} lpm` : ''}</span></div>${I('right',16)}</div>`;
       h = h.replace('<div class="stats">', card + '<div class="stats">');
     }
     return h;

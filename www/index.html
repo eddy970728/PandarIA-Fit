@@ -63,19 +63,19 @@ svg{display:block}
 #nav button.on .pill{background:var(--acs);color:var(--ac)}
 #nav .dot{position:absolute;top:8px;left:calc(50% + 12px);width:9px;height:9px;border-radius:50%;background:var(--ac);border:2px solid var(--bg2)}
 /* Header */
-.hdr{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 0 10px;display:flex;align-items:center;gap:10px}
+.hdr{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px;display:flex;align-items:center;gap:10px}
 .hdr h1{font-size:26px;font-weight:800;margin:0;flex:1;letter-spacing:-.3px}
 .hdr .sub{color:var(--mut);font-size:13px}
 .brand{display:flex;align-items:center;gap:8px}
 .brand b{color:var(--ac)}
 /* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 18px;border-radius:14px;font-weight:700;background:var(--card2);color:var(--tx);transition:transform .08s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 18px;border-radius:14px;font-weight:700;background:var(--card2);color:var(--tx);transition:transform .08s}
 .btn:active{transform:scale(.97)}
 .btn.pri{background:var(--ac);color:#1a0d02}
 .btn.ok{background:var(--ok);color:#03200f}
 .btn.ghost{background:transparent;color:var(--ac)}
 .btn.danger{background:var(--bads);color:var(--bad)}
-.btn.big{height:58px;font-size:17px;border-radius:18px;width:100%}
+.btn.big{height:52px;font-size:17px;border-radius:18px;width:100%}
 .btn.sm{height:36px;padding:0 12px;font-size:13.5px;border-radius:11px}
 .btn.wide{width:100%}
 .ibtn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--tx)}
@@ -83,15 +83,15 @@ svg{display:block}
 .ibtn.soft{background:var(--card2)}
 .link{color:var(--ac);font-weight:700;letter-spacing:.3px}
 /* Cards */
-.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--line)}
+.card{background:var(--card);border-radius:var(--r);padding:13px 14px;margin-bottom:10px;border:1px solid var(--line)}
 .card.tap:active{background:var(--card2)}
 .row{display:flex;align-items:center;gap:12px}
 .col{display:flex;flex-direction:column;gap:4px}
 .grow{flex:1;min-width:0}
 .mut{color:var(--mut)} .sm{font-size:13px} .xs{font-size:12.5px}
 .b{font-weight:700} .ttl{font-size:17px;font-weight:700}
-.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sec{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin:22px 2px 10px}
+.ell{overflow-wrap:anywhere;min-width:0} /* 1.6: nada cortado con «…»: si no cabe, pasa a la línea siguiente */
+.sec{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin:18px 2px 8px}
 .chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:16px;background:var(--card2);color:var(--tx);font-size:13.5px;font-weight:500;border:1px solid transparent;white-space:nowrap}
 .chip.on{background:var(--acs);color:var(--ac);border-color:var(--ac)}
 /* 1.1 · Zonas táctiles: los botones pequeños se ven igual, pero la zona que responde al dedo llega a unos 44 px de alto */
@@ -121,14 +121,12 @@ button.link::after,[data-a=kbOpen]::after{content:'';position:absolute;left:-6px
 .uiprev i.l{height:7px;background:var(--mut2)} .uiprev i.w60{width:60%} .uiprev i.o{background:var(--acs);border:1px solid var(--ac)}
 .uiprev i.h10{height:10px} .uiprev i.h18{height:18px} .uiprev i.h24{height:24px} .uiprev i.h36{height:36px}
 .uiopt.on{border:2px solid var(--ac)}
-.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 .ibtn.pri{background:var(--ac);color:#1a0d02}
 .rplay{background:var(--acs);color:var(--ac);flex:none}
-.tip1 .ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .newbtn{display:flex;align-items:center;gap:12px;width:100%;padding:16px;border-radius:var(--r);background:var(--ac);color:#1a0d02;font-weight:800;font-size:16px;margin-bottom:16px}
 .newbtn .pl{width:34px;height:34px;border-radius:10px;background:rgba(0,0,0,.14);display:grid;place-items:center}
 /* Banner */
-.banner{border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start;background:var(--acs);border:1px solid rgba(255,122,26,.3)}
+.banner{border-radius:var(--r);padding:11px 14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;background:var(--acs);border:1px solid rgba(255,122,26,.3)}
 .banner.blue{background:var(--blues);border-color:rgba(74,168,255,.3)}
 .banner.ok{background:var(--oks);border-color:rgba(47,210,122,.3)}
 .banner .ic{flex:0 0 auto;color:var(--ac)}
@@ -167,7 +165,7 @@ button.link::after,[data-a=kbOpen]::after{content:'';position:absolute;left:-6px
 /* Forms */
 .field{margin-bottom:16px}
 .field label{display:block;font-size:13px;color:var(--mut);font-weight:600;margin-bottom:7px}
-.inp{width:100%;height:48px;border-radius:13px;border:1px solid var(--line);background:var(--card);padding:0 14px;font-size:16px;outline:none}
+.inp{width:100%;height:46px;border-radius:13px;border:1px solid var(--line);background:var(--card);padding:0 14px;font-size:16px;outline:none}
 .inp:focus{border-color:var(--ac)}
 textarea.inp{height:auto;min-height:80px;padding:12px 14px;resize:vertical}
 .search{position:relative}
@@ -179,38 +177,40 @@ textarea.inp{height:auto;min-height:80px;padding:12px 14px;resize:vertical}
 .toggle{width:50px;height:30px;border-radius:15px;background:var(--line);position:relative;transition:.2s;flex:0 0 auto}
 .toggle::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
 .toggle.on{background:var(--ac)} .toggle.on::after{left:23px}
-.srow{display:flex;align-items:center;gap:14px;padding:15px 4px;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.srow{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);width:100%;text-align:left}
 .srow:last-child{border-bottom:0}
 .srow .si{width:38px;height:38px;border-radius:11px;background:var(--card2);display:grid;place-items:center;color:var(--ac);flex:0 0 auto}
 .check{width:26px;height:26px;border-radius:8px;border:2px solid var(--mut2);display:grid;place-items:center;flex:0 0 auto}
 .check.on{background:var(--ac);border-color:var(--ac);color:#1a0d02}
 input[type=range]{width:100%;accent-color:var(--ac)}
 /* Workout */
-.wk-top{display:flex;align-items:center;gap:8px;padding:8px 10px;min-height:62px;background:var(--bg2);border-bottom:1px solid var(--line)}
+.wk-top{display:flex;align-items:center;gap:8px;padding:6px 10px;min-height:54px;background:var(--bg2);border-bottom:1px solid var(--line)}
 .wk-top .clock{flex:1;text-align:center;color:var(--mut);font-variant-numeric:tabular-nums;font-size:16px}
-.wk-ex{margin:0 -16px;padding:18px 16px 6px;border-bottom:8px solid var(--bg2)}
-.wk-ex .exh{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.wk-ex{margin:0 -16px;padding:12px 16px 4px;border-bottom:6px solid var(--bg2)}
+.wk-ex .exi{width:38px;height:38px;border-radius:11px}
+.wk-ex .exh{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .wk-ex .exn{flex:1;min-width:0;color:var(--blue);font-weight:700;font-size:17px;line-height:1.25}
 .wk-ex .note{background:var(--card2);border-radius:10px;padding:8px 12px;font-size:13.5px;margin-bottom:8px;color:var(--mut)}
 .wk-ex .note.sticky{background:rgba(255,200,61,.12);color:var(--gold)}
 .sgrid{display:grid;grid-template-columns:40px 1fr 74px 74px 46px;align-items:center;gap:8px}
 .sgrid.nokg{grid-template-columns:40px 1fr 96px 46px}
-.shead{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--mut);padding:4px 0 6px;text-align:center}
+.shead{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--mut);padding:2px 0 4px;text-align:center}
 .shead>:nth-child(2){text-align:left}
-.srw{padding:5px 0;border-radius:10px;transition:background .2s}
+.srw{padding:3px 0;border-radius:10px;transition:background .2s}
 .srw.done{background:var(--oks)}
-.snum{height:40px;border-radius:10px;font-weight:700;display:grid;place-items:center;font-size:15px}
+.snum{height:36px;border-radius:10px;font-weight:700;display:grid;place-items:center;font-size:15px}
 .snum.c{color:var(--gold)} .snum.f{color:var(--bad)} .snum.d{color:var(--blue)}
-.sprev{color:var(--mut);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sinp{width:100%;height:42px;border-radius:10px;border:0;background:var(--card2);text-align:center;font-size:17px;font-weight:600;outline:none;padding:0 4px;-moz-appearance:textfield}
+.sprev{color:var(--mut);font-size:13.5px;overflow-wrap:anywhere}
+.sinp{width:100%;height:36px;border-radius:10px;border:0;background:var(--card2);text-align:center;font-size:17px;font-weight:600;outline:none;padding:0 4px;-moz-appearance:textfield}
 .sinp::-webkit-outer-spin-button,.sinp::-webkit-inner-spin-button{-webkit-appearance:none}
 .sinp::placeholder{color:var(--mut2);font-weight:500}
 .sinp:focus{box-shadow:0 0 0 2px var(--ac)}
 .srw.done .sinp{background:transparent}
-.sck{width:42px;height:42px;border-radius:10px;background:var(--card2);display:grid;place-items:center;color:var(--mut2)}
+.sck{position:relative;width:38px;height:36px;border-radius:10px;background:var(--card2);display:grid;place-items:center;color:var(--mut2)}
+.sck::after{content:'';position:absolute;inset:-4px -3px}
 .srw.done .sck{background:var(--ok);color:#03200f}
-.restline{display:flex;align-items:center;gap:10px;color:var(--blue);font-size:14px;font-weight:600;padding:2px 0}
-.restline::before,.restline::after{content:'';flex:1;height:3px;border-radius:2px;background:var(--blues)}
+.restline{display:flex;align-items:center;gap:10px;color:var(--blue);font-size:14px;font-weight:600;padding:0;line-height:1.5}
+.restline::before,.restline::after{content:'';flex:1;height:2px;border-radius:2px;background:var(--blues)}
 .restline.done{color:var(--ok)} .restline.done::before,.restline.done::after{background:var(--oks)}
 .restline.cus{color:var(--ac)} .restline.cus::before,.restline.cus::after{background:rgba(255,122,26,.28)}
 .restline .rtag{font-size:12px;font-weight:700;opacity:.85}
@@ -236,16 +236,17 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .esets.nokg{grid-template-columns:40px 1fr 34px}
 .esets .sinp{height:38px;font-size:15px}
 /* Calendar */
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
 .cal .dh{font-size:12px;color:var(--mut);font-weight:700;padding:4px 0}
-.cal .d{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:13.5px;position:relative}
+.cal .d{height:36px;border-radius:10px;display:grid;place-items:center;font-size:13.5px;position:relative}
 .cal .d.on{background:var(--ac);color:#1a0d02;font-weight:800}
 .cal .d.today{box-shadow:inset 0 0 0 2px var(--ac)}
 .cal .d.out{opacity:.25}
-.stat{background:var(--card2);border-radius:14px;padding:12px;flex:1;min-width:0}
+.stat{padding:6px 12px;flex:1;min-width:0}
+.stat+.stat{border-left:1px solid var(--line)}
 .stat .v{font-size:22px;font-weight:800}
 .stat .l{font-size:12px;color:var(--mut);margin-top:2px}
-.stats{display:flex;gap:10px;margin-bottom:12px}
+.stats{display:flex;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 2px}
 .ach{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .ach .a{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
 .ach .a .e{font-size:28px;filter:grayscale(1);opacity:.35}
@@ -303,7 +304,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 
 .stprow{padding:0 0 4px}
 .stp2{display:flex;gap:6px}
-.stb{flex:1;height:30px;border-radius:9px;background:var(--card2);color:var(--ac);font-weight:800;font-size:18px;line-height:1}
+.stb{flex:1;height:28px;border-radius:9px;background:var(--card2);color:var(--ac);font-weight:800;font-size:18px;line-height:1}
 .stb:active{background:var(--acs)}
 .sck.play{color:var(--ok);background:var(--oks)}
 .tbar .fill{background:var(--ok)}
@@ -327,7 +328,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 #nav button{font-size:12px}
 #nav button .pill{width:50px}
 .wstrip{display:flex;gap:6px}
-.wd{flex:1;height:44px;border-radius:12px;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:var(--mut)}
+.wd{flex:1;height:34px;border-radius:10px;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:var(--mut)}
 .wd.tr{color:var(--tx);box-shadow:inset 0 0 0 1.5px var(--line)}
 .wd.td{box-shadow:inset 0 0 0 2px var(--ac)}
 .wd.dn{background:var(--ok);color:#03200f}
@@ -382,6 +383,32 @@ html[data-fx=on] .tick-fast{animation:breathe 4s ease-in-out infinite}
 html[data-fx=on] #nav button.fx-splash .pill{animation:splash .4s ease}
 html[data-fx=off] *,html[data-fx=off] *::before{animation:none!important;transition:none!important}
 
+
+/* ---------- 1.6 · Estilo propio de iPhone ----------
+   Solo en la app de iPhone (clase native-ios). No copia Android: barras translúcidas con desenfoque, tarjetas sin borde
+   como las listas de iOS, interruptores verdes de Apple, controles segmentados de iOS, números redondeados (SF Rounded),
+   hojas con más radio y respuesta al toque por opacidad, como en las apps de Apple. */
+html.native-ios #nav{background:color-mix(in srgb,var(--bg2) 72%,transparent);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-top:.5px solid color-mix(in srgb,var(--line) 70%,transparent)}
+html.native-ios #nav button{font-size:10.5px;font-weight:600;letter-spacing:.1px;gap:2px}
+html.native-ios #nav button .pill{background:none!important;height:28px}
+html.native-ios #nav button.on{color:var(--ac)}
+html.native-ios .hdr{background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+html.native-ios h1{letter-spacing:-.6px}
+html.native-ios .card,html.native-ios .stats{border-color:transparent;border-radius:16px}
+html.native-ios .banner{border-radius:16px}
+html.native-ios .toggle{width:51px;height:31px;border-radius:16px}
+html.native-ios .toggle::after{top:2px;left:2px;width:27px;height:27px;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16)}
+html.native-ios .toggle.on{background:#34c759} html.native-ios .toggle.on::after{left:22px}
+html.native-ios .seg{border-radius:10px;padding:2px;gap:0}
+html.native-ios .seg button{border-radius:8px}
+html.native-ios .seg button.on{background:var(--card);color:var(--tx);box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
+html.native-ios .stat .v,html.native-ios .wk-top .clock,html.native-ios .restbar .t,html.native-ios .fring .t,html.native-ios .ring .v{font-family:ui-rounded,-apple-system,system-ui,sans-serif}
+html.native-ios .sheet{border-radius:14px 14px 0 0}
+html.native-ios .scrim{background:rgba(0,0,0,.4)}
+html.native-ios .btn,html.native-ios .ibtn,html.native-ios .srow,html.native-ios .chip{transition:opacity .12s}
+html.native-ios .btn:active,html.native-ios .ibtn:active,html.native-ios .srow:active,html.native-ios .chip:active{opacity:.55;transform:none}
+html.native-ios .sinp,html.native-ios .inp{border-radius:10px}
+html.native-ios .sck{border-radius:50%;width:36px}
 </style>
 </head>
 <body>
@@ -5476,7 +5503,7 @@ let audioCtx=null;
 function beep(){
   if (!S.settings.sound) return;
   try{
-    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+    if (!actx()) return;
     [0,0.22,0.44].forEach((t,i)=>{ const o=audioCtx.createOscillator(), g=audioCtx.createGain();
       o.frequency.value=i===2?1175:880; o.connect(g); g.connect(audioCtx.destination);
       g.gain.setValueAtTime(0.0001,audioCtx.currentTime+t); g.gain.exponentialRampToValueAtTime(0.35,audioCtx.currentTime+t+0.02);
@@ -6805,7 +6832,7 @@ function tick(){
 
 function shortBeep(hi){
   if (!S.settings.sound) return;
-  try{ audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  try{ if (!actx()) return; const o=audioCtx.createOscillator(), g=audioCtx.createGain();
     o.frequency.value=hi?1320:760; o.connect(g); g.connect(audioCtx.destination); const t=audioCtx.currentTime;
     g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.3,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+(hi?0.35:0.12)); o.start(t); o.stop(t+(hi?0.4:0.15)); }catch(e){}
 }
@@ -7721,9 +7748,10 @@ function tipCard(mini){
   if (S.settings.tips===false || S.settings.lang==='en') return '';
   const k='tip-'+new Date().toDateString(); if (S.dismissed[k]) return '';
   const t=tipOfDay();
-  if (mini) return `<div class="card row tip1" style="gap:10px;padding:10px 12px"><span style="color:var(--gold)">${I('spark',18)}</span><button class="grow sm ell" style="text-align:left;min-width:0" data-a="tipVer">${esc(t)}</button><button class="ibtn" style="width:28px;height:28px" data-a="dismiss" data-v="${k}" aria-label="${tx('Cerrar','Close')}">${I('x',16)}</button></div>`;
-  return `<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--gold)">${I('spark',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO DEL DÍA</div><div class="sm clamp2" style="margin-top:4px;line-height:1.45" data-a="tipVer">${esc(t)}</div>${kbLink(tipRule(t))}</div><button class="ibtn" style="width:30px;height:30px" data-a="dismiss" data-v="${k}" aria-label="${tx('Cerrar','Close')}">${I('x',18)}</button></div>`;
+  if (mini) return `<div class="card row tip1" style="gap:10px;padding:10px 12px"><span style="color:var(--gold)">${I('spark',18)}</span><button class="grow b sm" style="text-align:left" data-a="tipVer">${tx('Consejo del día','Tip of the day')}</button><span class="mut">${I('right',16)}</span><button class="ibtn" style="width:28px;height:28px" data-a="dismiss" data-v="${k}" aria-label="${tx('Cerrar','Close')}">${I('x',16)}</button></div>`;
+  return `<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--gold)">${I('spark',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO DEL DÍA</div><div class="sm" style="margin-top:4px;line-height:1.45">${esc(t)}</div>${kbLink(tipRule(t))}</div><button class="ibtn" style="width:30px;height:30px" data-a="dismiss" data-v="${k}" aria-label="${tx('Cerrar','Close')}">${I('x',18)}</button></div>`;
 }
+A.tipNutVer=()=>{ const t=tipOfDay('nut'); openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Consejo nutricional del día','Nutrition tip of the day')}</h3><p style="line-height:1.55;margin:0 4px 12px">${esc(t)}</p><div style="margin:0 4px 14px">${kbLink(tipRule(t))}</div><button class="btn wide" data-a="closeModal">${tx('Cerrar','Close')}</button></div>`); };
 A.tipVer=()=>{ const t=tipOfDay(); openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Consejo del día','Tip of the day')}</h3><p style="line-height:1.55;margin:0 4px 12px">${esc(t)}</p><div style="margin:0 4px 14px">${kbLink(tipRule(t))}</div><button class="btn wide" data-a="closeModal">${tx('Cerrar','Close')}</button></div>`); };
 function reportBanner(){
   if (S.settings.report===false) return '';
@@ -7812,7 +7840,8 @@ function viewNutricion(){
   // 1.3: dos subpestañas fijas arriba, para no tener que deslizar hasta el agua
   h+=`<div class="seg" style="margin-bottom:14px">${[['comida',tx('Comida','Food')],['agua',tx('Agua','Water')]].map(([k,t])=>`<button class="${NSEG===k?'on':''}" data-a="nseg" data-v="${k}">${t}</button>`).join('')}</div>`;
   if (NSEG!=='agua'){
-  if (S.settings.lang!=='en') h+=`<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--ok)">${I('leaf',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO NUTRICIONAL DEL DÍA</div><div class="sm" style="margin-top:4px;line-height:1.45">${(t=>esc(t)+kbLink(tipRule(t)))(tipOfDay('nut'))}</div></div></div>`;
+  if (S.settings.lang!=='en' && uiMini()) h+=`<div class="card row" style="gap:10px;padding:10px 12px"><span style="color:var(--ok)">${I('leaf',18)}</span><button class="grow b sm" style="text-align:left" data-a="tipNutVer">${tx('Consejo nutricional del día','Nutrition tip of the day')}</button><span class="mut">${I('right',16)}</span></div>`;
+  else if (S.settings.lang!=='en') h+=`<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--ok)">${I('leaf',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO NUTRICIONAL DEL DÍA</div><div class="sm" style="margin-top:4px;line-height:1.45">${(t=>esc(t)+kbLink(tipRule(t)))(tipOfDay('nut'))}</div></div></div>`;
   h+=diarioCard();
   if (habitos()){ h+=`<div class="sec">Objetivo</div><div class="card sm mut" style="line-height:1.45">Estás en modo hábitos: PandarIA no muestra calorías ni números. Puedes cambiarlo en las preferencias del diario.</div>`; }
   else {
@@ -8858,10 +8887,25 @@ A.alScan=async()=>{
   const B=capPlugin('BarcodeScanner'); if (!B) return toast(tx('El escáner funciona en la app instalada','The scanner works in the installed app'));
   let code=null;
   try{
-    const m=await B.isGoogleBarcodeScannerModuleAvailable(); if (m && m.available===false){ toast(tx('Preparando el escáner… (solo la primera vez)','Preparing the scanner… (first time only)')); await B.installGoogleBarcodeScannerModule(); }
+    // 1.6: el módulo de Google solo existe en Android; en iPhone esa comprobación fallaba y el escáner nunca se abría
+    if (!window.PF_IOS){ try{ const m=await B.isGoogleBarcodeScannerModuleAvailable(); if (m && m.available===false){ toast(tx('Preparando el escáner… (solo la primera vez)','Preparing the scanner… (first time only)')); await B.installGoogleBarcodeScannerModule(); } }catch(e){} }
     const r=await B.scan({formats:['EAN_13','EAN_8','UPC_A','UPC_E']}); code=r&&r.barcodes&&r.barcodes[0]&&r.barcodes[0].rawValue;
-  }catch(e){ if (!/cancel/i.test(String(e&&(e.message||e)))) toast(tx('No se pudo abrir el escáner. Prueba de nuevo en unos segundos.','The scanner could not open. Try again in a few seconds.')); return; }
+  }catch(e){ const m=String(e&&(e.message||e)||''); if (/cancel/i.test(m)) return;
+    const perm=/permiss|denied|authoriz|camera access/i.test(m);
+    return openModal(`<div class="sheet"><div class="grab"></div><h3>${perm?tx('Falta el permiso de la cámara','Camera permission missing'):tx('No se pudo abrir el escáner','The scanner could not open')}</h3>
+      <p class="sm" style="margin:-4px 4px 12px;line-height:1.5">${perm?(window.PF_IOS?tx('Actívalo en Ajustes del iPhone › PandarIA Fit › Cámara.','Turn it on in iPhone Settings › PandarIA Fit › Camera.'):tx('Actívalo en Ajustes del teléfono › Aplicaciones › PandarIA Fit › Permisos.','Turn it on in phone Settings › Apps › PandarIA Fit › Permissions.')):tx('Mientras tanto, puedes escribir los números que hay bajo el código de barras.','Meanwhile, you can type the numbers under the barcode.')}</p>
+      ${perm?'':`<p class="xs mut" style="margin:0 4px 12px">${tx('Detalle','Detail')}: ${esc(m.slice(0,140))}</p>`}
+      <button class="btn pri big" data-a="alCodigo">${I('edit',18)} ${tx('Escribir el código','Type the code')}</button><button class="btn ghost wide" style="margin-top:6px" data-a="closeModal">${tx('Cerrar','Close')}</button></div>`); }
   if (!code) return;
+  alPorCodigo(code);
+};
+// 1.6: escribir el código a mano (si la cámara falla o la etiqueta está estropeada)
+A.alCodigo=()=>{ if (!premOK()) return payFor('scan'); MODALS.length&&closeModal();
+  const ok=cb(()=>{ const c=String(MV.acC||'').replace(/\D/g,''); if (!/^\d{8,14}$/.test(c)) return toast(tx('El código tiene entre 8 y 14 números','The code has 8 to 14 digits')); alPorCodigo(c); });
+  setTimeout(()=>openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Código de barras','Barcode')}</h3><p class="sm mut" style="margin:-6px 4px 12px">${tx('Los números que hay debajo de las barras.','The numbers under the bars.')}</p>
+    <div class="field"><input id="acC" class="inp" type="text" inputmode="numeric" maxlength="14" placeholder="7790000000000" autocomplete="off"></div>
+    <button class="btn pri big" data-a="cbm" data-v="${ok}">${tx('Buscar','Search')}</button></div>`),MODALS.length?120:0); };
+async function alPorCodigo(code){
   const n=nd(); n.codigos=n.codigos||{};
   const ya=n.codigos[code]; if (ya && alimGet(ya)) return A.alPick(ya);
   toast(tx('Buscando el producto…','Looking up the product…'));
@@ -9366,7 +9410,7 @@ function periodoCanvas(D){
   const st=[[String(D.entrenos),tx('entrenos','workouts')],[D.horas+' h',tx('entrenando','training')],[D.kg?fmtNum(Math.round(toUnit(D.kg)/100)/10)+' t':'—',tx('levantadas','lifted')],[String(D.records),tx('récords','records')]];
   st.forEach(([v,l],i)=>{ const x=80+(i%2)*470, yy=y+Math.floor(i/2)*230; g.fillStyle='rgba(255,255,255,.16)'; roundRect(g,x,yy,440,200,30); g.fill(); g.fillStyle='#fff'; g.font='900 72px system-ui,Roboto,sans-serif'; g.fillText(v,x+34,yy+100); g.font='600 34px system-ui,Roboto,sans-serif'; g.globalAlpha=.85; g.fillText(l,x+34,yy+156); g.globalAlpha=1; });
   y+=500; g.font='700 38px system-ui,Roboto,sans-serif';
-  if (D.top){ let t=tx('Ejercicio estrella: ','Star exercise: ')+D.top; if (g.measureText(t).width>920){ while (t.length>4 && g.measureText(t+'…').width>920) t=t.slice(0,-1); t=t.trim()+'…'; } g.fillText(t,80,y); y+=64; }
+  if (D.top){ const t=tx('Ejercicio estrella: ','Star exercise: ')+D.top; let fs=38; while (fs>24 && g.measureText(t).width>920){ fs-=2; g.font=`700 ${fs}px system-ui,Roboto,sans-serif`; } g.fillText(t,80,y,920); g.font='700 38px system-ui,Roboto,sans-serif'; y+=64; } // 1.6: se achica la letra en vez de cortar
   g.fillText(`🔥 ${D.racha} ${tx('semanas seguidas','weeks in a row')} · 🌙 ${D.ayunos} · 💧 ${D.agua}`,80,y);
   g.globalAlpha=.85; g.font='600 30px system-ui,Roboto,sans-serif'; g.fillText(tx('Hecho con PandarIA Fit','Made with PandarIA Fit'),80,1270);
   return c;
@@ -10123,7 +10167,7 @@ const APP_VERSION='1.6';
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
- {v:'1.6',t:'Interfaz a tu gusto',items:['Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento', 'Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar']},
+ {v:'1.6',t:'Interfaz a tu gusto',items:['Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento', 'Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar', 'Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas', 'Ningún texto cortado: los consejos del día se leen enteros', 'iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta', 'Escribe el código de barras a mano si la cámara no puede leerlo']},
  {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas', 'Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno', 'Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar', 'Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)', 'Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno', 'Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer', 'Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos']},
  {v:'1.4',t:'Retos y Consulta a PandarIA',items:['Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale', 'Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)', 'Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos', 'Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores', 'Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir', 'Tarjeta del entreno renovada, con el panda y tus récords', 'Versión para iPhone y iPad (se instala con AltStore desde el PC)', 'Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)']},
  {v:'1.3',t:'Comer, dormir y ayunar',items:['Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua', 'Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano', 'Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado', 'Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)', 'Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)', 'Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)', 'Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)', 'Notificación del entreno con la serie siguiente y el botón «✓ Hecha»', 'Biblioteca de evidencia 1.6: 4 reglas nuevas']},
@@ -10376,7 +10420,7 @@ function cloudCardHtml(){
     <div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('La copia va a una carpeta oculta de tu Drive: PandarIA Fit no ve tus otros archivos y nadie más ve tus datos.','The backup goes to a hidden folder in your Drive: PandarIA Fit cannot see your other files and nobody else sees your data.')}</div></div>`;
   const estado=c.conflict?`<span style="color:var(--gold)">${tx('Hay una copia distinta de otro teléfono','There is a different backup from another phone')}</span>`:c.pending?`<span style="color:var(--gold)">${tx('Pendiente de guardar','Waiting to save')}${c.err?' · '+esc(c.err):''}</span>`:`${tx('Última copia','Last backup')}: ${hace(c.at)}`;
   return `<div class="sec">${tx('Copia en Google Drive','Google Drive backup')}</div><div class="card">
-    <div class="row" style="gap:12px"><span style="width:40px;height:40px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;flex:0 0 auto">${esc((c.name||c.email||'?').charAt(0).toUpperCase())}</span><div class="grow" style="min-width:0"><div class="b" style="overflow:hidden;text-overflow:ellipsis">${esc(c.name||c.email)}</div><div class="xs mut" style="overflow:hidden;text-overflow:ellipsis">${esc(c.email)}</div></div></div>
+    <div class="row" style="gap:12px"><span style="width:40px;height:40px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;flex:0 0 auto">${esc((c.name||c.email||'?').charAt(0).toUpperCase())}</span><div class="grow" style="min-width:0"><div class="b" style="overflow-wrap:anywhere">${esc(c.name||c.email)}</div><div class="xs mut" style="overflow-wrap:anywhere">${esc(c.email)}</div></div></div>
     <div class="sm" style="margin-top:10px;line-height:1.45">${estado}</div>
     ${c.conflict?`<button class="btn pri wide" style="margin-top:10px" data-a="cloudConflict">${tx('Elegir qué datos usar','Choose which data to keep')}</button>`:''}
     ${c.reauth&&!c.conflict?`<button class="btn pri wide" style="margin-top:10px" data-a="cloudSignIn">${I('user',18)} ${tx('Volver a iniciar sesión','Sign in again')}</button>`:''}
@@ -10687,9 +10731,19 @@ A.setLang=v=>{ S.settings.lang=v; save(); applyLang(); render.keep=true; render(
 /* ================= Sonidos y animaciones ================= */
 const FX_ON  = () => !!(typeof S!=='undefined'&&S&&S.settings&&S.settings.uiSound!==false);
 const ANIM_ON = () => !!(typeof S!=='undefined'&&S&&S.settings) && S.settings.anim!==false && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+// 1.6: iOS interrumpe el audio de la app (bloqueo, una llamada, la voz nativa, otra app) y lo deja «interrupted»:
+// si no vuelve a «running» en 1,5 s se cierra y se crea uno nuevo. Todos los sonidos pasan por aquí.
+let ACTX_T=0;
 function actx(){
-  try{ audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); if (audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }catch(e){ return null; }
+  try{
+    if (audioCtx && (audioCtx.state==='closed' || (audioCtx.state!=='running' && ACTX_T && Date.now()-ACTX_T>1500))){ try{ audioCtx.close(); }catch(e){} audioCtx=null; ACTX_T=0; }
+    if (!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if (audioCtx.state!=='running'){ if (!ACTX_T) ACTX_T=Date.now(); const p=audioCtx.resume(); if (p&&p.then) p.then(()=>{ if (audioCtx&&audioCtx.state==='running') ACTX_T=0; }).catch(()=>{}); }
+    else ACTX_T=0;
+    return audioCtx;
+  }catch(e){ return null; }
 }
+document.addEventListener('visibilitychange',()=>{ if (!document.hidden) actx(); });
 // una nota: frecuencia, inicio (s), duración, tipo, volumen, deslizamiento
 function tone(f,t0,d,type,vol,f2){
   const c=actx(); if(!c) return; const t=c.currentTime+(t0||0);
@@ -13164,6 +13218,12 @@ Mantén la pelvis estable.|Keep your pelvis stable.
 Despegar la zona lumbar.|Lifting your lower back off the floor.
 Perder la respiración.|Losing your breathing rhythm.`;
 const EN_09 = `Interfaz a tu gusto|Your interface, your way
+Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas|The whole app more compact without smaller text: workout, calendars and stats
+Ningún texto cortado: los consejos del día se leen enteros|No cut-off text: the daily tips are shown in full
+iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta|iPhone: its own style, sound and voice no longer drop out, scanner fixed and a clear message if Health does not connect
+Escribe el código de barras a mano si la cámara no puede leerlo|Type the barcode by hand if the camera cannot read it
+Consejo nutricional del día|Nutrition tip of the day
+Código de barras|Barcode
 Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento|Choose how to see the app: Full (everything in view, organised) or Minimal (just the essentials). Switch at any time
 Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar|Cleaner My routines: tip of the day on top, compact Today, notices together and routines with a start button
 Opcional. No cambia tu sesión, pero PandarIA lo tiene en cuenta para sus sugerencias.|Optional. It does not change your session, but PandarIA takes it into account for its suggestions.

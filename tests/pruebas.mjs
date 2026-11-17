@@ -716,6 +716,11 @@ if (fs.existsSync(COPIA07)) {
     ['pf_widget_checkin', 'pf_widget_dia', 'pf_widget_kcal', 'pf_widget_chip'].every(f => ex.includes(f + '.xml"')) && /a\.startsWith\(Widgets\.ACT\)/.test(ex));
   comprobar('widgets 1.5: la app aplica agua, deshacer, ayuno y check-in del widget, y les manda los textos traducidos',
     ['water', 'wundo', 'fastStart', 'fastEnd', 'chk'].every(t => nat.includes(`a.type === '${t}'`)) && /window\.pfWidgetApply/.test(nat) && /kMac:/.test(nat) && /'widgetAction'/.test(nat));
+  { const ix = fs.readFileSync(new URL('../www/index.html', import.meta.url), 'utf8');
+    comprobar('1.6: ningún texto se corta con «…» (regla de la casa)', !/text-overflow:\s*ellipsis/.test(ix) && !/line-clamp/.test(ix.replace(/\.rcard \.exs\{[^}]*\}/,'')));
+    comprobar('1.6: iPhone con estilo propio (barras translúcidas, interruptores de Apple) y el audio se recrea tras una interrupción de iOS', /html\.native-ios #nav\{[^}]*backdrop-filter/.test(ix) && /#34c759/.test(ix) && /audioCtx\.state!=='running' && ACTX_T/.test(ix) && !/audioCtx=audioCtx\|\|new/.test(ix));
+    comprobar('1.6: el escáner no usa en iPhone la comprobación de Google (solo existe en Android) y se puede escribir el código', /if \(!window\.PF_IOS\)\{ try\{ const m=await B\.isGoogleBarcodeScannerModuleAvailable/.test(ix) && /A\.alCodigo=/.test(ix) && /async function alPorCodigo/.test(ix));
+    comprobar('1.6: Salud en iPhone explica el motivo real si no conecta', /No se pudo conectar con Salud/.test(nat)); }
   comprobar('Google Play: símbolos nativos en el AAB y la cámara no es obligatoria', /debugSymbolLevel 'SYMBOL_TABLE'/.test(ex) && /'android\.hardware\.camera'/.test(ex) && /android:required="false" tools:replace/.test(ex));
 }
 
