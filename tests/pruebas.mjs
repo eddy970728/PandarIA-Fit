@@ -790,6 +790,19 @@ if (fs.existsSync(COPIA07)) {
     S.dismissed={'tip-Mon Jan 05 2026':1,['tip-'+new Date().toDateString()]:1,'upd-12':1}; n.waterLog={'2025-01-01':[{t:1,ml:250}],[dayKey()]:[{t:2,ml:250}]}; n.water['2025-01-01']=250; S.compactado=null;
     const nc=compactarDatos(); out.comp=nc===2&&!S.dismissed['tip-Mon Jan 05 2026']&&S.dismissed['upd-12']&&!n.waterLog['2025-01-01']&&n.water['2025-01-01']===250;
     out.uso=typeof usoDatos().pct==='number';
+    // informe de pruebas 1.8: récord sin peso, doble toque en «Terminar», pausa tras una descarga, RIR alto, objetivo raro
+    S.sessions=[{id:'r0',routineId:'x',start:Date.now()-2*H,end:Date.now()-H,intensity:6,items:[{exId:'press_banca',sets:[{t:'n',kg:0,reps:12,done:true}]}]}];
+    out.recSinPeso=!/undefined/.test(histRecords()) && /12 reps/.test(histRecords());
+    S.routines=[newRoutine({name:'F',pandaria:true,items:[buildItem('press_banca','musculo',3)]})]; _startWorkout(S.routines[0].id); MODALS.length=0; renderModals(); out.dobleAct=!!S.active;
+    if (S.active){ const it=S.active.items[0]; it.sets[0].kg=40; it.sets[0].reps=8; it.sets[0].done=true; }
+    const n0=S.sessions.length; let dobleOk=true; try{ finishWorkout('keep'); finishWorkout('keep'); A.wkFinish(); }catch(e){ dobleOk=false; } out.doble=dobleOk && S.sessions.length===n0+1;
+    LAYERS.length=0; renderLayers();
+    const r=S.routines[0], it=r.items[0], mk=(d,kg,extra)=>Object.assign({id:'p'+d,routineId:r.id,start:Date.now()-d*86400000-H,end:Date.now()-d*86400000,intensity:7,items:[{exId:'press_banca',sets:[1,2,3].map(()=>({t:'n',kg,reps:10,done:true}))}]},extra||{});
+    S.sessions=[mk(20,50), mk(13,50,{ajuste:{f:0.9}}), mk(6,50,{ajuste:{f:0.9}})];
+    out.pausa=!/^Volviste/.test(suggestSet(r,it,0).why||'');
+    S.sessions=[mk(3,40)]; S.sessions[0].items[0].sets.forEach(s=>{ s.reps=8; s.rir=6; });
+    const sg=suggestSet(r,it,0); out.rir=/^Te sobraron/.test(sg.why) && sg.kg>40 && sg.kg<=48;
+    nut().goal='subir'; const cn=calcNutrition(); out.metaRara=!!cn && !isNaN(cn.prot) && !isNaN(cn.carbs); nut().goal='mantener';
     return JSON.stringify(out); })()`));
   a.cerrar();
   comprobar('1.8: Historial en 4 pestañas con subpestañas (nada se pierde)', r.h4 && r.h4b && r.h4c, JSON.stringify([r.h4, r.h4b, r.h4c]));
@@ -803,6 +816,11 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.8: aprender cómo respondes (más series de pecho cuando con más progresas más)', r.apr, JSON.stringify(r.apr));
   comprobar('1.8: predicción de tu meta como rango de meses, y ninguna si el peso sube y baja', r.pred && r.predNo, JSON.stringify([r.pred, r.predNo]));
   comprobar('1.8: mirar el diario no crea datos vacíos', r.diarioRO);
+  comprobar('1.8 (simulaciones): un récord sin peso muestra sus repeticiones, no «undefined»', r.recSinPeso);
+  comprobar('1.8 (simulaciones): un doble toque en «Terminar» guarda un solo entreno y no da error', r.doble && r.dobleAct, JSON.stringify([r.doble, r.dobleAct]));
+  comprobar('1.8 (simulaciones): tras una descarga o días suaves PandarIA no cree que volviste de una pausa', r.pausa);
+  comprobar('1.8 (simulaciones): si te sobraron muchas repeticiones, el peso se recalcula (como mucho +20 %)', r.rir);
+  comprobar('1.8 (simulaciones): un objetivo de nutrición desconocido no deja metas en NaN', r.metaRara);
   comprobar('1.8: datos que crecen: se compactan avisos viejos y vasos de hace más de un año, sin tocar los totales', r.comp && r.uso, JSON.stringify([r.comp, r.uso]));
   const nat = fs.readFileSync(new URL('../www/native.js', import.meta.url), 'utf8'), ex = fs.readFileSync(new URL('../scripts/android-extra.mjs', import.meta.url), 'utf8');
   comprobar('1.8: el widget Mi día muestra el estado del día', /today\.estado = E && E\.score != null/.test(nat) && ex.includes('optString(\\"estado\\"'));

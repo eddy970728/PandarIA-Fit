@@ -2,3 +2,4 @@ node_modules/
 android/
 *.jks
 firma/
+tests/sim/resultado-*.json
