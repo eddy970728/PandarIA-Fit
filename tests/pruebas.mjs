@@ -826,6 +826,65 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.8: el widget Mi día muestra el estado del día', /today\.estado = E && E\.score != null/.test(nat) && ex.includes('optString(\\"estado\\"'));
 }
 
+/* ---------- 1.8: las fuentes de PandarIA se vinculan y combinan bien ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const ix = fs.readFileSync(new URL('../www/index.html', import.meta.url), 'utf8');
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; const H=3600000, D=86400000; window.isPremium=()=>true;
+    // integridad: cada regla con fuentes existentes, cada fuente usada, textos en inglés y enlaces que abren una regla real
+    out.srcMal=KB_RULES.flatMap(r=>r.src.filter(s=>!KB_SRC[s]).map(s=>r.id+'→'+s));
+    const usadas=new Set(KB_RULES.flatMap(r=>r.src)); out.srcSinUso=Object.keys(KB_SRC).filter(s=>!usadas.has(s));
+    out.sinEN=KB_RULES.filter(r=>!KB_EN_T[r.id]).map(r=>r.id);
+    out.nRules=KB_RULES.length; out.nSrc=Object.keys(KB_SRC).length;
+    // cada fuente lista las otras reglas que salen de ella
+    A.kbOpen('obj.fuerza'); out.otras=!!document.querySelector('#modals [data-a="kbOpen"][data-v="obj.musculo"]'); MODALS.length=0; renderModals();
+    // combinaciones: volver tras 12 semanas, en un día con poco descanso y en descarga: nunca más de un 40 % menos
+    S.routines=[newRoutine({name:'C',pandaria:true,items:[buildItem('press_banca','musculo',3)]})]; const R=S.routines[0], IT=R.items[0];
+    const mk=(d,kg,reps,extra)=>Object.assign({id:'c'+d+kg,routineId:R.id,start:Date.now()-d*D-H,end:Date.now()-d*D,intensity:7,items:[{exId:'press_banca',sets:[1,2,3].map(()=>({t:'n',kg,reps,done:true}))}]},extra||{});
+    S.sessions=[mk(90,60,10)]; const base=suggestSet(R,IT,0).kg;
+    S.deload={start:Date.now()-D,until:Date.now()+6*D}; S.checkinDia={day:dayKey(),sleep:0,energy:0,sore:0};
+    const comb=suggestSet(R,IT,0).kg; out.tope=comb>=Math.floor(60*0.6) && comb<base; S.deload=null; S.checkinDia=null;
+    // Bosquet: 3 semanas sin el ejercicio no bajan el peso a los 30 años; a los 70 sí
+    S.sessions=[mk(21,60,10)]; S.profile.age=30; out.pausa30=!/^Volviste/.test(suggestSet(R,IT,0).why);
+    S.profile.age=70; out.pausa70=/^Volviste/.test(suggestSet(R,IT,0).why); S.profile.age=30;
+    // máximo estimado: con series de 10 o menos solo cuentan esas
+    out.e1=Math.round(e1Sesion([{kg:100,reps:5},{kg:60,reps:20}]))===Math.round(100*(1+5/30)) && Math.round(e1Sesion([{kg:60,reps:12}]))===Math.round(60*(1+12/30));
+    // descarga: una serie menos en ejercicios de 3 o más
+    S.sessions=[mk(3,60,10)]; S.deload={start:Date.now()-D,until:Date.now()+6*D}; const nW=x=>x.sets.filter(s=>s.t!=='c').length, N=nW(IT); out.descSerie=N>=3 && nW(activeItemFrom(IT,R))===N-1; S.deload=null; out.normalSerie=nW(activeItemFrom(IT,R))===N; out.nW=N;
+    // calibración: la primera serie de un ejercicio nuevo corrige las siguientes
+    S.sessions=[]; S.settings.checkin=false; _startWorkout(R.id); MODALS.length=0; renderModals();
+    const it=S.active.items[0], s0=it.sets[0], sug=s0.sk, obj=s0.sr; s0.kg=sug; s0.reps=obj+6; completeSet(it.uid,0,true);
+    out.calib=it.sets[1].sk>sug && it.sets[1].why==='Ajusté el peso con tu primera serie'; S.active=null; LAYERS.length=0; renderLayers(); MODALS.length=0; renderModals();
+    // calorías del entreno (Compendio) y meta de pasos según la edad (Paluch)
+    out.kcal=gastoSesion({start:0,end:3600000,intensity:8})===Math.round(6*S.profile.weight/10)*10 && gastoSesion({start:0,end:3600000,intensity:5})===Math.round(3.5*S.profile.weight/10)*10;
+    out.pasos=pasosMeta()[0]===8000; S.profile.age=65; out.pasos=out.pasos&&pasosMeta()[0]===6000; S.profile.age=30;
+    // FAO/OMS: el factor de actividad ya no se queda corto; Schoenfeld y Aragon: 0,4 g/kg por comida
+    out.fao=kb('nut.actividad').sedentario===1.4; out.protComida=kb('nut.proteina_comida').gkg===0.4;
+    return JSON.stringify(out); })()`));
+  a.cerrar();
+  // cada «por qué» del peso sugerido enlaza con una regla
+  const whys = [...ix.matchAll(/res\.why='([^']+)'|n\.why='([^']+)'|why:'((?:Pasaste|No llegaste|Serie Bilbo|Pirámide|Completaste esta serie)[^']*)'/g)].map(m => m[1] || m[2] || m[3]);
+  const rx = [...ix.match(/const KB_WHY=\[([\s\S]*?)\n\];/)[1].matchAll(/\[\/(.+?)\/(i?),'([a-z._]+)'\]/g)].map(m => new RegExp(m[1], m[2]));
+  const sinRegla = whys.filter(w => !rx.some(x => x.test(w)));
+  // cada enlace a una regla en el código apunta a una regla que existe
+  const ids = new Set([...ix.matchAll(/\{id:'([a-z0-9_.]+)', area:/g)].map(m => m[1]));
+  const enlaces = [...ix.matchAll(/kb(?:Link)?\('([a-z0-9_.]+)'/g)].map(m => m[1]).filter(x => x.includes('.') && !x.endsWith('.'));
+  const rotos = [...new Set(enlaces.filter(x => !ids.has(x)))];
+  comprobar(`1.8 fuentes: ${r.nRules} reglas y ${r.nSrc} fuentes, todas conectadas (ninguna fuente rota ni sin usar, todas con inglés)`, !r.srcMal.length && !r.srcSinUso.length && !r.sinEN.length, JSON.stringify([r.srcMal, r.srcSinUso, r.sinEN]));
+  comprobar('1.8 fuentes: cada «por qué» del peso sugerido enlaza con su regla', !sinRegla.length, JSON.stringify(sinRegla));
+  comprobar('1.8 fuentes: ningún enlace a una regla que no existe', !rotos.length, JSON.stringify(rotos));
+  comprobar('1.8 fuentes: cada fuente muestra las otras reglas que salen de ella', r.otras);
+  comprobar('1.8 fuentes: los ajustes que bajan el peso se suman con tope (nunca más de un 40 % menos)', r.tope);
+  comprobar('1.8 fuentes: volver tras 3 semanas no baja el peso a los 30 años y sí a los 70 (Bosquet 2013)', r.pausa30 && r.pausa70, JSON.stringify([r.pausa30, r.pausa70]));
+  comprobar('1.8 fuentes: el máximo estimado usa las series de 10 o menos si las hay (Mayhew 2008)', r.e1);
+  comprobar('1.8 fuentes: en descarga una serie menos y un 10 % menos de peso (Bell 2023)', r.descSerie && r.normalSerie, JSON.stringify([r.descSerie, r.normalSerie]));
+  comprobar('1.8 fuentes: la primera serie de un ejercicio nuevo calibra las siguientes', r.calib);
+  comprobar('1.8 fuentes: calorías del entreno con el Compendio 2024 y meta de pasos según la edad (Paluch 2022)', r.kcal && r.pasos, JSON.stringify([r.kcal, r.pasos]));
+  comprobar('1.8 fuentes: factor de actividad de la FAO/OMS y proteína por comida de Schoenfeld y Aragon', r.fao && r.protComida);
+}
+
 /* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */
 {
   const dirC = new URL('./copias/', import.meta.url), fallosC = [];

@@ -1064,11 +1064,11 @@
  ],
  "nutricion_hombre_bajar": {
   "bmr": 1768,
-  "tdee": 2430,
-  "kcal": 1990,
+  "tdee": 2828,
+  "kcal": 2390,
   "prot": 160,
   "fat": 64,
-  "carbs": 194,
+  "carbs": 294,
   "goal": "bajar",
   "notes": [],
   "pk": 2,
@@ -1076,18 +1076,18 @@
   "ritmo": "lento",
   "adapt": {
    "ok": false,
-   "why": "Faltan días de diario: 0 de 10"
+   "why": "Faltan días de diario: 0 de 14"
   },
   "semana": 0.4,
   "limite": false
  },
  "nutricion_hombre_mantener": {
   "bmr": 1768,
-  "tdee": 2430,
-  "kcal": 2430,
+  "tdee": 2828,
+  "kcal": 2830,
   "prot": 128,
   "fat": 64,
-  "carbs": 336,
+  "carbs": 436,
   "goal": "mantener",
   "notes": [],
   "pk": 1.6,
@@ -1095,18 +1095,18 @@
   "ritmo": "lento",
   "adapt": {
    "ok": false,
-   "why": "Faltan días de diario: 0 de 10"
+   "why": "Faltan días de diario: 0 de 14"
   },
   "semana": null,
   "limite": false
  },
  "nutricion_hombre_ganar": {
   "bmr": 1768,
-  "tdee": 2430,
-  "kcal": 2670,
+  "tdee": 2828,
+  "kcal": 3110,
   "prot": 144,
   "fat": 64,
-  "carbs": 380,
+  "carbs": 490,
   "goal": "ganar",
   "notes": [],
   "pk": 1.8,
@@ -1114,18 +1114,18 @@
   "ritmo": "normal",
   "adapt": {
    "ok": false,
-   "why": "Faltan días de diario: 0 de 10"
+   "why": "Faltan días de diario: 0 de 14"
   },
   "semana": null,
   "limite": false
  },
  "nutricion_mujer_ganar": {
   "bmr": 1288,
-  "tdee": 1771,
-  "kcal": 1950,
+  "tdee": 2060,
+  "kcal": 2270,
   "prot": 108,
   "fat": 48,
-  "carbs": 272,
+  "carbs": 352,
   "goal": "ganar",
   "notes": [],
   "pk": 1.8,
@@ -1133,18 +1133,18 @@
   "ritmo": "normal",
   "adapt": {
    "ok": false,
-   "why": "Faltan días de diario: 0 de 10"
+   "why": "Faltan días de diario: 0 de 14"
   },
   "semana": null,
   "limite": false
  },
  "nutricion_imc_bajo": {
   "bmr": 1555,
-  "tdee": 2138,
-  "kcal": 2140,
+  "tdee": 2488,
+  "kcal": 2490,
   "prot": 88,
   "fat": 44,
-  "carbs": 348,
+  "carbs": 436,
   "goal": "mantener",
   "notes": [
    "Tu índice de masa corporal es bajo: no recomendamos déficit calórico. Te mostramos el mantenimiento."
@@ -1154,18 +1154,18 @@
   "ritmo": "lento",
   "adapt": {
    "ok": false,
-   "why": "Faltan días de diario: 0 de 10"
+   "why": "Faltan días de diario: 0 de 14"
   },
   "semana": null,
   "limite": false
  },
  "nutricion_menor": {
   "bmr": 1422,
-  "tdee": 1955,
-  "kcal": 1950,
+  "tdee": 2274,
+  "kcal": 2270,
   "prot": 96,
   "fat": 48,
-  "carbs": 284,
+  "carbs": 364,
   "goal": "mantener",
   "notes": [
    "En menores de 18 las necesidades cambian con el crecimiento: usa esto solo como orientación y consulta a un profesional."
@@ -1175,7 +1175,7 @@
   "ritmo": "lento",
   "adapt": {
    "ok": false,
-   "why": "Faltan días de diario: 0 de 10"
+   "why": "Faltan días de diario: 0 de 14"
   },
   "semana": null,
   "limite": false
@@ -5818,19 +5818,19 @@
  "sugerencia_tras_parar_30_dias": [
   [
    {
-    "kg": 22.5,
+    "kg": 25,
     "reps": 8,
     "time": null,
     "why": "Semana de descarga del bloque: más liviano"
    },
    {
-    "kg": 22.5,
+    "kg": 25,
     "reps": 8,
     "time": null,
     "why": "Semana de descarga del bloque: más liviano"
    },
    {
-    "kg": 22.5,
+    "kg": 25,
     "reps": 8,
     "time": null,
     "why": "Semana de descarga del bloque: más liviano"
@@ -5838,19 +5838,19 @@
   ],
   [
    {
-    "kg": 25,
+    "kg": 32.5,
     "reps": 8,
     "time": null,
     "why": "Semana de descarga del bloque: más liviano"
    },
    {
-    "kg": 25,
+    "kg": 32.5,
     "reps": 8,
     "time": null,
     "why": "Semana de descarga del bloque: más liviano"
    },
    {
-    "kg": 25,
+    "kg": 32.5,
     "reps": 8,
     "time": null,
     "why": "Semana de descarga del bloque: más liviano"
@@ -6826,43 +6826,43 @@
  },
  "ritmos_nutricion": {
   "bajar:lento": [
-   1990,
+   2390,
    160,
-   194
+   294
   ],
   "bajar:normal": [
-   1820,
+   2170,
    160,
-   151
+   239
   ],
   "bajar:rapido": [
-   1820,
+   2120,
    160,
-   151
+   226
   ],
   "ganar:lento": [
-   2550,
+   2970,
    144,
-   350
+   455
   ],
   "ganar:normal": [
-   2670,
+   3110,
    144,
-   380
+   490
   ],
   "ganar:rapido": [
-   2790,
+   3250,
    144,
-   410
+   525
   ],
-  "grande": 2240
+  "grande": 2600
  },
  "ajuste_automatico": {
-  "kcal": 2530,
-  "tdee": 2430,
+  "kcal": 2730,
+  "tdee": 2828,
   "adapt": {
    "ok": true,
-   "tdee": 2530,
+   "tdee": 2729,
    "obs": 2630,
    "intake": 2300,
    "days": 14,
@@ -7000,69 +7000,69 @@
   "na": 2100.7,
   "naUnk": false,
   "naMax": 2000,
-  "per": 20,
+  "per": 32,
   "meals": 3,
   "okMeals": 2
  },
  "menu_de_ejemplo": {
   "todo:": {
-   "kcal": 2289,
-   "objetivo": 2430,
-   "prot": 122,
+   "kcal": 2373,
+   "objetivo": 2830,
+   "prot": 123,
    "conflictos": [],
    "comidas": [
-    "desayuno:20038/65,01132/183,09176/165",
-    "almuerzo:15262/140,20029/300,11210/150,11136/100,04053/13.5",
+    "desayuno:20038/90,01132/183,09176/165",
+    "almuerzo:15262/130,20029/300,11210/150,11136/100,04053/13.5",
     "merienda:01116/310,09040/118",
     "cena:01129/150,11367/300,11959/60,11091/100,04053/13.5"
    ]
   },
   "vegetariano:": {
-   "kcal": 2438,
-   "objetivo": 2430,
-   "prot": 118,
+   "kcal": 2710,
+   "objetivo": 2830,
+   "prot": 125,
    "conflictos": [],
    "comidas": [
-    "desayuno:20038/65,01132/183,09176/165",
-    "almuerzo:16070/320,20029/240,11210/150,11136/100,04053/13.5",
+    "desayuno:20038/90,01132/183,09176/165",
+    "almuerzo:16070/320,20029/300,11210/150,11136/100,04053/13.5",
     "merienda:01116/310,09040/118",
-    "cena:16057/320,11367/75,11959/60,11091/100,04053/5"
+    "cena:16057/320,11367/150,11959/60,11091/100,04053/10"
    ]
   },
   "vegano:": {
-   "kcal": 2447,
-   "objetivo": 2430,
-   "prot": 111,
+   "kcal": 2781,
+   "objetivo": 2830,
+   "prot": 119,
    "conflictos": [],
    "comidas": [
-    "desayuno:20038/80,16139/486,09176/165",
-    "almuerzo:16070/320,20029/240,11210/150,11136/100,04053/13.5",
-    "merienda:09003/250,12061/30",
-    "cena:16015/320,11367/150,11959/60,11091/100,04053/10"
+    "desayuno:20038/110,16139/486,09176/165",
+    "almuerzo:16070/320,20029/300,11210/150,11136/100,04053/13.5",
+    "merienda:09003/364,12061/30",
+    "cena:16015/320,11367/220,11959/60,11091/100,04053/13.5"
    ]
   },
   "todo:LG": {
-   "kcal": 2268,
-   "objetivo": 2430,
+   "kcal": 2401,
+   "objetivo": 2830,
    "prot": 116,
    "conflictos": [],
    "comidas": [
-    "desayuno:36415/140,01123/150,09176/165",
-    "almuerzo:15262/170,11508/300,11210/150,11136/100,04053/13.5",
-    "merienda:09003/250,12061/30",
+    "desayuno:36415/180,01123/150,09176/165",
+    "almuerzo:15262/160,11508/300,11210/150,11136/100,04053/13.5",
+    "merienda:09003/364,12061/30",
     "cena:01129/150,11367/300,11959/60,11091/100,04053/13.5"
    ]
   },
   "todo:PCH": {
-   "kcal": 2216,
-   "objetivo": 2430,
-   "prot": 129,
+   "kcal": 2285,
+   "objetivo": 2830,
+   "prot": 130,
    "conflictos": [],
    "comidas": [
     "desayuno:20038/110,01015/28,09176/165",
     "almuerzo:05711/120,20029/300,11210/150,11136/100,04053/13.5",
     "merienda:01116/310,09040/118",
-    "cena:16114/180,11367/190,11959/60,11091/100,04053/13.5"
+    "cena:16114/180,11367/270,11959/60,11091/100,04053/13.5"
    ]
   }
  },

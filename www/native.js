@@ -986,7 +986,7 @@
     let h = _vhN.apply(this, arguments);
     if (HSEG === 'resumen' && HCS().on && HD.steps != null){
       // 1.6: los pasos en una tarjeta baja
-      const card = `<div class="card row" data-a="hcMenu" style="gap:10px;cursor:pointer;padding:10px 14px"><span style="color:var(--bad)">${I('flame',18)}</span><div class="grow sm"><b>${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy</b> <span class="mut">· media ${(HD.steps7 || 0).toLocaleString(window.LOC?LOC():'es')}${HD.hr ? ` · pulso ${HD.hr} lpm` : ''}</span></div>${I('right',16)}</div>`;
+      const card = `<div class="card row" data-a="hcMenu" style="gap:10px;cursor:pointer;padding:10px 14px"><span style="color:var(--bad)">${I('flame',18)}</span><div class="grow sm"><b>${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy</b> <span class="mut">· media ${(HD.steps7 || 0).toLocaleString(window.LOC?LOC():'es')}${HD.hr ? ` · pulso ${HD.hr} lpm` : ''}</span>${typeof pasosMeta === 'function' ? (m => `<div class="xs mut" style="margin-top:2px">${tx(`Tu meta según tu edad: ${m[0].toLocaleString(LOC())}–${m[1].toLocaleString(LOC())} pasos`, `Your goal for your age: ${m[0].toLocaleString(LOC())}–${m[1].toLocaleString(LOC())} steps`)}</div>`)(pasosMeta()) : ''}</div>${I('right',16)}</div>`;
       h = h.replace('<div class="stats">', card + '<div class="stats">');
     }
     return h;
