@@ -1126,8 +1126,8 @@ const KB_RULES=[
     t:'Para perder grasa sin perder músculo conviene bajar despacio, entre el 0,5 y el 1 % del peso por semana. PandarIA calcula el déficit para ese ritmo (cada kilo de grasa equivale a unas 7700 kcal, una estimación habitual), nunca quita más del 25 % de tu gasto y nunca baja de tu metabolismo en reposo. Las 7700 kcal por kilo solo valen para las primeras semanas: al adelgazar gastas menos y el ritmo baja (Hall y col., 2011), por eso PandarIA recalcula con tu peso de cada semana. Comer muy por debajo de lo que gastas durante mucho tiempo tiene riesgos para la salud (consenso del COI sobre REDs, 2023).', usa:'Calorías para bajar grasa', rev:'2028-11-01', desde:'0.8.1'},
   {id:'nut.superavit', area:'nutricion', n:'Superávit para ganar músculo', v:{lento:1.05, normal:1.1, rapido:1.15}, src:['iraki2019','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
     t:'Para ganar músculo se recomienda comer entre un 10 y un 20 % por encima de tu mantenimiento y ganar entre un 0,25 y un 0,5 % de tu peso por semana (Iraki, Helms y col., 2019). PandarIA suma un 10 % (normal) o un 15 % (rápido), o un 5 % si eliges ir lento para limitar la grasa.', usa:'Calorías para ganar músculo', rev:'2027-11-01', desde:'0.8.1'},
-  {id:'nut.adaptativo', area:'nutricion', n:'Objetivo que se ajusta solo', v:{dias:21, minDias:14, minKcal:800, minSpan:14, peso:0.5, rango:[0.75,1.25]}, src:['hall2011','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
-    t:'Las fórmulas son una estimación. Con al menos 14 días de diario y dos pesajes separados 14 días o más en las últimas 3 semanas, PandarIA compara lo que comiste con cómo cambió tu peso, estima tu gasto real y lo mezcla a partes iguales con la fórmula. Desde la 1.8 usa 3 semanas en vez de 2, porque con 2 el ruido del peso pesaba demasiado. Si el dato sale muy raro, no lo usa.', usa:'Calorías diarias (Premium)', rev:'2027-11-01', desde:'0.8.3'},
+  {id:'nut.adaptativo', area:'nutricion', n:'Objetivo que se ajusta solo', v:{dias:21, minDias:14, minKcal:800, minSpan:14, peso:0.5, pesoFull:0.75, pesajesFull:4, rango:[0.75,1.25]}, src:['hall2011','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'Las fórmulas son una estimación. Con al menos 14 días de diario y dos pesajes separados 14 días o más en las últimas 3 semanas, PandarIA compara lo que comiste con cómo cambió tu peso, estima tu gasto real y lo mezcla con la fórmula: a partes iguales al principio, y con un 75 % de tu gasto real cuando tienes las 3 semanas completas y 4 pesajes o más. Desde la 1.8 usa 3 semanas en vez de 2, porque con 2 el ruido del peso pesaba demasiado; y antes la mitad del error de la fórmula no se corregía nunca. Si el dato sale muy raro, no lo usa.', usa:'Calorías diarias (Premium)', rev:'2027-11-01', desde:'0.8.3'},
   {id:'nut.proteina', area:'nutricion', n:'Proteína diaria', v:{bajar:2.0, mantener:1.6, ganar:1.8}, src:['issn2017','morton2018'], lic:'consejo', ev:'solida', pob:'Adultos que entrenan',
     t:'Si entrenas, 1,4 a 2,0 g de proteína por kg al día cubren lo necesario, y en déficit puede hacer falta más. El beneficio para el músculo se estabiliza alrededor de 1,6 g/kg.', usa:'Proteína diaria', rev:'2028-11-01', desde:'0.8.1'},
   {id:'nut.proteina_comida', area:'nutricion', n:'Proteína por comida', v:{gkg:0.4, g:[20,50], horas:[3,4]}, src:['schoenfeld_aragon2018','issn2017'], lic:'consejo', ev:'moderada', pob:'Adultos que entrenan',
@@ -1329,7 +1329,7 @@ const KB_EN_T={
  'nut.actividad':'Your resting calories are multiplied by your physical activity level. According to FAO and WHO, a sedentary life is around 1.4–1.69, an active one 1.7–1.99 and a very active one 2 or more; PandarIA uses 1.4, 1.6 and 1.8 and raises it a little with your workouts of the last week. Before 1.8 it used 1.2 to 1.55, which fell short.',
  'nut.deficit':'To lose fat without losing muscle, go slowly: 0.5 to 1 % of body weight per week. PandarIA calculates the deficit for that pace (each kilo of fat is about 7,700 kcal, a common estimate), never removes more than 25 % of your expenditure and never goes below your resting metabolism. The 7,700 kcal per kilo only hold for the first weeks: as you lose weight you burn less and the pace slows (Hall et al., 2011), so PandarIA recalculates with your weight each week. Eating far below what you burn for a long time carries health risks (IOC consensus on REDs, 2023).',
  'nut.superavit':'To build muscle it is recommended to eat 10 to 20 % above maintenance and gain 0.25 to 0.5 % of your weight per week (Iraki, Helms et al., 2019). PandarIA adds 10 % (normal) or 15 % (fast), or 5 % if you choose slow to limit fat.',
- 'nut.adaptativo':'Formulas are an estimate. With at least 14 days of diary and two weigh-ins 14 or more days apart in the last 3 weeks, PandarIA compares what you ate with how your weight changed, estimates what you really burn and blends it half and half with the formula. Since 1.8 it uses 3 weeks instead of 2, because with 2 the noise in your weight weighed too much. If the result looks odd, it is not used.',
+ 'nut.adaptativo':'Formulas are an estimate. With at least 14 days of diary and two weigh-ins 14 or more days apart in the last 3 weeks, PandarIA compares what you ate with how your weight changed, estimates what you really burn and blends it with the formula: half and half at first, and 75 % your real energy use once you have the full 3 weeks and 4 or more weigh-ins. Since 1.8 it uses 3 weeks instead of 2, because with 2 the noise in your weight weighed too much; and before, half of the formula\'s error was never corrected. If the result looks odd, it is not used.',
  'nut.proteina':'If you train, 1.4 to 2.0 g of protein per kg a day covers your needs, and more may be needed in a deficit. The benefit for muscle levels off around 1.6 g/kg.',
  'nut.proteina_comida':'To make the most of protein when building muscle, split it into 4 or more servings of about 0.4 g per kg (20 to 50 g) every 3 to 4 hours (Schoenfeld and Aragon, 2018).',
  'nut.grasa':'PandarIA reserves 0.8 g of fat per kg to cover essentials; the rest of the calories go to carbs. It usually falls within 15 to 30 % of calories.',
@@ -7653,7 +7653,8 @@ A.plTog=id=>{ const pl=pkP().pl; const i=pl.order.indexOf(id); if(i>=0) pl.order
 A.plMove=v=>{ const [id,d]=v.split('|'); const o=pkP().pl.order; const i=o.indexOf(id), j=i+(+d); if(j<0||j>=o.length) return; [o[i],o[j]]=[o[j],o[i]]; refreshTop(); };
 A.plAuto=()=>{ if (!premOK()) return window.pfPay&&pfPay('pandaria'); const pl=pkP().pl; const rs=S.routines.filter(r=>!r.archived); const prog=rs.filter(r=>r.programId); const use=(prog.length?prog:rs).slice(0,6);
   pl.order=use.map(r=>r.id); pl.days=defaultDays(use.length); refreshTop(); toast('Plan propuesto por PandarIA'); };
-A.plDel=()=>{ S.plan=null; save(); closeLayer(); toast('Plan semanal quitado'); };
+// 1.8: con un solo toque se perdía el plan (lo detectó la simulación de usuarios): ahora se confirma
+A.plDel=()=>confirmBox({title:'¿Quitar el plan semanal?',text:'Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.',danger:true,okText:'Quitar plan',ok:()=>{ S.plan=null; save(); closeLayer(); toast('Plan semanal quitado'); }});
 A.plSave=()=>{ const pl=pkP().pl; if(!pl.days.length||!pl.order.length){ toast('Elige al menos un día y una rutina'); return; } S.plan=pl; save(); closeLayer(); toast('Plan semanal guardado'); };
 
 /* ---------- Metas ---------- */
@@ -7986,7 +7987,9 @@ function nutAdapt(tdeeF, w){
   const intake=days.reduce((a,k)=>a+D[k].reduce((b,e)=>b+(+e.k||0),0),0)/days.length;
   const obs=intake-sl*kb('nut.deficit').kcalKg;
   if (obs<tdeeF*K.rango[0] || obs>tdeeF*K.rango[1]) return {ok:false, why:'Los datos no cuadran con la fórmula (¿faltan comidas en el diario?): no los uso', obs:Math.round(obs)};
-  return {ok:true, tdee:Math.round(tdeeF*(1-K.peso)+obs*K.peso), obs:Math.round(obs), intake:Math.round(intake), days:days.length, kgWeek:Math.round(sl*7*100)/100};
+  // 1.8: con las 3 semanas completas y 4 pesajes o más, tu gasto real pesa un 75 % (antes siempre 50 %, y la mitad del error de la fórmula no se corregía nunca)
+  const wObs=days.length>=K.dias-2 && pts.length>=K.pesajesFull?K.pesoFull:K.peso;
+  return {ok:true, peso:wObs, tdee:Math.round(tdeeF*(1-wObs)+obs*wObs), obs:Math.round(obs), intake:Math.round(intake), days:days.length, kgWeek:Math.round(sl*7*100)/100};
 }
 function viewNutricion(){
   const n=nut(), c=calcNutrition();
@@ -13824,6 +13827,10 @@ Los estiramientos ya no cuentan como récords|Stretches no longer count as recor
 Lista para Google Play|Ready for Google Play
 Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno verás cuál toca. Con Premium, PandarIA la cambia si los músculos aún no se recuperaron.|Choose which days you train and the order of your routines. On each training day you will see which one is up next. With Premium, PandarIA swaps it if those muscles have not recovered yet.
 Quitar plan semanal|Remove weekly plan
+¿Quitar el plan semanal?|Remove the weekly plan?
+Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.|Your routines and history stay the same; you just won't see what is planned for each day.
+Quitar plan|Remove plan
+Plan semanal quitado|Weekly plan removed
 Ayuno largo o pocas calorías antes de entrenar|Long fast or few calories before training
 Proteína corta varios días|Protein short for several days
 Pulso en reposo más alto de lo normal|Resting heart rate higher than usual
