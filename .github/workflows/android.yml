@@ -97,6 +97,14 @@ jobs:
           if [ -n "$MAL" ] || [ "$N" != "10" ]; then echo "ERROR: permisos que no deben estar: $MAL (salud: $N de 10)"; exit 1; fi
           echo "Permisos correctos: 10 de salud y ninguno prohibido"
 
+      - name: Control de funciones de hardware (ninguna obligatoria, para que Play no excluya dispositivos)
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          $BT/aapt2 dump badging PandarIA-Fit.apk | grep -i "feature" | tee funciones.txt || true
+          # Play excluye dispositivos por cada función obligatoria, declarada o deducida (p. ej. pantalla vertical por una actividad en vertical)
+          OBL=$(grep -E "^uses-feature: name='android\.hardware\.|^uses-implied-feature: name='android\.hardware\.(screen|camera)" funciones.txt | grep -v "faketouch" || true)
+          if [ -n "$OBL" ]; then echo "ERROR: funciones obligatorias que excluyen dispositivos en Play:"; echo "$OBL"; exit 1; fi
+          echo "Funciones correctas: ninguna obligatoria"
       - name: Paquete para Google Play (AAB, sin aviso de versiones de GitHub)
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
