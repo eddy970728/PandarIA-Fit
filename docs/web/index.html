@@ -844,6 +844,16 @@ ergometro_brazos|Ergómetro de brazos|cardio|maq|cardio|hombros|c|1|t|Gira las m
 cuerdas_ondas|Cuerdas de batalla: ondas|cardio|cdb|cardio|hombros,abdomen|c|1|t|Rodillas flexionadas; ondas rápidas alternando brazos.
 cuerdas_golpes|Cuerdas de batalla: golpes|cardio|cdb|cardio|abdomen,hombros|c|1|t|Sube las dos cuerdas y golpea el suelo con fuerza.
 cuello_maq|Cuello en máquina de 4 direcciones|elevacion|maq|trapecio||a|2|p|Muy poco peso y movimiento lento en cada dirección.
+ext_triceps_cuerpo|Extensión de tríceps con peso corporal (bayitas)|extension|bar|triceps|hombros,abdomen|a|2|r|Manos en una barra baja y cuerpo recto: dobla los codos hasta pasar la cabeza por debajo de la barra y estira sin abrirlos.
+fondos_barra|Fondos en barra recta|empuje_h|dom|pecho|triceps,hombros|c|2|r|Manos en una barra a la altura del pecho; baja hasta rozarla y empuja hasta estirar.
+curl_cuerpo|Curl de bíceps con peso corporal|curl|bar|biceps|antebrazos|a|2|r|Bajo una barra baja con las palmas hacia ti: dobla los codos y lleva la frente a la barra con el cuerpo recto.
+crunch_inverso|Crunch inverso|core|est|abdomen||a|1|r|Lleva las rodillas al pecho y despega la cadera del suelo sin impulso.
+toes_to_bar|Pies a la barra|core|dom|abdomen|dorsales,antebrazos|a|3|r|Colgado, sube los pies hasta tocar la barra sin balancearte.
+pino_pared|Pino contra la pared|empuje_v|pc|hombros|triceps,abdomen|c|2|t|Manos a un palmo de la pared, brazos rectos y abdomen firme.
+zancada_salto|Zancadas con salto|zancada|pc|cuadriceps|gluteos,gemelos|c|2|r|Cambia de pierna en el aire y aterriza suave.
+sentadilla_bulgara_pc|Sentadilla búlgara sin peso|zancada|pc+ban|cuadriceps|gluteos|c|1|r|Pie trasero sobre el banco, baja vertical.
+flexiones_hindues|Flexiones hindúes|empuje_h|pc|pecho|hombros,triceps|c|2|r|Desde la V invertida, baja el pecho rozando el suelo y sube arqueando la espalda.
+remo_renegado|Remo renegado|tiron_h|man|dorsales|abdomen,biceps|c|2|p|En plancha sobre las mancuernas, rema con un brazo sin girar la cadera.
 `;
 
 /* Progresiones de calistenia: cuando dominas uno, PandarIA sugiere el siguiente */
@@ -1016,6 +1026,7 @@ const KB_SRC={
   bosquet2013:{n:'Effect of training cessation on muscular performance: a meta-analysis', a:'Bosquet y col.', y:2013, pub:'Scand J Med Sci Sports 23(3):e140–e149', url:'https://doi.org/10.1111/sms.12047', lic:'consejo'},
   refalo2023:{n:'Influence of resistance training proximity-to-failure on skeletal muscle hypertrophy: a systematic review with meta-analysis', a:'Refalo y col.', y:2023, pub:'Sports Med 53(3):649–665', url:'https://doi.org/10.1007/s40279-022-01784-y', lic:'consejo'},
   zourdos2016:{n:'Novel resistance training-specific rating of perceived exertion scale measuring repetitions in reserve', a:'Zourdos y col.', y:2016, pub:'J Strength Cond Res 30(1):267–275', url:'https://doi.org/10.1519/JSC.0000000000001049', lic:'consejo'},
+  ebben2011:{n:'Kinetic analysis of several variations of push-ups', a:'Ebben y col.', y:2011, pub:'J Strength Cond Res 25(10):2891–2894', url:'https://pubmed.ncbi.nlm.nih.gov/?term=Kinetic+analysis+of+several+variations+of+push-ups+Ebben', lic:'consejo'},
   mayhew2008:{n:'Accuracy of prediction equations for determining one repetition maximum bench press in women before and after resistance training', a:'Mayhew y col.', y:2008, pub:'J Strength Cond Res 22(5):1570–1577', url:'https://doi.org/10.1519/JSC.0b013e31817b02ad', lic:'consejo'},
   schoenfeld2016f:{n:'Effects of resistance training frequency on measures of muscle hypertrophy: a systematic review and meta-analysis', a:'Schoenfeld, Ogborn y Krieger', y:2016, pub:'Sports Med 46(11):1689–1697', url:'https://pubmed.ncbi.nlm.nih.gov/27102172/', lic:'consejo'},
   hall2011:{n:'Quantification of the effect of energy imbalance on bodyweight', a:'Hall y col.', y:2011, pub:'Lancet 378(9793):826–837', url:'https://pubmed.ncbi.nlm.nih.gov/21872751/', lic:'consejo'},
@@ -1105,6 +1116,8 @@ const KB_RULES=[
     t:'PandarIA compara empuje con tirón, cuádriceps con isquios y piernas con tren superior en las últimas 4 semanas, y avisa cuando uno supera claramente al otro.', usa:'Informe de equilibrio', rev:'2027-11-01', desde:'0.8.1'},
   {id:'fuerza.e1rm', area:'entreno', n:'Máximo estimado', v:{div:30, maxReps:20, mejorReps:10}, src:['mayhew2008','pandaria'], lic:'consejo', ev:'limitada', pob:'Todos',
     t:'Para comparar series con distinto peso y repeticiones, PandarIA estima tu máximo con la fórmula de Epley (peso × (1 + repeticiones ÷ 30)). Estas fórmulas aciertan más con menos de 10 repeticiones (Mayhew y col., 2008): si en una sesión tienes series de 10 o menos, PandarIA usa solo esas; si no, usa las de hasta 12.', usa:'Récords, progreso y peso inicial', rev:'2027-11-01', desde:'0.8.1'},
+  {id:'peso.lastre', area:'entreno', n:'Lastre en ejercicios de peso corporal', v:{repsMas:3, f:{flexiones:0.64}}, src:['ebben2011','mayhew2008','currier2026'], lic:'consejo', ev:'limitada', pob:'Todos',
+    t:'En dominadas, fondos y otros ejercicios de peso corporal puedes activar «Con lastre» y anotar los kg que añades (cinturón con discos, chaleco o mancuerna). El primer lastre se calcula con las repeticiones que ya haces sin él y la parte de tu peso que mueve el ejercicio: casi todo en dominadas y fondos, y alrededor del 64 % en las flexiones (Ebben y col., 2011), con margen de prudencia. Cuando superas en 3 repeticiones o más el rango de tu rutina en dominadas o fondos, PandarIA te propone pasar a la versión con lastre; en el resto, primero una variante más difícil.', usa:'Peso de la primera serie con lastre y propuesta de añadir lastre', rev:'2027-11-01', desde:'1.8'},
   {id:'peso.inicial', area:'entreno', n:'Peso inicial prudente', v:{prudente:0.75, final:0.9, mujerInf:0.8, mujerSup:0.6, otro:0.8, sedentario:0.85, mayor:0.85, edadMayor:60}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
     t:'Sin historial, PandarIA estima el peso inicial según tu peso corporal y nivel, y lo baja a propósito para que la primera sesión sea segura. Lo ajusta por sexo, sedentarismo y edad.', usa:'Peso inicial estimado', rev:'2027-11-01', desde:'0.8.1'},
   // ---------- Recuperación ----------
@@ -1259,7 +1272,7 @@ const KB_WHY=[
   [/^(Hoy llegas con poco descanso|Sesión suave)/,'recuperacion.ajuste'],
   [/^Completaste todas las series/,'carga.subida'], [/^Te sobraron muchas repeticiones/,'carga.rir'], [/^Dos sesiones sin llegar/,'carga.bajada'], [/^Sesión anterior muy exigente/,'carga.esfuerzo'],
   [/^(Intenta una repetición más|Mismo peso|Una repetición más|Mantén las repeticiones|Un poco más que)/,'carga.doble'], [/^Volviste tras/,'regreso.pausa'],
-  [/descarga/i,'descarga'], [/^Ajusté el peso con tu primera serie/,'peso.calibracion'], [/^Mismo peso que antes del día suave/,'recuperacion.ajuste'], [/^(Serie Bilbo|Pasaste de 15 repeticiones|No llegaste a 15)/,'metodo.bilbo'], [/pirámide|^Pirámide/i,'metodo.piramide'], [/^Serie de calentamiento/,'calentamiento'], [/^Peso inicial estimado/,'peso.inicial'], [/bloque de intensidad/,'bloque']
+  [/descarga/i,'descarga'], [/^Ajusté el peso con tu primera serie/,'peso.calibracion'], [/^Con lastre sigues/,'peso.lastre'], [/^Primer lastre calculado/,'peso.lastre'], [/^Mismo peso que antes del día suave/,'recuperacion.ajuste'], [/^(Serie Bilbo|Pasaste de 15 repeticiones|No llegaste a 15)/,'metodo.bilbo'], [/pirámide|^Pirámide/i,'metodo.piramide'], [/^Serie de calentamiento/,'calentamiento'], [/^Peso inicial estimado/,'peso.inicial'], [/bloque de intensidad/,'bloque']
 ];
 const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sueno.adultos'};
 // Textos de las reglas en inglés (pantalla Ciencia en inglés)
@@ -1319,6 +1332,7 @@ const KB_EN_T={
  'volumen.hipertrofia':'Doing at least 10 sets a week for each muscle group gives more growth than doing fewer. Splitting those sets over 2 or more days a week for each muscle works better than doing them all in one (Schoenfeld et al., 2016).',
  'volumen.minimo':'PandarIA warns you if a large muscle group had fewer than 2 sets in the last 7 days, or fewer than 4 in the report week.',
  'equilibrio':'PandarIA compares push with pull, quads with hamstrings and legs with upper body over the last 4 weeks, and warns you when one clearly outweighs the other.',
+ 'peso.lastre':'For pull-ups, dips and other bodyweight exercises you can turn on «Weighted» and log the kilos you add (dip belt with plates, vest or dumbbell). The first load is worked out from the reps you already do without it and the share of your body weight the exercise moves: nearly all of it in pull-ups and dips, and about 64 % in push-ups (Ebben et al., 2011), with a safety margin. When you beat your routine\'s rep range by 3 or more in pull-ups or dips, PandarIA suggests the weighted version; in the rest, a harder variation first.',
  'fuerza.e1rm':'To compare sets with different weights and reps, PandarIA estimates your max with the Epley formula (weight × (1 + reps ÷ 30)). These formulas are more accurate with fewer than 10 reps (Mayhew et al., 2008): if a session has sets of 10 or fewer, PandarIA uses only those; otherwise it uses those up to 12.',
  'peso.inicial':'Without history, PandarIA estimates your starting weight from your body weight and level, and deliberately lowers it so the first session is safe. It adjusts it for sex, inactivity and age.',
  'sueno.adultos':'Adults should regularly sleep 7 hours or more per night.',
@@ -1372,8 +1386,28 @@ function loadExercises(custom){
     EX[id]={id,n,pat,eq:eq.split('+'),prim:prim.split(','),sec:sec?sec.split(','):[],kind,lvl:+lvl,mode,tip:tip||''};
   });
   (custom||[]).forEach(c=>{ EX[c.id]=Object.assign({sec:[],kind:'c',lvl:1,tip:'',custom:true},c); });
+  // 1.8: versión «con lastre» de los ejercicios de peso corporal (kg añadidos con cinturón, chaleco, disco o mancuerna).
+  // Van aparte de EX para no duplicar la biblioteca ni las rutinas que crea PandarIA; se llega a ellas con «Con lastre».
+  for (const k in LX) delete LX[k];
+  for (const id in LASTRE_COMO){ const b=EX[id]; if (!b) continue;
+    LX[id+LASTRE]=Object.assign({},b,{id:id+LASTRE,n:b.n+' con lastre',mode:'p',lastre:true,base:id,tip:(b.tip?b.tip+' ':'')+'Lastre: '+LASTRE_COMO[id][0]+'.'}); }
 }
-const getEx = id => EX[id] || {id,n:'Ejercicio eliminado',pat:'core',eq:['pc'],prim:['abdomen'],sec:[],kind:'a',lvl:1,mode:'r',tip:'',missing:true};
+const LASTRE='_lastre', LX={};
+// ejercicio de peso corporal → [cómo se añade el lastre, parte del peso corporal que mueve (para estimar el lastre)]
+const LASTRE_COMO={
+  dominadas:['cinturón con discos o una mancuerna entre los pies',1], dominadas_supinas:['cinturón con discos o una mancuerna entre los pies',1], dominadas_neutras:['cinturón con discos o una mancuerna entre los pies',1],
+  fondos_pecho:['cinturón con discos o una mancuerna entre los pies',1], fondos_triceps:['cinturón con discos o una mancuerna entre los pies',1], fondos_anillas:['cinturón con discos o chaleco',1], fondos_barra:['cinturón con discos o chaleco',1],
+  fondos_banco:['un disco sobre los muslos',0.6], flexiones:['chaleco o un disco sobre la espalda (con ayuda)',0.64], flexiones_declinadas:['chaleco o un disco sobre la espalda (con ayuda)',0.7], flexiones_diamante:['chaleco o un disco sobre la espalda (con ayuda)',0.64],
+  flexiones_anillas:['chaleco',0.64], ext_triceps_cuerpo:['chaleco',0.6], remo_invertido:['chaleco o un disco sobre el pecho',0.6], remo_trx:['chaleco',0.6],
+  hiperextensiones:['un disco o mancuerna contra el pecho',0.5], hiper_gluteo:['un disco o mancuerna contra el pecho',0.5], hiper_inversa:['tobilleras o una mancuerna entre los pies',0.3], glute_ham:['un disco contra el pecho',0.5],
+  crunch:['un disco contra el pecho',0.3], crunch_declinado:['un disco contra el pecho',0.3], elev_rodillas_colgado:['tobilleras o una mancuerna entre los pies',0.3], elev_piernas_colgado:['tobilleras o una mancuerna entre los pies',0.3],
+  silla_rodillas:['tobilleras o una mancuerna entre los pies',0.3], silla_piernas:['tobilleras o una mancuerna entre los pies',0.3],
+  puente_gluteo:['un disco o mancuerna sobre la cadera',0.6], puente_gluteo_unilateral:['un disco o mancuerna sobre la cadera',0.6], hip_thrust_unilateral:['un disco o mancuerna sobre la cadera',0.6],
+  sentadilla_sissy:['un disco contra el pecho',0.7], sentadilla_pistol:['una mancuerna o kettlebell delante del pecho',0.8], curl_cuerpo:['chaleco',0.5]
+};
+const lastreDe = id => LX[id+LASTRE] ? id+LASTRE : null;
+const exExiste = id => !!(EX[id]||LX[id]);
+const getEx = id => EX[id] || LX[id] || {id,n:'Ejercicio eliminado',pat:'core',eq:['pc'],prim:['abdomen'],sec:[],kind:'a',lvl:1,mode:'r',tip:'',missing:true};
 
 const LEVELS = {principiante:1,intermedio:2,avanzado:3};
 const LEVEL_NAMES = ['','Principiante','Intermedio','Avanzado'];
@@ -1393,6 +1427,7 @@ const e1rm = (kg,reps)=> kg*(1+Math.min(reps,kb('fuerza.e1rm').maxReps)/kb('fuer
 const userLevel = () => LEVELS[S.settings.level]||1;
 const isLower = ex => ex.prim.some(m=>LOWER_MUSCLES.includes(m)) || ['sentadilla','bisagra','zancada','gluteo'].includes(ex.pat);
 function incFor(ex){
+  if (ex.lastre) return (S.settings.minPlate||1.25)*2; // discos en el cinturón o una mancuerna
   const e = ex.eq;
   if (e.includes('bar')||e.includes('smi')||e.includes('hex')||e.includes('ez')) return (S.settings.minPlate||1.25)*2;
   if (e.includes('lmn')) return 2.5; // un solo extremo cargado
@@ -1480,6 +1515,7 @@ function bodyWeight(){ const m=[...S.measures].reverse().find(x=>x.peso); return
 function estimateKg(exId, reps){
   const ex=getEx(exId); if (ex.mode!=='p') return null;
   const own = exHistory(exId,1)[0];
+  if (ex.lastre) return own ? own.sets.reduce((a,x)=>Math.max(a,+x.kg||0),0) : lastreKg(ex, reps);
   if (own){ const b=own.sets.reduce((a,x)=>(+x.kg||0)>a?+x.kg:a,0); if (b) return b; }
   // ejercicio relacionado con historial
   let best=null;
@@ -1504,6 +1540,26 @@ function estimateKg(exId, reps){
   return roundTo(w, incFor(ex));
 }
 
+// 1.8: pasa un ejercicio a su versión con lastre o de vuelta. vivo = dentro de un entreno (series sugeridas sk/sr).
+function lastreCambia(it, to, vivo){
+  const e=getEx(to), r0=(it.range||[8,12])[0]; it.exId=to; const kg0=e.lastre?estimateKg(to,r0):null;
+  it.sets.forEach(x=>{
+    if (x.t==='c') return;
+    if (!e.lastre){ x.kg=null; if (vivo){ x.sk=null; x.tk=null; if (!x.done) x.why=''; } return; }
+    // con lastre se vuelve al principio del rango de repeticiones
+    if (vivo){ if (x.done) x.kg=x.kg??0; else { x.sk=kg0; x.tk=kg0; x.sr=r0; x.tr=r0; x.why='Primer lastre calculado con tus repeticiones sin él'; } }
+    else { x.kg=x.kg??kg0; x.reps=r0; }
+  });
+  return it;
+}
+// 1.8: primer lastre a partir de las repeticiones que ya haces sin él. Con R repeticiones moviendo la parte f de tu peso,
+// tu máximo total es f·peso·(1+R/30); el lastre para «reps» es lo que falta hasta ese total, con margen de prudencia. Sin datos: 0 kg.
+function lastreKg(ex, reps){
+  const h=exHistory(ex.base,1)[0]; if (!h) return 0;
+  const K=kb('fuerza.e1rm'), R=Math.min(K.maxReps, h.sets.reduce((a,x)=>Math.max(a,+x.reps||0),0)); if (!R) return 0;
+  const f=(LASTRE_COMO[ex.base]||[0,1])[1], bw=bodyWeight()*f, tot=bw*(1+R/K.div)/(1+reps/K.div);
+  return Math.max(0, roundTo((tot-bw)*kb('peso.inicial').final, incFor(ex)));
+}
 /* ---------- Sugerencia en vivo para cada serie ---------- */
 function deloadActive(){ return premOK() && !!S.deload && S.deload.until>Date.now(); }
 function phaseAt(ts){ const st=S.periodStart||S.firstSession; if(!st||S.settings.period===false||ts<st) return null; const B=kb('bloque'), w=Math.floor((ts-st)/(7*DAY))%(B.vol+B.int+B.des); return w<B.vol?'volumen':w<B.vol+B.int?'intensidad':'descarga'; }
@@ -1721,6 +1777,7 @@ function pickExercise(slot, ctx){
     if (L===3 && free && o.kind==='c') sc+=0.8;
     if (BEGIN_MACH.has(id) && L===1) sc+=1;
     if (o.mode==='t' && !['core','cardio'].includes(o.pat) && !flexGoal) sc-=2;
+    if (PLYO.includes(id) && !['grasa','resistencia'].includes(ctx.goal)) sc-=4; // 1.8: los saltos no sustituyen a las zancadas en rutinas de fuerza o músculo
     if (ctx.progUsed.has(id)) sc-=2;
     if (ctx.dayPat && ctx.dayPat.has(o.pat+'|'+o.prim[0])){ if (ctx.strict||slot.strict) continue; sc-=2.5; }
     if (ctx.prefer && ctx.prefer.includes(id)) sc+=1;
@@ -1740,7 +1797,7 @@ function pickSecondary(m, ctx){
    Calentamiento → piernas (multiarticulares primero) → espalda y pecho → hombros → brazos → gemelos → core → cardio → vuelta a la calma.
    Los ejercicios del mismo músculo van juntos y, dentro de cada músculo, primero los más pesados y técnicos. */
 const LEGS=['cuadriceps','isquios','gluteos','aductores','abductores'];
-const PLYO=['box_jump','sentadilla_salto','skater','flexiones_pliometricas','kb_snatch','kb_clean']; // potencia: con el cuerpo fresco
+const PLYO=['box_jump','sentadilla_salto','skater','flexiones_pliometricas','kb_snatch','kb_clean','zancada_salto']; // potencia: con el cuerpo fresco
 function exGroup(ex){ const m=ex.prim[0]; if (LEGS.includes(m)) return 'piernas'; if (['abdomen','oblicuos','lumbar'].includes(m)) return 'core'; return m; }
 const GROUP_RANK={piernas:1,dorsales:2,pecho:2,hombros:3,trapecio:4,triceps:5,biceps:5,antebrazos:6,gemelos:6.5,core:7,cardio:8,movilidad:9};
 const EQ_ORDER=q=>q.includes('hex')||q.includes('bar')?0:q.includes('ez')?0.3:q.includes('lmn')?1.2:q.includes('smi')?1.5:q.includes('dom')||q.includes('par')?0.5:q.includes('kb')||q.includes('man')?1:q.includes('maq')?2:q.includes('pol')?3:q.includes('bnd')||q.includes('trx')?4:2.5;
@@ -1912,6 +1969,10 @@ function reviewExercise(r, it){
     const range=it.range||[8,12];
     const lastReps=Math.min(...h[0].sets.map(x=>+x.reps||0));
     const nx=nextProgression(it.exId);
+    // 1.8: en dominadas y fondos lo habitual es añadir lastre; en el resto, primero una variante más difícil
+    const lx=lastreDe(it.exId), KL=kb('peso.lastre'), pesos=['man','kb','bar'].some(q=>(S.settings.equip||[]).includes(q));
+    if (lastReps>=range[1]+KL.repsMas && lx && pesos && !avoided(lx) && (ex.pat==='tiron_v' || /^fondos/.test(it.exId) || !nx || avoided(nx)))
+      return {kind:'cambiar',uid:it.uid,exId:it.exId,title:`Añade lastre: ${getEx(lx).n}`,text:`Haces ${lastReps} repeticiones limpias de ${name}. Para volver a tu rango de ${range[0]}–${range[1]}, añade peso: ${LASTRE_COMO[it.exId][0]}.`,why:'Con lastre sigues entrenando en tu rango de repeticiones en vez de hacer series cada vez más largas.',data:{to:lx}};
     if (lastReps>=range[1]+3 && nx && !avoided(nx)) return {kind:'cambiar',uid:it.uid,exId:it.exId,title:`Sube de nivel: ${getEx(nx).n}`,text:`Haces ${lastReps} repeticiones limpias de ${name}. Es momento de pasar a ${getEx(nx).n}.`,why:'En calistenia se progresa con variantes más difíciles cuando superas el rango objetivo.',data:{to:nx}};
   }
   // de la versión guiada (Smith o máquina) a la libre, cuando ya progresa con estabilidad
@@ -2434,6 +2495,7 @@ const EXANIM = {
  yoga_guerrero1:'y_w1',yoga_guerrero2:'y_w2',yoga_triangulo:'y_tri',yoga_arbol:'y_tree',yoga_silla:'y_chair',yoga_puente:'bridge',yoga_paloma:'y_pigeon',yoga_pinza:'y_fold',
  yoga_torsion:'y_twist',yoga_barco:'y_boat',yoga_cuervo:'y_crow',pil_hundred:'p_hundred',pil_roll_up:'p_rollup',pil_circulos:'p_circles',pil_tijeras:'p_scissors',
  pil_puente:'bridge',pil_natacion:'p_swim',pil_sierra:'p_saw',pil_una_pierna:'p_legstretch',pil_patada_lateral:'side_leg',pil_teaser:'p_teaser',pil_rodar:'p_roll',
+ ext_triceps_cuerpo:'pushup_incl',fondos_barra:'dips',curl_cuerpo:'row_inv',crunch_inverso:'leg_raise',toes_to_bar:'hang_leg',pino_pared:'hspu',zancada_salto:'lunge',sentadilla_bulgara_pc:'bulgarian',flexiones_hindues:'pike',remo_renegado:'plank_tap',
  smith_sentadilla:'squat_back',smith_frontal:'squat_front',sentadilla_pendulo:'hack',v_squat:'hack',hack_inversa:'hack',belt_squat:'squat_bw',prensa_vertical:'leg_press',prensa_sentada:'leg_press',prensa_unilateral:'leg_press',ext_cuad_unilateral:'leg_ext',ext_cuad_polea:'leg_ext',sentadilla_landmine:'squat_goblet',sentadilla_zercher:'squat_front',box_squat:'squat_back',sentadilla_sissy:'squat_bw',nordico_inverso:'nordic',smith_zancada:'lunge',smith_bulgara:'bulgarian',zancada_caminando_barra:'lunge',zancada_caminando_man:'lunge',zancada_inversa_barra:'lunge',step_up_man:'step_up',pm_hexagonal:'deadlift',trineo_empuje:'sprint',trineo_arrastre:'walk_load',curl_femoral_pie:'leg_curl',curl_femoral_rodillas:'leg_curl',curl_femoral_unilateral:'leg_curl',curl_femoral_polea:'leg_curl',curl_femoral_fitball:'slide_curl',nordico_maquina:'nordic',glute_ham:'nordic',smith_rumano:'rdl',pm_piernas_rigidas:'rdl',hip_thrust_maq:'hip_thrust',smith_hip_thrust:'hip_thrust',hip_thrust_unilateral:'hip_thrust',patada_gluteo_maq:'kick_quad',multicadera_ext:'kick_cable',pull_through:'rdl',hiper_gluteo:'hyperext',hiper_inversa:'superman',abduccion_polea:'kick_cable',abduccion_multicadera:'kick_cable',fire_hydrant:'kick_quad',frog_pumps:'bridge',rack_pull:'deadlift',aduccion_polea:'kick_cable',aduccion_multicadera:'kick_cable',copenhague:'side_plank',sentadilla_cosaca:'lunge_side',gemelos_prensa:'calf',gemelos_smith:'calf',gemelo_burro:'calf',gemelos_barra:'calf',gemelo_unilateral_man:'calf',gemelo_excentrico:'calf',tibial:'calf',jalon_maquina:'pulldown',jalon_unilateral_maq:'pulldown',jalon_supino:'pulldown',jalon_neutro:'pulldown',jalon_una_mano:'pulldown',dominadas_maquina:'pullup',dominadas_neutras:'pullup',muscle_up:'pullup',remo_alto_maq:'row_mach',remo_bajo_maq:'row_mach',remo_t_apoyado:'row_mach',remo_apoyado_man:'row_db',remo_seal:'row_bb',remo_pendlay:'row_bb',remo_kroc:'row_db',remo_polea_unilateral:'row_cable',smith_remo:'row_bb',remo_meadows:'row_db',pullover_maq:'pullover_cable',ext_lumbar_maq:'hyperext',encog_maq:'shrug',encog_smith:'shrug',encog_polea:'shrug',smith_banca:'bench',smith_inclinado:'incline',press_inclinado_maq:'chest_mach',press_declinado_maq:'chest_mach',press_convergente:'chest_mach',press_pecho_polea:'cable_cross',banca_inversa:'bench',cruce_bajo_alto:'cable_cross',cruce_alto_bajo:'cable_cross',aperturas_polea_banco:'fly',aperturas_inclinadas:'fly',super_fly:'pec_deck',fondos_maquina_asistidos:'dips',press_svend:'front_raise',flexiones_anillas:'pushup',fondos_anillas:'dips',laterales_maq:'lat_raise',deltoide_post_maq:'rear_delt',pajaros_polea:'rear_delt',frontal_polea:'front_raise',frontal_disco:'front_raise',menton_polea:'upright',lateral_tumbado:'lat_raise',y_inclinado:'ytw',smith_hombro:'ohp',press_hombro_discos:'shoulder_mach',press_landmine:'ohp_one',push_press:'ohp',press_z:'ohp',press_cubano:'upright',rot_externa_polea:'pull_apart',rot_interna_polea:'pull_apart',rot_externa_man:'pull_apart',kb_halo:'arm_circles',curl_z:'curl',curl_predicador_z:'curl_preacher',curl_predicador_man:'curl_preacher',curl_maquina:'curl_preacher',curl_cuerda:'curl_cable',martillo_polea:'curl_cable',curl_bayesiano:'curl_cable',curl_polea_alta:'curl_cable',curl_arana:'curl_preacher',curl_arrastre:'curl',curl_zottman:'curl',curl_inverso_z:'curl',martillo_cruzado:'curl',ext_cuerda:'pushdown',ext_polea_inversa:'pushdown',ext_polea_cabeza:'oh_ext',ext_cruzada_polea:'pushdown',patada_polea:'kickback',ext_triceps_maq:'pushdown',fondos_sentado_maq:'dips',press_frances_z:'skull',press_frances_man:'skull',press_tate:'skull',press_jm:'bench',curl_muneca_barra:'wrist',ext_muneca:'wrist',rodillo_muneca:'wrist',pinza_discos:'farmer',gripper_maq:'wrist',granjero_hex:'farmer',crunch_maq:'crunch',rot_torso_maq:'twist',silla_rodillas:'hang_knee',silla_piernas:'hang_leg',crunch_declinado:'crunch',crunch_fitball:'crunch',lenador_bajo:'woodchop',rot_landmine:'woodchop',inclinacion_lateral:'farmer',paseo_maleta:'farmer',plancha_peso:'plank',rollout_barra:'ab_wheel',limpiaparabrisas:'hang_leg',bandera_dragon:'leg_raise',balon_suelo:'thruster',balon_lateral:'woodchop',wall_ball:'thruster',escaladora:'step_up',stepper:'march',skierg:'pullover_cable',air_bike:'bike',bici_reclinada:'bike',spinning:'bike',cinta_inclinada:'treadmill',cinta_curva:'treadmill',arc_trainer:'elliptical',versaclimber:'march',ergometro_brazos:'arm_circles',cuerdas_ondas:'boxing',cuerdas_golpes:'boxing',cuello_maq:'shrug'
 };
 const TPL_BY_PAT = {sentadilla:'squat_bw',bisagra:'rdl',zancada:'lunge',empuje_h:'pushup',empuje_v:'ohp',apertura:'fly',tiron_h:'row_bb',tiron_v:'pullup',curl:'curl',extension:'oh_ext',
@@ -2586,7 +2648,7 @@ Object.assign(ANIM_TPL,{
 Object.assign(EXANIM,{flexiones_diamante:'pushup_diamond',flexiones_archer:'pushup_archer',press_arnold:'arnold',face_pull_banda:'face_pull_b',remo_t:'row_t',
   curl_martillo:'curl_hammer',dominadas_asistidas:'pullup_band',ext_cuerda:'pushdown_rope',fondos_sentado_maq:'dip_mach',rodillo_muneca:'wrist_roller',pinza_discos:'pinch',crunch_maq:'crunch_m',silla_rodillas:'captain',silla_piernas:'captain',crunch_declinado:'crunch_decl',lenador_bajo:'woodchop_low',inclinacion_lateral:'side_bend',paseo_maleta:'suitcase',plancha_peso:'plank_w',limpiaparabrisas:'wipers',bandera_dragon:'dragon',balon_suelo:'slam',wall_ball:'wallball',stepper:'stepper_m',skierg:'skierg',bici_reclinada:'bike_rec',versaclimber:'versa',ergometro_brazos:'arm_ergo',cuerdas_ondas:'ropes_wave',cuerdas_golpes:'ropes_slam',cruce_bajo_alto:'cross_low',fondos_anillas:'dips_rings',deltoide_post_maq:'rev_pec',lateral_tumbado:'lat_side',rot_externa_man:'ext_rot_side',y_inclinado:'y_incline',curl_arana:'curl_spider',press_z:'ohp_floor',press_cubano:'cuban',rot_externa_polea:'ext_rot',rot_interna_polea:'int_rot',nordico_maquina:'nordic_m',glute_ham:'nordic_m',hiper_inversa:'rev_hyper',fire_hydrant:'hydrant',gemelos_prensa:'calf_press',gemelo_burro:'calf_donkey',gemelo_excentrico:'calf_step',tibial:'tibial',muscle_up:'muscle_up',remo_apoyado_man:'row_chest',remo_t_apoyado:'row_chest',remo_seal:'row_seal',ext_lumbar_maq:'lumbar_m',ext_cuad_polea:'leg_ext_stand',curl_femoral_pie:'leg_curl_stand',curl_femoral_polea:'leg_curl_cable',box_squat:'squat_box',belt_squat:'belt_squat',sentadilla_sissy:'sissy',nordico_inverso:'rev_nordic',pallof_banda:'pallof_b',abduccion_maq:'abduct_m',aduccion_maq:'adduct_m',elev_gemelos_maq:'calf_m',gemelos_smith:'calf',martillo_polea:'curl_cable',martillo_cruzado:'curl_hammer'});
 /*TPL2-END*/
-function tplFor(ex){ if (ex.custom && ex.like && EX[ex.like]) ex=EX[ex.like]; const k=EXANIM[ex.id]||TPL_BY_PAT[ex.pat]||'stand'; return prepTpl(ANIM_TPL[k]); }
+function tplFor(ex){ if (ex.custom && ex.like && EX[ex.like]) ex=EX[ex.like]; const k=EXANIM[ex.base||ex.id]||TPL_BY_PAT[ex.pat]||'stand'; return prepTpl(ANIM_TPL[k]); }
 
 /* ---------- Dibujo (motor 2: cuerpo con volumen, equipos, encuadre automático) ---------- */
 const f1=n=>Math.round(n*10)/10;
@@ -4918,6 +4980,12 @@ function floorLift(p){ const B=body3(p); const S=[[B.pel,B.mid,6],[B.mid,B.neck,
   ['R','L'].forEach(s=>{ S.push([B['hip'+s],B['knee'+s],5.2],[B['knee'+s],B['ank'+s],3.8],[B['heel'+s],B['toe'+s],2.2],[B['sho'+s],B['elb'+s],3.8],[B['elb'+s],B['hand'+s],2.6]); });
   let lo=1e9; S.forEach(([a,b,r])=>{ lo=Math.min(lo,Math.min(a[1],b[1])-r); }); const d=MATY-lo; if (d<=.05) return p;
   const sh=v=>v?[v[0],v[1]+d,v[2]]:v; p.pel=sh(p.pel); ['fR','fL','hR','hL'].forEach(k=>{ if (p[k]) p[k]=sh(p[k]); }); return p; }
+const BAY={b0:55,b1:33,hx:26,hy:47};
+/* 1.8: extensión de tríceps con peso corporal («bayitas»): manos en una barra baja, el cuerpo recto gira sobre los pies;
+   al doblar los codos (que apuntan al suelo) la cabeza pasa por debajo de la barra y al estirarlos vuelve arriba */
+def3('ext_triceps_cuerpo',{cams:[CAMP,CAM34],ph:['Baja','Sube'],...ecc(1500,1000),
+  pose:u=>{ const e=ease(u); const p=lineP(A0,mix(BAY.b0,BAY.b1,e)); return withHands(p,(B,g)=>[[BAY.hx,BAY.hy,g*9],vn(V(UP,-1,[1,0,0],-.35,[0,0,1],g*.25))]); },
+  kit:(R,u,B,pal)=>{ G.forEach(g=>K3.post(R,[BAY.hx,0,g*26],[BAY.hx,BAY.hy+6,g*26],pal)); R.cap([BAY.hx,BAY.hy,-29],[BAY.hx,BAY.hy,29],1.2,1.2,pal.steel); }});
 Object.keys(ANIM3).forEach(id=>{ const A=ANIM3[id]; if (!A.kit||!/matK\(/.test(A.kit.toString())) return; if (A._fl) return; const old=A.pose; A.pose=function(u){ return floorLift(old.call(this,u)); }; A._fl=1; });
 
 /* ===================== CARDIO (3D) ===================== */
@@ -5298,7 +5366,13 @@ function figWrap(inner, cls, vb, pal){
   const fl=vb[4]?`<rect x="${vb[0]}" y="${FLOOR_Y}" width="${vb[2]}" height="${f1(vb[1]+vb[3]-FLOOR_Y+1)}" fill="${pal.floor}" opacity="${pal.floorOp*.45}"/><line x1="${vb[0]}" y1="${FLOOR_Y}" x2="${f1(vb[0]+vb[2])}" y2="${FLOOR_Y}" stroke="${pal.floor}" stroke-width="1.1" opacity="${pal.floorOp*1.6}"/>`:'';
   return `<svg class="${cls||''}" viewBox="${vb.slice(0,4).join(' ')}" width="100%" height="100%" fill="none" stroke-linecap="round" stroke-linejoin="round">${fl}${inner}</svg>`;
 }
-const a3of=ex=>ANIM3[ex.id]||(ex.custom&&ex.like?ANIM3[ex.like]:null);
+// 1.8: ejercicios nuevos que comparten animación 3D con uno parecido (el pino es la parte de arriba de las flexiones en parada de manos, quieta)
+[['fondos_barra','fondos_pecho'],['curl_cuerpo','remo_invertido'],['crunch_inverso','elev_piernas'],['toes_to_bar','elev_piernas_colgado'],['zancada_salto','zancadas_pc'],
+ ['sentadilla_bulgara_pc','sentadilla_bulgara'],['flexiones_hindues','pike_pushup'],['remo_renegado','plancha_toques'],['pino_pared','handstand_pushup']].forEach(([n,o])=>{ const A=ANIM3[o]; if (!A||ANIM3[n]) return;
+  ANIM3[n]=Object.assign({},A,{_id:n}, n==='pino_pared'?{pose:u=>A.pose(0),ph:null,hold:1}:{}); });
+// la búlgara sin peso: el mismo movimiento con las manos en la cadera y sin mancuernas
+if (ANIM3.sentadilla_bulgara_pc){ const A=ANIM3.sentadilla_bulgara_pc, f=A.pose; A.pose=u=>{ const p=f(u); return withHands(p,(B,g)=>[vp(B.pel,UP,7,B.r,g*9.5,B.f,1),[0,-1,0]]); }; A.kit=(R,u,B,pal)=>{ K3.pad(R,[-26,22,0],20,14,4,0,pal); K3.post(R,[-26,20,0],[-26,1,0],pal); }; }
+const a3of=ex=>ANIM3[ex.id]||(ex.base?ANIM3[ex.base]:null)||(ex.custom&&ex.like?ANIM3[ex.like]:null);
 const ICON_CACHE={};
 function exFigureStatic(ex, pal){
   const A3=a3of(ex); if (A3){ const st=pal==='stage', key=ex.id+(st?'|s3':'|3')+(st&&animMusOn()?'|m':''); if (ICON_CACHE[key]) return ICON_CACHE[key];
@@ -6115,7 +6189,7 @@ SCREENS.editor = p => {
       <div class="row"><button data-a="openEx" data-v="${it.exId}">${exIcon(ex)}</button><div class="grow"><div class="b" style="color:var(--blue)">${esc(ex.n)}</div><button class="xs mut" data-a="edRest" data-v="${it.uid}">${I('timer',12).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} Descanso ${fmtTime(it.rest)}</button></div>
       <div class="col" style="gap:0"><button class="ibtn" style="width:34px;height:26px" data-a="edMove" data-v="${it.uid}|-1">${I('up',18)}</button><button class="ibtn" style="width:34px;height:26px" data-a="edMove" data-v="${it.uid}|1">${I('down',18)}</button></div><button class="ibtn" data-a="edItemMenu" data-v="${it.uid}">${I('more',22)}</button></div>
       ${it.sticky?`<div class="note sticky" style="background:rgba(255,200,61,.12);color:var(--gold);border-radius:10px;padding:8px 12px;margin-top:8px;font-size:13px">${I('pin',12).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} ${esc(it.sticky)}</div>`:''}
-      <div class="esets ${ex.mode!=='p'?'nokg':''}"><div class="shead">SERIE</div>${ex.mode==='p'?`<div class="shead">${S.settings.unit.toUpperCase()}</div>`:''}<div class="shead">${ex.mode==='t'?'SEG':'REPS'}</div><div></div>
+      <div class="esets ${ex.mode!=='p'?'nokg':''}"><div class="shead">SERIE</div>${ex.mode==='p'?`<div class="shead">${ex.lastre?'+':''}${S.settings.unit.toUpperCase()}</div>`:''}<div class="shead">${ex.mode==='t'?'SEG':'REPS'}</div><div></div>
       ${it.sets.map((s,i)=>{ const n=it.sets.slice(0,i+1).filter(x=>x.t!=='c').length;
         return `<button class="snum ${s.t}" data-a="edSetType" data-v="${it.uid}|${i}">${s.t==='c'?'C':s.t==='f'?'F':s.t==='d'?'D':n}</button>
         ${ex.mode==='p'?`<input class="sinp" type="number" inputmode="decimal" step="any" value="${toUnit(s.kg)}" placeholder="—" data-in="edSet" data-u="${it.uid}" data-i="${i}" data-f="kg">`:''}
@@ -6156,6 +6230,7 @@ A.edItemMenu=u=>{
     {icon:'info',label:'Ver ficha del ejercicio',fn:()=>openLayer('exercise',{id:it.exId,key:it.exId})},
     {icon:'trash',label:'Eliminar ejercicio',danger:true,fn:()=>{ d.items.splice(idx,1); edDirty(); refreshTop(); }}
   ];
+  if (ex.lastre||lastreDe(it.exId)) opts.splice(1,0,{icon:'plus',label:ex.lastre?'Quitar lastre':'Añadir lastre',fn:()=>{ lastreCambia(it, ex.lastre?ex.base:lastreDe(it.exId), false); edDirty(); refreshTop(); }});
   sheet(ex.n,opts);
 };
 A.edAddEx=()=>openLayer('picker',{mode:'add',q:'',m:'',mine:true,sel:[],onAdd:ids=>{ const d=edP().draft; ids.forEach(id=>d.items.push(buildItem(id,d.goal||'musculo',LEVELS[d.level]||userLevel()))); edDirty(); }});
@@ -6185,15 +6260,23 @@ const EX_ALIAS={pec_deck:'mariposa pec deck peck deck aperturas maquina',deltoid
   smith_banca:'multipower',smith_inclinado:'multipower',smith_hombro:'multipower',smith_hip_thrust:'multipower',smith_zancada:'multipower',
   smith_bulgara:'multipower',smith_rumano:'multipower',smith_remo:'multipower',smith_frontal:'multipower',gemelos_smith:'multipower',encog_smith:'multipower',
   cruce_poleas:'crossover',ext_triceps_polea:'pushdown polea triceps',crunch_polea:'crunch cuerda polea',dominadas_maquina:'gravitron',fondos_maquina_asistidos:'gravitron',
-  pm_hexagonal:'trap bar',escaladora:'stairmaster escaleras',air_bike:'assault bike',belt_squat:'cinturon'};
+  pm_hexagonal:'trap bar',escaladora:'stairmaster escaleras',air_bike:'assault bike',belt_squat:'cinturon',
+  // 1.8: nombres de otros países (en Cuba «planchas» son flexiones; en México «lagartijas»)
+  ext_triceps_cuerpo:'bayitas bayita rompecraneos skull crusher press frances peso corporal triceps barra baja',curl_cuerpo:'curl australiano barra baja',
+  flexiones:'planchas lagartijas push ups flexiones de pecho flexiones de brazos',flexiones_diamante:'planchas diamante lagartijas diamante',flexiones_inclinadas:'planchas inclinadas lagartijas inclinadas',
+  flexiones_declinadas:'planchas declinadas lagartijas declinadas',flexiones_rodillas:'planchas de rodillas lagartijas de rodillas',
+  dominadas:'barras pull ups jalones en barra',dominadas_supinas:'barras supinas chin ups',dominadas_neutras:'barras agarre neutro',
+  fondos_pecho:'paralelas dips',fondos_triceps:'paralelas dips',fondos_barra:'paralelas barra recta dips',remo_invertido:'australianas dominadas australianas',
+  fondos_banco:'fondos en silla dips en banco',toes_to_bar:'t2b',pino_pared:'parada de manos handstand vertical',remo_renegado:'renegade'};
 const PK_ORDER=MUSCLE_GROUPS.map(x=>x[0]).concat(['movilidad']);
 function pkList(p){
   const q=(p.q||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-  let list=Object.values(EX).filter(e=>{
+  // 1.8: las versiones con lastre solo aparecen al buscarlas (o desde «Añadir lastre» en el ejercicio)
+  let list=Object.values(EX).concat(/lastr|weight|chaleco|cinturon/.test(q)?Object.values(LX):[]).filter(e=>{
     if (p.m && !e.prim.includes(p.m) && !(p.m==='cardio'&&e.pat==='cardio')) return false;
     if (p.mine && !hasEquip(e)) return false;
     if (p.et && EQ_TEST[p.et] && !EQ_TEST[p.et](e)) return false;
-    if (q){ const hay=(e.n+' '+(EX_ALIAS[e.id]||'')+' '+e.prim.map(m=>MUSCLES[m]).join(' ')+' '+e.eq.map(x=>EQUIP[x]).join(' ')).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); if(!q.split(/\s+/).filter(Boolean).every(w=>hay.includes(w))) return false; }
+    if (q){ const hay=(e.n+' '+(EX_ALIAS[e.id]||'')+(e.lastre?' lastrado lastrada lastradas lastrados weighted '+(EX_ALIAS[e.base]||''):'')+' '+e.prim.map(m=>MUSCLES[m]).join(' ')+' '+e.eq.map(x=>EQUIP[x]).join(' ')).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); if(!q.split(/\s+/).filter(Boolean).every(w=>hay.includes(w))) return false; }
     return true;
   }).sort((a,b)=>a.n.localeCompare(b.n,'es'));
   let h='';
@@ -6285,7 +6368,7 @@ function animRedo(){ if (!S||S.animRevTag===ANIM_REDO_TAG) return; const R=S.ani
 const REV_GROUPS=[['maq','Máquinas'],['pol','Poleas'],['smi','Smith'],['libre','Peso libre'],['pc','Peso corporal'],['cardio','Cardio']];
 function revGroup(ex){ const e=ex.eq||[]; if (e.includes('maq')||e.includes('ghd')) return 'maq'; if (e.includes('pol')) return 'pol'; if (e.includes('smi')) return 'smi';
   if (ex.pat==='cardio'||['cin','bic','eli','rem','esc','ski','aib','cue','cdb','trn'].some(q=>e.includes(q))) return 'cardio'; if (['bar','man','kb','ez','hex','lmn','bal','fit'].some(q=>e.includes(q))) return 'libre'; return 'pc'; }
-function animReviewed(ex){ const id=ex.custom&&ex.like?ex.like:ex.id; return ANIM_OK.has(id) || ((S.animRev||{})[id]||{}).v==='ok'; }
+function animReviewed(ex){ const id=ex.custom&&ex.like?ex.like:(ex.base||ex.id); return ANIM_OK.has(id) || ((S.animRev||{})[id]||{}).v==='ok'; }
 function revStats(g){ const ids=Object.values(EX).filter(e=>!e.custom&&(!g||revGroup(e)===g)).map(e=>e.id); const R=S.animRev||{}; return {n:ids.length, ok:ids.filter(i=>ANIM_OK.has(i)||(R[i]||{}).v==='ok').length, bad:ids.filter(i=>(R[i]||{}).v==='bad').length, ids}; }
 function revCardHtml(){ const s=revStats(); return `<button class="card row" style="width:100%;margin-top:14px;gap:12px;text-align:left;border:1px solid rgba(255,200,61,.35)" data-a="openRev"><span style="font-size:26px">🔍</span><span class="grow"><div class="b">Revisión de animaciones</div><div class="xs mut">${s.ok} de ${s.n} aprobadas · ${s.bad} con errores · por secciones de equipo</div></span>${I('right',18)}</button>`; }
 SCREENS.animRev = p => {
@@ -6576,7 +6659,7 @@ SCREENS.workout = () => {
       <button class="ibtn soft" style="color:var(--blue)" data-a="openEx" data-v="${it.exId}">${I('chart',20)}</button><button class="ibtn" style="color:var(--blue)" data-a="wkMenu" data-v="${it.uid}">${I('more',24)}</button></div>
       ${it.sticky?`<div class="note sticky">${I('pin',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} ${esc(it.sticky)}</div>`:''}
       ${it.note?`<div class="note">${I('note',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} ${esc(it.note)}</div>`:''}
-      <div class="sgrid ${mode!=='p'?'nokg':''} shead"><div>SERIE</div><div>ANTERIOR</div>${mode==='p'?`<div>${S.settings.unit.toUpperCase()}</div>`:''}<div>${mode==='t'?'SEG':'REPS'}</div><div>${I('check',16).replace('<svg','<svg style="margin:0 auto"')}</div></div>`;
+      <div class="sgrid ${mode!=='p'?'nokg':''} shead"><div>SERIE</div><div>ANTERIOR</div>${mode==='p'?`<div>${getEx(it.exId).lastre?'+':''}${S.settings.unit.toUpperCase()}</div>`:''}<div>${mode==='t'?'SEG':'REPS'}</div><div>${I('check',16).replace('<svg','<svg style="margin:0 auto"')}</div></div>`;
     let wn=0, stepDone=false;
     it.sets.forEach((s,i)=>{
       if (s.t!=='c') wn++;
@@ -6801,6 +6884,8 @@ A.wkMenu=u=>{
     {icon:'eyeoff',label:'No me gusta este ejercicio',fn:()=>{ S.settings.avoid[ex.id]='no'; save(); toast('PandarIA lo evitará en nuevas rutinas'); }},
     {icon:'alert',label:'Me molesta (dolor o incomodidad)',fn:()=>{ S.settings.avoid[ex.id]='molesta'; save(); toast('PandarIA te propondrá un cambio al terminar'); }},
     {icon:'info',label:'Ver ficha y técnica',fn:()=>A.openEx(ex.id)}])});
+  // 1.8: lastre en los ejercicios de peso corporal (las series hechas se quedan como sin lastre: 0 kg)
+  if (ex.lastre||lastreDe(it.exId)) opts.splice(3,0,{icon:'plus',label:ex.lastre?'Quitar lastre':'Añadir lastre',fn:()=>{ lastreCambia(it, ex.lastre?ex.base:lastreDe(it.exId), true); const id=it.exId; if(!S.active.rec[id]){ const rc=records()[id]; if(rc) S.active.rec[id]=rc; } save(); refreshTop(); }});
   opts.push({icon:'trash',label:'Eliminar ejercicio',danger:true,fn:()=>{ S.active.items.splice(idx,1); if(S.active.rest&&S.active.rest.uid===u) S.active.rest=null; save(); refreshTop(); }});
   sheet(ex.n,opts);
 };
@@ -7235,7 +7320,7 @@ SCREENS.session = p => {
 A.delSession=id=>confirmBox({title:'¿Eliminar entreno?',text:'Se quitará del historial y de tus estadísticas.',danger:true,okText:'Eliminar',ok:()=>{ const L0=S.sessions.slice(); S.sessions=S.sessions.filter(s=>s.id!==id); save(); closeLayer(); toastUndo(tx('Entreno eliminado','Workout deleted'),()=>{ S.sessions=L0; }); }});
 
 function histRecords(){
-  const rec=records(); const ids=Object.keys(rec).filter(id=>EX[id]||id.startsWith('c_'));
+  const rec=records(); const ids=Object.keys(rec).filter(id=>exExiste(id)||id.startsWith('c_'));
   if (!ids.length) return `<div class="empty"><div class="big">🏆</div>Tus récords aparecerán aquí cuando completes entrenos.</div>`;
   ids.sort((a,b)=>(rec[b].date||0)-(rec[a].date||0));
   return `<div class="card" style="padding:4px 14px">${ids.map(id=>{ const e=getEx(id), r=rec[id];
@@ -7384,16 +7469,16 @@ A.tplAdd=()=>{
 
 /* ============ PandarIA 3.0: perfil, plan, metas, informes y consejos ============ */
 const INJURIES = {
-  rodilla:{n:'Rodilla',ex:['sentadilla_pistol','sentadilla_salto','box_jump','skater','burpees','zancadas_pc','zancadas','sentadilla_bulgara','curl_nordico','sprint','saltar_comba','ext_cuadriceps','sentadilla_frontal','sentadilla_sissy','nordico_inverso','zancada_caminando_barra','zancada_caminando_man','smith_zancada','smith_bulgara','sentadilla_zercher','wall_ball','ext_cuad_unilateral','ext_cuad_polea','sentadilla_cosaca','cinta_curva']},
+  rodilla:{n:'Rodilla',ex:['sentadilla_pistol','zancada_salto','sentadilla_salto','box_jump','skater','burpees','zancadas_pc','zancadas','sentadilla_bulgara','curl_nordico','sprint','saltar_comba','ext_cuadriceps','sentadilla_frontal','sentadilla_sissy','nordico_inverso','zancada_caminando_barra','zancada_caminando_man','smith_zancada','smith_bulgara','sentadilla_zercher','wall_ball','ext_cuad_unilateral','ext_cuad_polea','sentadilla_cosaca','cinta_curva']},
   lumbar:{n:'Espalda baja',ex:['peso_muerto','buenos_dias','remo_barra','remo_t','peso_muerto_sumo','sentadilla','kb_swing','kb_snatch','v_ups','pil_teaser','rueda_abdominal','hiperextensiones','crunch','sentadilla_frontal','thrusters','rack_pull','remo_pendlay','pm_piernas_rigidas','sentadilla_zercher','box_squat','rollout_barra','remo_kroc','push_press','press_z','hiper_inversa','hiper_gluteo','balon_suelo','bandera_dragon','limpiaparabrisas','crunch_declinado']},
-  hombro:{n:'Hombro',ex:['press_militar','handstand_pushup','fondos_pecho','fondos_triceps','pike_pushup','remo_menton','kb_snatch','flexiones_pliometricas','press_frances','pullover_man','pullover_polea','fondos_banco','yoga_cuervo','kb_turkish','muscle_up','fondos_anillas','fondos_maquina_asistidos','push_press','press_z','menton_polea','press_jm','pullover_maq','smith_hombro','press_cubano']},
-  muneca:{n:'Muñeca',ex:['flexiones','flexiones_diamante','flexiones_archer','flexiones_pliometricas','flexiones_declinadas','burpees','plancha_toques','mountain_climbers','bear_crawl','yoga_cuervo','handstand_pushup','pike_pushup','curl_muneca','l_sit','flexiones_anillas','curl_muneca_barra','ext_muneca','rodillo_muneca','press_jm','rollout_barra','fondos_anillas']},
+  hombro:{n:'Hombro',ex:['press_militar','handstand_pushup','pino_pared','fondos_barra','fondos_pecho','fondos_triceps','pike_pushup','remo_menton','kb_snatch','flexiones_pliometricas','press_frances','pullover_man','pullover_polea','fondos_banco','yoga_cuervo','kb_turkish','muscle_up','fondos_anillas','fondos_maquina_asistidos','push_press','press_z','menton_polea','press_jm','pullover_maq','smith_hombro','press_cubano']},
+  muneca:{n:'Muñeca',ex:['flexiones','pino_pared','flexiones_hindues','remo_renegado','flexiones_diamante','flexiones_archer','flexiones_pliometricas','flexiones_declinadas','burpees','plancha_toques','mountain_climbers','bear_crawl','yoga_cuervo','handstand_pushup','pike_pushup','curl_muneca','l_sit','flexiones_anillas','curl_muneca_barra','ext_muneca','rodillo_muneca','press_jm','rollout_barra','fondos_anillas']},
   tobillo:{n:'Tobillo',ex:['sentadilla_salto','box_jump','skater','burpees','jumping_jacks','sprint','saltar_comba','skipping','correr_cinta','trineo_empuje','cinta_curva','wall_ball']},
-  codo:{n:'Codo',kb:'lesion.codo',ex:['fondos_pecho','fondos_triceps','fondos_banco','fondos_anillas','press_frances','press_frances_z','press_frances_man','ext_triceps_man','ext_polea_cabeza','press_cerrado','press_jm','press_tate','curl_predicador','curl_predicador_z','curl_predicador_man','curl_barra','flexiones_diamante','flexiones_pliometricas','muscle_up','handstand_pushup','ext_muneca','curl_muneca','curl_muneca_barra','rodillo_muneca']},
+  codo:{n:'Codo',kb:'lesion.codo',ex:['ext_triceps_cuerpo','fondos_barra','fondos_pecho','fondos_triceps','fondos_banco','fondos_anillas','press_frances','press_frances_z','press_frances_man','ext_triceps_man','ext_polea_cabeza','press_cerrado','press_jm','press_tate','curl_predicador','curl_predicador_z','curl_predicador_man','curl_barra','flexiones_diamante','flexiones_pliometricas','muscle_up','handstand_pushup','ext_muneca','curl_muneca','curl_muneca_barra','rodillo_muneca']},
   cadera:{n:'Cadera',kb:'lesion.cadera',ex:['sentadilla_pistol','sentadilla_sumo','sentadilla_cosaca','zancada_lateral','copenhague','aduccion_maq','aduccion_polea','aduccion_multicadera','peso_muerto_sumo','box_jump','sentadilla_salto','skater','sprint','yoga_paloma','cadera_9090','fire_hydrant','abduccion_banda','monster_walk']},
   cuello:{n:'Cuello',ex:['handstand_pushup','crunch','v_ups','encogimientos','encogimientos_barra','pil_roll_up','pil_hundred','cuello_maq','encog_maq','encog_smith','encog_polea','crunch_declinado']}
 };
-const HIGH_IMPACT=['burpees','box_jump','sentadilla_salto','skater','sprint','saltar_comba','jumping_jacks','flexiones_pliometricas','skipping','sentadilla_pistol','wall_ball','cinta_curva','cuerdas_golpes','balon_suelo','muscle_up'];
+const HIGH_IMPACT=['burpees','box_jump','sentadilla_salto','zancada_salto','skater','sprint','saltar_comba','jumping_jacks','flexiones_pliometricas','skipping','sentadilla_pistol','wall_ball','cinta_curva','cuerdas_golpes','balon_suelo','muscle_up'];
 function bmi(){ const p=S.profile||{}; const w=bodyWeight(), h=+p.height; return h? w/((h/100)*(h/100)) : null; }
 function profileBlocks(id){
   const p=S.profile||{};
@@ -7582,7 +7667,7 @@ function fuerzaMusculosHtml(){
 }
 function fuerzaMusculos(){
   const now=Date.now(), W=28*DAY, por={};
-  S.sessions.forEach(s=>s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.mode!=='p'||ex.missing) return; const e=e1Sesion(it.sets.filter(x=>x.done&&x.t!=='c')); if (!e) return;
+  S.sessions.forEach(s=>s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.mode!=='p'||ex.missing||ex.lastre) return; const e=e1Sesion(it.sets.filter(x=>x.done&&x.t!=='c')); if (!e) return;
     const age=now-(s.end||s.start); const k=age<W?'a':age<2*W?'b':null; if (!k) return;
     const o=por[it.exId]=por[it.exId]||{a:0,b:0}; o[k]=Math.max(o[k],e); }));
   const mus={};
@@ -10026,7 +10111,7 @@ function v3Checkin(){ const c=S.checkinDia&&S.checkinDia.day===dayKey()?S.checki
 let PERF_C={k:'',m:null};
 function perfMapa(){ const k=S.sessions.length+'|'+((S.sessions[S.sessions.length-1]||{}).end||0); if (PERF_C.k===k) return PERF_C.m;
   const por={}, out={}; S.sessions.slice().sort((a,b)=>(a.end||0)-(b.end||0)).forEach(s=>{ const rs=[];
-    s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.mode!=='p'||ex.missing) return; const e=e1Sesion(it.sets.filter(x=>x.done&&x.t!=='c')); if (!e) return;
+    s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.mode!=='p'||ex.missing||ex.lastre) return; const e=e1Sesion(it.sets.filter(x=>x.done&&x.t!=='c')); if (!e) return;
       const H=(por[it.exId]=por[it.exId]||[]), prev=H.filter(p=>s.end-p.t<42*DAY&&p.t<s.end); if (prev.length) rs.push(e/Math.max(...prev.map(p=>p.e))); H.push({t:s.end,e}); });
     if (rs.length) out[s.id||s.end]=rs.reduce((a,b)=>a+b,0)/rs.length; });
   PERF_C={k,m:out}; return out; }
@@ -10398,7 +10483,8 @@ function restCode(v){ let bi=0,bd=1e9; REST_OPTS.forEach((c,i)=>{ const d=Math.a
 function encodeRoutine(r){
   // v2: añade el descanso del ejercicio y, si hace falta, el de cada serie
   const goals=Object.keys(GOALS); const bytes=[2, goals.indexOf(r.goal||'musculo')&7]; let skipped=0;
-  r.items.forEach(it=>{ const idx=CODE_IDS.indexOf(it.exId); if(idx<0||idx>255){ skipped++; return; } const ex=getEx(it.exId);
+  // 1.8: un ejercicio con lastre se comparte como su versión de peso corporal (el código no lleva kg)
+  r.items.forEach(it=>{ const idx=CODE_IDS.indexOf(getEx(it.exId).base||it.exId); if(idx<0||idx>255){ skipped++; return; } const ex=getEx(CODE_IDS[idx]);
     const wi=it.sets.map((s,k)=>s.t!=='c'?k:-1).filter(k=>k>=0); const w=wi.map(k=>it.sets[k]);
     const n=Math.max(1,Math.min(8,w.length||1)); const v=ex.mode==='t'?(w[0]&&w[0].time)||30:(w[0]&&w[0].reps)||10;
     const per=wi.slice(0,n).map(k=>restCode(restFor(it,k))); const base=restCode(+it.rest||0); const hasPer=per.some(x=>x!==base);
@@ -10418,7 +10504,7 @@ function decodeRoutine(code){
     let rest=null, per=null;
     if (ver===2){ if (i>=bytes.length) break; const rb=bytes[i++]; rest=REST_OPTS[rb&15]??null;
       if (rb&128){ per=[]; for (let k=0;k<n;k+=2){ const pb=bytes[i++]??0; per.push(REST_OPTS[pb>>4],REST_OPTS[pb&15]); } } }
-    if(!id||!EX[id]) continue;
+    if(!id||!exExiste(id)) continue;
     const it=buildItem(id,goal,userLevel()); const base=it.sets[0]; it.sets=[...Array(n)].map(()=>Object.assign({},base,getEx(id).mode==='t'?{time:v}:{reps:v}));
     if (rest!=null) it.rest=rest; if (per) it.sets.forEach((s,k)=>{ if(per[k]!=null && per[k]!==it.rest) s.rest=per[k]; }); items.push(it); }
   if (!items.length) throw 0;
@@ -10649,7 +10735,7 @@ const APP_VERSION='1.8';
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
- {v:'1.8',t:'PandarIA aprende de ti',items:['PandarIA con 19 fuentes nuevas, entre ellas la postura del ACSM de 2026: vuelve de una pausa según tu edad (Bosquet 2013), descargas con una serie menos (Bell 2023), máximo estimado más fiable (Mayhew 2008), calorías con los factores de la FAO/OMS y el modelo de Hall, proteína por comida de 0,4 g/kg, meta de pasos según tu edad y calorías de cada entreno (Compendio 2024)', 'Tu primera serie de un ejercicio nuevo calibra el peso de las siguientes, el gasto real usa 3 semanas de datos, y cada fuente de la Biblioteca enlaza con las otras reglas que salen de ella', 'Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas', 'PandarIA elige mejor el peso: tras una descarga ya no lo baja dos veces, si anotas que te sobran muchas repeticiones lo recalcula con tu fuerza real, y tus repeticiones de sobra mandan sobre la nota de la sesión', 'Arreglos encontrados con 32 usuarios simulados durante un mes: récords sin peso, doble toque en Terminar o al elegir una ración, y metas de nutrición que podían salir en blanco']},
+ {v:'1.8',t:'PandarIA aprende de ti',items:['Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)', '10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas', 'PandarIA con 19 fuentes nuevas, entre ellas la postura del ACSM de 2026: vuelve de una pausa según tu edad (Bosquet 2013), descargas con una serie menos (Bell 2023), máximo estimado más fiable (Mayhew 2008), calorías con los factores de la FAO/OMS y el modelo de Hall, proteína por comida de 0,4 g/kg, meta de pasos según tu edad y calorías de cada entreno (Compendio 2024)', 'Tu primera serie de un ejercicio nuevo calibra el peso de las siguientes, el gasto real usa 3 semanas de datos, y cada fuente de la Biblioteca enlaza con las otras reglas que salen de ella', 'Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas', 'PandarIA elige mejor el peso: tras una descarga ya no lo baja dos veces, si anotas que te sobran muchas repeticiones lo recalcula con tu fuerza real, y tus repeticiones de sobra mandan sobre la nota de la sesión', 'Arreglos encontrados con 32 usuarios simulados durante un mes: récords sin peso, doble toque en Terminar o al elegir una ración, y metas de nutrición que podían salir en blanco']},
  {v:'1.7',t:'El panda te avisa',items:['El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros', 'Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)', 'iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple', 'iPhone: textos de Apple Health corregidos']},
  {v:'1.6',t:'Interfaz a tu gusto',items:['Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento', 'Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar', 'Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas', 'Ningún texto cortado: los consejos del día se leen enteros', 'iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta', 'Escribe el código de barras a mano si la cámara no puede leerlo']},
  {v:'1.5',t:'Ayuno y agua completos',items:['Ayuno: las fases en una línea bajo el anillo, también en la versión web', 'Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas', 'Corrige, borra o añade un ayuno que olvidaste', 'Horario fijo: aviso diario y empezar desde tu hora con un toque', 'Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)', 'Plan 23:1 (una comida al día) con avisos de prudencia', 'Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora', 'Día de calor o de mucho sudor: medio litro más en la meta', 'Estadísticas del agua: calendario, medias y rachas', 'Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno', 'Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar', 'Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)', 'Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno', 'Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer', 'Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos']},
@@ -11685,6 +11771,16 @@ ergometro_brazos|Arm ergometer
 cuerdas_ondas|Battle rope waves
 cuerdas_golpes|Battle rope slams
 cuello_maq|4-way neck machine
+ext_triceps_cuerpo|Bodyweight triceps extension
+fondos_barra|Straight bar dips
+curl_cuerpo|Bodyweight biceps curl
+crunch_inverso|Reverse crunch
+toes_to_bar|Toes to bar
+pino_pared|Wall handstand hold
+zancada_salto|Jumping lunges
+sentadilla_bulgara_pc|Bodyweight Bulgarian split squat
+flexiones_hindues|Hindu push-ups
+remo_renegado|Renegade row
 pec_deck|Pec deck (butterfly)`;
 const EN_UI = `Mis rutinas|My routines
 Explorar|Explore
@@ -13089,6 +13185,9 @@ function buildEN(){
   (EN_UI+'\n'+EN_EXTRA).split('\n').forEach(l=>{ const [a,b]=l.split('|'); if(a&&b) EN_MAP.set(a.trim(),b.trim()); });
   EN_EX.split('\n').forEach(l=>{ const [id,n]=l.split('|'); if (EX[id]) EN_MAP.set(EX[id].n,n); });
   EN_TIP.split('\n').forEach(l=>{ const i=l.indexOf('|'); const id=l.slice(0,i); if (EX[id]&&EX[id].tip) EN_MAP.set(EX[id].tip,l.slice(i+1)); });
+  // 1.8: las versiones con lastre toman el nombre y el consejo de su ejercicio base
+  for (const id in LX){ const x=LX[id], b=EX[x.base], nE=EN_MAP.get(b.n), tE=b.tip?EN_MAP.get(b.tip):'', how=LASTRE_COMO_EN[LASTRE_COMO[x.base][0]]||'';
+    if (nE) EN_MAP.set(x.n, nE+' (weighted)'); EN_MAP.set(x.tip, ((tE||'')+' Added weight: '+how+'.').trim()); }
   [EN_PAT,EN_09].forEach(b=>b.split('\n').forEach(l=>{ const i=l.indexOf('|'); if(i>0){ const a=l.slice(0,i).trim(); if(!EN_MAP.has(a)) EN_MAP.set(a,l.slice(i+1).trim()); } }));
   EXPLORE.forEach(s=>{ EN_MAP.has(s.n)||0; });
   const names=[]; EN_EX.split('\n').forEach(l=>{ const [id,n]=l.split('|'); if(EX[id]) names.push([EX[id].n,n]); });
@@ -13485,7 +13584,17 @@ versaclimber|Opposite arm and leg together, like climbing.
 ergometro_brazos|Turn the handles at a steady pace.
 cuerdas_ondas|Knees bent; fast waves alternating arms.
 cuerdas_golpes|Lift both ropes and slam the floor hard.
-cuello_maq|Very light weight and slow movement in each direction.`;
+cuello_maq|Very light weight and slow movement in each direction.
+ext_triceps_cuerpo|Hands on a low bar and body straight: bend your elbows until your head passes under the bar, then straighten without flaring them.
+fondos_barra|Hands on a bar at chest height; lower until you brush it and press until your arms are straight.
+curl_cuerpo|Under a low bar with palms facing you: bend your elbows and bring your forehead to the bar with your body straight.
+crunch_inverso|Bring your knees to your chest and lift your hips off the floor without swinging.
+toes_to_bar|Hanging, raise your feet until they touch the bar without swinging.
+pino_pared|Hands a hand's width from the wall, arms straight and core tight.
+zancada_salto|Switch legs in the air and land softly.
+sentadilla_bulgara_pc|Back foot on the bench; lower straight down.
+flexiones_hindues|From an inverted V, lower your chest close to the floor and come up arching your back.
+remo_renegado|In a plank on the dumbbells, row with one arm without twisting your hips.`;
 const EN_PAT = `Sentadilla|Squat
 Bisagra de cadera|Hip hinge
 Zancada|Lunge
@@ -13830,6 +13939,17 @@ Quitar plan semanal|Remove weekly plan
 ¿Quitar el plan semanal?|Remove the weekly plan?
 Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.|Your routines and history stay the same; you just won't see what is planned for each day.
 Quitar plan|Remove plan
+Primer lastre calculado con tus repeticiones sin él|First load worked out from your reps without weight
+Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)|Added weight on pull-ups, dips, push-ups and other bodyweight exercises: in the exercise menu tap «Add weight» and log the kilos you add. PandarIA works out your first load from your reps and suggests adding weight when you go past your range (a tester request)
+10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas|10 new exercises: bodyweight triceps extension, straight bar dips, bodyweight biceps curl, toes to bar, wall handstand hold, reverse crunch, jumping lunges, bodyweight Bulgarian split squat, Hindu push-ups and renegade row. Search also understands names from other countries
+Lastre en ejercicios de peso corporal|Added weight on bodyweight exercises
+Peso de la primera serie con lastre y propuesta de añadir lastre|First weighted set and suggestion to add weight
+Con lastre sigues entrenando en tu rango de repeticiones en vez de hacer series cada vez más largas.|With added weight you keep training in your rep range instead of doing longer and longer sets.
+En calistenia se progresa con variantes más difíciles cuando superas el rango objetivo.|In calisthenics you progress with harder variations once you go past your target range.
+Con lastre|Weighted
+Quitar lastre|Remove weight
+Añadir lastre|Add weight
+LASTRE|ADDED
 Plan semanal quitado|Weekly plan removed
 Ayuno largo o pocas calorías antes de entrenar|Long fast or few calories before training
 Proteína corta varios días|Protein short for several days
@@ -14575,6 +14695,10 @@ Día|Day
 Activo|Active
 Premium activo|Premium active`;
 const enN=x=>{ x=String(x).trim(); const r=EN_MAP.get(x); if(r) return r; const t=trText(x); return t==null?x:t.trim(); };
+const LASTRE_COMO_EN={'cinturón con discos o una mancuerna entre los pies':'a dip belt with plates or a dumbbell between your feet','cinturón con discos o chaleco':'a dip belt with plates or a vest',
+  'un disco sobre los muslos':'a plate on your thighs','chaleco o un disco sobre la espalda (con ayuda)':'a vest or a plate on your back (with help)','chaleco':'a weight vest',
+  'chaleco o un disco sobre el pecho':'a vest or a plate on your chest','un disco o mancuerna contra el pecho':'a plate or dumbbell held to your chest','tobilleras o una mancuerna entre los pies':'ankle weights or a dumbbell between your feet',
+  'un disco contra el pecho':'a plate held to your chest','un disco o mancuerna sobre la cadera':'a plate or dumbbell on your hips','una mancuerna o kettlebell delante del pecho':'a dumbbell or kettlebell in front of your chest'};
 const enList=x=>x.split(/, | y /).map(enN).join(', ');
 const EN_MED={Peso:'Weight',Cintura:'Waist',Cadera:'Hips',Pecho:'Chest',Brazo:'Arm',Muslo:'Thigh',Cuello:'Neck',Hombros:'Shoulders',Pantorrilla:'Calf',Grasa:'Body fat',Glúteo:'Glutes',Antebrazo:'Forearm'};
 const EN_09_RX = [
@@ -14587,7 +14711,8 @@ const EN_09_RX = [
   [/^· (.+)$/,(m,a)=>'· '+enN(a)],
   [/^(Principal|Secundarios): (.*)$/,(m,a,b)=>(a==='Principal'?'Main: ':'Secondary: ')+b.split(', ').map(enN).join(', ')],
   [/^(.+): estancado$/,(m,a)=>enN(a)+': plateaued'],[/^(.+): una serie más$/,(m,a)=>enN(a)+': one more set'],
-  [/^Pasa a peso libre: (.+)$/,(m,a)=>'Move to free weights: '+enN(a)],[/^Sube de nivel: (.+)$/,(m,a)=>'Level up: '+enN(a)],
+  [/^Pasa a peso libre: (.+)$/,(m,a)=>'Move to free weights: '+enN(a)],[/^Sube de nivel: (.+)$/,(m,a)=>'Level up: '+enN(a)],[/^Añade lastre: (.+)$/,(m,a)=>'Add weight: '+enN(a)],
+  [/^Haces (\d+) repeticiones limpias de (.+)\. Para volver a tu rango de (\d+)–(\d+), añade peso: (.+)\.$/,(m,n,a,lo,hi,h)=>`You do ${n} clean reps of ${enN(a)}. To get back to your ${lo}–${hi} range, add weight: ${LASTRE_COMO_EN[h]||h}.`],
   [/^Haces (\d+) repeticiones limpias de (.+)\. Es momento de pasar a (.+)\.$/,(m,n,a,b)=>`You do ${n} clean reps of ${enN(a)}. Time to move on to ${enN(b)}.`],
   [/^Llevas (\d+) sesiones progresando en (.+)\. Ya puedes probar (.+); empieza con algo menos de peso\.$/,(m,n,a,b)=>`You've progressed on ${enN(a)} for ${n} sessions. You can now try ${enN(b)}; start with a bit less weight.`],
   [/^Te resulta cómodo \(intensidad media ([\d.,]+)\/10\) pero no avanzas\. Agrego una serie para dar más estímulo\.$/,'It feels comfortable (average intensity $1/10) but you are not progressing. I am adding a set for more stimulus.'],

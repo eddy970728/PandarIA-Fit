@@ -1499,7 +1499,7 @@
      "sticky": ""
     },
     {
-     "exId": "patada_gluteo",
+     "exId": "frog_pumps",
      "sets": [
       {
        "t": "n",
@@ -1595,7 +1595,7 @@
      "sticky": ""
     },
     {
-     "exId": "flexiones_inclinadas",
+     "exId": "flexiones",
      "sets": [
       {
        "t": "n",
@@ -1800,7 +1800,7 @@
      "sticky": ""
     },
     {
-     "exId": "frog_pumps",
+     "exId": "patada_gluteo",
      "sets": [
       {
        "t": "n",
@@ -1848,7 +1848,7 @@
      "sticky": ""
     },
     {
-     "exId": "flexiones_pared",
+     "exId": "flexiones_inclinadas",
      "sets": [
       {
        "t": "n",
@@ -1941,7 +1941,7 @@
      "sticky": ""
     },
     {
-     "exId": "plancha_toques",
+     "exId": "crunch_inverso",
      "sets": [
       {
        "t": "n",
@@ -1965,7 +1965,7 @@
      "sticky": ""
     },
     {
-     "exId": "sombra_boxeo",
+     "exId": "plancha",
      "sets": [
       {
        "t": "n",
@@ -2299,7 +2299,7 @@
      "sticky": ""
     },
     {
-     "exId": "curl_femoral_toalla",
+     "exId": "puente_isquios",
      "sets": [
       {
        "t": "n",
@@ -2329,7 +2329,7 @@
      "sticky": ""
     },
     {
-     "exId": "puente_isquios",
+     "exId": "curl_femoral_toalla",
      "sets": [
       {
        "t": "n",
@@ -2426,7 +2426,7 @@
      "warm": true
     },
     {
-     "exId": "flexiones_inclinadas",
+     "exId": "flexiones_hindues",
      "sets": [
       {
        "t": "n",
@@ -2525,38 +2525,35 @@
      "sticky": ""
     },
     {
-     "exId": "pike_pushup",
+     "exId": "pino_pared",
      "sets": [
       {
        "t": "n",
-       "reps": 3,
+       "reps": null,
        "kg": null,
-       "time": null
+       "time": 40
       },
       {
        "t": "n",
-       "reps": 3,
+       "reps": null,
        "kg": null,
-       "time": null
+       "time": 40
       },
       {
        "t": "n",
-       "reps": 3,
+       "reps": null,
        "kg": null,
-       "time": null
+       "time": 40
       },
       {
        "t": "n",
-       "reps": 3,
+       "reps": null,
        "kg": null,
-       "time": null
+       "time": 40
       }
      ],
      "rest": 180,
-     "range": [
-      3,
-      6
-     ],
+     "range": null,
      "note": "",
      "sticky": ""
     },
@@ -2598,7 +2595,7 @@
      "warm": true
     },
     {
-     "exId": "sentadilla_salto",
+     "exId": "sentadilla_peso",
      "sets": [
       {
        "t": "n",
@@ -3145,7 +3142,7 @@
      "sticky": ""
     },
     {
-     "exId": "patada_gluteo",
+     "exId": "frog_pumps",
      "sets": [
       {
        "t": "n",
@@ -3241,7 +3238,7 @@
      "sticky": ""
     },
     {
-     "exId": "flexiones_pared",
+     "exId": "flexiones_inclinadas",
      "sets": [
       {
        "t": "n",
@@ -3337,7 +3334,7 @@
      "sticky": ""
     },
     {
-     "exId": "crunch_bici",
+     "exId": "russian_twist",
      "sets": [
       {
        "t": "n",
@@ -3361,7 +3358,7 @@
      "sticky": ""
     },
     {
-     "exId": "jumping_jacks",
+     "exId": "skipping",
      "sets": [
       {
        "t": "n",
@@ -4446,7 +4443,7 @@
      "warm": true
     },
     {
-     "exId": "flexiones",
+     "exId": "flexiones_hindues",
      "sets": [
       {
        "t": "n",
@@ -4973,7 +4970,7 @@
      "sticky": ""
     },
     {
-     "exId": "remo_kroc",
+     "exId": "remo_renegado",
      "sets": [
       {
        "t": "n",
@@ -5130,7 +5127,7 @@
      "sticky": ""
     },
     {
-     "exId": "patada_gluteo",
+     "exId": "puente_gluteo",
      "sets": [
       {
        "t": "n",
@@ -5160,7 +5157,7 @@
      "sticky": ""
     },
     {
-     "exId": "remo_kroc",
+     "exId": "remo_renegado",
      "sets": [
       {
        "t": "n",
@@ -5284,7 +5281,7 @@
    "sticky": ""
   },
   {
-   "exId": "flexiones_inclinadas",
+   "exId": "flexiones_hindues",
    "sets": [
     {
      "t": "n",
@@ -5314,7 +5311,7 @@
    "sticky": ""
   },
   {
-   "exId": "flexiones_rodillas",
+   "exId": "flexiones_inclinadas",
    "sets": [
     {
      "t": "n",
@@ -5434,7 +5431,7 @@
    "warm": true
   },
   {
-   "exId": "sentadilla_salto",
+   "exId": "sentadilla_peso",
    "sets": [
     {
      "t": "n",
@@ -6101,7 +6098,6 @@
    "movilidad": 4,
    "cuadriceps": 12,
    "gluteos": 12,
-   "gemelos": 6,
    "isquios": 16,
    "pecho": 12,
    "triceps": 12,
@@ -6136,7 +6132,8 @@
   ],
   [
    "curl_arrastre",
-   "curl_toalla"
+   "curl_toalla",
+   "curl_cuerpo"
   ]
  ],
  "orden_de_la_sesion": [
@@ -6172,6 +6169,7 @@
   "wall_ball",
   "zancada_caminando_barra",
   "zancada_caminando_man",
+  "zancada_salto",
   "zancadas",
   "zancadas_pc"
  ],
@@ -6190,7 +6188,8 @@
   "skater",
   "skipping",
   "sprint",
-  "wall_ball"
+  "wall_ball",
+  "zancada_salto"
  ],
  "bloqueo_imc_32": {
   "bmi": 32.17993079584775,
@@ -6209,7 +6208,8 @@
    "skater",
    "skipping",
    "sprint",
-   "wall_ball"
+   "wall_ball",
+   "zancada_salto"
   ]
  },
  "periodizacion_6_semanas": [
@@ -6958,7 +6958,8 @@
   ],
   [
    "curl_arrastre",
-   "curl_toalla"
+   "curl_toalla",
+   "curl_cuerpo"
   ],
   [
    "peso_muerto_rumano",
@@ -7071,7 +7072,7 @@
   "pc": [
    [
     "press_banca",
-    "flexiones_archer",
+    "flexiones_hindues",
     [
      null,
      8,
@@ -7136,7 +7137,7 @@
   "bnd": [
    [
     "press_banca",
-    "flexiones_archer",
+    "flexiones_hindues",
     [
      null,
      8,

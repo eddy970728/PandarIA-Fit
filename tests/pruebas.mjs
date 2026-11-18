@@ -888,6 +888,49 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.8 fuentes: factor de actividad de la FAO/OMS y proteína por comida de Schoenfeld y Aragon', r.fao && r.protComida);
 }
 
+/* ---------- 1.8: lastre en ejercicios de peso corporal y ejercicios nuevos ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; const H=3600000, D=86400000; window.isPremium=()=>true;
+    out.nLX=Object.keys(LX).length; const pk=(q,id)=>pkList({q,m:''}).includes('data-v="'+id+'"'); out.ocultos=!pk('dominadas','dominadas_lastre'); out.buscar=pk('dominadas lastre','dominadas_lastre');
+    out.bayitas=pk('bayitas','ext_triceps_cuerpo'); out.planchas=pk('planchas','flexiones');
+    out.nuevos=['ext_triceps_cuerpo','fondos_barra','curl_cuerpo','crunch_inverso','toes_to_bar','pino_pared','zancada_salto','sentadilla_bulgara_pc','flexiones_hindues','remo_renegado'].filter(i=>!EX[i]||!a3of(EX[i]));
+    out.lx3d=Object.keys(LX).filter(i=>!a3of(LX[i]) && a3of(EX[LX[i].base]));
+    // primer lastre a partir de tus repeticiones sin él (80 kg, 15 dominadas → unos 12,5 kg para 8)
+    S.sessions=[{id:'b',start:Date.now()-2*D-H,end:Date.now()-2*D,intensity:7,items:[{exId:'dominadas',sets:[{t:'n',reps:15,done:true},{t:'n',reps:14,done:true}]}]}];
+    out.est=estimateKg('dominadas_lastre',8);
+    // en la rutina: activar lastre cambia el ejercicio y pone kg; quitarlo los borra
+    S.routines=[newRoutine({name:'L',pandaria:true,items:[buildItem('dominadas','musculo',2)]})]; const R=S.routines[0], IT=R.items[0];
+    lastreCambia(IT,'dominadas_lastre',false); out.cambia=IT.exId==='dominadas_lastre' && IT.sets.every(x=>x.kg===out.est);
+    // doble progresión con lastre: tope del rango con 0 kg → sube 2,5; con 10 kg → 12,5
+    const mk=(kg,reps)=>({id:'l'+kg,routineId:R.id,start:Date.now()-D-H,end:Date.now()-D,intensity:7,items:[{exId:'dominadas_lastre',sets:[1,2,3].map(()=>({t:'n',kg,reps,done:true}))}]});
+    IT.range=[8,12]; S.sessions=[mk(0,12)]; out.sube0=suggestSet(R,IT,0).kg; S.sessions=[mk(10,12)]; out.sube10=suggestSet(R,IT,0).kg;
+    lastreCambia(IT,'dominadas',false); out.quita=IT.exId==='dominadas' && IT.sets.every(x=>x.kg==null);
+    // en un entreno: las series hechas se quedan en 0 kg y las que faltan llevan el lastre sugerido
+    const it={uid:'u1',exId:'dominadas',range:[8,12],sets:[{t:'n',reps:10,done:true},{t:'n',sr:10,done:false}]}; S.sessions=[mk(10,10)];
+    lastreCambia(it,'dominadas_lastre',true); out.vivo=it.sets[0].kg===0 && it.sets[1].sk===10;
+    // PandarIA propone lastre cuando te pasas 3 repeticiones del rango (con pesas en tu equipo)
+    S.settings.equip=EQUIP_GYM.slice(); const R2=newRoutine({name:'P',pandaria:true,items:[buildItem('dominadas','musculo',2)]}); R2.items[0].range=[8,12]; S.routines=[R2];
+    S.sessions=[1,2,3].map(k=>({id:'p'+k,routineId:R2.id,start:Date.now()-k*2*D-H,end:Date.now()-k*2*D,intensity:7,items:[{exId:'dominadas',uid:R2.items[0].uid,sets:[1,2,3].map(()=>({t:'n',reps:16,done:true}))}]}));
+    const pr=reviewExercise(R2,R2.items[0]); out.propone=!!pr && pr.data && pr.data.to==='dominadas_lastre';
+    applySuggestion(R2,Object.assign({id:'x'},pr)); out.aplica=R2.items[0].exId==='dominadas_lastre' && R2.items[0].sets.every(x=>x.kg>0);
+    // compartir una rutina con lastre: se comparte como el ejercicio de peso corporal
+    try { const R3=newRoutine({name:'C',items:[Object.assign(buildItem('dominadas','musculo',2),{exId:'dominadas_lastre'})]}); const c=encodeRoutine?encodeRoutine(R3):null; out.codigo=!!c; } catch(e){ out.codigo='err '+e.message; }
+    return JSON.stringify(out); })()`));
+  comprobar(`1.8 lastre: ${r.nLX} ejercicios de peso corporal tienen versión con lastre, ocultos en la biblioteca salvo al buscarlos`, r.nLX >= 25 && r.ocultos && r.buscar, JSON.stringify([r.nLX, r.ocultos, r.buscar]));
+  comprobar('1.8 lastre: el primer lastre sale de tus repeticiones sin él (15 dominadas a 80 kg → 12,5 kg para 8)', r.est === 12.5, String(r.est));
+  comprobar('1.8 lastre: activar y quitar el lastre en la rutina', r.cambia && r.quita, JSON.stringify([r.cambia, r.quita]));
+  comprobar('1.8 lastre: doble progresión desde 0 kg y con lastre (sube 2,5 kg al llegar al tope)', r.sube0 === 2.5 && r.sube10 === 12.5, JSON.stringify([r.sube0, r.sube10]));
+  comprobar('1.8 lastre: en un entreno las series hechas quedan sin lastre y las que faltan llevan el sugerido', r.vivo);
+  comprobar('1.8 ejercicios nuevos: los 10 existen con animación 3D, y todas las versiones con lastre también', !r.nuevos.length && !r.lx3d.length, JSON.stringify([r.nuevos, r.lx3d]));
+  comprobar('1.8 lastre: PandarIA propone añadir lastre en dominadas al pasarte 3 repeticiones del rango, y al aceptar pone kg', r.propone && r.aplica, JSON.stringify([r.propone, r.aplica]));
+  comprobar('1.8 lastre: una rutina con lastre se puede compartir con código', r.codigo === true, String(r.codigo));
+  comprobar('1.8 búsqueda: «bayitas» encuentra la extensión de tríceps y «planchas» las flexiones', r.bayitas && r.planchas);
+  a.cerrar();
+}
+
 /* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */
 {
   const dirC = new URL('./copias/', import.meta.url), fallosC = [];
