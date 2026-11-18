@@ -838,6 +838,8 @@ if (fs.existsSync(COPIA07)) {
     const usadas=new Set(KB_RULES.flatMap(r=>r.src)); out.srcSinUso=Object.keys(KB_SRC).filter(s=>!usadas.has(s));
     out.sinEN=KB_RULES.filter(r=>!KB_EN_T[r.id]).map(r=>r.id);
     out.nRules=KB_RULES.length; out.nSrc=Object.keys(KB_SRC).length;
+    // quitar el plan semanal pide confirmación (antes se perdía con un toque)
+    S.plan={days:[1,3,5],order:[]}; MODALS.length=0; A.plDel(); out.planSigue=!!S.plan && !!document.querySelector('#modals .btn'); MODALS.length=0; renderModals(); S.plan=null;
     // cada fuente lista las otras reglas que salen de ella
     A.kbOpen('obj.fuerza'); out.otras=!!document.querySelector('#modals [data-a="kbOpen"][data-v="obj.musculo"]'); MODALS.length=0; renderModals();
     // combinaciones: volver tras 12 semanas, en un día con poco descanso y en descarga: nunca más de un 40 % menos
@@ -873,6 +875,7 @@ if (fs.existsSync(COPIA07)) {
   const enlaces = [...ix.matchAll(/kb(?:Link)?\('([a-z0-9_.]+)'/g)].map(m => m[1]).filter(x => x.includes('.') && !x.endsWith('.'));
   const rotos = [...new Set(enlaces.filter(x => !ids.has(x)))];
   comprobar(`1.8 fuentes: ${r.nRules} reglas y ${r.nSrc} fuentes, todas conectadas (ninguna fuente rota ni sin usar, todas con inglés)`, !r.srcMal.length && !r.srcSinUso.length && !r.sinEN.length, JSON.stringify([r.srcMal, r.srcSinUso, r.sinEN]));
+  comprobar('1.8: quitar el plan semanal pide confirmación', r.planSigue);
   comprobar('1.8 fuentes: cada «por qué» del peso sugerido enlaza con su regla', !sinRegla.length, JSON.stringify(sinRegla));
   comprobar('1.8 fuentes: ningún enlace a una regla que no existe', !rotos.length, JSON.stringify(rotos));
   comprobar('1.8 fuentes: cada fuente muestra las otras reglas que salen de ella', r.otras);

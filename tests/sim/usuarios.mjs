@@ -29,7 +29,7 @@ for (const u of usuarios) {
   if (SOLO && !SOLO.includes(u.id)) continue;
   const r = rng(SEMILLA * 100 + u.id);
   const a = await abrirApp({ t0: T0, seed: SEMILLA * 100 + u.id });
-  const prob = { errores: new Set(), raros: new Map(), datos: [], fuzz: 0, pantallas: 0 };
+  const prob = { errores: new Set(), raros: new Map(), datos: [], fuzz: 0, pantallas: 0, intentos: 0 };
   const nota = (tipo, msg) => { if (tipo === 'raro') { if (!prob.raros.has(msg)) prob.raros.set(msg, 1); } else prob.errores.add(msg); };
   // perfil y ajustes, como al terminar la bienvenida
   a.ev(`S=DEF(); S.settings.onboarded=true; S.settings.cloudAsked=true; S.settings.ui='${u.mini ? 'mini' : 'completa'}'; S.settings.lang='${u.en ? 'en' : 'es'}'; S.settings.checkin=${u.checkin}; S.settings.equip=${['["pc","est"]','["pc","est","man","ban","bnd"]','EQUIP_GYM.slice()'][u.id%3]};
@@ -82,8 +82,10 @@ DBG('comida');
         a.w.__T = base + 11 * H;
         const rid = a.ev(`(()=>{ const x=nextInPlan(); return x&&x.r?x.r.id:''; })()`);
         if (rid) {
-          a.tocar('startWorkout', rid); a.avanzar(500);
-          const emp = a.w.document.querySelector('#modals .btn.pri[data-a="cbm"]'); if (emp) { emp.click(); a.avanzar(500); }
+          a.tocar('startWorkout', rid); a.avanzar(500); prob.intentos++;
+          // puede haber otro aviso encima (p. ej. el del ayuno): se pulsa el botón Empezar del check-in, no el primero que haya
+          const emp = [...a.w.document.querySelectorAll('#modals .btn.pri[data-a="cbm"]')].find(b => /^(Empezar|Start)/.test(b.textContent.trim())); if (emp) { emp.click(); a.avanzar(500); }
+          if (!a.ev(`!!S.active`)) prob.datos.push(`día ${dia}: el entreno no empezó`);
           const sets = JSON.parse(a.ev(`JSON.stringify(S.active?S.active.items.flatMap(it=>it.sets.map((s,i)=>({u:it.uid,i,m:getEx(it.exId).mode,kg:s.kg??s.sk??s.tk,reps:s.reps??s.sr??s.tr,time:s.time??s.st??s.tt}))):[])`));
           for (const s of sets) {
             if (r() < 0.06) continue; // a veces se salta una serie
@@ -135,7 +137,9 @@ DBG('pantallas');
   // el final: ¿se registró lo que tocaba?
   const fin = JSON.parse(a.ev(`JSON.stringify({ses:S.sessions.length, agua:Object.keys(nut().water||{}).length, diario:Object.keys((S.nutri&&S.nutri.diario)||{}).length, ayunos:nut().fast.history.length, medidas:S.measures.length, kb:Object.keys(KB).length,
     estado:premOK()?(estadoDia()||{}).score??null:'—', propuestas:premOK()?v3Propuestas().map(p=>p.k.split('-')[0]):[], novedades:premOK()?v3Novedades().map(p=>p.k.split('-')[0]):[], tam:usoDatos().c, rutinas:S.routines.filter(r=>!r.archived).length, plan:S.plan?S.plan.days.join(''):'-', activo:!!S.active})`));
-  if (u.entreno && fin.ses < DIAS / 7 * 3 * 0.6) prob.datos.push(`solo ${fin.ses} entrenos guardados`);
+  // (el usuario simulado se salta a veces su día: se compara con los entrenos que de verdad empezó)
+  if (u.entreno && fin.ses < prob.intentos) prob.datos.push(`empezó ${prob.intentos} entrenos y solo hay ${fin.ses} guardados`);
+  if (u.entreno && !prob.intentos) prob.datos.push('no pudo entrenar ningún día');
   if (!u.entreno && fin.ses) prob.datos.push(`${fin.ses} entrenos sin haber entrenado`);
   if (u.agua && fin.agua < DIAS * 0.9) prob.datos.push(`agua en solo ${fin.agua} días`);
   if (u.ayuno && fin.ayunos < DIAS * 0.8) prob.datos.push(`solo ${fin.ayunos} ayunos guardados`);

@@ -6862,6 +6862,7 @@
   "tdee": 2828,
   "adapt": {
    "ok": true,
+   "peso": 0.5,
    "tdee": 2729,
    "obs": 2630,
    "intake": 2300,
