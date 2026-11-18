@@ -125,6 +125,9 @@ const quitar = [...HC_QUITAR.map(p => 'android.permission.health.' + p), ...OTRO
 m = m.replace('</manifest>', quitar.map(p => `    <uses-permission android:name="${p}" tools:node="remove" />`).join('\n') + '\n</manifest>');
 // 1.4: la cámara no es obligatoria (el escáner de códigos es opcional): así Play no excluye teléfonos ni tablets sin cámara
 m = m.replace('</manifest>', ['android.hardware.camera', 'android.hardware.camera.autofocus', 'android.hardware.camera.any'].map(f => `    <uses-feature android:name="${f}" android:required="false" tools:replace="android:required" />`).join('\n') + '\n</manifest>');
+// 1.8: el lector de códigos de ML Kit (GmsBarcodeScanningDelegateActivity) se abre siempre en vertical, y Play deduce de ahí que la app
+// exige pantalla vertical: avisa que excluye tablets, Chromebooks y Android XR. La pantalla vertical no es obligatoria.
+m = m.replace('</manifest>', '    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />\n</manifest>');
 writeFileSync(mf, m);
 
 // 4) Health Connect necesita Android 8 o superior
