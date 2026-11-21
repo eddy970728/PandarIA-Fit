@@ -55,6 +55,8 @@ for (const P of PERFILES) {
   if (SOLO && !SOLO.includes(P.id)) continue;
   const tP = Date.now();
   const r = rng(SEMILLA * 1000 + numero(P) * 13);
+  // asistencia: un generador propio con un número por día, para que faltar un día no dependa de lo demás que pasó ese día
+  const asis = rng(SEMILLA * 7919 + numero(P) * 31);
   const a = await abrirApp({ t0: T0, seed: SEMILLA * 100 + numero(P) });
   const L = { errores: new Map(), raros: new Map(), datos: [], avisos: [], ia: [], meses: [], fuzz: 0, propuestas: new Map(), aplicadas: [], porque: new Map(), series: [], suaves: 0, ui: { ok: 0, fallo: new Map() }, lento: [], dias: { toca: 0, salta: 0, guardadas: 0 } };
   const err = (k, m) => { const kk = (k + ': ' + m).replace(/\d{3,}/g, '#').slice(0, 260); L.errores.set(kk, (L.errores.get(kk) || 0) + 1); };
@@ -275,7 +277,7 @@ for (const P of PERFILES) {
       peso += (ingesta - gasto) / 7700; protOk = comido ? (comido.p >= peso * 1.4 ? 1 : 0.8) : 0.9;
       // entreno
       const toca = P.e && !enPausa && a.ev(`!!(S.plan&&S.plan.days.includes(new Date().getDay()))`);
-      const tira = r(); if (process.env.DBGPLAN && P.e && !enPausa) { const pd=a.ev(`JSON.stringify(S.plan&&S.plan.days)`); if (toca || dia%7===4) console.log('  plan', dia, 'dow', dow, 'appDow', a.ev('new Date().getDay()'), 'toca', toca, 'tira', tira.toFixed(2), pd, new Date(a.w.__T).toISOString()); }
+      const tira = asis(); if (process.env.DBGPLAN && P.e && !enPausa) { const pd=a.ev(`JSON.stringify(S.plan&&S.plan.days)`); if (toca || dia%7===4) console.log('  plan', dia, 'dow', dow, 'appDow', a.ev('new Date().getDay()'), 'toca', toca, 'tira', tira.toFixed(2), pd, new Date(a.w.__T).toISOString()); }
       if (toca) { L.dias.toca++; if (tira >= 0.85) L.dias.salta++; }
       if (toca && tira < 0.85) {
         a.w.__T = Math.max(a.w.__T, base + 10 * H);
@@ -381,6 +383,7 @@ for (const P of PERFILES) {
       }
     } catch (e) { err(`día ${dia}`, String(e && (e.stack || e)).slice(0, 300)); }
     a.errores.splice(0).forEach(e => err('general', e));
+    if (process.env.DBGHAB && dia%7===6 && dia>=56) console.log('  hab', dia, a.ev(`JSON.stringify({hb:habitosPlan(), sem:[...Array(8).keys()].map(i=>{ const w=weekShift(weekKey(Date.now()),-(i+1)); return S.sessions.filter(s=>weekKey(s.end)===w).map(s=>new Date(s.end).getDay()+'@'+new Date(s.end).getHours()).join(','); })})`));
     a.purgar();
     // jsdom avisa de cada cambio de localStorage con un temporizador real de Node que guarda el texto viejo y el nuevo: hay que dejarlos correr
     await new Promise(res => setTimeout(res, 2));
