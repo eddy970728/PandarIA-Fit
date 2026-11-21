@@ -10777,7 +10777,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=false;
-const NOTAS_VERSION=["1.5 · Ayuno y agua completos", "Fases del ayuno, estadísticas y horario fijo", "Corrige o añade ayunos olvidados", "Cómo te sienta cada ayuno", "Agua: tus recipientes y la lista del día", "Día de calor y estadísticas del agua", "Widgets interactivos: agua, ayuno, check-in, Mi día y calorías", "Deshacer al borrar y al terminar un ayuno", "Limpiar datos de prueba"];
+const NOTAS_VERSION=["1.8 · PandarIA aprende de ti", "Estado del día: PandarIA aprende cómo llegas y ajusta sus sugerencias", "19 fuentes científicas nuevas: pausas según tu edad, descargas y calorías más precisas", "Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal", "10 ejercicios nuevos, entre ellos las bayitas (extensión de tríceps con peso corporal)", "Calorías de cada entreno y meta de pasos según tu edad", "Historial por pestañas y Nutrición más ordenada", "Más de 10 fallos corregidos tras simular 32 usuarios y 3 meses de entrenamiento"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 const updOn=()=>false; function updPending(){ return null; } function updCard(){ return ''; } function updCardNew(){ return ''; } function updInit(){}
@@ -13939,6 +13939,14 @@ Quitar plan semanal|Remove weekly plan
 ¿Quitar el plan semanal?|Remove the weekly plan?
 Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.|Your routines and history stay the same; you just won't see what is planned for each day.
 Quitar plan|Remove plan
+1.8 · PandarIA aprende de ti|1.8 · PandarIA learns from you
+Estado del día: PandarIA aprende cómo llegas y ajusta sus sugerencias|Daily readiness: PandarIA learns how you feel and adapts its suggestions
+19 fuentes científicas nuevas: pausas según tu edad, descargas y calorías más precisas|19 new scientific sources: age-based return after breaks, deloads and more accurate calories
+Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal|Added weight on pull-ups, dips, push-ups and other bodyweight exercises
+10 ejercicios nuevos, entre ellos las bayitas (extensión de tríceps con peso corporal)|10 new exercises, including the bodyweight triceps extension
+Calorías de cada entreno y meta de pasos según tu edad|Calories for each workout and a step goal for your age
+Historial por pestañas y Nutrición más ordenada|History in tabs and a tidier Nutrition screen
+Más de 10 fallos corregidos tras simular 32 usuarios y 3 meses de entrenamiento|Over 10 bugs fixed after simulating 32 users and 3 months of training
 Primer lastre calculado con tus repeticiones sin él|First load worked out from your reps without weight
 Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)|Added weight on pull-ups, dips, push-ups and other bodyweight exercises: in the exercise menu tap «Add weight» and log the kilos you add. PandarIA works out your first load from your reps and suggests adding weight when you go past your range (a tester request)
 10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas|10 new exercises: bodyweight triceps extension, straight bar dips, bodyweight biceps curl, toes to bar, wall handstand hold, reverse crunch, jumping lunges, bodyweight Bulgarian split squat, Hindu push-ups and renegade row. Search also understands names from other countries
