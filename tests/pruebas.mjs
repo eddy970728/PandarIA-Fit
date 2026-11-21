@@ -291,7 +291,9 @@ if (fs.existsSync(COPIA07)) {
       if (lang === 'en') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
         if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán|Jesús/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
-      const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); TAB=${JSON.stringify(t === 'agua' ? 'nutricion' : t)}; NSEG=${JSON.stringify(t === 'agua' ? 'agua' : 'comida')}; render();`);
+      // 1.8.1: Explorar es una capa de Rutinas y Ayuno una sección de Nutrición; los bloques desplegables se recorren abiertos
+      const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); S.settings.orden181=1; S.settings.fold=Object.fromEntries([...Object.keys(FOLD_DEF),...MEALS.map(m=>'meal-'+m[0])].map(k=>[k,true]));
+        TAB=${JSON.stringify(['agua', 'ayuno'].includes(t) ? 'nutricion' : t === 'explorar' ? 'rutinas' : t)}; NSEG=${JSON.stringify(['agua', 'ayuno'].includes(t) ? t : 'comida')}; render(); ${t === 'explorar' ? 'A.openExplorar();' : ''}`);
       const botones = () => [...w.document.querySelectorAll('[data-a]')].map(e => [e.dataset.a, e.dataset.v || '']).filter(([x]) => !PELIGRO.test(x) && x !== 'tab');
       const tocar = (x, v) => { const e = [...w.document.querySelectorAll('[data-a]')].find(e => e.dataset.a === x && (e.dataset.v || '') === v); if (!e) return false; ultimo = null; const n0 = a.errores.length;
         try { e.click(); } catch (er) { ultimo = er.message; } if (!ultimo && a.errores.length > n0) ultimo = a.errores[a.errores.length - 1]; return true; };
@@ -364,7 +366,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('alimentos: carnes, aves y pescados marcados como de origen animal', !mal(f => ['carne', 'ave', 'pescado'].includes(f.cat) && !f.fl.includes('A')));
   comprobar('alimentos: lácteos marcados con leche (salvo bebidas vegetales)', !mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')), mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')));
   const porId = Object.fromEntries(L.map(f => [f.id, f]));
-  comprobar('alimentos: todos vienen del USDA (las recetas típicas, de ingredientes del USDA)', L.every(f => (f.usda && /^\d{5}$/.test(f.id)) || (f.rec && /^R\d{2}$/.test(f.id) && f.ing.length && f.ing.every(([i, g]) => porId[i] && porId[i].usda && g > 0))), mal(f => !f.usda && !f.rec));
+  comprobar('alimentos: todos vienen del USDA, SR o FNDDS de 8 cifras (las recetas típicas, de ingredientes del USDA)', L.every(f => (f.usda && /^\d{5}$|^\d{8}$/.test(f.id)) || (f.rec && /^R\d{2}$/.test(f.id) && f.ing.length && f.ing.every(([i, g]) => porId[i] && porId[i].usda && g > 0))), mal(f => !f.usda && !f.rec));
   comprobar('recetas típicas: al menos 40, con sus alérgenos sumados de los ingredientes', L.filter(f => f.rec).length >= 40 && L.filter(f => f.rec).every(f => f.ing.every(([i]) => [...porId[i].fl.replace('V', '')].every(x => f.fl.includes(x)))), mal(f => f.rec && !f.ing.every(([i]) => [...porId[i].fl.replace('V', '')].every(x => f.fl.includes(x)))));
   const html = fs.readFileSync(HTML, 'utf8');
   comprobar('alimentos: la app da el crédito al USDA', /USDA, base de datos de nutrientes/.test(html) && /dominio público/.test(html));
@@ -534,8 +536,9 @@ if (fs.existsSync(COPIA07)) {
     NSEG='comida'; const vc=viewNutricion(); NSEG='agua'; const va=viewNutricion(); NSEG='comida';
     out.comida=/Diario de comidas/.test(vc) && !/data-a="water"/.test(vc) && vc.includes('<!--fin-objetivo-->');
     out.agua=/data-a="water"/.test(va) && !/Diario de comidas/.test(va);
-    out.ayuno=/Ayuno/.test(viewAyuno()) && !/data-a="fastStart"/.test(vc+va);
-    TAB='ayuno'; render(); out.nav=document.querySelectorAll('#nav button').length; out.navOn=document.querySelector('#nav button.on').dataset.v; TAB='rutinas';
+    NSEG='ayuno'; const vy=viewNutricion(); NSEG='comida';
+    out.ayuno=/data-a="nseg" data-v="ayuno"/.test(vc) && /Ayuno/.test(vy) && !/data-a="fastStart"/.test(vc+va) && !/Diario de comidas/.test(vy);
+    A.tab('ayuno'); out.nav=document.querySelectorAll('#nav button').length; out.navOn=document.querySelector('#nav button.on').dataset.v+'/'+NSEG; A.tab('rutinas');
     const aj=SCREENS.ajGrupo({g:'nutri'}); out.ajustes=/data-a="nGoalPick"/.test(aj) && /data-a="dPrefs"/.test(aj);
     // proteína: a las 20 h con 30 g de 150 g
     __setNow(Date.UTC(2026,10,12,20,0,0)); const n=nd(); n.diario[dayKey()]=[{id:'a',fid:'09003',n:'Manzana',gr:150,m:'almuerzo',k:80,p:0.4,c:20,g:0.2,t:Date.now()-3600000}];
@@ -552,8 +555,8 @@ if (fs.existsSync(COPIA07)) {
     S.sessions=[0,10,20,30,40].map((m,i)=>({id:'s'+i,routineId:'r',start:Date.UTC(2026,10,1+i,18,m),end:Date.UTC(2026,10,1+i,19,m),items:[]}));
     out.hora=horaHabitual();
     return JSON.stringify(out); })()`));
-  comprobar('Nutrición: Comida y Agua por separado, y el ayuno ya no está en Nutrición', r.comida && r.agua && r.ayuno, JSON.stringify([r.comida, r.agua, r.ayuno]));
-  comprobar('barra de abajo: 6 pestañas con Ayuno', r.nav === 6 && r.navOn === 'ayuno', JSON.stringify([r.nav, r.navOn]));
+  comprobar('Nutrición: Comida, Agua y Ayuno por separado (1.8.1: el ayuno vuelve a Nutrición)', r.comida && r.agua && r.ayuno, JSON.stringify([r.comida, r.agua, r.ayuno]));
+  comprobar('barra de abajo: 4 pestañas; ir a Ayuno abre Nutrición › Ayuno', r.nav === 4 && r.navOn === 'nutricion/ayuno', JSON.stringify([r.nav, r.navOn]));
   comprobar('Ajustes › Nutrición y ayuno: objetivo nutricional y preferencias de comida', r.ajustes);
   comprobar('proteína: 3 ideas con 8 g o más por 100 kcal, solo con Premium', r.prot && r.protGratis);
   comprobar('peso: tendencia suavizada, ritmo semanal y fecha estimada de la meta', r.peso.now > 80 && r.peso.now < 81.5 && r.peso.rate < -0.3 && r.peso.eta > 0, JSON.stringify(r.peso));
@@ -928,6 +931,45 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.8 lastre: PandarIA propone añadir lastre en dominadas al pasarte 3 repeticiones del rango, y al aceptar pone kg', r.propone && r.aplica, JSON.stringify([r.propone, r.aplica]));
   comprobar('1.8 lastre: una rutina con lastre se puede compartir con código', r.codigo === true, String(r.codigo));
   comprobar('1.8 búsqueda: «bayitas» encuentra la extensión de tríceps y «planchas» las flexiones', r.bayitas && r.planchas);
+  a.cerrar();
+}
+
+/* ---------- 1.8.1: menú de 4 pestañas, Nutrición recogida y buscador de ingredientes ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; window.isPremium=()=>true; S.settings.orden181=1;
+    // buscador de recetas: con el buscador abierto dos veces, escribir actualiza la lista de arriba
+    LAYERS.length=0; openLayer('alimBuscar',{m:'almuerzo',q:'',tab:'todo',cat:''}); openLayer('receta',{r:{id:'rx',n:'',rac:2,items:[]},isNew:true}); openLayer('alimBuscar',{receta:true,q:'',tab:'todo',cat:''});
+    const ins=[...document.querySelectorAll('input[data-in="alQ"]')], top=ins[ins.length-1]; top.value='arroz'; top.dispatchEvent(new Event('input',{bubbles:true}));
+    const L=[...document.querySelectorAll('#allist')]; out.receta=L.length===2 && /Arroz blanco/.test(L[1].textContent) && !/Arroz blanco/.test(L[0].textContent); LAYERS.length=0; renderLayers();
+    // plurales y errores de una letra, solo si la búsqueda exacta no encuentra nada
+    const q=t=>(alimSearch(t)[0]||{}).n; out.busca=[q('tomates'),q('huevos'),q('arros'),q('bananna'),q('pera'),q('tasajo'),q('yerba mate')];
+    // menú: 4 pestañas; Explorar abre su capa y el + tiene sus tres grupos
+    A.tab('explorar'); out.explorar=TAB==='rutinas' && LAYERS.length && LAYERS[LAYERS.length-1].t==='explorar'; LAYERS.length=0; renderLayers();
+    A.newRoutine(); const m=document.querySelector('#modals').textContent; out.mas=['Explorar ejercicios y rutinas','Crea tu propia rutina','Modo intervalos','Entrenar ahora'].every(t=>m.includes(t)); MODALS.length=0; renderModals();
+    out.sinIntervalosArriba=!/data-a="openIntervals"/.test(viewRutinas());
+    // gratis con 3 rutinas: Explorar e intervalos se abren; crear una rutina pide Premium
+    const pay0=window.pfPay; let pago=null; window.pfPay=x=>{ pago=x; };
+    window.__pago=()=>pago; window.__pay0=pay0;
+    // Nutrición: bloques desplegables recordados; ayuno en curso con franja en Comida
+    NSEG='comida'; nut().fast.screened=true; nut().fast.active={start:Date.now()-3600000*5,goalH:16}; let v=viewNutricion();
+    out.franja=/data-a="nseg" data-v="ayuno"/.test(v) && /Ayunando/.test(v); out.objCerrado=!/data-a="nGoal"/.test(v);
+    A.fold('objetivo'); v=viewNutricion(); out.objAbierto=/data-a="nGoal"/.test(v) && S.settings.fold.objetivo===true; A.fold('objetivo');
+    A.nseg('ayuno'); out.recuerda=S.settings.nseg==='ayuno'; NSEG=null; viewNutricion(); out.recuerda=out.recuerda&&NSEG==='ayuno'; nut().fast.active=null; A.nseg('comida');
+    return JSON.stringify(out); })()`));
+  // las opciones del + se ejecutan 90 ms después de cerrar la hoja: se espera entre toque y comprobación
+  const opc = async t => { a.w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; renderLayers(); A.newRoutine(); [...document.querySelectorAll('#modals [data-a=cbm]')].find(b=>${t}.test(b.textContent)).click();`); await espera(400); };
+  a.w.eval(`window.isPremium=()=>false; S.routines=[1,2,3].map(i=>newRoutine({name:'R'+i})); window.pfRoomFor=n=>S.routines.length+n<=3;`);
+  await opc('/Explorar ejercicios/'); r.gratisExplora = a.w.eval(`!!LAYERS.length && LAYERS[LAYERS.length-1].t==='explorar' && !__pago()`);
+  await opc('/Crea tu propia/'); r.gratisCrea = a.w.eval(`__pago()==='routines'`);
+  a.w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; window.pfPay=__pay0; window.isPremium=()=>true; S.routines=[];`);
+  comprobar('1.8.1 recetas: el buscador de ingredientes actualiza su propia lista (antes no mostraba nada)', r.receta);
+  comprobar('1.8.1 buscador: plurales y errores de una letra (tomates, huevos, arros, bananna) sin estropear la búsqueda exacta (pera)', JSON.stringify(r.busca) === JSON.stringify(['Tomate', 'Huevo', 'Arroz blanco cocido', 'Banana', 'Pera', 'Carne seca salada', 'Té']), JSON.stringify(r.busca));
+  comprobar('1.8.1 menú: Explorar se abre desde Rutinas y el + tiene Explorar, Crear rutina y Entrenar ahora', r.explorar && r.mas && r.sinIntervalosArriba, JSON.stringify([r.explorar, r.mas, r.sinIntervalosArriba]));
+  comprobar('1.8.1 gratis con 3 rutinas: Explorar se abre; crear una rutina pide Premium', r.gratisExplora && r.gratisCrea, JSON.stringify([r.gratisExplora, r.gratisCrea]));
+  comprobar('1.8.1 Nutrición: franja del ayuno, objetivo desplegable que se recuerda y última sección recordada', r.franja && r.objCerrado && r.objAbierto && r.recuerda, JSON.stringify([r.franja, r.objCerrado, r.objAbierto, r.recuerda]));
   a.cerrar();
 }
 

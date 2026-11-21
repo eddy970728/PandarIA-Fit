@@ -5723,6 +5723,7 @@ function goBack(){ if (handleBack(false)) progBack(); }
 function sheet(title, items){
   const html=`<div class="sheet"><div class="grab"></div>${title?`<h3>${esc(title)}</h3>`:''}${items.map(it=>{
     if (it.sep) return '<div style="height:1px;background:var(--line);margin:4px 0"></div>';
+    if (it.head) return `<div class="xs mut b" style="letter-spacing:1px;text-transform:uppercase;margin:12px 4px 2px">${esc(it.head)}</div>`;
     const k=cb(it.fn);
     if (it.desc) return `<button class="opt ${it.danger?'danger':''}" data-a="cbm" data-v="${k}"><span class="oi">${I(it.icon||'plus',24)}</span><span class="grow"><div class="b">${esc(it.label)}</div><div class="od">${esc(it.desc)}</div></span></button>`;
     return `<button class="mi ${it.danger?'danger':''}" data-a="cbm" data-v="${k}">${I(it.icon||'right',22)}<span class="grow">${esc(it.label)}</span>${it.right||''}</button>`;
@@ -5748,14 +5749,15 @@ const PF_T0=(window.performance&&performance.now)?performance.now():0;
 const PF_PERF={boot:null, ult:null, max:0, n:0};
 function render(){
   const t0=performance.now(), v=$('#view'); const st=v.scrollTop;
-  v.innerHTML = TAB==='rutinas'?viewRutinas(): TAB==='explorar'?viewExplorar(): TAB==='nutricion'?viewNutricion(): TAB==='ayuno'?viewAyuno(): TAB==='historial'?viewHistorial(): viewAjustes();
+  if (TAB==='explorar') TAB='rutinas'; if (TAB==='ayuno'){ TAB='nutricion'; NSEG='ayuno'; }
+  v.innerHTML = TAB==='rutinas'?viewRutinas(): TAB==='nutricion'?viewNutricion(): TAB==='historial'?viewHistorial(): viewAjustes();
   if (render.keep) v.scrollTop=st; render.keep=false;
   renderNav(); renderMini(); startAnims();
   const ms=Math.round(performance.now()-t0); PF_PERF.ult=ms; PF_PERF.n++; if (PF_PERF.n>1) PF_PERF.max=Math.max(PF_PERF.max,ms);
 }
 function renderNav(){
   const anySugg=premOK() && S.routines.some(r=>!r.archived && (r.sugg||[]).length);
-  const tabs=[['rutinas',tx('Rutinas','Routines'),'dumbbell'],['explorar','Explorar','compass'],['nutricion','Nutrición','leaf'],['ayuno',tx('Ayuno','Fasting'),'timer'],['historial',tx('Historial','History'),'history'],['ajustes','Ajustes','settings']];
+  const tabs=[['rutinas',tx('Rutinas','Routines'),'dumbbell'],['nutricion','Nutrición','leaf'],['historial',tx('Historial','History'),'history'],['ajustes','Ajustes','settings']];
   $('#nav').innerHTML=tabs.map(([k,n,ic])=>`<button class="${TAB===k?'on':''}" data-a="tab" data-v="${k}"><span class="pill">${I(ic,22)}</span>${n}${k==='rutinas'&&anySugg?'<span class="dot"></span>':''}</button>`).join('');
 }
 function renderMini(){
@@ -5799,7 +5801,9 @@ const lhdr = (title, right, backAct) => `<div class="lhdr"><button class="ibtn" 
 
 /* ---------- Acciones ---------- */
 const A = {
-  tab(v){ TAB=v; render(); $('#view').scrollTop=0; },
+  // 1.8.1: Explorar y Ayuno ya no son pestañas: Explorar se abre desde Rutinas y Ayuno es una sección de Nutrición
+  tab(v){ if (v==='ayuno'){ NSEG='ayuno'; v='nutricion'; } let ex=false; if (v==='explorar'){ v='rutinas'; ex=true; }
+    TAB=v; render(); $('#view').scrollTop=0; if (ex) A.openExplorar(); },
   back(){ goBack(); },
   closeModal(){ goBack(); },
   cbm(k){ const f=CB[k]; const box=document.querySelector('#modals .scrim:last-child'); MV={}; if(box) box.querySelectorAll('input,textarea,select').forEach(el=>{ if(el.id) MV[el.id]=el.value; }); closeModal(); setTimeout(()=>f&&f(),90); },
@@ -5826,14 +5830,14 @@ A.avisosTog=()=>{ AVISOS_ABIERTOS=!AVISOS_ABIERTOS; render.keep=true; render(); 
 function viewRutinas(){
   const rs=S.routines.filter(r=>!r.archived), mini=uiMini();
   let h=`<div class="hdr"><div class="grow"><div class="brand xs mut">PandarIA <b>Fit</b></div><h1>${tx('Mis rutinas','My routines')}</h1></div>
-    <button class="ibtn soft" data-a="uiToggle" title="${mini?tx('Vista completa','Full view'):tx('Vista minimalista','Minimal view')}" aria-label="${tx('Cambiar vista','Switch view')}">${I(mini?'layers':'list',22)}</button><button class="ibtn soft" data-a="openIntervals" title="${tx('Modo intervalos','Interval mode')}">${I('timer',22)}</button><button class="ibtn soft" data-a="openLib" title="${tx('Biblioteca','Library')}">${I('book',22)}</button><button class="ibtn pri" data-a="newRoutine" title="${tx('Nueva rutina','New routine')}" aria-label="${tx('Nueva rutina','New routine')}">${I('plus',22)}</button></div>`;
+    <button class="ibtn soft" data-a="uiToggle" title="${mini?tx('Vista completa','Full view'):tx('Vista minimalista','Minimal view')}" aria-label="${tx('Cambiar vista','Switch view')}">${I(mini?'layers':'list',22)}</button><button class="ibtn soft" data-a="openLib" title="${tx('Biblioteca','Library')}">${I('book',22)}</button><button class="ibtn pri" data-a="newRoutine" title="${tx('Nueva rutina','New routine')}" aria-label="${tx('Nueva rutina','New routine')}">${I('plus',22)}</button></div>`;
   // el entreno en curso siempre va primero y entero: es lo más importante
   if (S.active) h+=`<div class="banner" data-a="resumeWorkout" style="cursor:pointer"><span class="ic">${I('play',20)}</span><div class="grow"><div class="b">${tx('Tienes un entreno en curso','You have a workout in progress')}</div><div class="sm mut">${esc(S.active.name)} · ${tx('toca para volver','tap to go back')}</div></div></div>`;
   h+=tipCard(mini);
   h+=mini?hoyMini():hoyCard();
   h+=avisosHtml(mini)+pandaPropFuera();
   if (!rs.length){
-    h+=`<div class="empty"><div class="big">🏋️</div><div class="ttl" style="color:var(--tx)">${tx('Aún no tienes rutinas','You have no routines yet')}</div><p>${tx('Crea la tuya, deja que PandarIA la diseñe o elige una en Explorar.','Create your own, let PandarIA design one or pick one in Explore.')}</p><div class="row" style="gap:8px;justify-content:center"><button class="btn pri" data-a="newRoutine">${I('plus',20)} ${tx('Nueva rutina','New routine')}</button><button class="btn" data-a="tab" data-v="explorar">${I('compass',20)} ${tx('Explorar','Explore')}</button></div></div>`;
+    h+=`<div class="empty"><div class="big">🏋️</div><div class="ttl" style="color:var(--tx)">${tx('Aún no tienes rutinas','You have no routines yet')}</div><p>${tx('Crea la tuya, deja que PandarIA la diseñe o elige una en Explorar.','Create your own, let PandarIA design one or pick one in Explore.')}</p><div class="row" style="gap:8px;justify-content:center"><button class="btn pri" data-a="newRoutine">${I('plus',20)} ${tx('Nueva rutina','New routine')}</button><button class="btn" data-a="openExplorar">${I('compass',20)} ${tx('Explorar','Explore')}</button></div></div>`;
     return h;
   }
   const progs={};
@@ -5843,6 +5847,8 @@ function viewRutinas(){
     else h+=`<div class="sec">${Object.keys(progs).length>1?tx('Rutinas','Routines'):tx('Tus rutinas','Your routines')}</div>`;
     h+=mini?`<div class="card" style="padding:2px 14px">${list.map(routineRow).join('')}</div>`:list.map(r=>routineCard(r)).join('');
   });
+  // 1.8.1: Explorar ya no es una pestaña; con pocas rutinas se ofrece aquí para que no pase desapercibido
+  if (rs.length<=1) h+=`<button class="card tap row" style="gap:12px;width:100%;text-align:left" data-a="openExplorar"><span style="color:var(--ac)">${I('compass',24)}</span><span class="grow"><span class="b" style="display:block">${tx('Explorar ejercicios y rutinas','Explore exercises and routines')}</span><span class="sm mut">${tx(`${EXPLORE.length} programas listos para casa, gym, calistenia, yoga y más`,`${EXPLORE.length} ready-made programs for home, gym, calisthenics, yoga and more`)}</span></span>${I('right',18)}</button>`;
   return h;
 }
 // Completa: dos líneas y botón de empezar; la lista de ejercicios se ve al abrir la rutina
@@ -5881,13 +5887,18 @@ function banners(){
 A.dismiss=v=>{ S.dismissed[v]=1; save(); render(); };
 A.resumeWorkout=()=>openLayer('workout');
 A.lagRoutine=v=>{ openLayer('wizGrupo',{muscles:v.split(','),goal:'musculo',minutes:45}); };
-A.newRoutine=()=>sheet('Nueva rutina',[
-  {icon:'edit',label:'Crea tu propia rutina',desc:'Créala basándote en lo que tengas planificado o traslada al móvil tu rutina en papel o notas.',fn:()=>openEditor(newRoutine({name:'Mi rutina',source:'propia',pandaria:false}),true)},
-  {icon:'target',label:'Rutina por grupo muscular',desc:'Te creamos una rutina inteligente para los músculos que elijas, la cual puedes editar.',fn:()=>openLayer('wizGrupo',{muscles:[],goal:'musculo',minutes:45})},
-  {icon:'spark',label:'Confía en PandarIA',desc:'Usamos nuestro potente algoritmo para diseñar tu rutina perfecta, te ayudaremos a mejorar y la iremos actualizando cuando sea necesario.',fn:()=>openLayer('wizPandaria',{step:0,goal:'musculo',days:3,minutes:60,level:S.settings.level,priorities:[]})},
+// 1.8.1: el + reúne todo lo que se empieza o se crea, en tres grupos (en la 1.9 «Cardio ahora» irá en Entrenar ahora)
+A.newRoutine=()=>{ const crea=fn=>()=>{ if (window.pfRoomFor && !pfRoomFor(1)) return pfPay('routines'); fn(); }; sheet('',[
+  {head:tx('Explorar','Explore')},
+  {icon:'compass',label:tx('Explorar ejercicios y rutinas','Explore exercises and routines'),desc:tx(`${EXPLORE.length} programas listos y la biblioteca de ejercicios.`,`${EXPLORE.length} ready-made programs and the exercise library.`),fn:()=>A.openExplorar()},
+  {head:tx('Crear rutina','Create routine')},
+  {icon:'edit',label:'Crea tu propia rutina',desc:'Créala basándote en lo que tengas planificado o traslada al móvil tu rutina en papel o notas.',fn:crea(()=>openEditor(newRoutine({name:'Mi rutina',source:'propia',pandaria:false}),true))},
+  {icon:'target',label:'Rutina por grupo muscular',desc:'Te creamos una rutina inteligente para los músculos que elijas, la cual puedes editar.',fn:crea(()=>openLayer('wizGrupo',{muscles:[],goal:'musculo',minutes:45}))},
+  {icon:'spark',label:'Confía en PandarIA',desc:'Usamos nuestro potente algoritmo para diseñar tu rutina perfecta, te ayudaremos a mejorar y la iremos actualizando cuando sea necesario.',fn:crea(()=>openLayer('wizPandaria',{step:0,goal:'musculo',days:3,minutes:60,level:S.settings.level,priorities:[]}))},
   {icon:'copy',label:'Importar con código',desc:'Pega el código de una rutina que te compartieron.',fn:()=>A.importCode()},
+  {head:tx('Entrenar ahora','Train now')},
   {icon:'timer',label:'Modo intervalos',desc:'Tabata, HIIT, EMOM o AMRAP con temporizador automático, avisos y registro en tu historial.',fn:()=>A.openIntervals()}
-]);
+]); };
 function newRoutine(o){ return Object.assign({id:uid(),name:'Rutina',items:[],created:Date.now(),archived:false,pandaria:true,goal:'musculo',level:S.settings.level,sugg:[],completions:0,exCount:{},source:'propia'},o); }
 A.openRoutine=id=>openLayer('routine',{id,key:id});
 
@@ -5981,8 +5992,19 @@ function boot(){
   if (!S.settings.onboarded) setTimeout(()=>openLayer('onboard',{step:0,level:'principiante',preset:null}),300);
   try{ updInit(); }catch(e){}
   setTimeout(()=>{ try{ cloudBoot(); }catch(e){} },0);
-  uiPreguntar();
+  uiPreguntar(); avisoOrden();
 }
+// 1.8.1: una sola vez, a quien ya usaba la app, se le cuenta dónde quedó cada cosa tras la reorganización
+function avisoOrden(){ if (S.settings.orden181) return; if (!S.settings.onboarded){ S.settings.orden181=1; save(); return; }
+  let n=0; const t=setInterval(()=>{ n++; if (n>240 || S.settings.orden181){ clearInterval(t); return; }
+    if (MODALS.length || LAYERS.length || !S.settings.ui) return; clearInterval(t); S.settings.orden181=1; save();
+    const fila=(ic,t1,t2)=>`<div class="row" style="gap:12px;align-items:flex-start;padding:8px 2px"><span style="color:var(--ac)">${I(ic,22)}</span><div class="grow"><div class="b sm">${t1}</div><div class="xs mut" style="line-height:1.4">${t2}</div></div></div>`;
+    openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('La app está más ordenada','The app is tidier')}</h3><p class="sm mut" style="margin:-6px 4px 8px;line-height:1.45">${tx('Ahora hay 4 pestañas. Esto es lo que cambió de sitio:','There are now 4 tabs. This is what moved:')}</p>
+      ${fila('compass',tx('Explorar','Explore'),tx('Ahora está en el + de Rutinas, como «Explorar ejercicios y rutinas».','It is now in the + on Routines, as «Explore exercises and routines».'))}
+      ${fila('timer',tx('Modo intervalos','Interval mode'),tx('También en el + de Rutinas, en «Entrenar ahora».','Also in the + on Routines, under «Train now».'))}
+      ${fila('leaf',tx('Ayuno','Fasting'),tx('Vuelve a Nutrición, junto a Comida y Agua. Si estás ayunando, lo verás arriba.','Back in Nutrition, next to Food and Water. If you are fasting, you will see it at the top.'))}
+      ${fila('down',tx('Bloques que se despliegan','Sections that expand'),tx('El diario, el objetivo, el agua y el historial muestran lo importante; toca un título para ver el resto.','The diary, goal, water and history show what matters; tap a title to see the rest.'))}
+      <button class="btn pri wide" style="margin-top:10px" data-a="closeModal">${tx('Entendido','Got it')}</button></div>`); },2500); }
 // 1.6: una sola vez (al estrenar la versión o tras la bienvenida) se ofrecen los dos modos con su vista previa
 function uiPreguntar(){ let n=0; const t=setInterval(()=>{ n++; if (n>240 || S.settings.ui){ clearInterval(t); return; }
   if (!S.settings.onboarded || MODALS.length || LAYERS.length || TAB!=='rutinas') return; clearInterval(t); A.uiElegir(); },2500); }
@@ -7283,17 +7305,21 @@ function histResumen(){
   // mapa muscular semanal
   const ms=muscleSets(7); const mx=Math.max(10,...Object.values(ms));
   const lv={}; Object.entries(ms).forEach(([k,v])=>lv[k]=v/mx);
-  h+=`<div class="sec">Mapa muscular de los últimos 7 días</div><div class="card">${bodyMap(lv,{w:300})}<button class="btn wide sm" style="margin-top:10px" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>
-    ${Object.keys(ms).length?`<div class="chips" style="margin-top:10px;justify-content:center">${Object.entries(ms).filter(([k])=>MUSCLES[k]&&!['cardio','movilidad'].includes(k)).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<span class="tag">${MUSCLES[k]} · ${fmtNum(v)}</span>`).join('')}</div><div class="xs mut" style="text-align:center;margin-top:8px">Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.</div>`:'<div class="xs mut" style="text-align:center">Entrena para ver qué músculos trabajaste.</div>'}</div>`;
+  // 1.8.1: el mapa y la recuperación van juntos en un bloque desplegable, cerrado, con los músculos más trabajados en una línea
+  const top=Object.entries(ms).filter(([k])=>MUSCLES[k]&&!['cardio','movilidad'].includes(k)).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>MUSCLES[k]);
+  h+=fold('mapa',tx('Mapa muscular y recuperación','Muscle map and recovery'),top.length?tx(`Últimos 7 días: ${top.join(', ')}`,`Last 7 days: ${top.join(', ')}`):tx('Sin entrenos en los últimos 7 días','No workouts in the last 7 days'),()=>`${bodyMap(lv,{w:300})}<button class="btn wide sm" style="margin-top:10px" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>
+    ${Object.keys(ms).length?`<div class="chips" style="margin-top:10px;justify-content:center">${Object.entries(ms).filter(([k])=>MUSCLES[k]&&!['cardio','movilidad'].includes(k)).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<span class="tag">${MUSCLES[k]} · ${fmtNum(v)}</span>`).join('')}</div><div class="xs mut" style="text-align:center;margin-top:8px">Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.</div>`:'<div class="xs mut" style="text-align:center">Entrena para ver qué músculos trabajaste.</div>'}`,{st:'margin-top:4px'});
   // sesiones
   h+=`<div class="sec">Entrenamientos</div>`;
   if (!S.sessions.length) return h+`<div class="empty"><div class="big">📅</div>Aún no hay entrenamientos.<br>Completa una rutina y aparecerá aquí.</div>`;
-  let lastM='';
-  [...S.sessions].reverse().slice(0,60).forEach(s=>{
+  // 1.8.1: los 5 últimos; «Ver todos» despliega el resto (hasta 60, como antes)
+  let lastM=''; const todos=foldOpen('entrenos'), N=S.sessions.length;
+  [...S.sessions].reverse().slice(0,todos?60:5).forEach(s=>{
     const d=new Date(s.end); const mk=`${mesN(d.getMonth())} ${d.getFullYear()}`;
     if (mk!==lastM){ h+=`<div class="xs mut b" style="margin:14px 2px 8px;text-transform:uppercase;letter-spacing:.8px">${mk}</div>`; lastM=mk; }
     h+=sessionCard(s);
   });
+  if (N>5) h+=`<button class="btn wide sm" style="margin-top:4px" data-a="fold" data-v="entrenos">${todos?tx('Ver menos','See less'):tx(`Ver todos (${N})`,`See all (${N})`)}</button>`;
   return h;
 }
 function sessionCard(s){
@@ -7427,9 +7453,11 @@ const XGRAD = {casa:['#ff7a1a','#ff4f3a'],sinpesas:['#18b39a','#0f8f7b'],cali:['
 const XICON = {casa:'user',sinpesas:'user',cali:'trophy',gym:'dumbbell',gluteos:'target',yoga:'spark',pilates:'spark',hiit:'flame',grasa:'flame',cero:'play',core:'target',piernas:'dumbbell',espalda:'user',movilidad:'refresh',expres:'timer',bandas:'link',kettlebell:'weight',funcional:'layers',mayores:'user',fuerza:'trophy'};
 const TPLM={};
 function tplMinutes(sid,i,r){ const k=`${sid}|${i}|${S.settings.level}|${S.settings.equip.join()}`; if(TPLM[k]==null) TPLM[k]=routineMinutes({items:templateItems(r)}); return TPLM[k]; }
+// 1.8.1: Explorar es una capa («Explorar ejercicios y rutinas») que se abre desde el + y desde Rutinas
+A.openExplorar=()=>openLayer('explorar',{key:'explorar'});
+SCREENS.explorar=()=>lhdr(tx('Explorar ejercicios y rutinas','Explore exercises and routines'))+`<div class="lbody">${viewExplorar()}</div>`;
 function viewExplorar(){
-  let h=`<div class="hdr"><h1>Explorar</h1></div>
-  <div class="xhero"><h2>Elige rutinas creadas por nuestro algoritmo y añádelas a tus rutinas</h2><p>Estas rutinas se actualizan automáticamente según tu progreso y puedes editarlas a tu gusto.</p></div>
+  let h=`<div class="xhero"><h2>Elige rutinas creadas por nuestro algoritmo y añádelas a tus rutinas</h2><p>Estas rutinas se actualizan automáticamente según tu progreso y puedes editarlas a tu gusto.</p></div>
   ${ANIM_FEEDBACK?revCardHtml():''}
   <button class="inp row" style="margin-top:14px;color:var(--mut);gap:10px;text-align:left" data-a="openLib">${I('search',20)}<span>Buscar entre ${Object.keys(EX).length} ejercicios</span></button>
   <div class="chips scroll" style="margin-top:14px">${EXPLORE.map(s=>`<button class="chip" data-a="xjump" data-v="${s.id}">${esc(s.n)}</button>`).join('')}</div>`;
@@ -7442,7 +7470,7 @@ function viewExplorar(){
   });
   return h;
 }
-A.xjump=id=>{ const el=document.getElementById('xs-'+id); if(el) $('#view').scrollTo({top:el.offsetTop-70,behavior:'smooth'}); };
+A.xjump=id=>{ const L=document.querySelectorAll('#xs-'+id), el=L[L.length-1]; if (!el) return; const sc=el.closest('.lbody')||$('#view'); sc.scrollTo({top:el.offsetTop-(sc===$('#view')?70:12),behavior:'smooth'}); };
 A.openTpl=v=>{ const [sid,i]=v.split('|'); openLayer('tpl',{sid,i:+i,key:v}); };
 SCREENS.tpl = p => {
   const sec=EXPLORE.find(s=>s.id===p.sid), t=sec.r[p.i];
@@ -8075,15 +8103,25 @@ function nutAdapt(tdeeF, w){
   return {ok:true, peso:wObs, tdee:Math.round(tdeeF*(1-wObs)+obs*wObs), obs:Math.round(obs), intake:Math.round(intake), days:days.length, kgWeek:Math.round(sl*7*100)/100};
 }
 function viewNutricion(){
+  if (!NSEG) NSEG=['agua','ayuno'].includes(S.settings.nseg)?S.settings.nseg:'comida';
   const n=nut(), c=calcNutrition();
   // 1.8: suplementos y menús pasan a un botón de la cabecera
   let h=`<div class="hdr"><h1>Nutrición</h1><button class="ibtn soft" data-a="nutMas" aria-label="${tx('Suplementos y menús','Supplements and menus')}">${I('pill',20)}</button></div>`;
-  // 1.3: dos subpestañas fijas arriba, para no tener que deslizar hasta el agua
-  h+=`<div class="seg" style="margin-bottom:14px">${[['comida',tx('Comida','Food')],['agua',tx('Agua','Water')]].map(([k,t])=>`<button class="${NSEG===k?'on':''}" data-a="nseg" data-v="${k}">${t}</button>`).join('')}</div>`;
+  // 1.3: subpestañas fijas arriba · 1.8.1: el ayuno vuelve a Nutrición como tercera sección
+  h+=`<div class="seg" style="margin-bottom:14px">${[['comida',tx('Comida','Food')],['agua',tx('Agua','Water')],['ayuno',tx('Ayuno','Fasting')]].map(([k,t])=>`<button class="${NSEG===k?'on':''}" data-a="nseg" data-v="${k}">${t}</button>`).join('')}</div>`;
+  // con un ayuno en curso, una franja con el tiempo en Comida y Agua (un toque lleva al ayuno)
+  const fa=n.fast&&n.fast.active;
+  if (fa && NSEG!=='ayuno'){ const el=(Date.now()-fa.start)/3600000; h+=`<button class="card row tap" style="width:100%;gap:10px;padding:10px 14px;text-align:left" data-a="nseg" data-v="ayuno"><span style="color:var(--ac)">${I('timer',18)}</span><span class="grow sm"><b>${tx('Ayunando','Fasting')}</b> · <span class="tick-fast">${fmtHM(el)}</span>${fa.goalH?tx(` de ${fa.goalH} h`,` of ${fa.goalH} h`):''}</span><span class="mut">${I('right',16)}</span></button>`; }
+  if (NSEG==='ayuno'){
+    h+=fastCard(true);
+    h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">${tx('El ayuno no es para todo el mundo. Si tienes una condición de salud, estás embarazada, das el pecho o tuviste problemas con la comida, consúltalo antes con un profesional.','Fasting is not for everyone. If you have a health condition, are pregnant or breastfeeding, or have had problems with food, check with a professional first.')}</p>`;
+    return h;
+  }
   if (NSEG!=='agua'){
   if (S.settings.lang!=='en' && uiMini()) h+=`<div class="card row" style="gap:10px;padding:10px 12px"><span style="color:var(--ok)">${I('leaf',18)}</span><button class="grow b sm" style="text-align:left" data-a="tipNutVer">${tx('Consejo nutricional del día','Nutrition tip of the day')}</button><span class="mut">${I('right',16)}</span></div>`;
   else if (S.settings.lang!=='en') h+=`<div class="card row" style="align-items:flex-start;gap:12px"><span style="color:var(--ok)">${I('leaf',22)}</span><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CONSEJO NUTRICIONAL DEL DÍA</div><div class="sm" style="margin-top:4px;line-height:1.45">${(t=>esc(t)+kbLink(tipRule(t)))(tipOfDay('nut'))}</div></div></div>`;
   h+=diarioCard();
+  const i0=h.length;
   if (habitos()){ h+=`<div class="sec">Objetivo</div><div class="card sm mut" style="line-height:1.45">Estás en modo hábitos: PandarIA no muestra calorías ni números. Puedes cambiarlo en las preferencias del diario.</div>`; }
   else {
   // calorías
@@ -8100,6 +8138,9 @@ function viewNutricion(){
     ${c.notes.map(t=>`<div class="sm" style="margin-top:8px;color:var(--blue);line-height:1.4">${esc(t)}</div>`).join('')}</div>`;
   }
   }
+  // 1.8.1: el objetivo diario va en un bloque desplegable, cerrado por defecto, con una línea de resumen
+  { const ob=h.slice(i0).replace('<div class="sec">Tu objetivo diario</div>','').replace('<div class="sec">Objetivo</div>','');
+    h=h.slice(0,i0)+'<!--ini-objetivo-->'+fold('objetivo',tx('Tu objetivo diario','Your daily goal'),habitos()?tx('Modo hábitos: sin calorías ni números','Habits mode: no calories or numbers'):!c?tx('Completa tu perfil para calcularlo','Complete your profile to work it out'):`${NGOALS[n.goal]||''} · ${fmtK(c.kcal)} · ${tx('proteína','protein')} ${c.prot} g`,ob,{st:'margin-top:4px'}); }
   h+='<!--fin-objetivo-->';
   }
   // agua
@@ -8107,21 +8148,20 @@ function viewNutricion(){
   const wg=waterGoal(), dd=diaryDrinks(dayKey()), wv=waterToday(), pct=Math.min(100,Math.round(wv/wg*100));
   const tt=trainedToday(), ttMin=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0), KA=kb('agua');
   const extraTxt=!tt.length?'':ttMin>KA.largo+29?tx(`, + agua extra por tu entreno de ${Math.round(ttMin)} min`,`, + extra water for your ${Math.round(ttMin)}-min workout`):tx(', + 500 ml porque hoy entrenaste',', + 500 ml because you trained today');
-  h+=`<div class="sec">Agua</div><div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString(LOC(),{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString(LOC(),{maximumFractionDigits:1})} L</span></div></div>
+  h+=`<div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString(LOC(),{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString(LOC(),{maximumFractionDigits:1})} L</span></div></div>
     <div class="grow col" style="gap:8px">${vasos().map((v,i)=>`<button class="btn sm" data-a="wVaso" data-v="${i}">${I('drop',16)} + ${esc(v.n)} ${v.ml} ml</button>`).join('')}<div class="row" style="gap:6px"><button class="btn sm grow" data-a="wOther">${I('plus',16)} ${tx('Otra bebida','Other drink')}</button><button class="btn sm ghost" data-a="water" data-v="-250" aria-label="${tx('Deshacer el último','Undo the last one')}">${tx('Deshacer','Undo')}</button></div><button class="link xs" style="align-self:flex-start" data-a="wVasos">${I('edit',13)} ${tx('Tus recipientes','Your containers')}</button></div></div>
-    ${dd.n?`<div class="xs" style="margin-top:10px;color:var(--blue);line-height:1.4">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}
-    ${cafLine(dd.caf)}
-    <div class="xs mut" style="margin-top:10px">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}${waterExtraHoy()?tx(`, + ${waterExtraHoy()} ml por el calor`,`, + ${waterExtraHoy()} ml for the heat`):''}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>
-<button class="btn sm wide" style="margin-top:10px" data-a="aguaStats">${I('chart',16)} ${tx('Estadísticas del agua','Water stats')}</button></div>`;
+    ${cafLine(dd.caf)}${aguaCalorHtml()}
+    ${fold('aguaMeta',tx('Cómo se calcula tu meta','How your goal is worked out'),'',`${dd.n?`<div class="xs" style="color:var(--blue);line-height:1.4;margin-bottom:6px">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}<div class="xs mut" style="line-height:1.4">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}${waterExtraHoy()?tx(`, + ${waterExtraHoy()} ml por el calor`,`, + ${waterExtraHoy()} ml for the heat`):''}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>`,{flat:true,st:'border-top:1px solid var(--line);margin-top:10px'})}
+<button class="btn sm wide" style="margin-top:6px" data-a="aguaStats">${I('chart',16)} ${tx('Estadísticas del agua','Water stats')}</button></div>`;
     h+=aguaHoyHtml();
   }
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">Esta sección da orientación general y no reemplaza a un nutricionista o médico. Si tienes una condición de salud, consulta antes de cambiar tu alimentación.</p>`;
   return h;
 }
-let NSEG='comida';
+let NSEG=null; // 1.8.1: se recuerda la última sección (S.settings.nseg)
 // 1.3: Ajustes › Objetivo nutricional abre el selector (antes solo cambiaba de pestaña)
 A.nGoalPick=()=>sheet(tx('Objetivo nutricional','Nutrition goal'),Object.entries(NGOALS).map(([k,v])=>({icon:nut().goal===k?'check':'target',label:v,fn:()=>{ A.nGoal(k); toast(tx(`Objetivo: ${v}`,`Goal: ${v}`)); }})));
-A.nseg=v=>{ NSEG=v==='agua'?'agua':'comida'; render(); };
+A.nseg=v=>{ NSEG=['agua','ayuno'].includes(v)?v:'comida'; S.settings.nseg=NSEG; save(); render(); $('#view').scrollTop=0; };
 // abre Nutrición › Agua (widgets, notificaciones y accesos directos)
 A.irAgua=()=>{ NSEG='agua'; A.tab('nutricion'); };
 // 1.3: el ayuno tiene su propia pestaña
@@ -8197,7 +8237,7 @@ const ALIM_RAW=`
 09241|Durazno en almíbar|melocotón en almíbar|fruta|74|0.5|19.9|0.1|1.3|18.6|6||1 mitad:81;1 taza:262
 09270|Ananá en almíbar|piña en almíbar|fruta|78|0.3|20.2|0.1|0.8|16.9|1||1 rodaja:49;1 taza:254
 09100|Macedonia en lata|ensalada de frutas en lata,cóctel de frutas|fruta|73|0.4|18.9|0.1|1|17.9|6||1 taza:248
-09277|Plátano macho|plátano verde,plátano para cocinar,plátano hartón|fruta|122|1.3|31.9|0.4|2.3|15|4||1 unidad:179;1 taza en rodajas:148
+09277|Plátano macho|plátano verde,plátano para cocinar,plátano hartón,plátano burro|fruta|122|1.3|31.9|0.4|2.3|15|4||1 unidad:179;1 taza en rodajas:148
 09278|Plátano macho cocido|plátano hervido|fruta|116|0.8|31.1|0.2|2.3|14|5||1 taza en puré:200;1 taza en rodajas:154
 09447|Plátano maduro frito|maduros fritos,tajadas|fruta|236|1.4|40.8|7.5|3.2|21.8|6||1 taza:169
 09446|Tostones|patacones,plátano verde frito|fruta|309|1.5|49.2|11.8|3.5|3.6|2||1 taza:118;10 rebanadas:53
@@ -8221,7 +8261,7 @@ const ALIM_RAW=`
 09318|Frutillas congeladas|fresas congeladas|fruta|35|0.4|9.1|0.1|2.1|4.6|2||1 taza:221
 09144|Jaca|yaca,jackfruit|fruta|95|1.7|23.2|0.6|1.5|19.1|2||1 taza en rodajas:165;1 taza:151
 09079|Pasas de arándano|arándanos deshidratados|fruta|308|0.2|82.8|1.1|5.3|72.6|5||1 cucharada:10;1/4 taza:40
-11529|Tomate|jitomate|verdura|18|0.9|3.9|0.2|1.2|2.6|5||1 mediano:123;1 pequeño:91;1 taza:149;1 taza picada:180
+11529|Tomate|jitomate,tomate cherry,tomatitos,tomate perita|verdura|18|0.9|3.9|0.2|1.2|2.6|5||1 mediano:123;1 pequeño:91;1 taza:149;1 taza picada:180
 11253|Lechuga|lechuga criolla,lechuga mantecosa|verdura|15|1.4|2.9|0.1|1.3|0.8|28||1 hoja:8;1 taza rallada:36
 11251|Lechuga romana|lechuga larga|verdura|17|1.2|3.3|0.3|2.1|1.2|8||1 hoja:6;1 taza rallada:47
 11252|Lechuga iceberg|lechuga repollada|verdura|14|0.9|3|0.1|1.2|2|10||1 hoja:8;1 taza rallada:72;1 taza picada:57
@@ -8243,7 +8283,7 @@ const ALIM_RAW=`
 11291|Cebolla de verdeo|cebollín,cebolleta,cebollino,cebolla larga|verdura|32|1.8|7.3|0.2|2.6|2.3|16||1 tallo:15;1 taza picada:100;1 cucharada picada:6
 11246|Puerro|ajo porro|verdura|61|1.5|14.2|0.3|1.8|3.9|20||1 unidad:89
 11215|Ajo|ajos|verdura|149|6.4|33.1|0.5|2.1|1|17||1 diente:3;1 taza:136;1 cucharadita:2.8
-11821|Morrón rojo|pimiento rojo,pimentón rojo,ají rojo,chile morrón|verdura|31|1|6|0.3|2.1|4.2|4||1 mediano:119;1 taza picada:149;1 taza en rodajas:92
+11821|Morrón rojo|pimiento rojo,pimentón rojo,ají rojo,chile morrón,ají dulce,ají cachucha|verdura|31|1|6|0.3|2.1|4.2|4||1 mediano:119;1 taza picada:149;1 taza en rodajas:92
 11333|Morrón verde|pimiento verde,pimentón verde,ají verde|verdura|20|0.9|4.6|0.2|1.7|2.4|3||1 mediano:119;1 taza picada:149;1 taza en rodajas:92
 11951|Morrón amarillo|pimiento amarillo|verdura|27|1|6.3|0.2|0.9||2||1 grande:186;10 tiras:52
 11979|Ají picante|chile,guindilla,jalapeño|verdura|29|0.9|6.5|0.4|2.8|4.1|3||1 unidad:14;1 taza en rodajas:90
@@ -8278,7 +8318,7 @@ const ALIM_RAW=`
 11508|Boniato al horno|batata asada,camote asado|verdura|90|2|20.7|0.1|3.3|6.5|36||1 mediano:114;1 taza:200;1 unidad grande:180
 11134|Mandioca|yuca,casava,aipim|verdura|160|1.4|38.1|0.3|1.8|1.7|14||1 taza:206;1 unidad:408
 11602|Ñame|ñame blanco|verdura|116|1.5|27.5|0.1|3.9|0.5|8||1 taza en cubos:136;1/2 taza en cubos:68
-11519|Malanga|taro,yautía,papa china|verdura|142|0.5|34.6|0.1|5.1|0.5|15||1 taza en rodajas:132
+11519|Malanga|taro,yautía,papa china,ocumo|verdura|142|0.5|34.6|0.1|5.1|0.5|15||1 taza en rodajas:132
 11011|Espárragos|espárrago|verdura|20|2.2|3.9|0.1|2.1|1.9|2||1 unidad:16;1 taza:134
 11012|Espárragos cocidos||verdura|22|2.4|4.1|0.2|2|1.3|14||1/2 taza:90
 11007|Alcaucil|alcachofa|verdura|47|3.3|10.5|0.1|5.4|1|94||1 mediano:128
@@ -8294,7 +8334,7 @@ const ALIM_RAW=`
 11955|Tomate seco||verdura|258|14.1|55.8|3|12.3|37.6|107||1 unidad:2;1 taza:54
 11174|Choclo cremoso|crema de elote|verdura|72|1.7|18.1|0.4|1.2|3.2|261||1 taza:256;1 lata:482
 11297|Perejil||verdura|36|3|6.3|0.8|3.3|0.8|56||1 cucharada:4;1 taza picada:60
-11165|Cilantro|culantro|verdura|23|2.1|3.7|0.5|2.8|0.9|46||1 cucharada:1;1/4 taza:4
+11165|Cilantro|culantro,coriandro|verdura|23|2.1|3.7|0.5|2.8|0.9|46||1 cucharada:1;1/4 taza:4
 02044|Albahaca||verdura|23|3.1|2.6|0.6|1.6|0.3|4||5 hojas:2.5;2 cucharadas picada:5.3
 11216|Jengibre fresco|kion|verdura|80|1.8|17.8|0.8|2|1.7|13||1 cucharadita:2;1/4 taza en rodajas:24
 11937|Pepinillos en vinagre|pickles,pepinillos|verdura|12|0.5|2.4|0.3|1|1.1|809||1 unidad:35;1 rebanada:7
@@ -8308,14 +8348,14 @@ const ALIM_RAW=`
 11591|Berro|berros|verdura|11|2.3|1.3|0.1|0.5|0.2|41||1 taza picada:34;1 ramita:2.5
 11213|Endivia|achicoria|verdura|17|1.2|3.4|0.2|3.1|0.2|22||1/2 taza picada:25
 11952|Radicchio|achicoria roja|verdura|23|1.4|4.5|0.2|0.9|0.6|22||1 taza rallada:40;1 hoja:8
-11819|Ají rojo picante|chile rojo|verdura|40|1.9|8.8|0.4|1.5|5.3|9||1 unidad:45;1/2 taza picada:75
+11819|Ají rojo picante|chile rojo,chile habanero,ají habanero,ají caballero|verdura|40|1.9|8.8|0.4|1.5|5.3|9||1 unidad:45;1/2 taza picada:75
 16015|Porotos negros cocidos|frijoles negros,caraotas negras,judías negras|legumbre|132|8.9|23.7|0.5|8.7|0.3|1||1 taza:172
 16033|Porotos colorados cocidos|frijoles rojos,alubias rojas,frijol colorado|legumbre|127|8.7|22.8|0.5|7.4|0.3|2||1 taza:177;1 cucharada:11
 16050|Porotos blancos cocidos|alubias blancas,frijoles blancos,judías blancas|legumbre|139|9.7|25.1|0.3|6.3|0.3|6||1 taza:179;1 cucharada:11.2
-16043|Porotos pintos cocidos|frijoles pintos|legumbre|143|9|26.2|0.7|9|0.3|1||1 taza:171;1 cucharada:10.6
+16043|Porotos pintos cocidos|frijoles pintos,frijol bayo,frijoles bayos|legumbre|143|9|26.2|0.7|9|0.3|1||1 taza:171;1 cucharada:10.6
 16316|Porotos en lata|frijoles en lata|legumbre|91|6|16.6|0.3|6.9|0.2|138||1 taza:240
 16103|Frijoles refritos|porotos refritos|legumbre|90|5|13.6|2|3.7|0.5|370||1 taza:238;1 lata:442
-16070|Lentejas cocidas|lentejas|legumbre|116|9|20.1|0.4|7.9|1.8|2||1 taza:198;1 cucharada:12.3
+16070|Lentejas cocidas|lentejas,lentejas rojas,lentejas coral|legumbre|116|9|20.1|0.4|7.9|1.8|2||1 taza:198;1 cucharada:12.3
 16069|Lentejas secas||legumbre|352|24.6|63.4|1.1|10.7|2|6||1 taza:192;1 cucharada:12
 16057|Garbanzos cocidos|garbanzo|legumbre|164|8.9|27.4|2.6|7.6|4.8|7||1 taza:164
 16058|Garbanzos en lata||legumbre|88|4.9|13.5|1.9|4.4||278||1 taza:240;1 lata:448
@@ -8331,7 +8371,7 @@ const ALIM_RAW=`
 16090|Maní tostado|cacahuate tostado|legumbre|587|24.4|21.3|49.7|8.4|4.9|410|M|1 puñado:28
 16398|Mantequilla de maní|crema de cacahuate,mantequilla de cacahuete,pasta de maní|legumbre|598|22.2|22.3|51.4|5|10.5|17|M|1 cucharada:16;2 cucharadas:32;1 taza:258
 16081|Porotos mung cocidos|frijol mungo|legumbre|105|7|19.1|0.4|7.6|2|2||1 taza:202
-20045|Arroz blanco cocido|arroz|cereal|130|2.7|28.2|0.3|0.4|0.1|1||1 taza:158
+20045|Arroz blanco cocido|arroz,arroz basmati,arroz jazmín,arroz grano largo|cereal|130|2.7|28.2|0.3|0.4|0.1|1||1 taza:158
 20044|Arroz blanco crudo||cereal|365|7.1|80|0.7|1.3|0.1|5||1 taza:185
 20037|Arroz integral cocido|arroz moreno|cereal|123|2.7|25.6|1|1.6|0.2|4||1 taza:195
 20036|Arroz integral crudo||cereal|367|7.5|76.2|3.2|3.6|0.7|5||1 taza:185
@@ -8411,7 +8451,7 @@ const ALIM_RAW=`
 01120|Yogur con frutas|yogurt de frutilla,yogur bebible|lacteo|99|4|18.6|1.1|0|18.6|53|LV|1 pote:125
 01294|Yogur griego con frutas|yogurt griego de frutas|lacteo|106|7.3|12.3|3|0|12|37|LV|1 vaso:240
 01289|Kéfir||lacteo|41|3.8|4.5|0.9|0|4.6|40|LV|1 vaso:243
-01228|Queso fresco|queso blanco,queso de campo|lacteo|299|18.1|3|23.8|0|2.3|751|LV|1 rebanada:28;1 taza desmenuzada:122
+01228|Queso fresco|queso blanco,queso de campo,cuajada,queso de freír,queso de mano|lacteo|299|18.1|3|23.8|0|2.3|751|LV|1 rebanada:28;1 taza desmenuzada:122
 01026|Queso mozzarella|muzzarella,mozarela|lacteo|300|22.2|2.2|22.4|0|1|627|LV|1 rebanada:28;1 taza rallada:112
 01028|Queso mozzarella light||lacteo|254|24.3|2.8|15.9|0|1.1|619|LV|1 rebanada:28
 01009|Queso cheddar|queso amarillo|lacteo|404|22.9|3.1|33.3|0|0.5|653|LV|1 rebanada:28;1 taza en cubos:132;1 taza derretida:244
@@ -8460,7 +8500,7 @@ const ALIM_RAW=`
 23572|Carne picada común|carne molida,picada|carne|254|17.2|0|20|0|0|66|A|
 23563|Carne picada magra cocida|carne molida magra cocida|carne|217|26.1|0|11.8|0|0|68|A|1 porción:85
 23575|Carne picada común cocida|carne molida cocida|carne|272|27|0|17.4|0|0|91|A|1 porción:85
-23601|Bife de lomo|filete de res,solomillo,lomo de res|carne|153|22.1|0|6.5|0|0|56|A|
+23601|Bife de lomo|filete de res,solomillo,lomo de res,ternera|carne|153|22.1|0|6.5|0|0|56|A|
 23600|Bife de lomo a la plancha|filete asado,lomo asado|carne|200|29|0|8.4|0|0|60|A|
 23611|Bife de chorizo|entrecot,bistec de res,sirloin|carne|131|22.1|0|4.1|0|0|56|A|
 23610|Bife de chorizo a la plancha|bistec asado,entrecot asado|carne|178|29.4|0|5.8|0|0|61|A|
@@ -8473,9 +8513,9 @@ const ALIM_RAW=`
 13325|Hígado de vaca|hígado de res|carne|135|20.4|3.9|3.6|0|0|69|A|1 porción:85
 13327|Hígado de vaca cocido|hígado encebollado|carne|175|26.5|5.2|4.7|0|0|77|A|1 rebanada:82
 23573|Hamburguesa de carne|carne para hamburguesa|carne|270|25.8|0|17.8|0|0|75|A|1 medallón:85
-10060|Lomo de cerdo|solomillo de cerdo,lomo de puerco|carne|109|20.9|0|2.2|0|0|53|A|1 porción:85
+10060|Lomo de cerdo|solomillo de cerdo,lomo de puerco,lomo de chancho|carne|109|20.9|0|2.2|0|0|53|A|1 porción:85
 10061|Lomo de cerdo asado|lomo de puerco asado|carne|143|26.2|0|3.5|0|0|57|A|1 porción:85;1 pieza:333
-10038|Chuleta de cerdo|bife de cerdo,costeleta de cerdo,chuleta de puerco|carne|209|25.6|0|11.1|0|0|55|A|1 unidad:120;1 porción:85
+10038|Chuleta de cerdo|bife de cerdo,costeleta de cerdo,chuleta de puerco,chuleta de chancho|carne|209|25.6|0|11.1|0|0|55|A|1 unidad:120;1 porción:85
 10071|Bondiola|paleta de cerdo,pernil|carne|292|23.3|0|21.4|0|0|68|A|1 taza en cubos:135;1 porción:85
 10089|Costillas de cerdo|costillar,costillitas de cerdo|carne|397|29.1|0|30.3|0|0|93|A|1 porción:85;1 pieza:177
 10860|Panceta|tocino,bacon,tocineta|carne|548|35.7|1.4|43.3|0|0|2193|A|1 lonja:8
@@ -8499,7 +8539,7 @@ const ALIM_RAW=`
 13479|T-bone|bife con hueso,chuletón|carne|212|27.9|0|10.4|0|0|67|A|1 porción:85;1 bife:363
 23557|Carne picada extra magra|carne molida 95 %|carne|137|21.4|0|5|0|0|66|A|
 10220|Carne picada de cerdo|carne molida de cerdo|carne|297|25.7|0|20.8|0|0|73|A|1 porción:85
-10011|Pernil de cerdo|pierna de cerdo asada,lechón|carne|211|29.4|0|9.4|0|0|64|A|1 taza en cubos:135;1 porción:85
+10011|Pernil de cerdo|pierna de cerdo asada,lechón,pernil de chancho,puerco asado|carne|211|29.4|0|9.4|0|0|64|A|1 taza en cubos:135;1 porción:85
 05062|Pechuga de pollo cruda|pechuga|ave|120|22.5|0|2.6|0|0|45|A|1 porción:85;1 pieza:272
 05064|Pechuga de pollo a la plancha|pechuga asada|ave|165|31|0|3.6|0|0|74|A|1 pechuga mediana:172;1 taza picada:140
 05065|Pechuga de pollo hervida||ave|151|29|0|3|0|0|63|A|1 taza picada:140
@@ -8557,7 +8597,7 @@ const ALIM_RAW=`
 15092|Lubina|róbalo,robalo,corvina negra|pescado|124|23.6|0|2.6|0||87|AP|1 filete:101;1 porción:85
 15194|Dorado|mahi mahi,lampuga|pescado|109|23.7|0|0.9|0||113|AP|1 porción:85;1 filete:159
 15235|Bagre|siluro|pescado|144|18.4|0|7.2|0|0|119|AP|1 filete:143;1 porción:85
-12061|Almendras||semilla|579|21.1|21.6|49.9|12.5|4.3|1|N|1 puñado:28;10 unidades:12;1 taza entera:143;1 taza en rodajas:92
+12061|Almendras|almendra molida,harina de almendra|semilla|579|21.1|21.6|49.9|12.5|4.3|1|N|1 puñado:28;10 unidades:12;1 taza entera:143;1 taza en rodajas:92
 12063|Almendras tostadas||semilla|598|21|21|52.5|10.9|4.9|3|N|1 puñado:28;1 taza entera:138
 12155|Nueces|nuez de nogal|semilla|654|15.2|13.7|65.2|6.7|2.6|2|N|1 puñado:28;1 mitad:2;1 taza picada:117;1 taza molida:80
 12087|Castañas de cajú|anacardos,merey,nuez de la india|semilla|553|18.2|30.2|43.9|3.3|5.9|12|N|1 puñado:28
@@ -8591,7 +8631,7 @@ const ALIM_RAW=`
 14209|Café negro|café,café colado,tinto|bebida|1|0.1|0|0|0|0|2||1 taza:237
 14210|Espresso|café expreso,cafecito,café cubano sin azúcar|bebida|9|0.1|1.7|0.2|0|0|14||1 tacita:30
 14215|Café instantáneo|café soluble|bebida|2|0.1|0.3|0|0|0|4||1 taza:240;1 porción:179
-14355|Té|té negro,infusión|bebida|1|0|0.3|0|0|0|3||1 taza:237
+14355|Té|té negro,infusión,mate,yerba mate,mate cebado,tereré,chimarrão|bebida|1|0|0.3|0|0|0|3||1 taza:237
 14278|Té verde||bebida|1|0.2|0|0|0|0|1||1 taza:245
 14545|Infusión de hierbas|tisana,té de manzanilla,manzanilla|bebida|1|0|0.2|0|0|0|1||1 taza:237
 09206|Jugo de naranja natural|zumo de naranja,jugo de china|bebida|45|0.7|10.4|0.2|0.2|8.4|1||1 vaso:248
@@ -8628,9 +8668,9 @@ const ALIM_RAW=`
 09128|Jugo de pomelo|jugo de toronja|bebida|39|0.5|9.2|0.1|0.1|9.1|1||1 vaso:247
 09442|Jugo de granada||bebida|54|0.1|13.1|0.3|0.1|12.7|9||1 vaso:249
 19335|Azúcar|azúcar blanca|dulce|387|0|100|0|0|99.8|1||1 cucharadita:4.2;1 cucharada:12.5;1 porción:2.8
-19334|Azúcar morena|azúcar rubia,azúcar mascabo,panela|dulce|380|0.1|98.1|0|0|97|28||1 cucharadita:4.6;1 taza compacta:220
+19334|Azúcar morena|azúcar rubia,azúcar mascabo,panela,piloncillo,raspadura,chancaca|dulce|380|0.1|98.1|0|0|97|28||1 cucharadita:4.6;1 taza compacta:220
 19296|Miel|miel de abeja|dulce|304|0.3|82.4|0|0.2|82.1|4|V|1 cucharadita:7;1 cucharada:21;1 taza:339
-19353|Jarabe de arce|miel de maple|dulce|260|0|67|0.1|0|60.5|12||1 cucharada:20;1 porción:83
+19353|Jarabe de arce|miel de maple,sirope de arce,maple|dulce|260|0|67|0.1|0|60.5|12||1 cucharada:20;1 porción:83
 19297|Mermelada|dulce de fruta,confitura,jalea|dulce|278|0.4|68.9|0.1|1.1|48.5|32||1 cucharada:20;1 sobre:14
 43028|Mermelada light||dulce|132|0.3|53.4|0.3|2.5|37.8|0||1 cucharada:14;1 taza:224
 09143|Cajeta de guayaba|dulce de guayaba,bocadillo|dulce|36|0.3|9.5|0.1|3.6|5.9|4||1 taza:238
@@ -8754,6 +8794,45 @@ const ALIM_RAW=`
 14067|Proteína de soja en polvo|proteína vegetal en polvo|suplemento|388|55.6|28.9|5.6|6.7|22.2|733|S|1 scoop:30;1 medida:45
 14062|Batido sustituto de comida|batido nutricional,suplemento líquido|suplemento|105|3.8|16.9|2.5|0|9.7|84|LSV|1 botella:240
 19177|Colágeno en polvo|gelatina sin sabor|suplemento|335|85.6|0|0.1|0|0|196|A|1 cucharada:7
+02020|Ajo en polvo|ajo granulado,ajo deshidratado|condimento|331|16.6|72.7|0.7|9|2.4|60||1 cucharadita:3.1
+02026|Cebolla en polvo|cebolla deshidratada|condimento|341|10.4|79.1|1|15.2|6.6|73||1 cucharadita:2.4
+02004|Hojas de laurel|laurel|condimento|313|7.6|75|8.4|26.3|0|23||1 hoja:0.6;1 cucharadita desmenuzada:0.6
+02042|Tomillo seco|tomillo|condimento|276|9.1|63.9|7.4|37|1.7|55||1 cucharadita:1
+02036|Romero seco|romero|condimento|331|4.9|64.1|15.2|42.6|0|50||1 cucharadita:1.2
+02025|Nuez moscada|nuez moscada molida|condimento|525|5.8|49.3|36.3|20.8|28.5|16||1 cucharadita:2.2
+02011|Clavo de olor|clavos de olor,clavito|condimento|274|6|65.5|13|33.9|2.4|277||1 cucharadita:2.1
+02015|Curry en polvo|curri,cari|condimento|325|14.3|55.8|14|53.2|2.8|52||1 cucharadita:2
+02031|Pimienta de cayena|cayena,ají cayena,chile de árbol molido|condimento|318|12|56.6|17.3|27.2|10.3|30||1 cucharadita:1.8
+02002|Anís en grano|anís,matalahúga,anís estrellado|condimento|337|17.6|50|15.9|14.6|0|16||1 cucharadita:2.1
+18369|Polvo de hornear|polvo para hornear,levadura química,polvo royal|condimento|53|0|27.7|0|0.2|0|10600||1 cucharadita:4.6
+18372|Bicarbonato de sodio|bicarbonato,bicarbonato de soda|condimento|0|0|0|0|0|0|27360||1 cucharadita:4.6
+18376|Levadura seca de panadería|levadura de panadero,levadura instantánea,levadura en polvo|condimento|325|40.4|41.2|7.6|26.9|0|51||1 sobre:7;1 cucharadita:4
+06971|Salsa inglesa|salsa Worcestershire,salsa perrins|condimento|78|0|19.5|0|0|10|980||1 cucharadita:6;1 cucharada:17
+06176|Salsa de ostras|salsa de ostión|condimento|51|1.4|10.9|0.3|0.3|0|2733|C|1 cucharada:18
+02048|Vinagre de manzana|vinagre de sidra|condimento|21|0|0.9|0|0|0.4|5||1 cucharada:15
+02054|Alcaparras|alcaparra|condimento|23|2.4|4.9|0.9|3.2|0.4|2348||1 cucharada:8.6
+19304|Melaza|miel de caña,melao|dulce|290|0|74.7|0.1|0|74.7|37||1 cucharada:20
+04058|Aceite de sésamo|aceite de ajonjolí|grasa|884|0|0|100|0|0|0|Z|1 cucharadita:4.5;1 cucharada:13.6
+01003|Ghee|mantequilla clarificada,manteca clarificada|grasa|876|0.3|0|99.5|0|0|2|LV|1 cucharadita:4.3;1 cucharada:12.8
+04615|Manteca vegetal|grasa vegetal,shortening|grasa|884|0|0|100|0|0|0||1 cucharada:12.8
+11953|Tomatillo|tomate verde,miltomate,tomate de cáscara|verdura|32|1|5.8|1|1.9|3.9|1||1 mediano:34;1 taza picado:132
+11984|Epazote|pazote|verdura|32|0.3|7.4|0.5|3.8|0|43||1 cucharada picado:1
+11670|Chile poblano|ají poblano,chile verde,pimiento poblano|verdura|40|2|9.5|0.2|1.5|5.1|7||1 unidad:45;1 taza picado:150
+11977|Chile serrano|ají serrano|verdura|32|1.7|6.7|0.4|3.7|3.8|10||1 unidad:6;1 taza picado:105
+11238|Hongos shiitake|setas shiitake,shiitake|verdura|34|2.2|6.8|0.5|2.5|2.4|9||1 unidad:19;1 taza:70
+71930200|Casabe|pan de yuca,cazabe,torta de yuca|cereal|299|2.5|71.2|0.5|3.4|3.2|1185||1 torta:100;1 trozo:25
+20061|Harina de arroz|harina de arroz blanco|cereal|366|6|80.1|1.4|2.4|0.1|0||1 taza:158;1 cucharada:10
+16157|Harina de garbanzo|harina de garbanzos,besan|legumbre|387|22.4|57.8|6.7|10.8|10.9|64||1 taza:92;1 cucharada:6
+56107000|Ñoquis de papa|ñoquis,gnocchi,ñoqui|cereal|133|2.4|17.1|6.2|1|1|279|LGHV|1 taza:188;1 plato:250
+09294|Arándanos secos|arándanos deshidratados,cranberries secos|fruta|308|0.2|82.4|1.4|5.7|65|3||1/4 taza:40;1 cucharada:10
+09434|Pitahaya|fruta del dragón,pitaya|fruta|60|1.2|12.9|0.4|3|8|0||1 unidad:200;1 taza en cubos:180
+01088|Suero de leche|buttermilk,leche cortada,leche agria|lacteo|40|3.3|4.8|0.9|0|4.8|105|LV|1 taza:245
+13023|Carne seca salada|tasajo,charqui,cecina,carne salada|carne|153|31.1|2.8|1.9|0|0|2790|A|1 porción:30;1 porción grande:85
+15102|Pargo|huachinango,chillo,pargo rojo|pescado|128|26.3|0|1.7|0|0|57|AP|1 filete:170
+15038|Mero|cherna,chernia,abadejo|pescado|118|24.8|0|1.3|0|0|53|AP|1 filete:200
+15060|Sierra|carite,caballa española,serrucho|pescado|158|23.6|0|6.3|0|0|66|AP|1 filete:146
+15052|Lisa|lebrancho,mújol|pescado|150|24.8|0|4.9|0|0|71|AP|1 filete:93
+02063|Hierbabuena|menta fresca,yerbabuena,menta|verdura|44|3.3|8.4|0.7|6.8|0|30||2 cucharadas picada:3.2;10 hojas:1.5
 `;
 const ALIM_CATS={fruta:'Frutas',verdura:'Verduras',legumbre:'Legumbres',cereal:'Cereales y panes',lacteo:'Lácteos',huevo:'Huevos',carne:'Carnes',ave:'Aves',pescado:'Pescados y mariscos',
   semilla:'Frutos secos y semillas',grasa:'Aceites y grasas',bebida:'Bebidas',dulce:'Dulces y postres',snack:'Snacks',preparado:'Comidas preparadas',condimento:'Condimentos y salsas',suplemento:'Suplementos',propio:'Mis alimentos',receta:'Mis recetas'};
@@ -8860,6 +8939,15 @@ function alimConflicts(f){
   if (P.dieta==='vegano' && /[AVLH]/.test(fl)) out.push('No es vegano');
   return out;
 }
+// 1.8.1: el buscador perdona plurales («tomates», «frijoles») y un error de una letra («arros», «bananna»): solo si la palabra exacta no está
+const alimRaiz = w => w.length>4&&/(es)$/.test(w)?w.slice(0,-2) : w.length>3&&/s$/.test(w)?w.slice(0,-1) : w;
+function lev1(a,b){ if (a===b) return true; const la=a.length, lb=b.length; if (Math.abs(la-lb)>1) return false; let i=0,j=0,d=0;
+  while (i<la&&j<lb){ if (a[i]===b[j]){ i++; j++; continue; } if (++d>1) return false;
+    if (la>lb) i++; else if (lb>la) j++; else if (a[i+1]===b[j]&&a[i]===b[j+1]){ i+=2; j+=2; } else { i++; j++; } }
+  return d+(la-i)+(lb-j)<=1; }
+function alimCasi(f,w,casi,nt){ const r=alimRaiz(w); if (r!==w && f.key.includes(r)) return nt.some(t=>t.startsWith(r))?3:2; if (!casi||w.length<4) return 0;
+  const T=f._kt||(f._kt=f.key.split(/[\s,()]+/).filter(t=>t.length>2)), ok=t=>lev1(t,w)||lev1(t,r)||(t.length>w.length&&lev1(t.slice(0,w.length),w));
+  return nt.some(ok)?2:T.some(ok)?1:0; }
 function alimSearch(q, opts){
   opts=opts||{}; const n=nd();
   const pool=[...n.alim.map(c=>alimGet(c.id)), ...n.recetas.map(r=>recetaFood(r)), ...Object.values(ALIM)].filter(Boolean);
@@ -8868,12 +8956,14 @@ function alimSearch(q, opts){
   if (opts.cat) res=res.filter(f=>f.cat===opts.cat);
   if (words.length){
     const qq=words.join(' ');
-    res=res.map(f=>{ const nm=anorm(f.n), nt=nm.split(/[\s,]+/), sy=f.syn.map(anorm), st=sy.join(' ').split(/[\s,]+/); let sc=0;
-      for (const w of words){ if (!f.key.includes(w)) return null;
+    const base=res, pasada=casi=>base.map(f=>{ const nm=anorm(f.n), nt=nm.split(/[\s,]+/), sy=f.syn.map(anorm), st=sy.join(' ').split(/[\s,]+/); let sc=0;
+      for (const w of words){ if (!f.key.includes(w)){ const m=alimCasi(f,w,casi,nt); if (!m) return null; sc+=m; continue; }
         sc+= nt.includes(w)?4 : nt.some(t=>t.startsWith(w))?3 : st.includes(w)?3 : st.some(t=>t.startsWith(w))?2 : 1; }
       if (nm===qq) sc+=5; else if (sy.includes(qq)) sc+=4; else if (nm.startsWith(qq)) sc+=1;
       if (ALIM_POP.has(f.id)) sc+=2; if (f.propio||f.receta) sc+=1;
       return {f,sc}; }).filter(Boolean).sort((a,b)=>b.sc-a.sc||(ALIM_CAT_RANK[a.f.cat]??9)-(ALIM_CAT_RANK[b.f.cat]??9)||a.f.n.length-b.f.n.length).map(x=>x.f);
+    // primero la búsqueda exacta; solo si no encuentra nada, la que perdona plurales y errores
+    res=pasada(false); if (!res.length) res=pasada(true);
   } else if (!opts.cat) res=[];
   return res.slice(0, opts.limit||60);
 }
@@ -8928,12 +9018,17 @@ function protIdeas(k){
   return out.length?{falta, ids:out}:null;
 }
 A.pIdea=id=>{ const f=alimGet(id); if (!f) return; amountModal(f,{m:mealNow()}); };
+/* 1.8.1: bloques desplegables. Cada uno recuerda si lo dejaste abierto o cerrado (S.settings.fold). Cerrado muestra una línea de resumen. */
+const FOLD_DEF={diario:true,objetivo:false,calidad:false,diarioMas:false,aguaHoy:false,aguaMeta:false,ayunos:false,mapa:false,entrenos:false};
+const foldOpen=k=>{ const F=S.settings.fold||{}; return k in F?!!F[k]:!!FOLD_DEF[k]; };
+function fold(k, title, sum, body, o){ o=o||{}; const op=foldOpen(k);
+  return `<div class="${o.flat?'':'card '}fold" style="${o.flat?'':'padding:0;'}${o.st||''}"><button class="row" style="width:100%;gap:10px;padding:${o.flat?'10px 0':'12px 14px'};text-align:left" data-a="fold" data-v="${k}" aria-expanded="${op}"><span class="grow" style="min-width:0"><span class="b ${o.flat?'sm':''}" style="display:block">${title}</span>${sum&&!op?`<span class="xs mut" style="display:block;margin-top:2px;line-height:1.35">${sum}</span>`:''}</span><span class="mut" style="display:inline-flex">${I(op?'up':'down',18)}</span></button>${op?`<div style="${o.flat?'':'padding:0 14px 13px'}">${typeof body==='function'?body():body}</div>`:''}</div>`; }
+A.fold=k=>{ const F=S.settings.fold=S.settings.fold||{}; F[k]=!foldOpen(k); save(); render.keep=true; if (LAYERS.length) refreshTop(); else render(); };
 function diarioCard(){
   const n=nd(), k=dayKeyOf(), items=dayItems(k), T=dayTotals(k), hab=habitos();
   const isToday=k===dayKey(), isY=k===dayKey(Date.now()-DAY);
   const d=new Date(k+'T12:00'); const lbl=isToday?'Hoy':isY?'Ayer':`${DAYS_LONG[d.getDay()]} ${d.getDate()}`;
-  let h=`<div class="row" style="margin:20px 2px 8px"><span class="sec grow" style="margin:0">Diario de comidas</span><button class="ibtn" style="width:34px;height:34px" data-a="dPrefs" aria-label="Preferencias">${I('settings',18)}</button></div><div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:10px"><button class="ibtn" data-a="dDay" data-v="-1" aria-label="Día anterior">${I('back',20)}</button><b>${esc(lbl.charAt(0).toUpperCase()+lbl.slice(1))}</b><button class="ibtn" data-a="dDay" data-v="1" ${isToday?'disabled style="opacity:.3"':''} aria-label="Día siguiente"><span style="display:inline-flex;transform:scaleX(-1)">${I('back',20)}</span></button></div>`;
+  let h=`<div class="row" style="justify-content:space-between;margin-bottom:10px"><button class="ibtn" data-a="dDay" data-v="-1" aria-label="Día anterior">${I('back',20)}</button><b>${esc(lbl.charAt(0).toUpperCase()+lbl.slice(1))}</b><span class="row" style="gap:4px"><button class="ibtn" data-a="dDay" data-v="1" ${isToday?'disabled style="opacity:.3"':''} aria-label="Día siguiente"><span style="display:inline-flex;transform:scaleX(-1)">${I('back',20)}</span></button><button class="ibtn" style="width:34px;height:34px" data-a="dPrefs" aria-label="Preferencias">${I('settings',18)}</button></span></div>`;
   if (hab) h+=habitosResumen(k);
   else {
     h+=`<div class="row" style="align-items:flex-end;gap:10px"><div class="grow"><div style="font-size:28px;font-weight:900;line-height:1.1">${T.k.toLocaleString(LOC())} <span class="sm mut" style="font-weight:600">kcal</span></div></div>
@@ -8949,17 +9044,21 @@ function diarioCard(){
       } else h+=`<div class="xs mut" style="margin-top:8px">Completa tu perfil para comparar con tu objetivo.</div>`;
     } else h+=`<button class="link xs" style="margin-top:8px" data-a="dPay">🔒 Compara con tu objetivo y mira tu semana · Premium</button>`;
   }
-  if (!hab && items.length>=2) h+=prem()?dietQualityHtml(k):`<button class="link xs" style="margin-top:6px;display:block" data-a="dQPay">🔒 ${tx('Calidad del día: fibra, sodio y proteína por comida · Premium','Diet quality: fibre, sodium and protein per meal · Premium')}</button>`;
+  if (!hab && items.length>=2) h+=prem()?fold('calidad',tx('Calidad del día','Diet quality'),tx('Fibra, sodio y proteína en cada comida','Fibre, sodium and protein per meal'),()=>dietQualityHtml(k),{flat:true,st:'border-top:1px solid var(--line);margin-top:12px'}):`<button class="link xs" style="margin-top:6px;display:block" data-a="dQPay">🔒 ${tx('Calidad del día: fibra, sodio y proteína por comida · Premium','Diet quality: fibre, sodium and protein per meal · Premium')}</button>`;
   MEALS.forEach(([m,ml])=>{
     const es=items.filter(e=>e.m===m); const mk=Math.round(es.reduce((a,e)=>a+(+e.k||0),0));
-    h+=`<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px"><div class="row"><b class="grow">${ml}</b>${!hab&&es.length?`<span class="xs mut" style="margin-right:8px">${fmtK(mk)}</span>`:''}<button class="btn sm" data-a="dAdd" data-v="${m}" aria-label="Añadir a ${ml}">${I('plus',16)}</button></div>
-      ${es.map(e=>`<div class="row tap" data-a="dEdit" data-v="${e.id}" style="padding:7px 0;gap:10px"><div class="grow" style="min-width:0"><div class="sm ell">${esc(e.n)}</div><div class="xs mut">${esc(porTxt(e))}</div></div>${hab?'':`<span class="xs mut">${fmtK(e.k)}</span>`}</div>`).join('')}</div>`;
+    const op=es.length && foldOpen('meal-'+m);
+    h+=`<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:8px"><div class="row"><button class="row grow" style="gap:8px;text-align:left;min-height:36px" ${es.length?`data-a="fold" data-v="meal-${m}" aria-expanded="${!!op}"`:'disabled'}><b>${ml}</b>${es.length?`<span class="xs mut">${tx(plural(es.length,'alimento','alimentos'),es.length===1?'1 item':es.length+' items')}${!hab?' · '+fmtK(mk):''}</span><span class="mut" style="display:inline-flex">${I(op?'up':'down',16)}</span>`:''}</button><button class="btn sm" data-a="dAdd" data-v="${m}" aria-label="Añadir a ${ml}">${I('plus',16)}</button></div>
+      ${(op?es:[]).map(e=>`<div class="row tap" data-a="dEdit" data-v="${e.id}" style="padding:7px 0;gap:10px"><div class="grow" style="min-width:0"><div class="sm ell">${esc(e.n)}</div><div class="xs mut">${esc(porTxt(e))}</div></div>${hab?'':`<span class="xs mut">${fmtK(e.k)}</span>`}</div>`).join('')}</div>`;
   });
   h+=`<div class="row" style="gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn sm grow" data-a="dCopy">${I('copy',16)} Copiar ${isToday?'ayer':'el día anterior'}</button><button class="btn sm grow" data-a="dSaveMeal">${I('pin',16)} Guardar comida</button></div>`;
+  let mas='';
   if (!hab && prem() && calcNutrition()){ const days=[...Array(7).keys()].reverse().map(i=>dayKey(new Date(k+'T12:00').getTime()-i*DAY));
-    h+=`<div class="xs mut b" style="letter-spacing:1px;margin:16px 0 4px">ÚLTIMOS 7 DÍAS (KCAL)</div>${barChart(days.map(x=>dayTotals(x).k),days.map(x=>DAYS_SHORT[new Date(x+'T12:00').getDay()]),{fmt:v=>v?Math.round(v).toLocaleString(LOC()):''})}`; }
-  h+=`<div class="xs mut" style="margin-top:12px;line-height:1.4">Datos de alimentos: USDA, base de datos de nutrientes de referencia (dominio público). Revisa siempre la etiqueta de los productos envasados.</div></div>`;
-  return h;
+    mas+=`<div class="xs mut b" style="letter-spacing:1px;margin:4px 0 4px">ÚLTIMOS 7 DÍAS (KCAL)</div>${barChart(days.map(x=>dayTotals(x).k),days.map(x=>DAYS_SHORT[new Date(x+'T12:00').getDay()]),{fmt:v=>v?Math.round(v).toLocaleString(LOC()):''})}`; }
+  mas+=`<div class="xs mut" style="margin-top:12px;line-height:1.4">Datos de alimentos: USDA, base de datos de nutrientes de referencia (dominio público). Revisa siempre la etiqueta de los productos envasados.</div>`;
+  h+=fold('diarioMas',tx('Ver más','See more'),'',mas,{flat:true,st:'border-top:1px solid var(--line);margin-top:12px'});
+  const c0=!hab&&calcNutrition();
+  return fold('diario',tx('Diario de comidas','Food diary'),hab?'':`${fmtK(T.k)}${c0&&prem()?tx(` de ${fmtK(c0.kcal)}`,` of ${fmtK(c0.kcal)}`):''} · ${tx(plural(items.length,'alimento','alimentos'),items.length===1?'1 item':items.length+' items')}`,h);
 }
 function habitosResumen(k){
   const it=dayItems(k), meals=new Set(it.map(e=>e.m)).size;
@@ -8996,12 +9095,14 @@ function dietQualityHtml(k){
 A.dAdd=m=>openLayer('alimBuscar',{m:m||mealNow(),q:'',tab:'todo',cat:'',day:dayKeyOf()});
 A.dCopy=()=>{ const k=dayKeyOf(), prev=dayKey(new Date(k+'T12:00').getTime()-DAY); const src=dayItems(prev);
   if (!src.length) return toast('No hay nada registrado el día anterior');
-  const n=nd(), add=src.map(e=>Object.assign({},e,{id:uid(),t:Date.now()})); n.diario[k]=(n.diario[k]||[]).concat(add); save(); render.keep=true; render(); toast(`Copiados ${plural(add.length,'alimento','alimentos')}`); diarioAdded(k,add); };
+  const n=nd(), add=src.map(e=>Object.assign({},e,{id:uid(),t:Date.now()})); n.diario[k]=(n.diario[k]||[]).concat(add); diarioAbre(add); save(); render.keep=true; render(); toast(`Copiados ${plural(add.length,'alimento','alimentos')}`); diarioAdded(k,add); };
 A.dSaveMeal=()=>{ const k=dayKeyOf(); const opts=MEALS.filter(([m])=>dayItems(k).some(e=>e.m===m));
   if (!opts.length) return toast('Registra algo primero');
   sheet('¿Qué comida quieres guardar?',opts.map(([m,ml])=>({icon:'pin',label:ml,desc:dayItems(k).filter(e=>e.m===m).map(e=>e.n).slice(0,3).join(', '),fn:()=>promptBox({title:'Nombre de la comida',ph:'Por ejemplo: Mi desayuno',value:ml,okText:'Guardar',ok:v=>{ v=(v||'').trim()||ml;
     nd().comidas.push({id:uid(),n:v.slice(0,40),items:dayItems(k).filter(e=>e.m===m).map(e=>({f:e.fid,gr:e.gr,por:e.por||null,q:e.q||null}))}); save(); toast('Comida guardada: la encontrarás al añadir'); }})}))); };
 // Cada vez que se añade comida al diario (native.js la guarda también en Health Connect)
+// 1.8.1: la comida donde añadiste algo queda abierta para que veas lo que pusiste
+function diarioAbre(entries){ if (!entries||!entries.length) return; const F=S.settings.fold=S.settings.fold||{}; new Set(entries.map(e=>e.m)).forEach(m=>{ F['meal-'+m]=true; }); F.diario=true; }
 function diarioAdded(k, entries){
   const f=S.nutri&&S.nutri.fast, a=f&&f.active; if (!a || k!==dayKey() || !entries.length) return;
   if (entries.every(e=>{ const x=alimGet(e.fid); return x && (x.k*(+e.gr||0)/100)<15; })) return; // agua, café o té solos no rompen el ayuno
@@ -9047,15 +9148,18 @@ SCREENS.alimBuscar=p=>{
     <div id="allist" style="margin-top:6px">${alList(p)}</div></div>
     ${p.receta?'':`<div class="lfoot" style="display:flex;gap:8px"><button class="btn grow" data-a="alNew">${I('plus',16)} Crear alimento</button><button class="btn grow" data-a="recNew">${I('list',16)} Crear receta</button></div>`}`;
 };
-IN.alQ=el=>{ const p=alP(); p.q=el.value; const box=$('#allist'); if(box) box.innerHTML=alList(p); };
+// 1.8.1: con el buscador abierto dos veces (diario › crear receta › añadir ingrediente) había dos #allist y se actualizaba el de abajo,
+// así que al buscar un ingrediente no pasaba nada. Ahora siempre se usa la lista de la capa de arriba.
+const alBox = () => { const L=document.querySelectorAll('#allist'); return L[L.length-1]||null; };
+IN.alQ=el=>{ const p=alP(); p.q=el.value; const box=(el.closest('.lbody')||document).querySelector('#allist')||alBox(); if(box) box.innerHTML=alList(p); };
 A.alTab=v=>{ const p=alP(); p.tab=v; p.q=''; p.cat=''; refreshTop(); };
 A.alCat=v=>{ const p=alP(); p.cat=v; p.tab='todo'; p.q=''; refreshTop(); };
 A.alMeal=v=>{ alP().m=v; refreshTop(); };
-A.alFav=id=>{ const n=nd(); const i=n.fav.indexOf(id); if(i>=0) n.fav.splice(i,1); else n.fav.unshift(id); save(); const p=alP(); const box=$('#allist'); if(box) box.innerHTML=alList(p); };
+A.alFav=id=>{ const n=nd(); const i=n.fav.indexOf(id); if(i>=0) n.fav.splice(i,1); else n.fav.unshift(id); save(); const p=alP(); const box=alBox(); if(box) box.innerHTML=alList(p); };
 A.alPick=id=>{ const f=alimGet(id); if(!f) return; const p=alP(); if (p.receta) return recAmount(f); amountModal(f,{m:p.m}); };
 A.alMealAdd=id=>{ const c=nd().comidas.find(x=>x.id===id); if(!c) return; const p=alP(), k=p.day||dayKeyOf(), n=nd();
   const add=c.items.map(i=>{ const f=alimGet(i.f); if(!f) return null; return Object.assign(alimMac(f,i.gr),{id:uid(),fid:f.id,n:f.n,gr:i.gr,por:i.por,q:i.q,m:p.m,t:Date.now()}); }).filter(Boolean);
-  n.diario[k]=(n.diario[k]||[]).concat(add); save(); closeLayer(); render.keep=true; render(); toast(`${c.n}: ${plural(add.length,'alimento añadido','alimentos añadidos')}`); diarioAdded(k,add); };
+  n.diario[k]=(n.diario[k]||[]).concat(add); diarioAbre(add); save(); closeLayer(); render.keep=true; render(); toast(`${c.n}: ${plural(add.length,'alimento añadido','alimentos añadidos')}`); diarioAdded(k,add); };
 A.alMealDel=id=>confirmBox({title:'¿Borrar esta comida guardada?',text:'Tu diario no cambia.',danger:true,okText:'Borrar',ok:()=>{ const n=nd(); n.comidas=n.comidas.filter(x=>x.id!==id); save(); refreshTop(); }});
 
 /* ---------- Cantidad ---------- */
@@ -9082,7 +9186,7 @@ function amountModal(f, o){
     const e=Object.assign(alimMac(f,g),{id:AQ.edit||uid(),fid:f.id,n:f.n,gr:Math.round(g*10)/10,por:por==='100 g'?null:por,q:AQ.pi>=0&&por!=='100 g'?AQ.q:null,m:AQ.m,t:Date.now()});
     if (por==='100 g'){ e.por=null; e.q=null; }
     const arr=n.diario[k]=n.diario[k]||[]; const i=arr.findIndex(x=>x.id===e.id); if (i>=0) arr[i]=e; else arr.push(e);
-    const isNew=!AQ.edit; save(); if (isNew && LAYERS.length && LAYERS[LAYERS.length-1].t==='alimBuscar') closeLayer(); render.keep=true; render(); if(isNew) toast(`${f.n} añadido`); vibrate(15); if (isNew) diarioAdded(k,[e]); });
+    const isNew=!AQ.edit; if (isNew) diarioAbre([e]); save(); if (isNew && LAYERS.length && LAYERS[LAYERS.length-1].t==='alimBuscar') closeLayer(); render.keep=true; render(); if(isNew) toast(`${f.n} añadido`); vibrate(15); if (isNew) diarioAdded(k,[e]); });
   const del=o.edit?cb(()=>dDel(o.edit)):null;
   openModal(`<div class="sheet"><div class="grab"></div><h3 style="margin-bottom:4px">${esc(f.n)}</h3>
     ${f.syn.length&&!EN_LANG()?`<div class="xs mut" style="margin:0 4px 10px">También: ${esc(f.syn.slice(0,4).join(', '))}</div>`:''}
@@ -9224,9 +9328,9 @@ A.dpEv=k=>{ const e=nd().prefs.evitar; const i=e.indexOf(k); if(i>=0) e.splice(i
 A.dpHab=()=>{ nut().habitos=!habitos(); save(); dpRepaint(); };
 
 /* ---------- Ayuno ---------- */
-function fastCard(){
+function fastCard(enNut){
   const n=nut(), f=n.fast;
-  let h=`<div class="sec">Ayuno intermitente</div>`;
+  let h=enNut?'':`<div class="sec">Ayuno intermitente</div>`;
   const p=S.profile||{};
   if (p.age && p.age<kb('nut.menores').edad) return h+`<div class="card sm mut" style="line-height:1.45">El ayuno intermitente no se recomienda en menores de 18 años. Te sugerimos comidas regulares y equilibradas.</div>`;
   if (f.blocked) return h+`<div class="card"><div class="sm" style="line-height:1.45">Por lo que nos indicaste, el ayuno intermitente no es recomendable sin supervisión profesional. Habla con tu médico o nutricionista antes de hacerlo.</div><button class="link sm" style="margin-top:10px" data-a="fastScreen">Revisar mis respuestas</button></div>`;
@@ -9282,7 +9386,9 @@ function fastAdvice(){
 }
 function fastHistory(){
   const H=nut().fast.history, hs=H.map((x,i)=>[x,i]).slice(-5).reverse(); const R=fastRachas();
-  return `<div class="row" style="margin:16px 2px 8px"><span class="sec grow" style="margin:0">${tx('Últimos ayunos','Latest fasts')}</span>${R.act?`<span class="tag ok">${tx(`${R.act} seguidos ✓`,`${R.act} in a row ✓`)}</span>`:''}</div>${hs.length?`<div class="card" style="padding:4px 14px">${hs.map(([x,i])=>fastFila(x,i)).join('')}</div>`:''}
+  // 1.8.1: los últimos ayunos van en un bloque desplegable con la racha y el último a la vista
+  const u=hs[0]&&hs[0][0], uh=u?(u.end-u.start)/3600000:0;
+  return `${hs.length?fold('ayunos',tx('Últimos ayunos','Latest fasts'),[R.act?tx(`${R.act} seguidos ✓`,`${R.act} in a row ✓`):'',u?tx(`el último: ${fmtHM(uh)} h`,`last one: ${fmtHM(uh)} h`):''].filter(Boolean).join(' · '),`<div style="margin:-4px 0 0">${hs.map(([x,i])=>fastFila(x,i)).join('')}</div>`,{st:'margin-top:14px'}):''}
   <div class="row" style="gap:8px;margin-top:8px"><button class="btn sm grow" data-a="fastStats">${I('chart',16)} ${tx('Estadísticas e historial','Stats and history')}</button><button class="btn sm" data-a="fastEdit" data-v="nuevo">${I('plus',16)} ${tx('Añadir','Add')}</button></div>`;
 }
 A.fastScreen=()=>{
@@ -9443,12 +9549,14 @@ function waterExtraHoy(){ return ((nut().waterExtra||{})[dayKey()])||0; }
 function wGoalDia(k){ const n=nut(); if (k===dayKey()) return waterGoal(); return ((n.waterGoalDia||{})[k])||waterGoalBase(); }
 function waterGoalBase(){ const w=bodyWeight(), K=kb('agua'), sx=(S.profile||{}).sex, ref=K.ref[sx==='h'?'h':sx==='m'?'m':'x']; return Math.round(Math.min(ref*K.max, Math.max(ref*K.min, K.mlkg*w))/50)*50; }
 function wGuardaMeta(){ const n=nut(); n.waterGoalDia=n.waterGoalDia||{}; n.waterGoalDia[dayKey()]=waterGoal(); const ks=Object.keys(n.waterGoalDia).sort(); if (ks.length>120) ks.slice(0,ks.length-120).forEach(k=>delete n.waterGoalDia[k]); }
-function aguaHoyHtml(){ const n=nut(), k=dayKey(), L=wLog(k), sum=L.reduce((a,x)=>a+x.ml,0), resto=Math.max(0,((n.water||{})[k]||0)-sum), ex=waterExtraHoy();
-  let h=`<div class="row" style="margin:16px 2px 8px"><span class="sec grow" style="margin:0">${tx('Hoy','Today')}</span><button class="link sm" style="white-space:nowrap" data-a="wHora">${I('plus',14)} ${tx('Con otra hora','At another time')}</button></div>`;
-  h+=`<div class="card" style="padding:4px 14px;margin-bottom:8px"><button class="srow" style="width:100%" data-a="wCalor"><span class="grow"><div class="b sm">${tx('Día de calor o de mucho sudor','Hot day or heavy sweating')}</div><div class="xs mut">${ex?tx(`Meta de hoy +${ex} ml`,`Today's goal +${ex} ml`):tx(`Suma ${kb('agua.calor').ml} ml a la meta de hoy`,`Adds ${kb('agua.calor').ml} ml to today's goal`)}</div></span><span class="toggle ${ex?'on':''}"></span></button><div class="xs" style="padding:0 0 10px">${kbLink('agua.calor',tx('Por qué medio litro','Why half a litre'))}</div></div>`;
-  if (!L.length && !resto) return h+`<div class="card sm mut">${tx('Todavía no registraste agua hoy.','You have not logged any water today.')}</div>`;
-  return h+`<div class="card" style="padding:4px 14px">${L.map((x,i)=>[x,i]).reverse().map(([x,i])=>`<div class="kv"><span>${I('drop',14)} <b>${x.ml} ml</b>${x.n?` <span class="mut xs">${esc(x.n)}</span>`:''}</span><span class="row" style="gap:6px"><span class="mut sm">${hhmm(x.t)}</span><button class="ibtn" style="width:32px;height:32px" data-a="wDel" data-v="${i}" aria-label="${tx('Borrar','Delete')}">${I('close',16)}</button></span></div>`).join('')}
-    ${resto?`<div class="kv"><span>${I('drop',14)} <b>${resto} ml</b></span><span class="mut xs">${tx('sin hora (widget o aviso)','no time (widget or notification)')}</span></div>`:''}</div>`; }
+// 1.8.1: «Día de calor» va dentro de la tarjeta del agua; el registro de hoy es un bloque desplegable
+function aguaCalorHtml(){ const ex=waterExtraHoy();
+  return `<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:4px"><button class="srow" style="width:100%" data-a="wCalor"><span class="grow"><div class="b sm">${tx('Día de calor o de mucho sudor','Hot day or heavy sweating')}</div><div class="xs mut">${ex?tx(`Meta de hoy +${ex} ml`,`Today's goal +${ex} ml`):tx(`Suma ${kb('agua.calor').ml} ml a la meta de hoy`,`Adds ${kb('agua.calor').ml} ml to today's goal`)}</div></span><span class="toggle ${ex?'on':''}"></span></button><div class="xs" style="margin-top:-4px">${kbLink('agua.calor',tx('Por qué medio litro','Why half a litre'))}</div></div>`; }
+function aguaHoyHtml(){ const n=nut(), k=dayKey(), L=wLog(k), sum=L.reduce((a,x)=>a+x.ml,0), resto=Math.max(0,((n.water||{})[k]||0)-sum);
+  const body=`<button class="link sm" style="white-space:nowrap;margin:-2px 0 4px" data-a="wHora">${I('plus',14)} ${tx('Añadir con otra hora','Add at another time')}</button>${!L.length&&!resto?`<div class="sm mut" style="padding:4px 0">${tx('Todavía no registraste agua hoy.','You have not logged any water today.')}</div>`:`${L.map((x,i)=>[x,i]).reverse().map(([x,i])=>`<div class="kv"><span>${I('drop',14)} <b>${x.ml} ml</b>${x.n?` <span class="mut xs">${esc(x.n)}</span>`:''}</span><span class="row" style="gap:6px"><span class="mut sm">${hhmm(x.t)}</span><button class="ibtn" style="width:32px;height:32px" data-a="wDel" data-v="${i}" aria-label="${tx('Borrar','Delete')}">${I('close',16)}</button></span></div>`).join('')}
+    ${resto?`<div class="kv"><span>${I('drop',14)} <b>${resto} ml</b></span><span class="mut xs">${tx('sin hora (widget o aviso)','no time (widget or notification)')}</span></div>`:''}`}`;
+  const ult=L.length?L[L.length-1]:null;
+  return fold('aguaHoy',tx('Registro de agua hoy','Water log today'),L.length?tx(`${plural(L.length,'registro','registros')} · el último a las ${hhmm(ult.t)}`,`${L.length} ${L.length===1?'entry':'entries'} · last at ${hhmm(ult.t)}`):tx('Sin registros todavía','No entries yet'),body,{st:'margin-top:4px'}); }
 A.wDel=i=>{ const n=nut(), k=dayKey(), L=wLog(k), x=L[+i]; if (!x) return; L.splice(+i,1); n.water[k]=Math.max(0,(n.water[k]||0)-x.ml); save(); render.keep=true; render(); toastUndo(tx(`${x.ml} ml borrados`,`${x.ml} ml removed`),()=>{ L.splice(+i,0,x); n.water[k]=(n.water[k]||0)+x.ml; }); };
 A.wCalor=()=>{ const n=nut(), k=dayKey(); n.waterExtra=n.waterExtra||{}; if (n.waterExtra[k]) delete n.waterExtra[k]; else n.waterExtra[k]=kb('agua.calor').ml;
   Object.keys(n.waterExtra).forEach(x=>{ if (x<dayKey(Date.now()-30*DAY)) delete n.waterExtra[x]; }); save(); render.keep=true; render(); };
@@ -10071,7 +10179,7 @@ const CQ_CTX={rutinas:['estado','hoy','series','descarga','estanco'],estadoDia:[
   exercise:['pesoUsar','estanco','molestia'],session:['pesoCambio','hoy','agujetas','despues'],workout:['pesoCambio','hoy','agujetas'],recuMapa:['colores','hoy','agujetas','recuCalc'],plan:['dias','descarga'],suplementos:['creatina','polvo','cafeina'],
   periodo:['estanco','noBajo','dias'],menu:['proteina','calorias','antes']};
 function cqContexto(){ const top=LAYERS.length?LAYERS[LAYERS.length-1]:null;
-  let k=top&&CQ_CTX[top.t]?top.t:(TAB==='nutricion'&&typeof NSEG!=='undefined'&&NSEG==='agua'?'agua':TAB);
+  let k=top&&CQ_CTX[top.t]?top.t:(TAB==='nutricion'&&typeof NSEG!=='undefined'&&['agua','ayuno'].includes(NSEG)?NSEG:TAB);
   const ids=(CQ_CTX[k]||CQ_CTX.rutinas).filter(id=>CQ.some(q=>q.id===id));
   const ej=top&&top.t==='exercise'&&top.p&&(top.p.id||top.p.exId);
   return {ids, p:ej?{ej}:null}; }
@@ -10637,7 +10745,7 @@ A.openMenu=()=>{ if (!prem()) return payFor('menu'); if (!calcNutrition()) retur
 A.menuOtro=()=>{ const t=LAYERS[LAYERS.length-1]; t.p.seed=(t.p.seed*7+13)%2147483647; refreshTop(); };
 function menuEntries(M){ return M.items.map(it=>{ const f=ALIM[it.id]; return Object.assign(alimMac(f,it.gr),{id:uid(),fid:f.id,n:f.n,gr:it.gr,por:it.por||null,q:it.q||null,m:M.m,t:Date.now()}); }); }
 A.menuAdd=m=>{ const t=LAYERS[LAYERS.length-1], c=calcNutrition(); if (!c) return; const mn=buildMenu(c,t.p.seed); const ms=mn.meals.filter(M=>m==='all'||M.m===m);
-  const n=nd(), k=dayKey(), add=ms.flatMap(menuEntries); if (!add.length) return; n.diario[k]=(n.diario[k]||[]).concat(add); NUT_DAY=null; save(); render.keep=true; render();
+  const n=nd(), k=dayKey(), add=ms.flatMap(menuEntries); if (!add.length) return; n.diario[k]=(n.diario[k]||[]).concat(add); diarioAbre(add); NUT_DAY=null; save(); render.keep=true; render();
   toast(m==='all'?tx('Menú añadido a tu diario de hoy','Menu added to today’s diary'):tx(`${(MEALS.find(x=>x[0]===m)||[,''])[1]} añadido a tu diario`,'Meal added to your diary')); diarioAdded(k,add); };
 SCREENS.menu=p=>{
   const c=calcNutrition(); if (!c) return lhdr(tx('Ejemplo de menú','Sample menu'))+`<div class="lbody"><p class="sm mut">${tx('Completa tu perfil.','Complete your profile.')}</p></div>`;
@@ -10730,9 +10838,10 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='1.8';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
-const APP_PARCHE='';
+const APP_PARCHE='1';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.8.1',t:'Más ordenada',items:['Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes', 'Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos', 'El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección', 'Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan', 'Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados', 'El buscador de alimentos entiende plurales y errores de una letra', '39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate']},
  {v:'1.8',t:'PandarIA aprende de ti',items:['Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)', '10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas', 'PandarIA con 19 fuentes nuevas, entre ellas la postura del ACSM de 2026: vuelve de una pausa según tu edad (Bosquet 2013), descargas con una serie menos (Bell 2023), máximo estimado más fiable (Mayhew 2008), calorías con los factores de la FAO/OMS y el modelo de Hall, proteína por comida de 0,4 g/kg, meta de pasos según tu edad y calorías de cada entreno (Compendio 2024)', 'Tu primera serie de un ejercicio nuevo calibra el peso de las siguientes, el gasto real usa 3 semanas de datos, y cada fuente de la Biblioteca enlaza con las otras reglas que salen de ella', 'Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas', 'PandarIA elige mejor el peso: tras una descarga ya no lo baja dos veces, si anotas que te sobran muchas repeticiones lo recalcula con tu fuerza real, y tus repeticiones de sobra mandan sobre la nota de la sesión', 'Arreglos encontrados con 32 usuarios simulados durante un mes: récords sin peso, doble toque en Terminar o al elegir una ración, y metas de nutrición que podían salir en blanco']},
  {v:'1.7',t:'El panda te avisa',items:['El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros', 'Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)', 'iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple', 'iPhone: textos de Apple Health corregidos']},
  {v:'1.6',t:'Interfaz a tu gusto',items:['Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento', 'Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar', 'Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas', 'Ningún texto cortado: los consejos del día se leen enteros', 'iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta', 'Escribe el código de barras a mano si la cámara no puede leerlo']},
@@ -10775,7 +10884,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.8 · PandarIA aprende de ti", "Estado del día: PandarIA aprende cómo llegas y ajusta sus sugerencias", "19 fuentes científicas nuevas: pausas según tu edad, descargas y calorías más precisas", "Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal", "10 ejercicios nuevos, entre ellos las bayitas (extensión de tríceps con peso corporal)", "Calorías de cada entreno y meta de pasos según tu edad", "Historial por pestañas y Nutrición más ordenada", "Más de 10 fallos corregidos tras simular 32 usuarios y 3 meses de entrenamiento"];
+const NOTAS_VERSION=["1.8.1 · Más ordenada", "Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes", "Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos", "El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección", "Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan", "Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados", "El buscador de alimentos entiende plurales y errores de una letra", "39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -11083,7 +11192,7 @@ A.obEnd=v=>{
   if (hayPerfil || p.pf.name){ S.profile=Object.assign({injuries:[]}, S.profile||{}, p.pf); if (p.pf.weight && !S.measures.some(m=>m.peso)) S.measures.push({id:uid(),date:Date.now(),peso:p.pf.weight}); }
   S.settings.onboarded=true; S.settings.cloudIntro=true; save(); closeLayer();
   if (cloudS()) setTimeout(()=>cloudBackup({}),1500);
-  setTimeout(()=>{ if (v==='pandaria') openLayer('wizPandaria',{step:0,goal:'musculo',days:3,minutes:60,level:S.settings.level,priorities:[]}); else if (v==='explorar'){ TAB='explorar'; render(); } },120);
+  setTimeout(()=>{ if (v==='pandaria') openLayer('wizPandaria',{step:0,goal:'musculo',days:3,minutes:60,level:S.settings.level,priorities:[]}); else if (v==='explorar'){ TAB='rutinas'; render(); A.openExplorar(); } },120);
 };
 
 /* ---------- Para quien ya tenía la app: una tarjeta breve, una sola vez ---------- */
@@ -12219,7 +12328,46 @@ Dificultad|Difficulty`;
 const EN_MAP = new Map();
 const ES_EX_NAME = {};
 /* ---------- Inglés del contenido 0.8 (diario, Biblioteca, suplementos, menús, Health Connect) ---------- */
-const ALIM_EN_RAW=`09003|Apple with skin
+const ALIM_EN_RAW=`02020|Garlic powder
+02026|Onion powder
+02004|Bay leaves
+02042|Dried thyme
+02036|Dried rosemary
+02025|Ground nutmeg
+02011|Cloves
+02015|Curry powder
+02031|Cayenne pepper
+02002|Anise seed
+18369|Baking powder
+18372|Baking soda
+18376|Active dry yeast
+06971|Worcestershire sauce
+06176|Oyster sauce
+02048|Apple cider vinegar
+02054|Capers
+19304|Molasses
+04058|Sesame oil
+01003|Ghee
+04615|Vegetable shortening
+11953|Tomatillo
+11984|Epazote
+11670|Poblano pepper
+11977|Serrano pepper
+11238|Shiitake mushrooms
+71930200|Cassava bread (casabe)
+20061|Rice flour
+16157|Chickpea flour
+56107000|Potato gnocchi
+09294|Dried cranberries
+09434|Dragon fruit
+01088|Buttermilk
+13023|Salted dried beef (tasajo)
+15102|Red snapper
+15038|Grouper
+15060|Spanish mackerel
+15052|Mullet
+02063|Spearmint (mint)
+09003|Apple with skin
 09004|Peeled apple
 09040|Banana
 09200|Orange
@@ -13984,6 +14132,15 @@ Quitar plan semanal|Remove weekly plan
 ¿Quitar el plan semanal?|Remove the weekly plan?
 Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.|Your routines and history stay the same; you just won't see what is planned for each day.
 Quitar plan|Remove plan
+1.8.1 · Más ordenada|1.8.1 · Tidier
+Más ordenada|Tidier
+Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes|4-tab menu: Routines, Nutrition, History and Settings
+Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos|Explore exercises and routines and Interval mode are now in the + on Routines, sorted into three groups
+El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección|Fasting is back in Nutrition next to Food and Water; if you are fasting, you see it at the top of every section
+Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan|Shorter Food, Water, Fasting and History: what matters is on show and the rest is in sections that expand
+Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados|Fixed the ingredient search when creating a recipe, which showed no results
+El buscador de alimentos entiende plurales y errores de una letra|Food search understands plurals and one-letter typos
+39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate|39 new ingredients (spices, baking, cassava bread, gnocchi, dried beef, fish…) and more names from Cuba, Mexico and Uruguay
 1.8 · PandarIA aprende de ti|1.8 · PandarIA learns from you
 Estado del día: PandarIA aprende cómo llegas y ajusta sus sugerencias|Daily readiness: PandarIA learns how you feel and adapts its suggestions
 19 fuentes científicas nuevas: pausas según tu edad, descargas y calorías más precisas|19 new scientific sources: age-based return after breaks, deloads and more accurate calories

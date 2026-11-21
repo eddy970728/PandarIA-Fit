@@ -346,7 +346,8 @@
     let h = _vn.apply(this, arguments);
     if (!locked()) return h;
     // 1.3: Comida y Agua son subpestañas; el bloque de calorías termina en la marca <!--fin-objetivo-->
-    const a = h.indexOf('<div class="sec">Tu objetivo diario</div>'), b = h.indexOf('<!--fin-objetivo-->');
+    // 1.8.1: el objetivo es un bloque desplegable que empieza en <!--ini-objetivo-->
+    const a0 = h.indexOf('<!--ini-objetivo-->'), a = a0 >= 0 ? a0 : h.indexOf('<div class="sec">Tu objetivo diario</div>'), b = h.indexOf('<!--fin-objetivo-->');
     if (a < 0 || b < 0) return h;
     // 1.8: una tarjeta de una línea con candado en vez del bloque borroso
     return h.slice(0, a) + `<button class="card row tap pf-lockline" style="width:100%;gap:10px;padding:12px 14px;text-align:left" data-a="pfGo" data-v="nutrition"><span style="font-size:18px">🔒</span><div class="grow"><div class="b sm">Calorías y macros</div><div class="xs mut">Tu objetivo diario y tu diario comparado con él · Premium</div></div><span class="mut">›</span></button>` + h.slice(b);
@@ -356,7 +357,8 @@
   const FREE_ROUTINES = 3;
   const roomFor = (n=1) => !locked() || S.routines.length + n <= FREE_ROUTINES;
   const guard = (fn, n) => function(){ const k = typeof n === 'function' ? n() : (n || 1); if (!roomFor(k)) return pay('routines'); return fn.apply(this, arguments); };
-  A.newRoutine = guard(A.newRoutine);
+  // 1.8.1: el + también lleva a Explorar y a intervalos, que no crean rutinas: el límite se comprueba al elegir una opción que crea una
+  window.pfRoomFor = roomFor;
   A.tplAdd = guard(A.tplAdd);
   A.importCode = guard(A.importCode);
   if (A.wgGo) A.wgGo = guard(A.wgGo);

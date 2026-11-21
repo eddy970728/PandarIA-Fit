@@ -6374,24 +6374,24 @@
   "Graba tu técnica de vez en cuando: verte desde fuera corrige errores que no sientes."
  ],
  "alimentos_base": {
-  "n": 637,
+  "n": 676,
   "cats": {
-   "carne": 44,
-   "verdura": 89,
-   "legumbre": 23,
+   "carne": 45,
+   "verdura": 95,
+   "legumbre": 24,
    "bebida": 40,
-   "condimento": 30,
+   "condimento": 47,
    "semilla": 20,
-   "fruta": 64,
+   "fruta": 66,
    "suplemento": 5,
-   "lacteo": 55,
-   "pescado": 38,
+   "lacteo": 56,
+   "pescado": 42,
    "snack": 9,
-   "cereal": 62,
-   "dulce": 40,
+   "cereal": 65,
+   "dulce": 41,
    "preparado": 79,
    "ave": 19,
-   "grasa": 10,
+   "grasa": 13,
    "huevo": 10
   },
   "muestra": [
@@ -6600,6 +6600,7 @@
   ],
   "yuca": [
    "Mandioca",
+   "Casabe",
    "Chips de mandioca"
   ],
   "pollo": [
