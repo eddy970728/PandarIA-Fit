@@ -5897,6 +5897,88 @@
  "sugerencia_esfuerzo_alto": [
   [
    {
+    "kg": 32.5,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 32.5,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 32.5,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   }
+  ],
+  [
+   {
+    "kg": 40,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 40,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   },
+   {
+    "kg": 40,
+    "reps": 8,
+    "time": null,
+    "why": "Completaste todas las series: sube el peso"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": 12,
+    "time": null,
+    "why": "Mantén las repeticiones"
+   },
+   {
+    "kg": null,
+    "reps": 12,
+    "time": null,
+    "why": "Mantén las repeticiones"
+   },
+   {
+    "kg": null,
+    "reps": 12,
+    "time": null,
+    "why": "Mantén las repeticiones"
+   }
+  ],
+  [
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": ""
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": ""
+   },
+   {
+    "kg": null,
+    "reps": null,
+    "time": 70,
+    "why": ""
+   }
+  ]
+ ],
+ "sugerencia_esfuerzo_alto_al_fallo": [
+  [
+   {
     "kg": 31,
     "reps": 12,
     "time": null,
@@ -6036,29 +6118,29 @@
        "sets": [
         {
          "t": "n",
-         "reps": 10,
-         "kg": 25,
+         "reps": 16,
+         "kg": 21.5,
          "time": null
         },
         {
          "t": "n",
-         "reps": 10,
-         "kg": 25,
+         "reps": 16,
+         "kg": 21.5,
          "time": null
         },
         {
          "t": "n",
-         "reps": 10,
-         "kg": 25,
+         "reps": 16,
+         "kg": 21.5,
          "time": null
         }
        ],
-       "line": "Curl con barra 25 kg × 10"
+       "line": "Curl con barra 21,5 kg × 16"
       }
      ]
     },
     "why": "La sobrecarga progresiva es la base de las ganancias de fuerza y músculo.",
-    "text": "Progresaste en 3 ejercicios. Actualizo la rutina con tus nuevos números: Press de banca con barra 35 kg × 8 · Remo con barra 35 kg × 8 · Curl con barra 25 kg × 10."
+    "text": "Progresaste en 3 ejercicios. Actualizo la rutina con tus nuevos números: Press de banca con barra 35 kg × 8 · Remo con barra 35 kg × 8 · Curl con barra 21,5 kg × 16."
    }
   ],
   "completions": 6

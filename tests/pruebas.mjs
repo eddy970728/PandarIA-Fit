@@ -6,6 +6,7 @@
 //                                            (solo cuando Eddy aprueba un cambio a propósito)
 import { JSDOM, VirtualConsole } from 'jsdom';
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -64,14 +65,14 @@ window.__reset = (profile, settings) => {
 // Historial sintético: n sesiones de una rutina, una cada 'cada' días, terminando hace 'fin' días.
 // Las cargas suben 'paso' kg por sesión; en la última se llega al tope del rango si 'tope'.
 window.__hist = (r, o) => {
-  o = Object.assign({ n: 6, cada: 3, fin: 1, base: 0.6, paso: 2.5, tope: true, intensidad: 7 }, o);
+  o = Object.assign({ n: 6, cada: 3, fin: 1, base: 0.6, paso: 2.5, tope: true, intensidad: 7, rir: 2 }, o);
   for (let k = 0; k < o.n; k++) {
     const end = ${NOW} - (o.fin + (o.n - 1 - k) * o.cada) * DAY, last = k === o.n - 1;
     const items = r.items.map(it => { const ex = getEx(it.exId); return { exId: it.exId, note: '', sets: it.sets.filter(s => s.t !== 'c').map(s => {
       if (ex.mode === 't') return { t: 'n', time: (+s.time || 30) + k * 5, done: true };
       const reps = it.range ? (last && o.tope ? it.range[1] : it.range[0] + (k % 2)) : (+s.reps || 10);
       const kg = ex.mode === 'p' ? Math.round(((+s.kg || 20) * o.base + k * o.paso) * 2) / 2 : null;
-      return { t: 'n', kg, reps, done: true, rir: 2 }; }) }; });
+      return { t: 'n', kg, reps, done: true, rir: o.rir }; }) }; });
     const s = { id: 's' + k + '_' + r.id, routineId: r.id, routineName: r.name, start: end - 3600000, end, intensity: o.intensidad, checkin: null, items };
     s.vol = sessionVolume(s); s.prs = []; S.sessions.push(s);
     S.firstSession = S.firstSession || end; S.periodStart = S.periodStart || end;
@@ -128,6 +129,7 @@ caso('sugerencia_tras_tope', new Function(SUG({ n: 4, tope: true })));
 caso('sugerencia_sin_tope', new Function(SUG({ n: 4, tope: false })));
 caso('sugerencia_tras_parar_30_dias', new Function(SUG({ n: 4, fin: 30 })));
 caso('sugerencia_esfuerzo_alto', new Function(SUG({ n: 5, intensidad: 10 })));
+caso('sugerencia_esfuerzo_alto_al_fallo', new Function(SUG({ n: 5, intensidad: 10, rir: 0 })));
 // 36-38 · Análisis después de entrenar
 caso('analisis_tras_sesion', () => { __reset(HOMBRE, { level: 'intermedio' }); const r = __routine([buildItem('press_banca', 'musculo', 2), buildItem('remo_barra', 'musculo', 2), buildItem('curl_barra', 'musculo', 2)]);
   __hist(r, { n: 6, tope: true }); const created = S.sessions.map(x => afterSession(x)).flat(); return __clean({ created, sugg: r.sugg, completions: r.completions }); });
@@ -970,6 +972,85 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.8.1 menú: Explorar se abre desde Rutinas y el + tiene Explorar, Crear rutina y Entrenar ahora', r.explorar && r.mas && r.sinIntervalosArriba, JSON.stringify([r.explorar, r.mas, r.sinIntervalosArriba]));
   comprobar('1.8.1 gratis con 3 rutinas: Explorar se abre; crear una rutina pide Premium', r.gratisExplora && r.gratisCrea, JSON.stringify([r.gratisExplora, r.gratisCrea]));
   comprobar('1.8.1 Nutrición: franja del ayuno, objetivo desplegable que se recuerda y última sección recordada', r.franja && r.objCerrado && r.objAbierto && r.recuerda, JSON.stringify([r.franja, r.objCerrado, r.objAbierto, r.recuerda]));
+  a.cerrar();
+}
+
+/* ---------- 1.8.2: lo que encontró la simulación de un año ---------- */
+{
+  // cambio de hora: racha, gráfica y informe semanal con la hora de España y la de Nueva York
+  for (const tz of ['Europe/Madrid', 'America/New_York']) {
+    let r = {}; try { r = JSON.parse(execFileSync(process.execPath, [new URL('./sim/cambio-hora.mjs', import.meta.url).pathname], { env: Object.assign({}, process.env, { TZ: tz }), encoding: 'utf8' }).trim().split('\n').pop()); } catch (e) { r = { error: String(e).slice(0, 200) }; }
+    comprobar(`1.8.2 cambio de hora (${tz}): 8 semanas seguidas dan racha 8, la gráfica las ve todas y el informe compara con la semana anterior`, r.racha === 8 && r.semanas === 8 && r.previa === 1 && !r.errores, JSON.stringify(r));
+  }
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); window.isPremium=()=>true; const out={};
+    const ids=['press_banca','remo_barra','press_militar','curl_barra','sentadilla'];
+    const mk=n=>__routine(ids.slice(0,n).map(id=>buildItem(id,'musculo',2)));
+    const ses=(r,plan,hechos,dias)=>{ S.sessions.push({id:uid(),routineId:r.id,routineName:r.name,start:Date.now()-dias*DAY-3600e3,end:Date.now()-dias*DAY,intensity:7,planned:plan,items:hechos.map(id=>({exId:id,sets:[{t:'n',kg:20,reps:10,done:true}]}))}); };
+    // un ejercicio recién cambiado (no estaba planeado en las sesiones anteriores) no se propone quitar
+    let r1=mk(5); const nuevo='press_inclinado_man'; r1.items[4].exId=nuevo;
+    for (let i=4;i>=1;i--) ses(r1,ids.slice(0,5),ids.slice(0,4),i*7);
+    out.nuevo=ejercicioSaltado(); S.sessions=[];
+    // uno planeado y saltado 3 de 4 veces sí se propone
+    for (let i=4;i>=1;i--) ses(r1,ids.slice(0,4).concat([nuevo]),i===4?ids.slice(0,4).concat([nuevo]):ids.slice(0,4),i*7);
+    const sa=ejercicioSaltado(); out.saltado=sa&&sa.it.exId; S.sessions=[];
+    // con 4 ejercicios ya no se quita ninguno
+    S.routines=[]; const r2=mk(4); for (let i=4;i>=1;i--) ses(r2,ids.slice(0,4),ids.slice(0,3),i*7); out.minimo=ejercicioSaltado(); S.sessions=[]; S.routines=[];
+    // las semanas de vacaciones no cuentan como días saltados
+    const r3=mk(5); S.plan={days:[1,3,5],order:[r3.id]}; const wk0=weekKey(Date.now());
+    for (let w=1;w<=8;w++) if (w>2){ for (const d of [0,4]) { const t=weekShift(wk0,-w)+d*DAY+18*3600e3; S.sessions.push({id:uid(),routineId:r3.id,start:t-3600e3,end:t,items:[],planned:[]}); } }
+    S.sessions.sort((x,y)=>x.end-y.end); let hb=habitosPlan(); out.vacaciones=hb&&hb.salta&&hb.salta.sem; // 6 semanas con entrenos, no 8
+    // con un plan de 2 días no se propone quitar ninguno
+    S.plan={days:[1,3],order:[r3.id]}; S.sessions=S.sessions.filter(x=>new Date(x.end).getDay()===1); hb=habitosPlan(); out.dos=!!(hb&&hb.salta); // sin otro día al que cambiarlo S.sessions=[]; S.plan=null; S.routines=[];
+    // peso muy bajo con objetivo mantener: aviso con profesional, sin ayuno, sin celebraciones, estado del día no «listo»
+    __reset({name:'C',age:29,height:165,weight:43,sex:'m',fitness:'activo'}); nut().goal='mantener'; nut().fast.screened=true;
+    out.card=/médico o nutricionista/.test(riesgoCard()); out.ayuno=/no recomendamos ayunar/.test(fastAdvice());
+    S.checkins=S.checkins||{}; A.checkinHoy&&0; const E=estadoDia(); out.estado=E&&E.score!=null?E.score:'sin';
+    // comer menos que el metabolismo en reposo 7 días seguidos
+    __reset(MUJER); const D=nut().diario||(nut().diario={}); for (let i=1;i<=7;i++){ const k=dayKey(Date.now()-i*DAY); D[k]=[{id:'a'+i,fid:'20045',n:'Arroz',gr:300,k:450,m:'almuerzo'},{id:'b'+i,fid:'05062',n:'Pollo',gr:200,k:450,m:'cena'}]; }
+    const rp=riesgoPeso(); out.poco=!!(rp&&rp.poco&&!rp.nivel);
+    // mantener y bajando 0,8 % por semana: aviso con lo que come
+    __reset(MUJER); nut().goal='mantener'; S.measures=[]; for (let i=0;i<5;i++) S.measures.push({id:'m'+i,date:Date.now()-(28-i*7)*DAY,peso:60-i*0.5});
+    const c=calcNutrition(); out.deriva=c.notes.some(t=>/objetivo es mantener/.test(t));
+    // ayuno olvidado: a las 48 h pregunta si sigue
+    __reset(HOMBRE); nut().fast.screened=true; nut().fast.active={start:Date.now()-50*3600e3,goalH:16}; MODALS.length=0; fastOlvido(); out.olvido=/Sigues ayunando/.test(document.querySelector('#modals').textContent); MODALS.length=0; renderModals();
+    // versión gratis: si hiciste todas las repeticiones, te lo dice
+    __reset(HOMBRE); window.isPremium=()=>false; const rf=__routine([buildItem('press_banca','musculo',2)],{pandaria:false}); rf.items[0].sets.forEach(x=>{ x.kg=40; x.reps=8; });
+    S.sessions.push({id:'f1',routineId:rf.id,start:Date.now()-3*DAY-3600e3,end:Date.now()-3*DAY,intensity:6,items:[{exId:'press_banca',sets:rf.items[0].sets.filter(x=>x.t!=='c').map(x=>({t:'n',kg:40,reps:8,done:true}))}]});
+    out.gratis=suggestSet(rf,rf.items[0],rf.items[0].sets.findIndex(x=>x.t!=='c')).why; window.isPremium=()=>true;
+    // sesión muy dura: si al ejercicio le sobraron repeticiones se progresa; si llegaste al fallo, se mantiene
+    const dur=rir=>{ __reset(HOMBRE,{level:'intermedio'}); const rr=__routine([buildItem('press_banca','musculo',2)]); __hist(rr,{n:5,intensidad:10,rir}); const it=rr.items[0]; return suggestSet(rr,it,it.sets.findIndex(x=>x.t!=='c')).why; };
+    out.duroSobra=dur(2); out.duroFallo=dur(0);
+    // mancuernas ligeras: si el siguiente peso es un salto grande, primero más repeticiones
+    __reset(HOMBRE,{level:'intermedio'}); const rm=__routine([buildItem('press_hombro_man','musculo',2)]); rm.items[0].range=[8,12]; __hist(rm,{n:4,base:0,paso:0,tope:true}); rm.items[0].sets.forEach(x=>{ if(x.t!=='c') x.kg=6; });
+    S.sessions.forEach(ss=>ss.items.forEach(it=>it.sets.forEach(x=>{ x.kg=6; x.reps=12; })));
+    const sg=suggestSet(rm,rm.items[0],rm.items[0].sets.findIndex(x=>x.t!=='c')); out.salto=[sg.kg,sg.reps,sg.why];
+    // un toque en el objetivo se puede deshacer
+    __reset(HOMBRE); nut().goal='mantener'; A.nGoal('bajar'); const und=document.querySelector('.toast.undo button'); out.undo=!!und; if (und) und.click(); out.undoOk=nut().goal==='mantener';
+    return JSON.stringify(out); })()`));
+  // lesión nueva desde el perfil: se ofrece cambiar los ejercicios que la cargan y, al aceptar, ya no queda ninguno
+  a.w.eval(`__reset(HOMBRE); window.isPremium=()=>false; __routine(['zancadas','press_banca','ext_cuadriceps','remo_barra'].map(id=>buildItem(id,'musculo',2))); LAYERS.length=0; MODALS.length=0; A.openProfile(); A.pfInj('rodilla'); A.pfSave();`);
+  await espera(700);
+  r.lesionOfrece = a.w.eval(`/conviene cambiar/.test(document.querySelector('#modals').textContent)`);
+  a.w.eval(`[...document.querySelectorAll('#modals [data-a=cbm]')].find(b=>/Cambiarlos/.test(b.textContent)).click();`);
+  await espera(300);
+  r.lesionQueda = a.w.eval(`lesionBloqueados().map(x=>x.it.exId).join(',')`);
+  comprobar('1.8.2 rutinas: un ejercicio recién cambiado por PandarIA no se propone quitar «por saltado»', !r.nuevo, JSON.stringify(r.nuevo));
+  comprobar('1.8.2 rutinas: un ejercicio planeado y saltado 3 de 4 veces sí se propone quitar', r.saltado === 'press_inclinado_man', String(r.saltado));
+  comprobar('1.8.2 rutinas: con 4 ejercicios PandarIA ya no propone quitar ninguno', !r.minimo, JSON.stringify(r.minimo));
+  comprobar('1.8.2 plan: las semanas de vacaciones no cuentan como días saltados, y con 2 días no se propone quitar ninguno', r.vacaciones === 6 && r.dos === false, JSON.stringify([r.vacaciones, r.dos]));
+  comprobar('1.8.2 seguridad: con peso muy bajo y objetivo mantener hay aviso con profesional, sin ayuno, y el estado del día no sale «listo»', r.card && r.ayuno && (r.estado === 'sin' || r.estado < 80), JSON.stringify([r.card, r.ayuno, r.estado]));
+  comprobar('1.8.2 seguridad: comer menos que el metabolismo en reposo 7 días seguidos se avisa', r.poco);
+  comprobar('1.8.2 mantener: si el peso baja un 0,8 % por semana, la app lo dice', r.deriva);
+  comprobar('1.8.2 ayuno: a las 48 h pregunta «¿Sigues ayunando?»', r.olvido);
+  comprobar('1.8.2 gratis: si hiciste todas las repeticiones, la sugerencia dice «prueba a subir el peso»', /prueba a subir el peso/.test(r.gratis || ''), String(r.gratis));
+  comprobar('1.8.2 objetivo: un toque en Bajar/Mantener/Ganar se puede deshacer', r.undo && r.undoOk, JSON.stringify([r.undo, r.undoOk]));
+  comprobar('1.8.2 progresión: tras una sesión muy dura con repeticiones de sobra se progresa, y al fallo se mantiene', !/mantén/.test(r.duroSobra) && /mantén/.test(r.duroFallo), JSON.stringify([r.duroSobra, r.duroFallo]));
+  comprobar('1.8.2 progresión: con mancuernas de 6 kg (salto a 8 kg, +33 %) primero se suman repeticiones', r.salto[0] === 6 && r.salto[1] > 12 && /salto grande/.test(r.salto[2]), JSON.stringify(r.salto));
+  comprobar('1.8.2 lesión: al marcar la rodilla se ofrece cambiar sus ejercicios y, al aceptar, no queda ninguno (también gratis)', r.lesionOfrece && r.lesionQueda === '', JSON.stringify([r.lesionOfrece, r.lesionQueda]));
+  comprobar('1.8.2 sin errores en estas comprobaciones', !a.errores.length, a.errores.join(' | '));
   a.cerrar();
 }
 

@@ -1022,6 +1022,7 @@ const KB_SRC={
   bell2023:{n:'Integrating deloading into strength and physique sports training programmes: an international Delphi consensus approach', a:'Bell y col.', y:2023, pub:'Sports Med Open 9:87', url:'https://doi.org/10.1186/s40798-023-00633-0', lic:'consejo'},
   bell2025:{n:'A practical approach to deloading: recommendations and considerations for strength and physique sports', a:'Bell y col.', y:2025, pub:'Strength Cond J', url:'https://doras.dcu.ie/31501/', lic:'consejo'},
   bosquet2013:{n:'Effect of training cessation on muscular performance: a meta-analysis', a:'Bosquet y col.', y:2013, pub:'Scand J Med Sci Sports 23(3):e140–e149', url:'https://doi.org/10.1111/sms.12047', lic:'consejo'},
+  lopez2021:{n:'Resistance training load effects on muscle hypertrophy and strength gain: systematic review and network meta-analysis', a:'Lopez y col.', y:2021, pub:'Med Sci Sports Exerc 53(6):1206–1216', url:'https://doi.org/10.1249/MSS.0000000000002585', lic:'consejo'},
   refalo2023:{n:'Influence of resistance training proximity-to-failure on skeletal muscle hypertrophy: a systematic review with meta-analysis', a:'Refalo y col.', y:2023, pub:'Sports Med 53(3):649–665', url:'https://doi.org/10.1007/s40279-022-01784-y', lic:'consejo'},
   zourdos2016:{n:'Novel resistance training-specific rating of perceived exertion scale measuring repetitions in reserve', a:'Zourdos y col.', y:2016, pub:'J Strength Cond Res 30(1):267–275', url:'https://doi.org/10.1519/JSC.0000000000001049', lic:'consejo'},
   ebben2011:{n:'Kinetic analysis of several variations of push-ups', a:'Ebben y col.', y:2011, pub:'J Strength Cond Res 25(10):2891–2894', url:'https://pubmed.ncbi.nlm.nih.gov/?term=Kinetic+analysis+of+several+variations+of+push-ups+Ebben', lic:'consejo'},
@@ -1089,15 +1090,17 @@ const KB_RULES=[
   {id:'alternativa.similar', area:'entreno', n:'Alternativas de dificultad parecida', v:{facil:-3, nivel:-1}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
     t:'Cuando PandarIA propone cambiar un ejercicio, busca uno que trabaje lo mismo con una dificultad parecida: evita pasar de un ejercicio con peso a uno mucho más fácil y cuenta como tuyo el equipo del ejercicio que ya haces.', usa:'Cambios de ejercicio por estancamiento o molestia', rev:'2027-11-01', desde:'0.8.3'},
   {id:'carga.subida', area:'entreno', n:'Cuánto subir el peso', v:{inf:0.05, sup:0.025}, src:['currier2026','acsm2009'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
-    t:'Cuando completas todas las series en el tope de repeticiones, se sube la carga entre un 2 y un 10 %. PandarIA sube un 5 % en piernas y un 2,5 % en el resto, como mínimo un disco. La sobrecarga progresiva es lo que más influye en lo que ganas (ACSM 2026).', usa:'Sugerencia de peso en cada serie', rev:'2028-11-01', desde:'0.8.1'},
+    t:'Cuando completas todas las series en el tope de repeticiones (con 3 series o más, la última puede quedarse a una repetición), se sube la carga entre un 2 y un 10 %. PandarIA sube un 5 % en piernas y un 2,5 % en el resto, como mínimo un disco. La sobrecarga progresiva es lo que más influye en lo que ganas (ACSM 2026).', usa:'Sugerencia de peso en cada serie', rev:'2028-11-01', desde:'0.8.1'},
   {id:'carga.doble', area:'entreno', n:'Doble progresión', v:{reps:1, repsFacil:2}, src:['currier2026','acsm2009'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
     t:'Primero se suman repeticiones con el mismo peso hasta llegar al tope del rango, y solo entonces se sube el peso.', usa:'Sugerencia de repeticiones en cada serie', rev:'2028-11-01', desde:'0.8.1'},
   {id:'carga.rir', area:'entreno', n:'Repeticiones en reserva', v:{facil:5, minSeries:2, rirObj:2, maxSube:0.2}, src:['helms2016','zourdos2016'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
     t:'Si anotas cuántas repeticiones te sobraban (RIR) y en la última sesión te sobraron 5 o más de media (en 2 series o más), sumar de a una repetición tardaría semanas. PandarIA calcula tu fuerza con lo que hiciste más lo que te sobró y propone el peso para tus repeticiones dejando unas 2 en reserva, subiendo como mucho un 20 % de una vez. La escala de repeticiones en reserva está validada (Zourdos y col., 2016).', usa:'Sugerencia de peso en cada serie', rev:'2028-11-01', desde:'1.8'},
   {id:'carga.bajada', area:'entreno', n:'Bajar tras dos fallos', v:{f:0.9}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
-    t:'Si dos sesiones seguidas no llegas al mínimo de repeticiones, PandarIA baja el peso un 10 % para consolidar la técnica y volver a subir.', usa:'Sugerencia de peso en cada serie', rev:'2027-11-01', desde:'0.8.1'},
+    t:'Si dos sesiones seguidas no llegas al mínimo de repeticiones en la primera serie o en la mitad de las series o más, PandarIA baja el peso un 10 % para consolidar la técnica y volver a subir. Que la última serie se quede corta es normal y no cuenta.', usa:'Sugerencia de peso en cada serie', rev:'2027-11-01', desde:'0.8.1'},
+  {id:'carga.salto', area:'entreno', n:'Saltos de peso grandes', v:{rel:0.1, maxExtra:6}, src:['lopez2021','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
+    t:'Con pesos ligeros, el siguiente disco o mancuerna puede ser un 20 o 25 % más. Si el salto supera el 10 %, PandarIA no sube todavía: te pide sumar repeticiones hasta que tu fuerza estimada te permita hacer el peso nuevo dentro del rango, como mucho 6 por encima del rango; entonces sube. Con series cerca del fallo, el músculo crece de forma parecida con pesos altos, medios o bajos (para la fuerza máxima rinden algo más los altos).', usa:'Sugerencia de peso en cada serie', rev:'2028-11-01', desde:'1.8.2'},
   {id:'carga.esfuerzo', area:'entreno', n:'Sesión muy exigente', v:{rpe:9, rirOk:3}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
-    t:'Si marcaste la sesión anterior como muy exigente (9 o 10 de 10), PandarIA mantiene el peso en lugar de subirlo. Desde la 1.8, si además anotaste las repeticiones que te sobraban y de media fueron 3 o más, manda lo que dicen tus series: la progresión sigue.', usa:'Sugerencia de peso en cada serie', rev:'2027-11-01', desde:'0.8.1'},
+    t:'Si marcaste la sesión anterior como muy exigente (9 o 10 de 10), PandarIA mantiene el peso en lugar de subirlo. Desde la 1.8, si además anotaste las repeticiones que te sobraban y de media fueron 3 o más, manda lo que dicen tus series: la progresión sigue. Desde la 1.8.2, si te sobró al menos 1 de media en ese ejercicio, se suma una repetición o, si llegaste al tope, se sube un disco: solo se mantiene si llegaste al fallo.', usa:'Sugerencia de peso en cada serie', rev:'2027-11-01', desde:'0.8.1'},
   {id:'regreso.pausa', area:'entreno', n:'Volver tras una pausa', v:{dias:[28,56,84], f:[0.9,0.8,0.7], edadMayor:65, diasMayor:[14,42,70]}, src:['bosquet2013','pandaria'], lic:'consejo', ev:'moderada', pob:'Todos',
     t:'Un metaanálisis de 103 estudios encontró que la fuerza máxima casi no cambia en las primeras 4 semanas sin entrenar y que se pierde más rápido después; los mayores de 65 la pierden unas dos veces más. Por eso PandarIA baja el peso un 10 % tras 4 semanas sin hacer un ejercicio, un 20 % tras 8 y un 30 % tras 12; desde los 65 años empieza a las 2 semanas.', usa:'Sugerencia de peso al volver', rev:'2027-11-01', desde:'0.8.1'},
   {id:'bloque', area:'entreno', n:'Bloques de 6 semanas', v:{vol:3, int:2, des:1}, src:['currier2026','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
@@ -1147,6 +1150,10 @@ const KB_RULES=[
     t:'PandarIA reserva 0,8 g de grasa por kg para cubrir lo esencial; el resto de calorías va a carbohidratos. Suele caer dentro del 15 al 30 % de las calorías.', usa:'Macros diarios', rev:'2027-11-01', desde:'0.8.1'},
   {id:'nut.imc_bajo', area:'seguridad', n:'IMC bajo', v:{imc:18.5}, src:['whobmi'], lic:'consejo', ev:'solida', pob:'Adultos',
     t:'Un índice de masa corporal por debajo de 18,5 se considera bajo peso. En ese caso PandarIA no propone déficit y muestra tu mantenimiento.', usa:'Calorías para bajar grasa', rev:'2028-11-01', desde:'0.8.1'},
+  {id:'seguridad.peso_bajo', area:'seguridad', n:'Peso bajo o comer muy poco', v:{imc:18.5, grave:17, dias:7, minDias:5, fBmr:1, rapidoPct:1}, src:['whobmi','pandaria'], lic:'consejo', ev:'solida', pob:'Adultos',
+    t:'Con un índice de masa corporal por debajo de 18,5 (bajo peso), sea cual sea tu objetivo, PandarIA no propone déficit ni ayuno: avisa en Nutrición y en el ayuno, deja de celebrar los ayunos y el estado del día lo tiene en cuenta. Por debajo de 17 recomienda hablar con un médico o nutricionista. Si en tus últimos 7 días comes de media menos de lo que tu cuerpo gasta en reposo (con al menos 5 días anotados), también avisa.', usa:'Nutrición, ayuno y estado del día', rev:'2028-11-01', desde:'1.8.2'},
+  {id:'comida.deriva', area:'nutricion', n:'Tu peso se aleja de tu objetivo', v:{mantener:0.5, ganarMax:0.5, dias:28, minSpan:21, largo:84, mantenerLargo:0.25, minSpanLargo:63}, src:['iraki2019','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
+    t:'Si tu objetivo es mantener y en las últimas 4 semanas tu peso cambia más de un 0,5 % por semana (o más de un 0,25 % por semana durante 12 semanas, unos 3 kg en alguien de 80), o si quieres ganar y tu peso no sube en 4 semanas o sube más de un 0,5 % por semana (lo recomendado es entre 0,25 y 0,5 %), PandarIA te lo dice con lo que comes de media frente a tu objetivo.', usa:'Calorías y peso', rev:'2028-11-01', desde:'1.8.2'},
   {id:'nut.menores', area:'seguridad', n:'Menores de edad', v:{edad:18}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Menores de 18',
     t:'En menores de 18 las necesidades cambian con el crecimiento: PandarIA solo muestra el mantenimiento como orientación y recomienda consultar a un profesional.', usa:'Calorías y ayuno', rev:'2027-11-01', desde:'0.8.1'},
   {id:'agua', area:'nutricion', n:'Agua diaria', v:{mlkg:33, ref:{h:2000, m:1600, x:1800}, min:0.85, max:1.35, entreno:500, largo:60, extra30:250, extraMax:500}, src:['efsa2010','acsm2007','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
@@ -1176,6 +1183,8 @@ const KB_RULES=[
     t:'La OMS recomienda a los adultos menos de 2 g de sodio al día (unos 5 g de sal, una cucharadita). La mayor parte llega con pan, fiambres, quesos, salsas y comidas preparadas.', usa:'Calidad del día en el diario (Premium)', rev:'2028-11-01', desde:'0.8.4'},
   {id:'menu.ejemplo', area:'nutricion', n:'Ejemplos de menú', v:{reparto:{desayuno:0.25, almuerzo:0.35, merienda:0.12, cena:0.28}, tol:0.08}, src:['issn2017','pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
     t:'Los menús de ejemplo reparten tus calorías en cuatro comidas (25, 35, 12 y 28 %), ponen proteína en cada una, verduras en almuerzo y cena, y respetan tu alimentación y tus alergias. Son una idea para inspirarte, no una dieta.', usa:'Ejemplos de menú (Premium)', rev:'2027-11-01', desde:'0.8.4'},
+  {id:'ayuno.olvido', area:'seguridad', n:'Ayuno olvidado o muy largo', v:{preguntaH:48, avisoH:72}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
+    t:'Si un ayuno sigue abierto 48 horas, PandarIA pregunta si sigues ayunando, por si olvidaste pararlo. A partir de 72 horas avisa de que un ayuno tan largo no es seguro sin supervisión y, al terminarlo, te deja corregir la hora de fin para que no estropee tus estadísticas.', usa:'Ayuno', rev:'2028-11-01', desde:'1.8.2'},
   {id:'ayuno.diario', area:'nutricion', n:'Ayuno conectado con el diario', v:{maxH:16}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos sanos',
     t:'Si usas el diario, PandarIA toma la hora de tu última comida registrada para empezar el ayuno y te ofrece terminarlo si registras comida mientras ayunas.', usa:'Ayuno intermitente', rev:'2027-11-01', desde:'0.8.4'},
   {id:'viaje', area:'entreno', n:'Modo viaje', v:{}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
@@ -1232,7 +1241,7 @@ const KB_RULES=[
     t:'La variabilidad del pulso (RMSSD) suele bajar con el cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si la de hoy está un 15 % o más por debajo de tu media (con al menos 5 medidas anteriores), PandarIA la cuenta como una señal más de cansancio.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.3'},
   {id:'conexion.pulso', area:'recuperacion', n:'Pulso en reposo más alto de lo normal', v:{min:4, lpm:7}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos con Health Connect',
     t:'Un pulso en reposo claramente más alto que tu media puede ser una señal de cansancio, aunque también cambia con el sueño, el estrés o una enfermedad. Si el de hoy está 7 latidos o más por encima de tu media (con al menos 4 medidas anteriores), PandarIA lo cuenta como una señal más, igual que el check-in.', usa:'«Hoy toca» y recuperación (con Health Connect)', rev:'2028-11-01', desde:'1.0.1'},
-  {id:'estado.dia', area:'recuperacion', n:'Estado del día', v:{p:{sueno0:15,sueno1:5,energia0:15,agujetas0:10,agujetas1:3,suenoCorto:10,hrv:12,pulso:10,musculos50:15,musculos85:6,intensa:8,ayuno:8,cansancio:15}, listo:80, normal:60, suave:40}, src:['pandaria','buchheit2014','aasm2015'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
+  {id:'estado.dia', area:'recuperacion', n:'Estado del día', v:{p:{sueno0:15,sueno1:5,energia0:15,agujetas0:10,agujetas1:3,suenoCorto:10,hrv:12,pulso:10,musculos50:15,musculos85:6,intensa:8,ayuno:8,cansancio:15,pesoBajo:45,comePoco:25}, listo:80, normal:60, suave:40}, src:['pandaria','buchheit2014','aasm2015'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
     t:'Un número de 0 a 100 que junta las señales de cansancio que PandarIA ya usa: el check-in, la recuperación de los músculos que tocan hoy, una sesión muy exigente, un ayuno largo y, con Salud, el sueño, el pulso en reposo y la variabilidad del pulso. Cada señal resta puntos según su peso (dormir mal, 15; energía baja, 15; músculos a menos de la mitad, 15; cansancio acumulado, 15; variabilidad baja, 12…). Con 80 o más, Listo; de 60 a 79, Normal; de 40 a 59, Suave (un 10 % menos de carga); menos de 40, Descansa. Sin ningún dato de hoy no muestra número.', usa:'Tarjeta de Hoy, estado del día y widget Mi día', rev:'2028-11-01', desde:'1.8'},
   {id:'linea.base', area:'recuperacion', n:'Tu línea base', v:{dias:28, min:14}, src:['buchheit2014','pandaria'], lic:'consejo', ev:'limitada', pob:'Adultos sanos',
     t:'Cada persona tiene su propio normal: un pulso de 60 puede ser alto para uno y bajo para otro. Por eso PandarIA compara cada dato (sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento) con tu media de las últimas 4 semanas y no con valores generales. Solo lo hace con 14 días de datos o más.', usa:'Estado del día', rev:'2028-11-01', desde:'1.8'},
@@ -1246,8 +1255,8 @@ const KB_RULES=[
     t:'Llegar al entreno con poca agua puede bajar el rendimiento. PandarIA compara, en las últimas 8 semanas, tus entrenos de días con menos del 60 % de tu meta de agua con los de días con el 90 % o más. Solo lo cuenta si hay al menos 3 de cada y la diferencia es del 3 % o más: una vez no es un patrón.', usa:'Novedades del panda', rev:'2028-11-01', desde:'1.8'},
   {id:'comida.progreso', area:'nutricion', n:'Comida y progreso', v:{minSes:3, minSpan:14, minDias:5, deficit:0.9, adaptDif:150}, src:['helms2014','issn2017','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
     t:'En déficit de calorías o con poca proteína cuesta más subir de peso en los ejercicios; mantener la fuerza ya es un buen resultado. Si un ejercicio lleva 3 sesiones (en 14 días o más) sin mejorar tu fuerza estimada y estás en déficit (por tu objetivo o porque en 5 días o más de diario comiste menos del 90 % de tu gasto) o con la proteína corta, PandarIA te lo explica así en vez de solo pedir más peso. Si apagaste el ajuste automático y tu gasto real se aleja 150 kcal o más, te propone volver a activarlo.', usa:'Novedades y propuestas del panda', rev:'2028-11-01', desde:'1.8'},
-  {id:'habitos.plan', area:'entreno', n:'Tus hábitos', v:{semanas:6, minSem:4, fallo:0.6, minOtro:2, difMin:60, saltaDe:4, saltaMin:3}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
-    t:'Un plan que cumples rinde más que uno más largo. Con 4 semanas o más, si te saltas un día del plan en el 60 % de las semanas, PandarIA propone cambiarlo por el día en que de verdad entrenas fuera del plan (2 veces o más) o quitarlo. Si tu aviso de entreno está a una hora o más de tu hora real, propone moverlo. Y si saltas un ejercicio en 3 de tus 4 últimas sesiones de una rutina, propone quitarlo.', usa:'Propuestas del panda', rev:'2028-11-01', desde:'1.8'},
+  {id:'habitos.plan', area:'entreno', n:'Tus hábitos', v:{semanas:8, minSem:6, fallo:0.6, minOtro:2, difMin:60, saltaDe:4, saltaMin:3, minEj:4, avisoDias:30}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'Un plan que cumples rinde más que uno más largo. Con 6 semanas de entrenos o más (las semanas sin ningún entreno, como unas vacaciones, no cuentan), si te saltas un día del plan en el 60 % de las semanas, PandarIA propone cambiarlo por el día en que de verdad entrenas fuera del plan (2 veces o más) o quitarlo. Si tu aviso de entreno está a una hora o más de tu hora real, propone moverlo. Y si saltas un ejercicio en 3 de las 4 últimas sesiones en las que lo tenías planeado, propone quitarlo, sin dejar nunca una rutina con menos de 4 ejercicios. Con un plan de 2 días no propone quitar ninguno, y el aviso de entreno se mueve como mucho una vez al mes.', usa:'Propuestas del panda', rev:'2028-11-01', desde:'1.8'},
   {id:'prediccion.margen', area:'nutricion', n:'Predicciones con margen', v:{corto:14, largo:28, margen:0.2, maxDias:540}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Adultos',
     t:'Una fecha exacta promete más de lo que se sabe. PandarIA calcula tu ritmo de las últimas 2 y 4 semanas y, solo si los dos van en la misma dirección que tu meta, da un rango de meses con un 20 % de margen. Si la fecha queda a más de 18 meses, no la da.', usa:'Novedades del panda', rev:'2028-11-01', desde:'1.8'},
   {id:'carga.tope', area:'entreno', n:'Tope de ajustes que se suman', v:{min:0.6}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
@@ -1268,13 +1277,17 @@ function kb(id){ const r=KB[id]; if (!r) throw new Error('PandarIA: regla descon
 // Qué regla explica cada "por qué" que muestra la app
 const KB_WHY=[
   [/^(Hoy llegas con poco descanso|Sesión suave)/,'recuperacion.ajuste'],
-  [/^Completaste todas las series/,'carga.subida'], [/^Te sobraron muchas repeticiones/,'carga.rir'], [/^Dos sesiones sin llegar/,'carga.bajada'], [/^Sesión anterior muy exigente/,'carga.esfuerzo'],
+  [/^Completaste todas las series/,'carga.subida'], [/^El siguiente peso es un salto grande/,'carga.salto'], [/^Hiciste todas las repeticiones/,'carga.doble'], [/^Te sobraron muchas repeticiones/,'carga.rir'], [/^Dos sesiones sin llegar/,'carga.bajada'], [/^Sesión anterior muy exigente/,'carga.esfuerzo'],
   [/^(Intenta una repetición más|Mismo peso|Una repetición más|Mantén las repeticiones|Un poco más que)/,'carga.doble'], [/^Volviste tras/,'regreso.pausa'],
   [/descarga/i,'descarga'], [/^Ajusté el peso con tu primera serie/,'peso.calibracion'], [/^Con lastre sigues/,'peso.lastre'], [/^Primer lastre calculado/,'peso.lastre'], [/^Mismo peso que antes del día suave/,'recuperacion.ajuste'], [/^(Serie Bilbo|Pasaste de 15 repeticiones|No llegaste a 15)/,'metodo.bilbo'], [/pirámide|^Pirámide/i,'metodo.piramide'], [/^Serie de calentamiento/,'calentamiento'], [/^Peso inicial estimado/,'peso.inicial'], [/bloque de intensidad/,'bloque']
 ];
 const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sueno.adultos'};
 // Textos de las reglas en inglés (pantalla Ciencia en inglés)
 const KB_EN_T={
+ 'carga.salto':'With light weights, the next plate or dumbbell can be 20 or 25 % more. If the jump is over 10 %, PandarIA does not go up yet: it asks you to add reps until your estimated strength lets you do the new weight within the range, at most 6 above the range; then it goes up. With sets close to failure, muscle grows similarly with heavy, moderate or light loads (for maximal strength heavier loads do a bit better).',
+ 'ayuno.olvido':'If a fast is still open after 48 hours, PandarIA asks whether you are still fasting, in case you forgot to stop it. From 72 hours it warns that a fast this long is not safe without supervision and, when you end it, lets you correct the end time so it does not spoil your stats.',
+ 'seguridad.peso_bajo':'With a body mass index below 18.5 (underweight), whatever your goal, PandarIA does not suggest a deficit or fasting: it warns you in Nutrition and in fasting, stops celebrating fasts and takes it into account in the state of the day. Below 17 it recommends talking to a doctor or dietitian. If over your last 7 days you eat on average less than your body burns at rest (with at least 5 days logged), it also warns you.',
+ 'comida.deriva':'If your goal is to maintain and over the last 4 weeks your weight changes by more than 0.5 % a week (or more than 0.25 % a week over 12 weeks, about 3 kg for someone weighing 80), or if you want to gain and your weight does not go up in 4 weeks or goes up more than 0.5 % a week (0.25 to 0.5 % is recommended), PandarIA tells you, with what you eat on average compared with your goal.',
  'carga.tope':'Several rules can lower the weight at once (coming back from a break, a poorly rested day, a deload). So they do not multiply out of control, PandarIA never lowers the weight by more than 40 % at once compared with what it would be without those adjustments.',
  'peso.calibracion':'The first time you do an exercise, the weight PandarIA suggests is an estimate. If in your first set you do 3 or more reps above what was planned, or 2 or more below, PandarIA works out your strength from that set and adjusts the weight of the following sets so you have about 2 reps left.',
  'pasos.meta':'A meta-analysis of 15 cohorts with almost 50,000 people found that mortality risk drops with more steps and stops dropping at around 6,000–8,000 a day from age 60, and around 8,000–10,000 before. PandarIA uses that band as your step goal.',
@@ -1288,7 +1301,7 @@ const KB_EN_T={
  'ayuno.entreno':'Training fasted does not hurt short sessions, but in long ones people who ate beforehand perform better. With plans of 16 hours or more and at least 4 completed fasts, PandarIA looks at when you usually open your eating window and when you train. If you usually train fasted, it suggests training between one hour after your first meal and one hour before the window closes, so you eat before and after.',
  'agua.rendimiento':'Arriving at a workout with little water can lower performance. Over the last 8 weeks, PandarIA compares your workouts on days under 60 % of your water goal with those on days at 90 % or more. It only counts it with at least 3 of each and a difference of 3 % or more: once is not a pattern.',
  'comida.progreso':'In a calorie deficit or with little protein it is harder to add weight to your lifts; keeping your strength is already a good result. If an exercise has gone 3 sessions (over 14 days or more) without improving your estimated strength and you are in a deficit (because of your goal, or because on 5 or more diary days you ate under 90 % of what you burn) or short on protein, PandarIA explains it that way instead of just asking for more weight. If you turned off the automatic adjustment and what you really burn moves 150 kcal or more away, it suggests turning it back on.',
- 'habitos.plan':'A plan you keep pays off more than a longer one. With 4 weeks or more, if you skip a plan day in 60 % of weeks, PandarIA suggests swapping it for the day you actually train outside the plan (2 times or more) or removing it. If your workout reminder is an hour or more away from when you really train, it suggests moving it. And if you skip an exercise in 3 of your last 4 sessions of a routine, it suggests removing it.',
+ 'habitos.plan':'A plan you keep pays off more than a longer one. With 6 weeks of training or more (weeks with no training at all, like a holiday, do not count), if you skip a plan day in 60 % of weeks, PandarIA suggests swapping it for the day you actually train outside the plan (2 times or more) or removing it. If your workout reminder is an hour or more away from when you really train, it suggests moving it. And if you skip an exercise in 3 of the last 4 sessions where it was planned, it suggests removing it, never leaving a routine with fewer than 4 exercises. With a 2-day plan it does not suggest dropping any, and the workout reminder moves at most once a month.',
  'prediccion.margen':'An exact date promises more than is known. PandarIA works out your pace over the last 2 and 4 weeks and, only if both go in the direction of your goal, gives a range of months with a 20 % margin. If the date is more than 18 months away, it does not give one.',
  'conexion.ayuno':'Training fasted does not hurt short sessions, but in long ones people who ate beforehand perform better. So if you have been fasting for 18 hours or more, or ate less than 60 % of your target yesterday, “Up next” suggests starting easy.',
  'conexion.proteina':'Daily protein helps you recover and build muscle with training. If on 2 of your last 3 days with a food diary you stayed below 70 % of your goal, PandarIA tells you next to your workouts. In the weekly report, a day counts as met from 90 % of the goal.',
@@ -1319,10 +1332,10 @@ const KB_EN_T={
  'obj.flexibilidad':'In mobility routines PandarIA uses few sets and minimal rest: the priority is moving with control.',
  'descanso.multi':'On weighted compound lifts (squat, press, row, deadlift), resting 2 minutes or more builds more strength and muscle than resting 1 minute, because it lets you keep your reps up.',
  'alternativa.similar':'When PandarIA suggests swapping an exercise, it looks for one that works the same muscles at a similar difficulty: it avoids going from a weighted exercise to a much easier one, and counts the equipment of the exercise you already do as yours.',
- 'carga.subida':'When you complete every set at the top of the rep range, the load goes up by 2 to 10 %. PandarIA adds 5 % for legs and 2.5 % for everything else, at least one plate. Progressive overload is what matters most for your gains (ACSM 2026).',
+ 'carga.subida':'When you complete every set at the top of the rep range (with 3 sets or more, the last one may fall one rep short), the load goes up by 2 to 10 %. PandarIA adds 5 % for legs and 2.5 % for everything else, at least one plate. Progressive overload is what matters most for your gains (ACSM 2026).',
  'carga.doble':'First add reps with the same weight until you reach the top of the range, and only then add weight.',
- 'carga.bajada':'If you miss the minimum reps two sessions in a row, PandarIA lowers the weight by 10 % to consolidate technique and build back up.',
- 'carga.esfuerzo':'If you rated the previous session as very hard (9 or 10 out of 10), PandarIA keeps the weight instead of raising it. Since 1.8, if you also logged the reps you had left and they were 3 or more on average, your sets have the last word: progression continues.',
+ 'carga.bajada':'If you miss the minimum reps two sessions in a row on the first set or on half the sets or more, PandarIA lowers the weight by 10 % to consolidate technique and build back up. Falling short on the last set is normal and does not count.',
+ 'carga.esfuerzo':'If you rated the previous session as very hard (9 or 10 out of 10), PandarIA keeps the weight instead of raising it. Since 1.8, if you also logged the reps you had left and they were 3 or more on average, your sets have the last word: progression continues. Since 1.8.2, if you had at least 1 rep left on average in that exercise, it adds a rep or, if you reached the top, one plate: it only holds when you reached failure.',
  'regreso.pausa':'A meta-analysis of 103 studies found that maximal strength barely changes in the first 4 weeks without training and drops faster afterwards; people over 65 lose about twice as much. So PandarIA lowers the weight by 10 % after 4 weeks without an exercise, by 20 % after 8 and by 30 % after 12; from age 65 it starts at 2 weeks.',
  'bloque':'The 2026 ACSM position stand did not find that periodizing in phases consistently beats progressing without phases. PandarIA uses it mainly to include a deload week and vary the stimulus: it alternates 3 weeks of volume, 2 of intensity and 1 of deload. You can turn it off.',
  'descarga':'The international coaches\' consensus (Bell et al., 2023) defines a deload as a period of lower stress to reduce fatigue and recover, and its practical recommendations propose a lighter week every 4 to 8 weeks, lowering the load by about 10 % and cutting sets. PandarIA lowers the weight by 10 % and removes one set from exercises with 3 or more. There are few direct experimental studies.',
@@ -1604,32 +1617,53 @@ function suggestSet(routine, item, idx){
   if (!hist.length){ if (ex.mode==='p' && !res.kg) res.kg=estimateKg(item.exId, range[0]); res.why= res.kg?'Peso inicial estimado por PandarIA':''; return res; }
   const last=hist[0];
   const ref=last.sets[Math.min(wIdx<0?0:wIdx,last.sets.length-1)];
-  if (!routine || !routine.pandaria){ return {kg:ref.kg, reps:ref.reps, time:ref.time, why:'Lo de la última vez'}; }
+  if (!routine || !routine.pandaria){
+    // 1.8.2: sin PandarIA el peso no cambia solo, pero si la última vez hiciste todas las repeticiones en todas las series, te lo decimos
+    if (ex.mode==='p' && +ref.kg>0){ const mains=last.sets.filter(x=>!x.m&&x.t!=='c'), obj=work.map(x=>+x.reps||0);
+      if (mains.length && mains.length>=work.length && mains.every((x,i)=>(+x.reps||0)>=(obj[i]||obj[0]||0))) return {kg:ref.kg, reps:ref.reps, time:ref.time, why:'Hiciste todas las repeticiones: prueba a subir el peso'}; }
+    return {kg:ref.kg, reps:ref.reps, time:ref.time, why:'Lo de la última vez'}; }
   // 1.8: la pausa se cuenta desde la última vez que hiciste el ejercicio, también si fue en descarga o en un día suave
   // (antes se contaba desde la última sesión «normal» y, tras una descarga, PandarIA creía que volvías de una pausa y bajaba otra vez)
   const days=(Date.now()-hist0[0].date)/DAY;
+  // 1.8.2: con mancuernas ligeras el siguiente peso puede ser un 20–25 % más (de 8 a 10 kg) y no llegabas ni al mínimo de repeticiones.
+  // Si el salto es grande, antes se suman repeticiones hasta que tu fuerza estimada permita el peso nuevo dentro del rango (regla carga.salto)
+  const saltoGrande=(k0,k1)=>{ const KS=kb('carga.salto'), div=kb('fuerza.e1rm').div;
+    // con lastre la carga real es tu peso (la parte que mueves) más el lastre: 10 → 12,5 kg de lastre en dominadas no es un salto del 25 %
+    const pc=ex.lastre?bodyWeight()*((LASTRE_COMO[ex.base]||[0,1])[1]):0, kg0=k0+pc, kg1=k1+pc;
+    if (!(k0>0) || (kg1-kg0)/kg0<=KS.rel) return 0;
+    const ms=last.sets.filter(x=>!x.m&&x.t!=='c'); if (!ms.length) return 0;
+    const hechas=Math.min(...ms.map((x,i)=>(+x.reps||0)+(i===ms.length-1&&ms.length>=3?1:0)));
+    const necesita=Math.min(Math.ceil(div*(kg1/kg0*(1+(range[0]+1)/div))-div), range[1]+KS.maxExtra); if (hechas>=necesita) return 0;
+    return Math.min(necesita, Math.max(range[1], (+ref.reps||0)+1)); };
   if (ex.mode==='p'){
     const mainS = h => h.sets.filter(x=>!x.m);
-    const allTop=mainS(last).every(x=>(+x.reps||0)>=range[1]);
-    const fails = h => h && mainS(h).some(x=>(+x.reps||0)<range[0]);
+    // 1.8.2: las repeticiones bajan un poco de serie a serie aunque el peso sea el correcto. Por eso la última serie (con 3 o más) puede quedarse
+    // a una repetición del tope y aun así se sube, y «no llegar» es no llegar en la primera serie o en la mitad o más (antes bastaba una sola serie)
+    const MS=mainS(last), allTop=MS.length>0 && MS.every((x,i)=>(+x.reps||0)>=range[1]-(i===MS.length-1&&MS.length>=3?1:0));
+    const fails = h => { if (!h) return false; const m=mainS(h); if (!m.length) return false; const bajo=m.filter(x=>(+x.reps||0)<range[0]).length; return (+m[0].reps||0)<range[0] || bajo*2>=m.length+(m.length%2); };
     const twoFails = fails(hist[0]) && fails(hist[1]);
     let kg=+ref.kg||0, reps=+ref.reps||range[0];
     const RPE=kb('carga.esfuerzo').rpe;
     // 1.8: las repeticiones en reserva de cada serie dicen más que la nota de toda la sesión: con RIR medio de 3 o más, la sesión no frena la progresión
     const rirL=mainS(last).map(x=>x.rir).filter(x=>x!=null), rirLm=rirL.length>=2?rirL.reduce((a,b)=>a+b,0)/rirL.length:null, duro=last.intensity>=RPE && !(rirLm!=null && rirLm>=kb('carga.esfuerzo').rirOk);
     if (last.aj){ kg=roundTo(kg/last.aj,incFor(ex)); res.why='Mismo peso que antes del día suave'; } // solo hay días aligerados: se vuelve al peso de antes, sin subir
+    // 1.8.2: si la sesión fue muy dura pero en este ejercicio te quedó al menos 1 repetición de media, se sube igual (un disco, sin extras)
+    else if (allTop && duro && rirLm!=null && rirLm>=1){ const sa=saltoGrande(kg, roundTo(kg+incFor(ex),incFor(ex)));
+      if (sa){ reps=sa; res.why='El siguiente peso es un salto grande: suma una repetición más antes de subir'; } else { kg=roundTo(kg+incFor(ex),incFor(ex)); reps=range[0]; res.why='Completaste todas las series: sube el peso'; } }
     else if (allTop && !duro){
       const pct = isLower(ex)?kb('carga.subida').inf:kb('carga.subida').sup;
       let inc=Math.max(incFor(ex), kg*pct); if (last.intensity<=4) inc*=2;
       const rirs=last.sets.map(x=>x.rir).filter(x=>x!=null); const rirAvg=rirs.length?rirs.reduce((a,b)=>a+b,0)/rirs.length:null;
       if (rirAvg!=null && rirAvg>=3) inc*=1.5;
       if (codoSensible() && ['curl','extension'].includes(ex.pat)) inc=incFor(ex)*kb('lesion.codo').paso; // codo sensible: de a un disco
-      kg=roundTo(kg+inc, incFor(ex)); reps=range[0]; res.why='Completaste todas las series: sube el peso';
+      const sa=saltoGrande(kg, roundTo(kg+inc, incFor(ex)));
+      if (sa){ reps=sa; res.why='El siguiente peso es un salto grande: suma una repetición más antes de subir'; }
+      else { kg=roundTo(kg+inc, incFor(ex)); reps=range[0]; res.why='Completaste todas las series: sube el peso'; }
     } else if (twoFails){
       kg=roundTo(kg*kb('carga.bajada').f, incFor(ex)); reps=range[0]; res.why='Dos sesiones sin llegar: bajamos 10 % para consolidar';
-    } else if (duro){ reps=Math.min(reps,range[1]); res.why='Sesión anterior muy exigente: mantén'; }
+    } else if (duro && !(rirLm!=null && rirLm>=1)){ reps=Math.min(reps,range[1]); res.why='Sesión anterior muy exigente: mantén'; }
     else { const rr=last.sets.map(x=>x.rir).filter(x=>x!=null); const ra=rr.length?rr.reduce((a,b)=>a+b,0)/rr.length:null;
-      reps=Math.max(range[0],Math.min(reps+(ra!=null&&ra>=3?kb('carga.doble').repsFacil:kb('carga.doble').reps),range[1])); res.why= (+ref.reps||0)<range[0]?'Mismo peso: busca llegar al mínimo de repeticiones':'Intenta una repetición más'; }
+      reps=Math.max(range[0],Math.min(reps+(!duro&&ra!=null&&ra>=3?kb('carga.doble').repsFacil:kb('carga.doble').reps),range[1])); res.why= (+ref.reps||0)<range[0]?'Mismo peso: busca llegar al mínimo de repeticiones':'Intenta una repetición más'; }
     // 1.8: si anotaste que te sobraban muchas repeticiones, sumar de a una tarda semanas: el peso se recalcula con tu fuerza real
     const KR=kb('carga.rir'), rs=mainS(last).filter(x=>x.rir!=null&&+x.kg>0&&+x.reps>0);
     if (!twoFails && rs.length>=KR.minSeries && rs.reduce((a,x)=>a+ +x.rir,0)/rs.length>=KR.facil){
@@ -1902,6 +1936,8 @@ function trainedWeeksSince(ts){
   return wk.size;
 }
 function weekKey(ts){ const d=new Date(ts); d.setHours(0,0,0,0); d.setDate(d.getDate()-((d.getDay()+6)%7)); return d.getTime(); }
+// 1.8.2: mover semanas con el calendario y no restando 7×24 h (la semana del cambio de hora tiene 23 o 25 h y la resta no caía en el lunes)
+function weekShift(k,n){ const d=new Date(k); d.setDate(d.getDate()+7*n); return weekKey(d.getTime()); }
 function hasSugg(r, kind, itemUid){ return (r.sugg||[]).some(x=>x.kind===kind && (!itemUid||x.uid===itemUid)); }
 function setsFromSuggest(r,it){ return it.sets.map((s,i)=>{ const g=suggestSet(r,it,i); return Object.assign({},s,{kg:g.kg??s.kg, reps:g.reps??s.reps, time:g.time??s.time}); }); }
 function afterSession(session){
@@ -2062,8 +2098,8 @@ function streakWeeks(){
   if (!S.sessions.length) return 0;
   const wk=new Set(S.sessions.map(s=>weekKey(s.end)));
   let k=weekKey(Date.now()), n=0;
-  if (!wk.has(k)) k-=7*DAY;
-  while (wk.has(k)){ n++; k-=7*DAY; }
+  if (!wk.has(k)) k=weekShift(k,-1);
+  while (wk.has(k)){ n++; k=weekShift(k,-1); }
   return n;
 }
 // 1.1: los estiramientos, la movilidad y el yoga no tienen récords (aguantar más una postura no es un récord de rendimiento)
@@ -5705,7 +5741,12 @@ function closeLayer(){ if(!LAYERS.length) return; LAYERS.pop(); renderLayers(); 
 function closeAllLayers(){ const n=LAYERS.length; if(!n) return; LAYERS.length=0; renderLayers(); render(); ignorePop++; ignoreT=Date.now(); try{ history.go(-n); }catch(e){} }
 function replaceLayer(t,p){ LAYERS.pop(); LAYERS.push({t,p:p||{}}); renderLayers(); }
 function openModal(html, opts){ MODALS.push(Object.assign({html},opts||{})); pushNav(); renderModals(); }
-function closeModal(){ if(!MODALS.length) return; MODALS.pop(); renderModals(); progBack(); }
+function closeModal(){ if(!MODALS.length) return; MODALS.pop(); renderModals(); progBack(); cbGC(); }
+// 1.8.2: las acciones de las ventanas (cb) no se borraban nunca y se acumulaban mientras la app seguía abierta.
+// Con más de 300, se borran las que ya no están en pantalla (se guardan siempre las 100 más recientes).
+function cbGC(){ const ks=Object.keys(CB); if (ks.length<=300) return;
+  const vivos=new Set((document.body.innerHTML+MODALS.map(m=>m.html||'').join('')).match(/c\d+/g)||[]);
+  ks.forEach(k=>{ if (+k.slice(1)<cbn-100 && !vivos.has(k)) delete CB[k]; }); }
 function handleBack(fromPop){
   if (MODALS.length){ const m=MODALS[MODALS.length-1]; if (m.locked){ if(fromPop) pushNav(); return false; } MODALS.pop(); renderModals(); return true; }
   if (LAYERS.length){ const top=LAYERS[LAYERS.length-1];
@@ -6677,6 +6718,7 @@ SCREENS.workout = () => {
     b+=`<div class="wk-ex"><div class="${inSup?'ssup':''}">${inSup&&prevSup!==it.superset?'<div class="suptag">SUPERSERIE</div>':''}
       <div class="exh"><button data-a="wkPeek" data-v="${it.exId}">${exIcon(ex)}</button><button class="exn" style="text-align:left" data-a="openEx" data-v="${it.exId}">${esc(ex.n)}</button>
       <button class="ibtn soft" style="color:var(--blue)" data-a="openEx" data-v="${it.exId}">${I('chart',20)}</button><button class="ibtn" style="color:var(--blue)" data-a="wkMenu" data-v="${it.uid}">${I('more',24)}</button></div>
+      ${!it.warm&&!it.cool&&profileBlocks(it.exId)?`<div class="note" style="color:var(--bad)">${I('alert',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} ${esc(tx('Con tu perfil (lesión, edad o peso) este ejercicio no es el más recomendable. Cámbialo desde el menú o hazlo sin dolor y con poco peso.','With your profile (injury, age or weight) this exercise is not the best choice. Swap it from the menu or do it pain-free and light.'))}</div>`:''}
       ${it.sticky?`<div class="note sticky">${I('pin',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} ${esc(it.sticky)}</div>`:''}
       ${it.note?`<div class="note">${I('note',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')} ${esc(it.note)}</div>`:''}
       <div class="sgrid ${mode!=='p'?'nokg':''} shead"><div>SERIE</div><div>ANTERIOR</div>${mode==='p'?`<div>${getEx(it.exId).lastre?'+':''}${S.settings.unit.toUpperCase()}</div>`:''}<div>${mode==='t'?'SEG':'REPS'}</div><div>${I('check',16).replace('<svg','<svg style="margin:0 auto"')}</div></div>`;
@@ -6977,7 +7019,7 @@ function finishWorkout(mode){
   const a=S.active, end=Date.now();
   if (!a) return; // 1.8: doble toque en «Terminar»: el segundo llega cuando el entreno ya se guardó
   const r=findR(a.routineId);
-  const session={id:uid(), routineId:a.routineId, routineName:a.name, start:a.start, end, intensity:a.intensity||6, checkin:a.checkin||null, ...(a.ajuste&&a.ajuste.f<1?{ajuste:{f:a.ajuste.f}}:{}),
+  const session={id:uid(), routineId:a.routineId, routineName:a.name, start:a.start, end, planned:a.items.filter(it=>!it.warm&&!it.cool).map(it=>it.exId), intensity:a.intensity||6, checkin:a.checkin||null, ...(a.ajuste&&a.ajuste.f<1?{ajuste:{f:a.ajuste.f}}:{}),
     items:a.items.map(it=>({exId:it.exId, note:it.note||'', sets:it.sets.filter(s=>s.done).map(s=>{ const o={t:s.t,kg:s.kg,reps:s.reps,time:s.time,done:true,pr:!!s.pr,rir:s.rir??null}; if(s.rd!=null) o.rd=s.rd; if(s.m) o.m=s.m; return o; })})).filter(x=>x.sets.length)};
   session.vol=sessionVolume(session);
   session.prs=[]; session.items.forEach(it=>it.sets.forEach(s=>{ if(s.pr) session.prs.push({exId:it.exId,kg:s.kg,reps:s.reps,time:s.time}); }));
@@ -7351,15 +7393,26 @@ function histRecords(){
     const v=e.mode==='p'?(r.kg>0?`${fmtKg(r.kg)} × ${r.kgReps}`:`${r.kgReps} reps`):e.mode==='t'?fmtTime(r.time):`${r.reps} reps`;
     return `<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)" data-a="openEx" data-v="${id}">${exIcon(e)}<div class="grow"><div class="b ell">${esc(e.n)}</div><div class="xs mut">${r.date?fmtDate(r.date):''}</div></div><div class="b" style="color:var(--gold)">${v}</div></div>`; }).join('')}</div>`;
 }
+// 1.8.2: tu progreso de un vistazo: cuánto subió tu fuerza estimada en los ejercicios que repites (máximo estimado, regla fuerza.e1rm)
+function progresoResumen(){ const ids=[...new Set(S.sessions.flatMap(s=>s.items.map(it=>it.exId)))].filter(id=>getEx(id).mode==='p');
+  const L=ids.map(id=>{ const h=e1Hist(id,400); if (h.length<4) return null; const a=h.slice(0,2).reduce((x,p)=>x+p.y,0)/2, b=Math.max(...h.slice(-3).map(p=>p.y)); return a>0?{id,pct:(b/a-1)*100,desde:h[0].x,n:h.length}:null; }).filter(Boolean);
+  if (!L.length) return null; const pct=L.reduce((x,o)=>x+o.pct,0)/L.length, desde=Math.min(...L.map(o=>o.desde));
+  return {pct:Math.round(pct), desde, top:L.sort((x,y)=>y.pct-x.pct).slice(0,3), n:L.length}; }
+function progresoResumenHtml(){ const p=progresoResumen(); if (!p) return '';
+  const f=new Date(p.desde).toLocaleDateString(LOC(),{day:'numeric',month:'long'}), sg=p.pct>=0?'+':'';
+  return `<div class="card"><div class="xs mut b" style="letter-spacing:1px">${tx('TU FUERZA ESTIMADA','YOUR ESTIMATED STRENGTH')}</div>
+    <div class="row" style="align-items:baseline;gap:8px;margin-top:4px"><span style="font-size:30px;font-weight:900;color:${p.pct>=0?'var(--ok)':'var(--bad)'}">${sg}${p.pct} %</span><span class="sm mut">${tx(`desde el ${f}, de media en ${plural(p.n,'ejercicio','ejercicios')}`,`since ${f}, on average across ${p.n} ${p.n===1?'exercise':'exercises'}`)}</span></div>
+    <div class="xs mut" style="margin-top:6px;line-height:1.5">${p.top.map(o=>`${esc(getEx(o.id).n)} ${o.pct>=0?'+':''}${Math.round(o.pct)} %`).join(' · ')}${kbLink('fuerza.e1rm')}</div>
+    ${premOK()?'':`<button class="link xs" style="margin-top:8px" data-a="openPremium">${tx('Con PandarIA el peso y las repeticiones se ajustan solos en cada serie para que sigas subiendo','With PandarIA, weight and reps adjust on their own every set so you keep improving')}</button>`}</div>`; }
 function histProgreso(){
   if (!S.sessions.length) return `<div class="empty"><div class="big">📈</div>Entrena para ver tus gráficas de progreso.</div>`;
   const wk=[]; const k0=weekKey(Date.now());
-  for (let i=11;i>=0;i--){ const k=k0-i*7*DAY; const ss=S.sessions.filter(s=>weekKey(s.end)===k); wk.push({k,vol:ss.reduce((a,s)=>a+(s.vol||0),0),n:ss.length}); }
+  for (let i=11;i>=0;i--){ const k=weekShift(k0,-i); const ss=S.sessions.filter(s=>weekKey(s.end)===k); wk.push({k,vol:ss.reduce((a,s)=>a+(s.vol||0),0),n:ss.length}); }
   const lbl=wk.map((w,i)=>i%3===2||i===11?`${new Date(w.k).getDate()}/${new Date(w.k).getMonth()+1}`:'');
   // 1.1: con menos de 2 semanas de datos las barras casi no dicen nada; se explica en vez de dejar la gráfica «vacía»
   const semanasCon=wk.filter(w=>w.n>0).length;
   const aviso=semanasCon<2?`<div class="banner" style="margin-top:10px"><span class="ic">${I('info',20)}</span><div class="grow sm">${tx('Entrena al menos 2 semanas para ver tu tendencia. Cada semana con entrenos suma una barra.','Train for at least 2 weeks to see your trend. Each week with workouts adds a bar.')}</div></div>`:'';
-  let h=aviso+`<div class="sec">Volumen semanal (${S.settings.unit})</div><div class="card">${barChart(wk.map(w=>Math.round(toUnit(w.vol))),lbl,{fmt:v=>v>=1000?(Math.round(v/100)/10)+'k':v})}</div>
+  let h=aviso+progresoResumenHtml()+`<div class="sec">Volumen semanal (${S.settings.unit})</div><div class="card">${barChart(wk.map(w=>Math.round(toUnit(w.vol))),lbl,{fmt:v=>v>=1000?(Math.round(v/100)/10)+'k':v})}</div>
   <div class="sec">Entrenos por semana</div><div class="card">${barChart(wk.map(w=>w.n),lbl)}</div>
   <div class="sec">Series por músculo cada semana</div><div class="chips scroll" style="margin-bottom:10px">${MUSCLE_GROUPS.filter(([k])=>k!=='cardio').map(([k,n])=>`<button class="chip ${PMUS===k?'on':''}" data-a="pmus" data-v="${k}">${n}</button>`).join('')}</div><div class="card">${muscleWeekChart(PMUS)}<div class="xs mut" style="margin-top:6px">La franja verde (10 a 20 series) es lo recomendado para ganar músculo. Las series de músculos secundarios cuentan como media.</div></div>`;
   const trained={}; S.sessions.forEach(s=>s.items.forEach(i=>trained[i.exId]=(trained[i.exId]||0)+1));
@@ -7508,7 +7561,9 @@ const HIGH_IMPACT=['burpees','box_jump','sentadilla_salto','zancada_salto','skat
 function bmi(){ const p=S.profile||{}; const w=bodyWeight(), h=+p.height; return h? w/((h/100)*(h/100)) : null; }
 function profileBlocks(id){
   const p=S.profile||{};
-  if ((p.injuries||[]).some(k=>INJURIES[k]&&INJURIES[k].ex.includes(id))) return true;
+  // 1.8.2: las variantes con lastre cuentan como su ejercicio base (fondos con lastre = fondos)
+  const b=(typeof LX!=='undefined'&&LX[id]&&LX[id].base)||null;
+  if ((p.injuries||[]).some(k=>INJURIES[k]&&(INJURIES[k].ex.includes(id)||(b&&INJURIES[k].ex.includes(b))))) return true;
   const KI=kb('seguridad.alto_impacto');
   if ((p.age>=KI.edad || (bmi()||0)>=KI.imc) && HIGH_IMPACT.includes(id)) return true;
   return false;
@@ -7561,7 +7616,17 @@ const pfData=()=>{ const t=LAYERS[LAYERS.length-1]; return t.p.d||t.p.pf; };
 A.pfSet=v=>{ const [k,val]=v.split('|'); const d=pfData(); keepPf(()=>{ d[k]=val; }); };
 A.pfInj=k=>{ const d=pfData(); d.injuries=d.injuries||[]; keepPf(()=>{ const i=d.injuries.indexOf(k); if(i>=0) d.injuries.splice(i,1); else d.injuries.push(k); }); };
 function keepPf(fn){ const d=pfData(); const pre=document.getElementById('pf_name')?'pf':'ob'; readProfileForm(d,pre); fn(); refreshTop(); }
-A.pfSave=()=>{ const d=pfData(); readProfileForm(d,'pf'); const er=perfilErr(d); if (er) return toast(er); S.profile=d; if (d.weight && !S.measures.some(m=>m.peso)) S.measures.push({id:uid(),date:Date.now(),peso:d.weight}); TPLM_reset(); save(); closeLayer(); toast('Perfil guardado'); };
+A.pfSave=()=>{ const d=pfData(); readProfileForm(d,'pf'); const er=perfilErr(d); if (er) return toast(er); const antes=((S.profile||{}).injuries||[]).slice(); S.profile=d; if (d.weight && !S.measures.some(m=>m.peso)) S.measures.push({id:uid(),date:Date.now(),peso:d.weight}); TPLM_reset(); save(); closeLayer(); toast('Perfil guardado');
+  // 1.8.2: con una lesión nueva, ofrecer cambiar los ejercicios que la cargan en las rutinas que ya tienes (también en la versión gratis: es seguridad)
+  if ((d.injuries||[]).some(k=>!antes.includes(k))) setTimeout(lesionRevisar,500); };
+function lesionBloqueados(){ const out=[]; S.routines.filter(r=>!r.archived).forEach(r=>r.items.forEach(it=>{ if (!it.warm&&!it.cool&&profileBlocks(it.exId)) out.push({r,it}); })); return out; }
+function lesionRevisar(){ const L=lesionBloqueados(); if (!L.length) return;
+  const nombres=[...new Set(L.map(x=>getEx(x.it.exId).n))];
+  confirmBox({title:tx('Ejercicios que conviene cambiar','Exercises worth swapping'),text:esc(tx(`Tus rutinas tienen ${plural(nombres.length,'ejercicio','ejercicios')} que cargan la zona que marcaste: ${nombres.slice(0,4).join(', ')}${nombres.length>4?'…':''}. ¿Los cambio por alternativas que no la cargan?`,`Your routines have ${nombres.length} ${nombres.length===1?'exercise':'exercises'} that load the area you marked: ${nombres.slice(0,4).map(enN).join(', ')}${nombres.length>4?'…':''}. Swap them for alternatives that do not?`)),
+    okText:tx('Cambiarlos','Swap them'),noText:tx('Ahora no','Not now'),ok:()=>{ let n=0; const prev=L.map(({r,it})=>({r,it,exId:it.exId,range:it.range,sets:JSON.parse(JSON.stringify(it.sets))}));
+      L.forEach(({r,it})=>{ const used=r.items.map(x=>x.exId), alt=alternatives(it.exId,used)[0]; if (!alt) return; applySuggestion(r,{kind:'cambiar',uid:it.uid,data:{to:alt}}); n++; });
+      save(); render.keep=true; render(); refreshTopSafe();
+      toastUndo(tx(`${plural(n,'ejercicio cambiado','ejercicios cambiados')}`,`${n} ${n===1?'exercise':'exercises'} swapped`),()=>{ prev.forEach(x=>{ x.it.exId=x.exId; x.it.range=x.range; x.it.sets=x.sets; }); }); }}); }
 function TPLM_reset(){ for (const k in TPLM) delete TPLM[k]; }
 A.openProfile=()=>openLayer('profile',{});
 
@@ -7884,7 +7949,7 @@ function semanaNutri(wk){
 /* ---------- Informe semanal ---------- */
 function weekReport(wk){
   const ss=S.sessions.filter(s=>weekKey(s.end)===wk);
-  const prev=S.sessions.filter(s=>weekKey(s.end)===wk-7*DAY);
+  const prev=S.sessions.filter(s=>weekKey(s.end)===weekShift(wk,-1));
   const vol=ss.reduce((a,s)=>a+(s.vol||0),0), pvol=prev.reduce((a,s)=>a+(s.vol||0),0);
   const mins=Math.round(ss.reduce((a,s)=>a+(s.end-s.start),0)/60000);
   const prs=ss.reduce((a,s)=>a+(s.prs||[]).length,0);
@@ -7904,7 +7969,7 @@ function histInformes(){
   // 1.8: lo que PandarIA aprendió de ti (agua y rendimiento, tus mejores días, ayuno y entreno, comida y progreso, tu meta)
   if (premOK()){ const L=v3Novedades().filter(x=>x.a==='kbOpen'); if (L.length) h+=`<div class="sec">${tx('Lo que PandarIA aprendió de ti','What PandarIA learned about you')}</div><div class="card" style="padding:4px 14px">${L.map((x,i)=>`<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="b sm">${esc(x.t)}</div><div class="xs mut" style="margin-top:3px;line-height:1.45">${esc(x.d)}${kbLink(x.v,tx('Por qué','Why'))}</div></div>`).join('')}</div>`; }
   for (let i=0;i<8;i++){
-    const wk=k0-i*7*DAY; const r=weekReport(wk); if (!r.n && i>0) continue; any=true;
+    const wk=weekShift(k0,-i); const r=weekReport(wk); if (!r.n && i>0) continue; any=true;
     const bal=i<2?balanceReport(28).msgs:[];
     const end=new Date(wk+6*DAY);
     h+=`<div class="card"><div class="row"><div class="grow"><div class="b">${i===0?'Esta semana':i===1?'Semana pasada':`Semana del ${fmtDate(wk)}`}</div><div class="xs mut">${fmtDate(wk)} al ${fmtDate(end.getTime())}</div></div>${r.prs?`<span class="tag" style="background:rgba(255,200,61,.15);color:var(--gold)">★ ${r.prs}</span>`:''}</div>
@@ -8020,7 +8085,7 @@ A.tipNutVer=()=>{ const t=tipOfDay('nut'); openModal(`<div class="sheet"><div cl
 A.tipVer=()=>{ const t=tipOfDay(); openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Consejo del día','Tip of the day')}</h3><p style="line-height:1.55;margin:0 4px 12px">${esc(t)}</p><div style="margin:0 4px 14px">${kbLink(tipRule(t))}</div><button class="btn wide" data-a="closeModal">${tx('Cerrar','Close')}</button></div>`); };
 function reportBanner(){
   if (S.settings.report===false) return '';
-  const lw=weekKey(Date.now())-7*DAY; const k='rep-'+lw; if (S.dismissed[k]) return '';
+  const lw=weekShift(weekKey(Date.now()),-1); const k='rep-'+lw; if (S.dismissed[k]) return '';
   const r=weekReport(lw); if (!r.n) return '';
   return `<div class="banner" style="cursor:pointer" data-a="openReport" data-v="${k}"><span class="ic">${I('chart',22)}</span><div class="grow"><div class="b">Tu informe semanal está listo</div><div class="sm mut">${plural(r.n,'entreno','entrenos')} la semana pasada. Toca para verlo.</div></div></div>`;
 }
@@ -8061,6 +8126,10 @@ function calcNutrition(){
   else if (goal==='ganar') kcal=tdeeUse*(kb('nut.superavit')[ritmo]||kb('nut.superavit').normal);
   else kcal=tdeeUse;
   kcal=Math.round(kcal/10)*10;
+  const dv=derivaPeso(goal); if (dv){ const im=ingestaMedia(14), cm=im?tx(` En tus últimas 2 semanas comiste de media ${im.toLocaleString(LOC())} kcal y tu objetivo es ${kcal.toLocaleString(LOC())}.`,` Over the last 2 weeks you ate ${im} kcal on average and your goal is ${kcal}.`):'';
+    notes.push(goal==='ganar'&&dv.dir===1?tx(`Estás subiendo un ${fmtNum(dv.pct)} % por semana: más de un 0,5 % suele ser sobre todo grasa.${cm} Come un poco menos para ganar músculo con menos grasa.`,`You are gaining ${dv.pct} % a week: more than 0.5 % is usually mostly fat.${cm} Eat a little less to build muscle with less fat.`)
+      :goal==='ganar'?tx(`Quieres ganar pero tu peso no sube desde hace 4 semanas.${cm} Prueba a comer unas 200 kcal más al día y revisa que anotas todo.`,`You want to gain but your weight has not gone up for 4 weeks.${cm} Try eating about 200 kcal more a day and check you log everything.`)
+      :tx(`Tu objetivo es mantener, pero tu peso ${dv.dir<0?'baja':'sube'} un ${fmtNum(dv.pct)} % por semana.${cm} ${dv.dir<0?'Come un poco más':'Come un poco menos'} para quedarte donde estás.`,`Your goal is to maintain, but your weight is ${dv.dir<0?'going down':'going up'} ${dv.pct} % a week.${cm} ${dv.dir<0?'Eat a little more':'Eat a little less'} to stay where you are.`)); }
   const tr=weightTrend(); if (goal==='bajar' && tr && tr.pct<-KD.ritmo.rapido*100) notes.push(`Estás bajando un ${fmtNum(-tr.pct)} % por semana: más del 1 % puede costarte músculo. Considera comer un poco más.`);
   const pk=kb('nut.proteina')[goal];
   const prot=Math.round(w*pk), fat=Math.round(w*kb('nut.grasa').gkg), carbs=Math.max(0,Math.round((kcal-prot*4-fat*9)/4));
@@ -8086,6 +8155,38 @@ function weightTrend(days){ days=days||28; const from=Date.now()-days*DAY; const
   const mx=pts.reduce((a,p)=>a+p[0],0)/pts.length, my=pts.reduce((a,p)=>a+p[1],0)/pts.length;
   const sl=pts.reduce((a,p)=>a+(p[0]-mx)*(p[1]-my),0)/pts.reduce((a,p)=>a+(p[0]-mx)**2,0);
   return {kgDay:sl, kgWeek:sl*7, pct:sl*7/my*100, span}; }
+// 1.8.2: peso bajo o comer muy poco, con cualquier objetivo (regla seguridad.peso_bajo). Los menores ya tienen su propio aviso.
+function riesgoPeso(){
+  const p=S.profile||{}, K=kb('seguridad.peso_bajo'), bm=bmi(); if (!bm || !p.age || +p.age<kb('nut.menores').edad) return null;
+  const KM=kb('nut.metabolismo'), w=bodyWeight(), h=+p.height, a=+p.age; if (!h) return null;
+  const bmr=KM.w*w+KM.h*h-KM.a*a+(p.sex==='h'?KM.hombre:p.sex==='m'?KM.mujer:KM.otro);
+  const D=(S.nutri&&S.nutri.diario)||{}, dias=[...Array(K.dias).keys()].map(i=>dayKey(Date.now()-(i+1)*DAY)).filter(k=>(D[k]||[]).length>=2);
+  const ingesta=dias.length>=K.minDias?Math.round(dias.reduce((s,k)=>s+D[k].reduce((x,e)=>x+(+e.k||0),0),0)/dias.length):null;
+  const poco=ingesta!=null && ingesta<bmr*K.fBmr, tr=weightTrend(), rapido=!!(tr&&tr.pct<=-K.rapidoPct);
+  const nivel=bm<K.grave?2:bm<K.imc?1:0;
+  if (!nivel && !poco) return null;
+  return {nivel, imc:Math.round(bm*10)/10, ingesta, dias:dias.length, bmr:Math.round(bmr), poco, rapido};
+}
+function riesgoCard(){ const r=riesgoPeso(); if (!r) return ''; const hab=habitos();
+  const imc=fmtNum(r.imc), partes=[];
+  if (r.nivel===2) partes.push(hab?tx('Tu peso está muy por debajo de lo saludable.','Your weight is well below a healthy range.'):tx(`Tu peso está muy por debajo de lo saludable (índice de masa corporal ${imc}).`,`Your weight is well below a healthy range (body mass index ${imc}).`),
+    tx('Te recomendamos hablar con un médico o nutricionista. PandarIA no te propondrá bajar de peso ni ayunar.','We recommend talking to a doctor or dietitian. PandarIA will not suggest losing weight or fasting.'),
+    tx('Si comer te genera angustia o culpa, pedir ayuda es un buen paso.','If eating makes you anxious or guilty, asking for help is a good step.'));
+  else if (r.nivel===1) partes.push(hab?tx('Tu peso está por debajo de lo saludable.','Your weight is below a healthy range.'):tx(`Tu índice de masa corporal (${imc}) está por debajo de 18,5, lo que se considera bajo peso.`,`Your body mass index (${imc}) is below 18.5, which is considered underweight.`),
+    tx('PandarIA no te propone déficit ni ayuno: te muestra tu mantenimiento.','PandarIA does not suggest a deficit or fasting: it shows your maintenance.'));
+  if (r.poco) partes.push(hab?tx('Estos días comes muy poco para lo que tu cuerpo necesita.','These days you are eating very little for what your body needs.'):tx(`En tus últimos ${r.dias} días con diario comiste de media ${fmtK(r.ingesta)}, menos de lo que tu cuerpo gasta en reposo (${fmtK(r.bmr)}).`,`Over your last ${r.dias} days with a diary you ate ${fmtK(r.ingesta)} on average, less than your body burns at rest (${fmtK(r.bmr)}).`),
+    tx('Comer tan poco seguido cuesta músculo, energía y salud.','Eating this little for long costs muscle, energy and health.'));
+  return `<div class="card row" style="align-items:flex-start;gap:12px;border:1px solid var(--bad)"><span style="color:var(--bad)">${I('alert',22)}</span><div class="grow sm" style="line-height:1.45">${partes.map(esc).join(' ')}${kbLink('seguridad.peso_bajo')}</div></div>`; }
+// 1.8.2: al mantener o ganar, avisar si el peso se aleja del objetivo (regla comida.deriva)
+function derivaPeso(goal){ const K=kb('comida.deriva'), tr=weightTrend(K.dias); if (!tr || tr.span<K.minSpan) return null;
+  if (goal==='mantener' && Math.abs(tr.pct)>K.mantener) return {dir:tr.pct<0?-1:1, pct:Math.round(Math.abs(tr.pct)*100)/100};
+  // un cambio lento pero sostenido también se aleja del objetivo (−0,2 kg por semana durante un año son −10 kg)
+  const tl=weightTrend(K.largo); if (goal==='mantener' && tl && tl.span>=K.minSpanLargo && Math.abs(tl.pct)>K.mantenerLargo && Math.sign(tl.pct)===Math.sign(tr.pct||tl.pct)) return {dir:tl.pct<0?-1:1, pct:Math.round(Math.abs(tl.pct)*100)/100};
+  if (goal==='ganar' && tr.pct<=0) return {dir:0, pct:Math.round(Math.abs(tr.pct)*100)/100};
+  if (goal==='ganar' && tr.pct>K.ganarMax) return {dir:1, pct:Math.round(tr.pct*100)/100};
+  return null; }
+function ingestaMedia(n){ const D=(S.nutri&&S.nutri.diario)||{}, dias=[...Array(n||14).keys()].map(i=>dayKey(Date.now()-(i+1)*DAY)).filter(k=>(D[k]||[]).length>=2);
+  return dias.length>=5?Math.round(dias.reduce((s,k)=>s+D[k].reduce((x,e)=>x+(+e.k||0),0),0)/dias.length):null; }
 // Gasto real estimado con el diario y el peso de los últimos días
 function nutAdapt(tdeeF, w){
   const K=kb('nut.adaptativo'), D=(S.nutri&&S.nutri.diario)||{}; const end=Date.now()-DAY;
@@ -8112,6 +8213,8 @@ function viewNutricion(){
   // con un ayuno en curso, una franja con el tiempo en Comida y Agua (un toque lleva al ayuno)
   const fa=n.fast&&n.fast.active;
   if (fa && NSEG!=='ayuno'){ const el=(Date.now()-fa.start)/3600000; h+=`<button class="card row tap" style="width:100%;gap:10px;padding:10px 14px;text-align:left" data-a="nseg" data-v="ayuno"><span style="color:var(--ac)">${I('timer',18)}</span><span class="grow sm"><b>${tx('Ayunando','Fasting')}</b> · <span class="tick-fast">${fmtHM(el)}</span>${fa.goalH?tx(` de ${fa.goalH} h`,` of ${fa.goalH} h`):''}</span><span class="mut">${I('right',16)}</span></button>`; }
+  // 1.8.2: peso bajo o comer muy poco: aviso arriba en Comida y en Ayuno, sea cual sea el objetivo
+  if (NSEG!=='agua') h+=riesgoCard();
   if (NSEG==='ayuno'){
     h+=fastCard(true);
     h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">${tx('El ayuno no es para todo el mundo. Si tienes una condición de salud, estás embarazada, das el pecho o tuviste problemas con la comida, consúltalo antes con un profesional.','Fasting is not for everyone. If you have a health condition, are pregnant or breastfeeding, or have had problems with food, check with a professional first.')}</p>`;
@@ -8171,7 +8274,9 @@ function viewAyuno(){
   h+=`<p class="xs mut" style="text-align:center;margin:20px 8px;line-height:1.5">${tx('El ayuno no es para todo el mundo. Si tienes una condición de salud, estás embarazada, das el pecho o tuviste problemas con la comida, consúltalo antes con un profesional.','Fasting is not for everyone. If you have a health condition, are pregnant, breastfeeding or have had problems with food, check with a professional first.')}</p>`;
   return h;
 }
-A.nGoal=v=>{ nut().goal=v; delete nut().ritmo; save(); render.keep=true; render(); };
+// 1.8.2: cambiar el objetivo con un toque muestra las calorías nuevas y se puede deshacer (un toque sin querer cambiaba tus metas durante meses)
+A.nGoal=v=>{ const n=nut(), g0=n.goal, r0=n.ritmo; if (g0===v) return; n.goal=v; delete n.ritmo; save(); render.keep=true; render();
+  const c=calcNutrition(); toastUndo(tx(`Objetivo: ${(NGOALS[v]||v).toLowerCase()}${c?` · ${c.kcal.toLocaleString(LOC())} kcal`:''}`,`Goal: ${({bajar:'lose fat',mantener:'maintain',ganar:'build muscle'})[v]||v}${c?` · ${c.kcal} kcal`:''}`),()=>{ n.goal=g0; if (r0!=null) n.ritmo=r0; }); };
 A.nRitmo=v=>{ nut().ritmo=v; save(); render.keep=true; render(); };
 A.nAdapt=()=>{ const n=nut(); n.adaptOff=!n.adaptOff; save(); render.keep=true; render(); toast(n.adaptOff?'Ajuste automático desactivado':'Ajuste automático activado'); };
 A.water=(v,nom)=>{ const n=nut(), k=dayKey(), b0=waterToday(k); v=+v;
@@ -9365,12 +9470,15 @@ function diaryTimes(k){ return ((S.nutri&&S.nutri.diario&&S.nutri.diario[k])||[]
 function lastMealTs(){ const t=diaryTimes(dayKey()).concat(diaryTimes(dayKey(Date.now()-DAY))).filter(x=>Date.now()-x<kb('ayuno.diario').maxH*3600000); return t.length?Math.max(...t):null; }
 function fastWindowHtml(){ const t=diaryTimes(dayKey()); if (t.length<2) return '';
   const h=(t[t.length-1]-t[0])/3600000; return `<div class="xs mut" style="margin-top:12px;line-height:1.4">${tx(`Según tu diario, hoy comiste entre las ${hhmm(t[0])} y las ${hhmm(t[t.length-1])} (${fmtHMl(h)}).`,`According to your diary, today you ate between ${hhmm(t[0])} and ${hhmm(t[t.length-1])} (${Math.floor(h)} h ${String(Math.floor(h*60)%60).padStart(2,'0')} min).`)}${kbLink('ayuno.diario',tx('Cómo funciona','How it works'))}</div>`; }
-A.fastFromDiary=()=>{ const lm=lastMealTs(); if (!lm) return toast(tx('No hay comidas recientes en tu diario','No recent meals in your diary')); const f=nut().fast; f.active={start:lm,goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast(tx(`Ayuno desde las ${hhmm(lm)}, tu última comida`,`Fasting since ${hhmm(lm)}, your last meal`)); };
+A.fastFromDiary=()=>fastRiesgoAntes(()=>{ const lm=lastMealTs(); if (!lm) return toast(tx('No hay comidas recientes en tu diario','No recent meals in your diary')); const f=nut().fast; f.active={start:lm,goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast(tx(`Ayuno desde las ${hhmm(lm)}, tu última comida`,`Fasting since ${hhmm(lm)}, your last meal`)); });
 const fmtHM = h => { const m=Math.floor(h*60); return `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`; };
 const fmtHMl = h => { const m=Math.floor(h*60); return `${Math.floor(m/60)} h ${String(m%60).padStart(2,'0')} min`; };
 function fastAdvice(){
   const n=nut(), f=n.fast, p=S.profile||{}; const msgs=[];
   const plan=FAST_PLANS[f.plan]||{};
+  const rp=riesgoPeso(); if (rp&&rp.nivel) msgs.push(tx('Con tu peso actual no recomendamos ayunar: tu cuerpo necesita comer con regularidad.','At your current weight we do not recommend fasting: your body needs to eat regularly.'));
+  else if (rp&&rp.poco) msgs.push(tx('Estos días comes menos de lo que tu cuerpo gasta en reposo: ahora no es buen momento para ayunar.','These days you eat less than your body burns at rest: now is not a good time to fast.'));
+  if (f.active && (Date.now()-f.active.start)/3600000>=kb('ayuno.olvido').avisoH) msgs.push(tx('Llevas más de 72 horas. Un ayuno tan largo no es seguro sin supervisión: rómpelo con una comida suave y, si te encuentras mal, consulta a un profesional.','You have gone over 72 hours. A fast this long is not safe without supervision: break it with a light meal and, if you feel unwell, see a professional.'));
   const KF=kb('ayuno.prudencia');
   if (f.history.length<KF.inicioN && plan.h>=KF.inicioMaxH) msgs.push('Para empezar te sugiero 12:12 o 14:10 y subir de a poco cuando te sientas cómodo.');
   if (plan.h>=23 && f.history.filter(x=>x.ok&&(x.end-x.start)/3600000>=16).length<3) msgs.push(tx('Antes de un 23:1, completa al menos 3 ayunos de 16 h o más. Comer una sola vez al día hace difícil llegar a tu proteína.','Before 23:1, complete at least 3 fasts of 16 h or more. Eating once a day makes it hard to reach your protein.'));
@@ -9387,7 +9495,7 @@ function fastAdvice(){
 function fastHistory(){
   const H=nut().fast.history, hs=H.map((x,i)=>[x,i]).slice(-5).reverse(); const R=fastRachas();
   // 1.8.1: los últimos ayunos van en un bloque desplegable con la racha y el último a la vista
-  const u=hs[0]&&hs[0][0], uh=u?(u.end-u.start)/3600000:0;
+  const u=hs[0]&&hs[0][0], uh=u?(u.end-u.start)/3600000:0; if (riesgoPeso()) R.act=0; // 1.8.2: con peso bajo no se celebran rachas de ayuno
   return `${hs.length?fold('ayunos',tx('Últimos ayunos','Latest fasts'),[R.act?tx(`${R.act} seguidos ✓`,`${R.act} in a row ✓`):'',u?tx(`el último: ${fmtHM(uh)} h`,`last one: ${fmtHM(uh)} h`):''].filter(Boolean).join(' · '),`<div style="margin:-4px 0 0">${hs.map(([x,i])=>fastFila(x,i)).join('')}</div>`,{st:'margin-top:14px'}):''}
   <div class="row" style="gap:8px;margin-top:8px"><button class="btn sm grow" data-a="fastStats">${I('chart',16)} ${tx('Estadísticas e historial','Stats and history')}</button><button class="btn sm" data-a="fastEdit" data-v="nuevo">${I('plus',16)} ${tx('Añadir','Add')}</button></div>`;
 }
@@ -9409,7 +9517,11 @@ A.fastPlan=v=>{ const f=nut().fast, P=FAST_PLANS[v]||{}, set=()=>{ f.plan=v; sav
       okText:tx('Elegir igualmente','Choose anyway'),noText:tx('Mejor no','Better not'),ok:set}); }
   set(); };
 A.fast52=d=>{ const a=nut().fast.days52; d=+d; const i=a.indexOf(d); if(i>=0) a.splice(i,1); else { if(a.length>=2) a.shift(); a.push(d); } save(); render.keep=true; render(); };
-A.fastStart=()=>{ const f=nut().fast; delete f.deshacer; f.active={start:Date.now(),goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast('Ayuno iniciado'); };
+// 1.8.2: con peso bajo o comiendo muy poco, antes de empezar se pregunta (la decisión sigue siendo tuya)
+function fastRiesgoAntes(fn){ const r=riesgoPeso(); if (!r) return fn();
+  confirmBox({title:tx('¿Ayunar ahora?','Fast now?'),text:esc(r.nivel?tx('Con tu peso actual no recomendamos ayunar: tu cuerpo necesita comer con regularidad.','At your current weight we do not recommend fasting: your body needs to eat regularly.'):tx('Estos días comes menos de lo que tu cuerpo gasta en reposo: ahora no es buen momento para ayunar.','These days you eat less than your body burns at rest: now is not a good time to fast.')),okText:tx('Empezar igualmente','Start anyway'),noText:tx('Ahora no','Not now'),ok:fn}); }
+A.fastStart=()=>fastRiesgoAntes(fastStartYa);
+function fastStartYa(){ const f=nut().fast; delete f.deshacer; f.active={start:Date.now(),goalH:(FAST_PLANS[f.plan]||{}).h||null}; save(); render.keep=true; render(); toast('Ayuno iniciado'); };
 A.fastStartPast=()=>fastTimePicker(false);
 A.fastAdjust=()=>fastTimePicker(true);
 const toLocalInput = ts => { const d=new Date(ts - new Date(ts).getTimezoneOffset()*60000); return d.toISOString().slice(0,16); };
@@ -9437,8 +9549,18 @@ A.fastEnd=()=>{ const f=nut().fast, a=f.active; if(!a) return; const el=(Date.no
 A.fastEndNow=()=>{ const f=nut().fast, a=f.active; if(!a) return; const end=Date.now(); const el=(end-a.start)/3600000, guarda=el>=FAST_MIN_H;
   if (guarda){ f.history.push({start:a.start,end,goalH:a.goalH,ok:!a.goalH||el>=a.goalH}); f.history=f.history.slice(-400); }
   f.active=null; f.deshacer={a:{start:a.start,goalH:a.goalH},end,guardado:guarda}; save(); render.keep=true; render();
-  if (guarda && el>=4) setTimeout(()=>{ if (!MODALS.length && !document.querySelector('.toast.undo')) A.fastSentir(f.history.length-1); },6500);
-  toastUndo(!guarda?tx('Ayuno de menos de 1 hora: no se guarda','Fast under 1 hour: not saved'):a.goalH&&el>=a.goalH?tx('✓ ¡Ayuno completado!','✓ Fast complete!'):tx('Ayuno terminado','Fast ended'),()=>fastReanudar()); };
+  // 1.8.2: un ayuno de más de 72 h casi siempre es uno que se olvidó parar: se ofrece corregir la hora de fin
+  const largo=guarda && el>=kb('ayuno.olvido').avisoH, idx=f.history.length-1;
+  if (largo) setTimeout(()=>confirmBox({title:tx('¿Ayuno de '+fmtHMl(el)+'?','A '+Math.floor(el)+' h fast?'),text:esc(tx('Si terminaste antes y olvidaste pararlo, corrige la hora de fin para que no cuente en tus estadísticas.','If you finished earlier and forgot to stop it, correct the end time so it does not count in your stats.')),okText:tx('Corregir la hora','Correct the time'),noText:tx('Dejarlo así','Leave it'),ok:()=>A.fastEdit(idx)}),400);
+  else if (guarda && el>=4) setTimeout(()=>{ if (!MODALS.length && !document.querySelector('.toast.undo')) A.fastSentir(f.history.length-1); },6500);
+  toastUndo(!guarda?tx('Ayuno de menos de 1 hora: no se guarda','Fast under 1 hour: not saved'):a.goalH&&el>=a.goalH&&!riesgoPeso()?tx('✓ ¡Ayuno completado!','✓ Fast complete!'):tx('Ayuno terminado','Fast ended'),()=>fastReanudar()); };
+// 1.8.2: con un ayuno abierto 48 h, preguntar si sigue (por si se olvidó pararlo)
+function fastOlvido(){ const f=S&&S.nutri&&S.nutri.fast, a=f&&f.active; if (!a || a.pregunta || MODALS.length || !S.settings.onboarded) return;
+  const el=(Date.now()-a.start)/3600000; if (el<kb('ayuno.olvido').preguntaH) return;
+  a.pregunta=Date.now(); save();
+  confirmBox({title:tx('¿Sigues ayunando?','Still fasting?'),text:esc(tx(`Llevas ${fmtHMl(el)} en ayuno. Si terminaste antes y olvidaste pararlo, termínalo y corrige la hora de fin.`,`You have been fasting for ${Math.floor(el)} h. If you finished earlier and forgot to stop it, end it and correct the end time.`)),
+    okText:tx('Sí, sigo ayunando','Yes, still fasting'),noText:tx('Ya terminé','I already finished'),ok:()=>{},no:()=>{ const fa=nut().fast; if (!fa.active) return; A.fastEndNow(); setTimeout(()=>{ MODALS.length=0; renderModals(); A.fastEdit(fa.history.length-1); },450); }}); }
+setInterval(fastOlvido,60000); document.addEventListener('visibilitychange',()=>{ if (!document.hidden) setTimeout(fastOlvido,1200); });
 function fastReanudar(){ const f=nut().fast, d=f.deshacer; if (!d || f.active) return;
   if (d.guardado){ const i=f.history.findIndex(x=>x.start===d.a.start&&x.end===d.end); if (i>=0) f.history.splice(i,1); }
   f.active={start:d.a.start,goalH:d.a.goalH}; delete f.deshacer; }
@@ -9607,7 +9729,7 @@ SCREENS.aguaStats=p=>{ const D=n=>[...Array(n).keys()].map(i=>dayKey(Date.now()-
 let PMUS='pecho';
 function muscleWeekChart(m){
   const k0=weekKey(Date.now()); const vals=[], lbl=[];
-  for (let i=7;i>=0;i--){ const wk=k0-i*7*DAY; let n=0;
+  for (let i=7;i>=0;i--){ const wk=weekShift(k0,-i); let n=0;
     S.sessions.filter(s=>weekKey(s.end)===wk).forEach(s=>s.items.forEach(it=>{ const ex=getEx(it.exId); const c=it.sets.filter(x=>x.done&&x.t!=='c').length; if(ex.prim.includes(m)) n+=c; else if(ex.sec.includes(m)) n+=c*0.5; }));
     vals.push(n); const d=new Date(wk); lbl.push(i%2===0?`${d.getDate()}/${d.getMonth()+1}`:''); }
   const W=320,H=160,pl=24,pr=8,pt=12,pb=22, mx=Math.max(22,...vals);
@@ -10273,6 +10395,8 @@ function estadoDiaCalc(){ const K=kb('estado.dia'), P=K.p, f=[]; let n=0; const 
     const last=S.sessions[S.sessions.length-1], KR=kb('recuperacion.ajuste'); if (last&&Date.now()-last.end<KR.horas*3600000&&(last.intensity||0)>=KR.intensa) pen(P.intensa,tx('tu última sesión fue muy exigente','your last session was very hard')); }
   const ay=ayunoCarga(); if (ay) pen(P.ayuno,ay);
   const ca=cansancioAcum(); if (ca) pen(P.cansancio,tx('cansancio acumulado de varios días','fatigue built up over several days'));
+  // 1.8.2: con peso muy bajo o comiendo muy poco, el día no puede salir «listo»
+  const rp=riesgoPeso(); if (rp&&(rp.nivel>=2||rp.poco)){ n++; if (rp.nivel>=2) pen(P.pesoBajo,tx('peso muy por debajo de lo saludable','weight well below a healthy range')); if (rp.poco) pen(P.comePoco,tx('comes menos de lo que gastas en reposo','you eat less than you burn at rest')); }
   if (!n) return {score:null,n:0};
   const score=Math.max(0,Math.min(100,100-f.reduce((a,x)=>a+x.p,0)));
   const w=score>=K.listo?'listo':score>=K.normal?'normal':score>=K.suave?'suave':'descansa';
@@ -10312,7 +10436,7 @@ A.checkinHoy=()=>{ const c=Object.assign({sleep:null,energy:null,sore:null},S.ch
 /* ----- aprender cómo respondes: series por músculo y días en que rindes mejor (8 semanas o más) ----- */
 function aprendeSeries(){ if (!premOK()) return []; const K=kb('aprende.series'), KV=kb('volumen.hipertrofia'), wk0=weekKey(Date.now());
   const first=S.sessions.length?Math.min(...S.sessions.map(s=>s.end||Date.now())):Date.now(); if ((Date.now()-first)/(7*DAY)<K.semanas || S.sessions.length<K.minSes) return [];
-  const sem=[...Array(K.semanas).keys()].map(i=>wk0-(i+1)*7*DAY).reverse(), out=[];
+  const sem=[...Array(K.semanas).keys()].map(i=>weekShift(wk0,-(i+1))).reverse(), out=[];
   ['pecho','dorsales','hombros','cuadriceps','isquios','gluteos','biceps','triceps'].forEach(m=>{ if (!MUSCLES[m]) return;
     const series=[], fuerza=[];
     sem.forEach(w=>{ let n=0; const e={}; S.sessions.filter(s=>weekKey(s.end)===w).forEach(s=>s.items.forEach(it=>{ const ex=getEx(it.exId); if (ex.prim[0]!==m) return; const ds=it.sets.filter(x=>x.done&&x.t!=='c'); n+=ds.length; if (ex.mode==='p'){ const v=e1Sesion(ds); if (v) e[it.exId]=Math.max(e[it.exId]||0,v); } }));
@@ -10359,16 +10483,24 @@ function comidaProgresoTxt(o){ const p=[];
 
 /* ----- tus hábitos: días que sueles saltarte y la hora a la que entrenas de verdad ----- */
 function habitosPlan(){ if (!premOK()||!S.plan||!planRoutines().length) return null; const K=kb('habitos.plan'), wk0=weekKey(Date.now()), out={};
-  const first=S.sessions.length?Math.min(...S.sessions.map(s=>s.end||Date.now())):Date.now(), sems=[...Array(K.semanas).keys()].map(i=>wk0-(i+1)*7*DAY).filter(w=>w>=weekKey(first));
-  if (sems.length<K.minSem) return null; const hechos=sems.map(w=>new Set(S.sessions.filter(s=>weekKey(s.end)===w).map(s=>new Date(s.end).getDay())));
-  const salta=S.plan.days.map(d=>({d,n:hechos.filter(h=>!h.has(d)).length})).filter(x=>x.n>=Math.ceil(sems.length*K.fallo)).sort((a,b)=>b.n-a.n)[0];
+  const first=S.sessions.length?Math.min(...S.sessions.map(s=>s.end||Date.now())):Date.now(), sems=[...Array(K.semanas).keys()].map(i=>weekShift(wk0,-(i+1))).filter(w=>w>=weekKey(first));
+  // 1.8.2: una semana sin ningún entreno es una pausa (vacaciones, enfermedad), no un hábito: no cuenta como días saltados
+  const todas=sems.map(w=>new Set(S.sessions.filter(s=>weekKey(s.end)===w).map(s=>new Date(s.end).getDay()))), hechos=todas.filter(h=>h.size>0);
+  if (hechos.length<K.minSem) return null;
+  // con un plan de 2 días ya no se propone quitar ninguno (solo cambiarlo por el día en que de verdad entrenas)
+  const salta=S.plan.days.map(d=>({d,n:hechos.filter(h=>!h.has(d)).length})).filter(x=>x.n>=Math.ceil(hechos.length*K.fallo)).sort((a,b)=>b.n-a.n)[0];
   if (salta){ const otros=[0,1,2,3,4,5,6].filter(d=>!S.plan.days.includes(d)).map(d=>({d,n:hechos.filter(h=>h.has(d)).length})).filter(x=>x.n>=K.minOtro).sort((a,b)=>b.n-a.n)[0];
-    out.salta=Object.assign({sem:sems.length},salta,{por:otros?otros.d:null,porN:otros?otros.n:0}); }
-  const hh=horaHabitual(), r=S.settings.reminders; if (hh&&r&&r.days&&r.days.length&&r.time){ const [a,b]=r.time.split(':').map(Number), [c,d]=hh.aviso.split(':').map(Number); if (Math.abs((a*60+b)-(c*60+d))>=K.difMin) out.hora={actual:r.time,nueva:hh.aviso,habitual:hh.hora}; }
+    if (otros || S.plan.days.length>2) out.salta=Object.assign({sem:hechos.length},salta,{por:otros?otros.d:null,porN:otros?otros.n:0}); }
+  const hh=horaHabitual(), r=S.settings.reminders; if (hh&&r&&r.days&&r.days.length&&r.time&&!(r.movido&&Date.now()-r.movido<K.avisoDias*DAY)){ /* 1.8.2: como mucho una vez al mes (antes iba y volvía entre dos horas) */ const [a,b]=r.time.split(':').map(Number), [c,d]=hh.aviso.split(':').map(Number); if (Math.abs((a*60+b)-(c*60+d))>=K.difMin) out.hora={actual:r.time,nueva:hh.aviso,habitual:hh.hora}; }
   return out.salta||out.hora?out:null; }
 function ejercicioSaltado(){ if (!premOK()) return null; const K=kb('habitos.plan');
-  for (const r of S.routines.filter(x=>!x.archived)){ const ss=S.sessions.filter(s=>s.routineId===r.id).slice(-K.saltaDe); if (ss.length<K.saltaDe) continue;
-    for (const it of r.items){ if (it.warm||it.cool) continue; const veces=ss.filter(s=>!s.items.some(x=>x.exId===it.exId&&x.sets.some(y=>y.done))).length; if (veces>=K.saltaMin && r.items.filter(x=>!x.warm&&!x.cool).length>2) return {r,it,ex:getEx(it.exId),veces,de:ss.length}; } }
+  // 1.8.2: solo cuentan las sesiones en las que el ejercicio estaba planeado (las sesiones guardan qué ejercicios tocaban).
+  // Antes, un ejercicio recién cambiado por PandarIA no aparecía en las sesiones anteriores, parecía «saltado» y se proponía quitarlo:
+  // quien hacía caso al panda perdía un ejercicio al día. Además ninguna rutina baja de K.minEj ejercicios por esta propuesta.
+  for (const r of S.routines.filter(x=>!x.archived)){ const ss=S.sessions.filter(s=>s.routineId===r.id && Array.isArray(s.planned)).slice(-K.saltaDe); if (ss.length<K.saltaDe) continue;
+    if (r.items.filter(x=>!x.warm&&!x.cool).length<=K.minEj) continue;
+    for (const it of r.items){ if (it.warm||it.cool) continue; const pl=ss.filter(s=>s.planned.includes(it.exId)); if (pl.length<K.saltaDe) continue;
+      const veces=pl.filter(s=>!s.items.some(x=>x.exId===it.exId&&x.sets.some(y=>y.done))).length; if (veces>=K.saltaMin) return {r,it,ex:getEx(it.exId),veces,de:pl.length}; } }
   return null; }
 
 /* ----- predicciones con margen: la fecha de tu meta como un rango, solo con una tendencia clara ----- */
@@ -10393,7 +10525,7 @@ function v3Propuestas(){ if (!premOK()) return []; const L=[], P=PANDA();
   if (hb&&hb.salta){ const s=hb.salta, D=DAYS_LONG; L.push({k:`dia-${s.d}-${s.por}`,t:s.por!=null?tx(`Cambiar los ${DIAS_N(s.d)} por los ${DIAS_N(s.por)}`,`Swap ${DIAS_N(s.d)} for ${DIAS_N(s.por)}`):tx(`Quitar los ${DIAS_N(s.d)} de tu plan`,`Drop ${DIAS_N(s.d)} from your plan`),
     d:s.por!=null?tx(`Te saltaste ${s.n} de los últimos ${s.sem} ${DIAS_N(s.d)} y entrenaste ${s.porN} ${DIAS_N(s.por)} fuera del plan.`,`You skipped ${s.n} of the last ${s.sem} ${DIAS_N(s.d)} and trained on ${s.porN} ${DIAS_N(s.por)} outside your plan.`):tx(`Te saltaste ${s.n} de los últimos ${s.sem} ${DIAS_N(s.d)}. Un plan que cumples rinde más que uno más largo.`,`You skipped ${s.n} of the last ${s.sem} ${DIAS_N(s.d)}. A plan you keep pays off more than a longer one.`),
     kb:'habitos.plan',ok:tx('Plan semanal actualizado','Weekly plan updated'),fn:()=>{ const d=S.plan.days, i=d.indexOf(s.d); if (i<0) return; if (s.por!=null) d.splice(i,1,s.por); else if (d.length>2) d.splice(i,1); d.sort((a,b)=>((a+6)%7)-((b+6)%7)); void D; }}); }
-  if (hb&&hb.hora) L.push({k:`hora-${hb.hora.nueva}`,t:tx(`Mover tu aviso de entreno a las ${hb.hora.nueva}`,`Move your workout reminder to ${hb.hora.nueva}`),d:tx(`Sueles entrenar sobre las ${hb.hora.habitual} y tu aviso está a las ${hb.hora.actual}. Así te avisa media hora antes.`,`You usually train around ${hb.hora.habitual} and your reminder is at ${hb.hora.actual}. This way it reminds you half an hour before.`),kb:'habitos.plan',ok:tx('Aviso movido','Reminder moved'),fn:()=>{ S.settings.reminders.time=hb.hora.nueva; try{ scheduleReminder(); }catch(e){} }});
+  if (hb&&hb.hora) L.push({k:`hora-${hb.hora.nueva}`,t:tx(`Mover tu aviso de entreno a las ${hb.hora.nueva}`,`Move your workout reminder to ${hb.hora.nueva}`),d:tx(`Sueles entrenar sobre las ${hb.hora.habitual} y tu aviso está a las ${hb.hora.actual}. Así te avisa media hora antes.`,`You usually train around ${hb.hora.habitual} and your reminder is at ${hb.hora.actual}. This way it reminds you half an hour before.`),kb:'habitos.plan',ok:tx('Aviso movido','Reminder moved'),fn:()=>{ S.settings.reminders.time=hb.hora.nueva; S.settings.reminders.movido=Date.now(); try{ scheduleReminder(); }catch(e){} }});
   const sa=ejercicioSaltado(); if (sa) L.push({k:`salta-${sa.r.id}-${sa.it.exId}`,t:tx(`Quitar ${sa.ex.n} de «${sa.r.name}»`,`Remove ${sa.ex.n} from “${sa.r.name}”`),d:tx(`Lo saltaste en ${sa.veces} de tus últimas ${sa.de} sesiones de esta rutina. Si prefieres otro, cámbialo desde la rutina.`,`You skipped it in ${sa.veces} of your last ${sa.de} sessions of this routine. If you prefer another one, swap it from the routine.`),kb:'habitos.plan',ok:tx('Ejercicio quitado de la rutina','Exercise removed from the routine'),fn:()=>{ sa.r.items=sa.r.items.filter(x=>x!==sa.it); }});
   // la duración de ayuno que mejor te sienta
   const f=nut().fast, fi=fastSensInsight(); if (f.screened&&!f.blocked&&fi&&/14:10/.test(fi)&&(FAST_PLANS[f.plan]||{}).h>=16) L.push({k:'ayuno-14',t:tx('Probar el plan 14:10','Try the 14:10 plan'),d:fi,kb:'ayuno.prudencia',ok:tx('Plan de ayuno: 14:10','Fasting plan: 14:10'),fn:()=>{ f.plan='14:10'; }});
@@ -10838,9 +10970,10 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='1.8';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
-const APP_PARCHE='1';
+const APP_PARCHE='2';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.8.2',t:'Te cuida mejor',items:['PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas', 'Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso', 'Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo', 'Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan', 'La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora', 'Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin', 'Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice', 'Después de unas vacaciones ya no propone quitar días de tu plan', 'Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso', 'Cambiar tu objetivo de calorías ahora se puede deshacer']},
  {v:'1.8.1',t:'Más ordenada',items:['Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes', 'Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos', 'El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección', 'Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan', 'Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados', 'El buscador de alimentos entiende plurales y errores de una letra', '39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate']},
  {v:'1.8',t:'PandarIA aprende de ti',items:['Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)', '10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas', 'PandarIA con 19 fuentes nuevas, entre ellas la postura del ACSM de 2026: vuelve de una pausa según tu edad (Bosquet 2013), descargas con una serie menos (Bell 2023), máximo estimado más fiable (Mayhew 2008), calorías con los factores de la FAO/OMS y el modelo de Hall, proteína por comida de 0,4 g/kg, meta de pasos según tu edad y calorías de cada entreno (Compendio 2024)', 'Tu primera serie de un ejercicio nuevo calibra el peso de las siguientes, el gasto real usa 3 semanas de datos, y cada fuente de la Biblioteca enlaza con las otras reglas que salen de ella', 'Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas', 'PandarIA elige mejor el peso: tras una descarga ya no lo baja dos veces, si anotas que te sobran muchas repeticiones lo recalcula con tu fuerza real, y tus repeticiones de sobra mandan sobre la nota de la sesión', 'Arreglos encontrados con 32 usuarios simulados durante un mes: récords sin peso, doble toque en Terminar o al elegir una ración, y metas de nutrición que podían salir en blanco']},
  {v:'1.7',t:'El panda te avisa',items:['El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros', 'Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)', 'iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple', 'iPhone: textos de Apple Health corregidos']},
@@ -10884,7 +11017,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.8.1 · Más ordenada", "Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes", "Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos", "El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección", "Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan", "Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados", "El buscador de alimentos entiende plurales y errores de una letra", "39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate"];
+const NOTAS_VERSION=["1.8.2 · Te cuida mejor", "PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas", "Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso", "Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo", "Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan", "La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora", "Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin", "Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice", "Después de unas vacaciones ya no propone quitar días de tu plan", "Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso", "Cambiar tu objetivo de calorías ahora se puede deshacer"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -11522,7 +11655,7 @@ function applyAnim(){ document.documentElement.dataset.fx=ANIM_ON()?'on':'off'; 
   const fs0=A.fastStart;
   if (fs0) A.fastStart=function(){ const had=!!nut().fast.active; const r=fs0.apply(this,arguments); if(!had&&nut().fast.active){ sfx('start'); anim(document.querySelector('.fring'),'fx-ring'); } return r; };
   const fe0=A.fastEndNow;
-  A.fastEndNow=()=>{ const a=nut().fast.active; const ok=a&&(!a.goalH||(Date.now()-a.start)/3600000>=a.goalH); fe0(); if(!a) return; if (ok&&a.goalH){ sfx('finish'); confetti({n:110}); } else sfx('success'); };
+  A.fastEndNow=()=>{ const a=nut().fast.active; const ok=a&&(!a.goalH||(Date.now()-a.start)/3600000>=a.goalH); fe0(); if(!a) return; if (ok&&a.goalH&&!riesgoPeso()){ sfx('finish'); confetti({n:110}); } else sfx('success'); };
   // ajustes
   const tg0=A.toggleSet;
   A.toggleSet=k=>{ const s=S.settings; if (k==='uiSound'||k==='anim'){ s[k]=s[k]===false; applyAnim(); save(); render.keep=true; render(); if(k==='uiSound'&&s.uiSound!==false) sfx('success'); return; } tg0(k); };
@@ -14132,6 +14265,18 @@ Quitar plan semanal|Remove weekly plan
 ¿Quitar el plan semanal?|Remove the weekly plan?
 Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.|Your routines and history stay the same; you just won't see what is planned for each day.
 Quitar plan|Remove plan
+1.8.2 · Te cuida mejor|1.8.2 · Looks after you better
+Te cuida mejor|Looks after you better
+PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas|PandarIA no longer removes exercises it has just swapped in: your routines do not shrink on their own
+Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso|With Premium you progress faster: the weight goes up even if the last set falls one rep short, and one short set no longer lowers it
+Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo|Clear warning if your weight is low or you eat less than you burn at rest, whatever your goal
+Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan|When you mark an injury, PandarIA offers to swap the exercises in your routines that load it
+La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora|Your week streak, charts and weekly report no longer break when the clocks change
+Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin|If you forget to stop a fast, at 48 h it asks whether you are still fasting and lets you correct the end time
+Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice|If you want to maintain or gain and your weight drifts from your goal, it tells you
+Después de unas vacaciones ya no propone quitar días de tu plan|After a holiday it no longer suggests dropping days from your plan
+Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso|Free version: it tells you when you did all the reps so you can try going up in weight
+Cambiar tu objetivo de calorías ahora se puede deshacer|Changing your calorie goal can now be undone
 1.8.1 · Más ordenada|1.8.1 · Tidier
 Más ordenada|Tidier
 Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes|4-tab menu: Routines, Nutrition, History and Settings
@@ -14978,6 +15123,14 @@ const EN_09_RX = [
   [/^Minuto (\d+)\. (.*)$/,(m,n,a)=>`Minute ${n}. ${a?enN(a):''}`],[/^Trabajo\. (.*)$/,(m,a)=>'Work. '+(a?enN(a):'')]
 ];
 const EN_EXTRA = `Solo esta serie|This set only
+Calorías y peso|Calories and weight
+El siguiente peso es un salto grande: suma una repetición más antes de subir|The next weight is a big jump: add one more rep before going up
+Saltos de peso grandes|Big weight jumps
+Tu peso se aleja de tu objetivo|Your weight is drifting from your goal
+Peso bajo o comer muy poco|Low weight or eating too little
+Ayuno olvidado o muy largo|Forgotten or very long fast
+Hiciste todas las repeticiones: prueba a subir el peso|You did all the reps: try going up in weight
+Nutrición, ayuno y estado del día|Nutrition, fasting and state of the day
 Todas las series de este ejercicio|All sets of this exercise
 Cambia únicamente este descanso|Changes only this rest
 El mismo descanso para todas|Same rest for every set

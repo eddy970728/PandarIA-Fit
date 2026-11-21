@@ -39,6 +39,12 @@ const PERFILES = [
   { id: 'P15', d: '62 años · salud · duerme mal · Premium', prem: true, e: { meta: 'salud', dias: 2, eq: 'casa' }, a: 1, ck: 1, med: 1, sigue: 1, duermeMal: 1, sexo: 'h', edad: 62, alto: 172, peso: 86, tdee: 2200 },
   { id: 'P16', d: 'Mujer · ganar músculo · todo menos ayuno · Premium · inglés', prem: true, en: 1, e: { meta: 'musculo', dias: 4, eq: 'gym' }, a: 1, c: { goal: 'ganar', r: 1, p: 1, g: 1 }, ck: 1, med: 1, sigue: 1, sexo: 'm', edad: 31, alto: 165, peso: 58, tdee: 2050 },
 ];
+// gemelos: la misma persona (misma vida, mismo cuerpo, mismas rutinas de partida) sin Premium ni guía de PandarIA
+for (const [id, base] of [['P17', 'P01'], ['P18', 'P16'], ['P19', 'P08'], ['P20', 'P15']]) {
+  const B = PERFILES.find(x => x.id === base);
+  PERFILES.push(Object.assign({}, B, { id, base, gemelo: 1, sigue: 0, d: `Gemelo de ${base} sin Premium ni guía` }));
+}
+const numero = P => parseInt((P.base || P.id).slice(1));
 
 const SOLO = process.env.SOLO ? process.env.SOLO.split(',') : null;
 const salida = [];
@@ -48,9 +54,9 @@ const recorta = (tx, m) => tx.slice(Math.max(0, m.index - 70), m.index + 40).rep
 for (const P of PERFILES) {
   if (SOLO && !SOLO.includes(P.id)) continue;
   const tP = Date.now();
-  const r = rng(SEMILLA * 1000 + parseInt(P.id.slice(1)) * 13);
-  const a = await abrirApp({ t0: T0, seed: SEMILLA * 100 + parseInt(P.id.slice(1)) });
-  const L = { errores: new Map(), raros: new Map(), datos: [], avisos: [], ia: [], meses: [], fuzz: 0, propuestas: new Map(), aplicadas: [], porque: new Map(), series: [], suaves: 0, ui: { ok: 0, fallo: new Map() }, lento: [] };
+  const r = rng(SEMILLA * 1000 + numero(P) * 13);
+  const a = await abrirApp({ t0: T0, seed: SEMILLA * 100 + numero(P) });
+  const L = { errores: new Map(), raros: new Map(), datos: [], avisos: [], ia: [], meses: [], fuzz: 0, propuestas: new Map(), aplicadas: [], porque: new Map(), series: [], suaves: 0, ui: { ok: 0, fallo: new Map() }, lento: [], dias: { toca: 0, salta: 0, guardadas: 0 } };
   const err = (k, m) => { const kk = (k + ': ' + m).replace(/\d{3,}/g, '#').slice(0, 260); L.errores.set(kk, (L.errores.get(kk) || 0) + 1); };
   const raro = (donde) => { const tx = a.texto(), m = tx.match(RAROS); if (m) { const k = `${donde}: «${recorta(tx, m)}»`; L.raros.set(k, (L.raros.get(k) || 0) + 1); } };
   const uiFallo = (k) => L.ui.fallo.set(k, (L.ui.fallo.get(k) || 0) + 1);
@@ -81,14 +87,21 @@ for (const P of PERFILES) {
       a.ev(`S.plan={days:${dias},order:S.routines.filter(r=>!r.archived).map(r=>r.id)}; save(true);`);
     }
     if (!a.ev(`S.routines.length`)) L.datos.push('no se pudieron crear las rutinas');
+    // el gemelo: mismas rutinas, pero sin Premium y sin PandarIA (repite lo de la última vez)
+    if (P.gemelo) { a.ev(`S.routines.forEach(r=>r.pandaria=false); window.__PREM=false; save(true); render();`); premAhora = false; }
   }
   if (P.f) a.ev(`const f=nut().fast; f.screened=true; f.plan='${P.f}'; save(true);`);
   if (P.c) a.ev(`nut().goal='${P.c.goal}'; save(true);`);
 
   // ---- el cuerpo simulado ----
   const rutinas = P.e ? JSON.parse(a.ev(`JSON.stringify(S.routines.filter(r=>!r.archived).map(r=>({id:r.id,items:r.items.map(it=>({ex:it.exId,mode:getEx(it.exId).mode}))})))`)) : [];
-  const C = {}, C0 = {};
-  const fuerzaDe = ex => { if (!C[ex]) { const est = +a.ev(`estimateKg('${ex}',10)||0`); C[ex] = Math.max(8, est * 1.33 * (0.85 + r() * 0.35)); C0[ex] = C[ex]; } return C[ex]; };
+  // fuerza por patrón de movimiento (empuje, tirón, sentadilla, bisagra…): lo que se gana con un ejercicio se conserva
+  // al cambiarlo por otro del mismo patrón, como en la vida real. Cada ejercicio tiene su fuerza base sin entrenar (B).
+  const B = {}, PAT = {}, M = {}, C = {}, C0 = {};
+  const fuerzaDe = ex => { if (!B[ex]) { const est = +a.ev(`estimateKg('${ex}',10)||0`); B[ex] = Math.max(8, est * 1.33 * (0.85 + r() * 0.35)); PAT[ex] = a.ev(`getEx('${ex}').pat||'otro'`); if (!M[PAT[ex]]) M[PAT[ex]] = 1; C0[ex] = B[ex] * M[PAT[ex]]; }
+    C[ex] = B[ex] * M[PAT[ex]]; return C[ex]; };
+  // estímulo de una serie según las repeticiones que sobraron (las series lejos del fallo cuentan poco: Robinson 2024, Refalo 2023)
+  const ESTIM = rir => rir <= 2 ? 1 : rir === 3 ? 0.9 : rir === 4 ? 0.75 : rir === 5 ? 0.55 : rir === 6 ? 0.35 : rir === 7 ? 0.2 : 0.1;
   rutinas.forEach(rt => rt.items.forEach(it => { if (it.mode === 'p') fuerzaDe(it.ex); }));
   let F = 0, peso = P.peso, protOk = 1;
   const cola = [];
@@ -173,7 +186,7 @@ for (const P of PERFILES) {
         rutinas:S.routines.filter(r=>!r.archived).length, archivadas:S.routines.filter(r=>r.archived).length, alim:nd().alim.length, recetas:nd().recetas.length, comidas:nd().comidas.length,
         datos:usoDatos(), lesiones:(S.profile.injuries||[]).slice(), plan:S.plan?S.plan.days.slice():[], ejercicios:S.routines.filter(r=>!r.archived).reduce((n,r)=>n+r.items.filter(i=>!i.warm&&!i.cool).length,0), series:S.routines.filter(r=>!r.archived).reduce((n,r)=>n+r.items.filter(i=>!i.warm&&!i.cool).reduce((m,i)=>m+i.sets.filter(x=>x.t!=='c').length,0),0), meta:nut().goal, faPlan:nut().fast.plan }; })())`));
     f.dia = dia; f.ms = tiempos; f.pesoReal = Math.round(peso * 10) / 10;
-    f.fuerza = Object.keys(C).length ? Math.round(Object.keys(C).reduce((s, k) => s + C[k] / C0[k] - 1, 0) / Object.keys(C).length * 1000) / 10 : null;
+    f.fuerza = Object.keys(M).length ? Math.round(Object.values(M).reduce((s, v) => s + v - 1, 0) / Object.keys(M).length * 1000) / 10 : null;
     L.meses.push(f);
     limpiar();
     return f;
@@ -206,7 +219,12 @@ for (const P of PERFILES) {
       }
       en(base);
       if (P.finPrem && dia === P.finPrem) { a.ev(`window.__PREM=false; render();`); premAhora = false; L.avisos.push(`día ${dia}: deja de pagar Premium`); }
-      if (P.lesion && dia === P.lesion[0]) { a.ev(`S.profile.injuries=['${P.lesion[1]}']; save(); render();`); L.avisos.push(`día ${dia}: se lesiona (${P.lesion[1]}) y lo marca en su perfil`); }
+      if (P.lesion && dia === P.lesion[0]) {
+        a.ev(`A.openProfile()`); a.avanzar(300); a.tocar('pfInj', P.lesion[1]); a.tocar('pfSave'); a.avanzar(800);
+        const ok = qa('#modals .btn.pri[data-a="cbm"]').pop(); const ofrece = !!ok; if (ok) { ok.click(); a.avanzar(500); }
+        L.avisos.push(`día ${dia}: se lesiona (${P.lesion[1]}) y lo marca en su perfil · la app ${ofrece ? 'ofrece cambiar ejercicios y los cambia' : 'NO ofrece cambiar ejercicios'}`); limpiar();
+        if (!a.ev(`(S.profile.injuries||[]).includes('${P.lesion[1]}')`)) L.datos.push('la lesión no se guardó en el perfil');
+      }
       // la noche anterior y la fatiga
       const durmio = P.duermeMal ? (r() < 0.4 ? 0 : r() < 0.7 ? 1 : 2) : (r() < 0.12 ? 0 : r() < 0.35 ? 1 : 2);
       F *= 0.86;
@@ -257,7 +275,9 @@ for (const P of PERFILES) {
       peso += (ingesta - gasto) / 7700; protOk = comido ? (comido.p >= peso * 1.4 ? 1 : 0.8) : 0.9;
       // entreno
       const toca = P.e && !enPausa && a.ev(`!!(S.plan&&S.plan.days.includes(new Date().getDay()))`);
-      if (toca && r() < 0.85) {
+      const tira = r(); if (process.env.DBGPLAN && P.e && !enPausa) { const pd=a.ev(`JSON.stringify(S.plan&&S.plan.days)`); if (toca || dia%7===4) console.log('  plan', dia, 'dow', dow, 'appDow', a.ev('new Date().getDay()'), 'toca', toca, 'tira', tira.toFixed(2), pd, new Date(a.w.__T).toISOString()); }
+      if (toca) { L.dias.toca++; if (tira >= 0.85) L.dias.salta++; }
+      if (toca && tira < 0.85) {
         a.w.__T = Math.max(a.w.__T, base + 10 * H);
         const x = JSON.parse(a.ev(`JSON.stringify((()=>{ const n=nextInPlan(); const E=estadoDia(); return {rid:n&&n.r?n.r.id:'', est:E&&E.score!=null?{s:E.score,soft:E.soft}:null}; })())`));
         let suave = false;
@@ -271,8 +291,10 @@ for (const P of PERFILES) {
             const items = JSON.parse(a.ev(`JSON.stringify(S.active.items.map(it=>({u:it.uid,ex:it.exId,mode:getEx(it.exId).mode,lastre:!!getEx(it.exId).lastre,sets:it.sets.map((s,i)=>({i,t:s.t,sk:s.sk,sr:s.sr,st:s.st,tk:s.tk,tr:s.tr,tt:s.tt,why:s.why||''}))})))`));
             const lesionadas = P.lesion && dia >= P.lesion[0] + 14 ? items.filter(it => a.ev(`(INJURIES['${P.lesion[1]}'].ex||[]).includes(getEx('${it.ex}').base||'${it.ex}')`)).map(it => it.ex) : [];
             if (lesionadas.length) L.ia.push({ dia, tipo: 'ejercicio-contraindicado', txt: lesionadas.join(', ') });
+            const estPat = {};
             for (const it of items) {
-              let Pd = (it.mode === 'p' ? fuerzaDe(it.ex) : 0) * (1 - F) * (durmio === 0 ? 0.95 : 1) * (0.97 + r() * 0.06);
+              if (it.mode === 'p') fuerzaDe(it.ex);
+              let Pd = (it.mode === 'p' ? C[it.ex] : 0) * (1 - F) * (durmio === 0 ? 0.95 : 1) * (0.97 + r() * 0.06);
               const why = [...new Set(it.sets.map(s => s.why).filter(Boolean))];
               why.forEach(w => { const k = w.replace(/[\d.,]+/g, '#'); L.porque.set(k, (L.porque.get(k) || 0) + 1); });
               let stim = 0, kg0 = 0, todas = true, obj0 = 0;
@@ -287,25 +309,25 @@ for (const P of PERFILES) {
                   a.ev(`(()=>{ const s=wkItem('${it.u}').sets[${s.i}]; s.kg=${kg}; s.reps=${reps}; ${s.t !== 'c' ? `s.rir=${Math.min(rir, 5)};` : ''} })()`);
                   a.tocar('wkCheck', `${it.u}|${s.i}`); const cbm = q('#modals [data-a="cbm"]'); if (cbm) cbm.click();
                   if (s.t !== 'c') { L.series.push({ d: dia, ex: it.ex, sug: s.sk ?? s.tk, kg, obj: objetivo, reps, rir, bajo, pct: Math.round(kg / (C[it.ex] || 1) * 100), why: (s.why || '').slice(0, 60) });
-                    stim += rir <= 3 ? 1 : rir <= 5 ? 0.5 : 0.1; Pd *= 0.975; if (!kg0) { kg0 = kg; obj0 = objetivo; } if (reps < objetivo) todas = false; }
+                    stim += ESTIM(rir); Pd *= 0.975; if (!kg0) { kg0 = kg; obj0 = objetivo; } if (reps < objetivo) todas = false; }
                 } else if (it.mode === 'r') { a.ev(`(()=>{ const s=wkItem('${it.u}').sets[${s.i}]; s.reps=${s.sr ?? s.tr ?? 10}; })()`); a.tocar('wkCheck', `${it.u}|${s.i}`); }
                 else { a.ev(`(()=>{ const s=wkItem('${it.u}').sets[${s.i}]; s.time=${s.st ?? s.tt ?? 30}; })()`); a.tocar('wkCheck', `${it.u}|${s.i}`); }
                 a.avanzar(90000);
               }
-              if (it.mode === 'p' && C[it.ex]) {
-                const gan = 0.008 * Math.pow(Math.min(stim, 8) / 4, 0.6) * Math.max(0, 1 - 4 * F) * protOk * Math.max(0.15, 1 - (C[it.ex] / C0[it.ex] - 1) * 1.2);
-                C[it.ex] *= 1 + gan; F += 0.0022 * stim;
-              }
+              if (it.mode === 'p' && C[it.ex]) { estPat[PAT[it.ex]] = (estPat[PAT[it.ex]] || 0) + stim; F += 0.0022 * stim; }
             }
+            // adaptación por patrón: más estímulo, más ganancia (rendimientos decrecientes por sesión y con lo ya ganado); el cansancio la frena algo
+            for (const [pt, st0] of Object.entries(estPat)) M[pt] *= 1 + 0.008 * Math.pow(Math.min(st0, 10) / 4, 0.6) * Math.max(0.5, 1 - 2 * F) * protOk * Math.max(0.15, 1 - (M[pt] - 1) * 1.2);
             a.tocar('wkFinish'); a.avanzar(300); a.ev(`(()=>{ const el=document.querySelector('[data-in="finInt"]'); if (el){ el.value=${F > 0.08 ? 9 : 7}; IN.finInt(el); } })()`);
             a.tocar('finDo', r() < 0.1 ? 'update' : 'keep'); a.avanzar(2000); limpiar();
-            if (a.ev('!!S.active')) L.datos.push(`día ${dia}: el entreno no se cerró`);
+            if (a.ev('!!S.active')) L.datos.push(`día ${dia}: el entreno no se cerró`); else L.dias.guardadas++;
+            if (process.env.DBGPLAN) console.log('  fin', dia, 'sesiones', a.ev('S.sessions.length'), 'items', items.length, items.map(i=>i.mode+i.sets.length).join(''), 'última', a.ev('JSON.stringify((S.sessions[S.sessions.length-1]||{}).items?.map(i=>i.sets.length))'), a.ev('(S.sessions[S.sessions.length-1]||{}).routineName'));
           }
         }
       }
       hp('entreno');
       // pérdida de fuerza durante la pausa (desentrenamiento)
-      if (enPausa) for (const k in C) C[k] *= 0.9985;
+      if (enPausa) for (const k in M) M[k] *= 0.9985;
       // comienzo del ayuno a las 20:00
       if (P.f && !enPausa) { en(base + 13 * H); if (!a.ev(`!!nut().fast.active`)) a.ev(`A.fastStart()`); }
       if (largo) { en(base + 14 * H); a.ev(`A.tab('nutricion'); A.nseg('ayuno')`); raro('ayuno largo'); L.ia.push({ dia, tipo: 'ayuno de 36 h, a las 25 h', txt: a.ev(`(fastAdvice().match(/<span>([^<]*)<\\/span>/)||[])[1]||''`) }); }
@@ -320,7 +342,7 @@ for (const P of PERFILES) {
           L.propuestas.set(t.replace(/\d+([.,]\d+)?/g, '#').slice(0, 140), (L.propuestas.get(t.replace(/\d+([.,]\d+)?/g, '#').slice(0, 140)) || 0) + 1);
           const ap = prop.querySelector('[data-a="pandaAplicar"], [data-a="pandaIr"]');
           if (P.sigue && ap) {
-            L.aplicadas.push(`día ${dia}: ${t.slice(0, 120)}`);
+            L.aplicadas.push(`día ${dia}: ${t.slice(0, 120)}`); if (process.env.DBGPLAN) console.log('  aplica', dia, t.slice(0,80), a.ev('JSON.stringify(S.plan&&S.plan.days)'));
             if (ap.dataset.a === 'pandaIr') { ap.click(); a.avanzar(500); const ok = q('[data-a="applySugg"]'); if (ok) { ok.click(); a.avanzar(500); } }
             else { ap.click(); a.avanzar(500); }
           }
@@ -382,10 +404,11 @@ for (const P of PERFILES) {
   b.errores.forEach(e => err('reabrir', e));
   b.cerrar();
 
-  const fuerza = Object.fromEntries(Object.keys(C).map(id => [id, { ini: Math.round(C0[id] * 10) / 10, fin: Math.round(C[id] * 10) / 10, pct: Math.round((C[id] / C0[id] - 1) * 1000) / 10 }]));
+  const fuerza = Object.fromEntries(Object.keys(M).map(pt => [pt, { pct: Math.round((M[pt] - 1) * 1000) / 10, ejercicios: Object.keys(PAT).filter(e => PAT[e] === pt) }]));
+  const efectivas = L.series.filter(x => x.rir <= 3).length;
   const out = { id: P.id, d: P.d, perfil: P, fuerza, peso: { ini: P.peso, fin: Math.round(peso * 10) / 10 }, final: finalApp, reabrirMs: msRe, comidas: comidasHechas,
     errores: [...L.errores], raros: [...L.raros], datos: L.datos, avisos: L.avisos, ia: L.ia, meses: L.meses, fuzz: L.fuzz, propuestas: [...L.propuestas].sort((x, y) => y[1] - x[1]),
-    aplicadas: L.aplicadas, porque: [...L.porque].sort((x, y) => y[1] - x[1]).slice(0, 25), series: L.series, suaves: L.suaves, ui: { ok: L.ui.ok, fallo: [...L.ui.fallo] }, lento: L.lento, seg: Math.round((Date.now() - tP) / 1000) };
+    aplicadas: L.aplicadas, efectivas, porque: [...L.porque].sort((x, y) => y[1] - x[1]).slice(0, 25), series: L.series, suaves: L.suaves, ui: { ok: L.ui.ok, fallo: [...L.ui.fallo] }, lento: L.lento, dias: L.dias, seg: Math.round((Date.now() - tP) / 1000) };
   salida.push(out);
   fs.writeFileSync(new URL(`./resultado-anio-${P.id}${process.env.NOFUZZ ? '-limpio' : ''}.json`, import.meta.url), JSON.stringify(out, null, 1));
   const fz = Object.values(fuerza); const fm = fz.length ? (fz.reduce((s, x) => s + x.pct, 0) / fz.length).toFixed(1) : '—';
