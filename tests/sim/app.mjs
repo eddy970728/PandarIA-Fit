@@ -2,6 +2,8 @@
 // para poder vivir días y meses de uso en segundos.
 import { JSDOM, VirtualConsole } from 'jsdom';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
+const idl = createRequire(import.meta.url)('jsdom/lib/jsdom/living/generated/utils.js');
 
 // como en la versión web: la app y después premium.js (candados, pagos y licencias)
 const HTML = fs.readFileSync(new URL('../../www/index.html', import.meta.url), 'utf8').replace(/<\/body>(?![\s\S]*<\/body>)/, () => `<script>${fs.readFileSync(new URL('../../www/premium.js', import.meta.url), 'utf8')}</script></body>`);
@@ -63,7 +65,9 @@ export async function abrirApp({ t0, storage = {}, seed = 1 } = {}) {
     return !!el;
   };
   const texto = () => ['#view', '#layers', '#modals', '#nav'].map(s => { const e = w.document.querySelector(s); return e ? e.textContent : ''; }).join(' \n ');
-  return { w, ev, avanzar, tocar, texto, errores, cerrar: () => w.close() };
+  return { w, ev, avanzar, tocar, texto, errores, pendientes: () => cola.length,
+    // jsdom (nwsapi) guarda los resultados de hasta 1000 selectores con su árbol aunque ya no esté en pantalla (los navegadores no): se vacía de vez en cuando
+    purgar: () => { const d = idl.implForWrapper(w.document); for (const n of [d._nwsapi, d._nwsapiDontThrow]) if (n) { n.selectResolvers && n.selectResolvers.clear(); n.matchResolvers && n.matchResolvers.clear(); } }, cerrar: () => w.close() };
 }
 
 // texto que nunca debería verse en pantalla
