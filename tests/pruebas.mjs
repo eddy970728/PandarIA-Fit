@@ -1054,6 +1054,43 @@ if (fs.existsSync(COPIA07)) {
   a.cerrar();
 }
 
+/* ---------- 1.9 fase 1: logros que no se acaban ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); window.isPremium=()=>true; const out={};
+    // los escalones siguen para siempre: 10, 25 … 1.000 y después uno cada 500
+    out.esc=[0,1,2,3,4,5,6,7,8,20].map(i=>hitoUmbral(HITOS.find(h=>h.id==='agua'),i));
+    // 10 semanas cumpliendo un plan de 3 días, con agua y diario
+    S.plan={days:[1,3,5],order:['r']}; const w0=weekKey(Date.now());
+    for (let w=1;w<=10;w++) for (const d of [0,2,4]){ const t=weekShift(w0,-w)+d*DAY+18*3600e3; S.sessions.push({id:'s'+w+d,routineId:'r',start:t-3600e3,end:t,items:[],vol:1000,prs:[]}); }
+    const n=nut(); n.water=n.water||{}; for (let i=1;i<=30;i++) n.water[dayKey(Date.now()-i*DAY)]=6000;
+    n.diario=n.diario||{}; for (let i=1;i<=12;i++) n.diario[dayKey(Date.now()-i*DAY)]=[{id:'a'+i,fid:'20045',k:300},{id:'b'+i,fid:'05062',k:300}];
+    hitosRevisar(); out.agua=S.hitos.agua.n; out.diario=S.hitos.diario.n; out.sem=S.repes.sem.length; out.mesOk=S.repes.mes.length>=1; out.aguaSem=S.repes.agua.length>=3;
+    // lo ganado no se pierde aunque cambies el plan
+    S.plan={days:[0,1,2,3,4,5,6],order:['r']}; hitosRevisar(); out.noPierde=S.repes.sem.length===out.sem;
+    // ayunos con peso bajo: el hito se pausa
+    __reset({name:'C',age:29,height:165,weight:43,sex:'m',fitness:'activo'}); nut().fast.screened=true; nut().fast.history=[...Array(12).keys()].map(i=>({start:Date.now()-(i+2)*DAY,end:Date.now()-(i+2)*DAY+16*3600e3,goalH:16,ok:true}));
+    hitosRevisar(); out.pausa=(S.hitos.ayunos||{n:0}).n===0;
+    // la pantalla de logros muestra lo que se repite y los hitos
+    const h=histLogros(); out.pantalla=/Se repiten/.test(h)&&/Hitos/.test(h)&&/En pausa/.test(h);
+    // reto estrella: 10 % más que el mes anterior, con tope
+    __reset(HOMBRE); S.plan={days:[1,3,5],order:['r']}; const [d0]=mesRango(mesKey(Date.now())); const pm=new Date(d0); pm.setMonth(pm.getMonth()-1);
+    for (let i=0;i<8;i++){ const t=pm.getTime()+i*3*DAY+18*3600e3; S.sessions.push({id:'p'+i,routineId:'r',start:t-3600e3,end:t,items:[],checkin:{sleep:2}}); }
+    S.sessions.push({id:'hoy',routineId:'r',start:Date.now()-3*3600e3,end:Date.now()-2*3600e3,items:[],checkin:{sleep:2}});
+    const es=retosMes().find(x=>x.estrella); out.estrella=es?[es.id,es.meta]:null;
+    return JSON.stringify(out); })()`));
+  comprobar('1.9 hitos: los escalones no se acaban (10, 25, 50, 100, 250, 500, 1.000 y uno cada 500)', JSON.stringify(r.esc) === JSON.stringify([10,25,50,100,250,500,1000,1500,2000,8000]), JSON.stringify(r.esc));
+  comprobar('1.9 hitos: 30 días de agua dan 2 niveles y 12 días de diario 1', r.agua === 2 && r.diario === 1, JSON.stringify([r.agua, r.diario]));
+  comprobar('1.9 se repiten: 10 semanas cumpliendo el plan son 10 semanas perfectas, con mes perfecto y semanas hidratadas', r.sem === 10 && r.mesOk && r.aguaSem, JSON.stringify([r.sem, r.mesOk, r.aguaSem]));
+  comprobar('1.9 se repiten: lo ganado no se pierde al cambiar el plan', r.noPierde);
+  comprobar('1.9 salud: con peso bajo los hitos de ayuno se pausan y la pantalla lo dice', r.pausa && r.pantalla, JSON.stringify([r.pausa, r.pantalla]));
+  comprobar('1.9 reto estrella: sale con algo que usas y su meta tiene sentido', !!r.estrella && r.estrella[1] >= 1, JSON.stringify(r.estrella));
+  comprobar('1.9 fase 1 sin errores', !a.errores.length, a.errores.join(' | '));
+  a.cerrar();
+}
+
 /* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */
 {
   const dirC = new URL('./copias/', import.meta.url), fallosC = [];

@@ -1097,6 +1097,8 @@ const KB_RULES=[
     t:'Si anotas cuántas repeticiones te sobraban (RIR) y en la última sesión te sobraron 5 o más de media (en 2 series o más), sumar de a una repetición tardaría semanas. PandarIA calcula tu fuerza con lo que hiciste más lo que te sobró y propone el peso para tus repeticiones dejando unas 2 en reserva, subiendo como mucho un 20 % de una vez. La escala de repeticiones en reserva está validada (Zourdos y col., 2016).', usa:'Sugerencia de peso en cada serie', rev:'2028-11-01', desde:'1.8'},
   {id:'carga.bajada', area:'entreno', n:'Bajar tras dos fallos', v:{f:0.9}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
     t:'Si dos sesiones seguidas no llegas al mínimo de repeticiones en la primera serie o en la mitad de las series o más, PandarIA baja el peso un 10 % para consolidar la técnica y volver a subir. Que la última serie se quede corta es normal y no cuenta.', usa:'Sugerencia de peso en cada serie', rev:'2027-11-01', desde:'0.8.1'},
+  {id:'logros.infinitos', area:'actividad', n:'Logros que no se acaban', v:{escalones:[10,25,50,100,250,500,1000], cada:500, subeReto:1.1}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
+    t:'Además de los logros fijos, hay hitos para todo lo que usas (entrenos, mejor racha, récords, toneladas, días con la meta de agua, ayunos de tu plan, días con diario y check-ins) con escalones de 10, 25, 50, 100, 250, 500 y 1.000, y después uno cada 500, así que nunca se acaban. Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez. El reto estrella del mes cambia cada mes y pide un 10 % más que tu mes anterior, con un tope. Nunca hay premios por bajar de peso, comer menos, ayunar más de lo planeado ni entrenar más de lo planeado; con peso bajo los hitos de ayuno se pausan, y las sesiones suaves cuentan igual.', usa:'Logros y retos del mes', rev:'2028-11-01', desde:'1.9'},
   {id:'carga.salto', area:'entreno', n:'Saltos de peso grandes', v:{rel:0.1, maxExtra:6}, src:['lopez2021','pandaria'], lic:'consejo', ev:'moderada', pob:'Adultos sanos',
     t:'Con pesos ligeros, el siguiente disco o mancuerna puede ser un 20 o 25 % más. Si el salto supera el 10 %, PandarIA no sube todavía: te pide sumar repeticiones hasta que tu fuerza estimada te permita hacer el peso nuevo dentro del rango, como mucho 6 por encima del rango; entonces sube. Con series cerca del fallo, el músculo crece de forma parecida con pesos altos, medios o bajos (para la fuerza máxima rinden algo más los altos).', usa:'Sugerencia de peso en cada serie', rev:'2028-11-01', desde:'1.8.2'},
   {id:'carga.esfuerzo', area:'entreno', n:'Sesión muy exigente', v:{rpe:9, rirOk:3}, src:['pandaria'], lic:'propio', ev:'limitada', pob:'Todos',
@@ -1284,6 +1286,7 @@ const KB_WHY=[
 const KB_SUGG={actualizar:'carga.subida', descarga:'descarga', recuperacion:'sueno.adultos'};
 // Textos de las reglas en inglés (pantalla Ciencia en inglés)
 const KB_EN_T={
+ 'logros.infinitos':'Besides the fixed awards, there are milestones for everything you use (workouts, best streak, records, tonnes, days hitting your water goal, fasts from your plan, food diary days and check-ins) with steps at 10, 25, 50, 100, 250, 500 and 1,000, and then one every 500, so they never run out. Perfect week, perfect month and hydrated week can be earned again and again. The monthly star challenge changes every month and asks for 10 % more than your previous month, with a cap. There are never awards for losing weight, eating less, fasting longer than planned or training more than planned; with low weight the fasting milestones pause, and easy sessions count the same.',
  'carga.salto':'With light weights, the next plate or dumbbell can be 20 or 25 % more. If the jump is over 10 %, PandarIA does not go up yet: it asks you to add reps until your estimated strength lets you do the new weight within the range, at most 6 above the range; then it goes up. With sets close to failure, muscle grows similarly with heavy, moderate or light loads (for maximal strength heavier loads do a bit better).',
  'ayuno.olvido':'If a fast is still open after 48 hours, PandarIA asks whether you are still fasting, in case you forgot to stop it (and asks again every day if you do not answer). From 72 hours it warns that a fast this long is not safe without supervision and, when you end it, lets you correct the end time so it does not spoil your stats.',
  'seguridad.peso_bajo':'With a body mass index below 18.5 (underweight), whatever your goal, PandarIA does not suggest a deficit or fasting: it warns you in Nutrition and in fasting, stops celebrating fasts and takes it into account in the state of the day. Below 17 it recommends talking to a doctor or dietitian. If over your last 7 days you eat on average less than your body burns at rest (with at least 5 days logged), it also warns you.',
@@ -5651,6 +5654,7 @@ function save(now){
   clearTimeout(saveT);
   const go=()=>{ fotosPrep(); try{ localStorage.setItem(KEY, datosJSON()); }catch(e){ liberarEspacio(); } fotosSync(); };
   if (now) go(); else saveT=setTimeout(go,250);
+  if (typeof achPronto==='function' && S && S.settings && S.settings.onboarded) achPronto();
 }
 // Si la memoria se llena, primero se borra la copia de antes de actualizar y luego las fotos más antiguas
 // (nunca la primera), hasta que los datos se puedan guardar. Los entrenos no se pierden.
@@ -7131,8 +7135,51 @@ function checkAch(){ try{ retosPremios(); }catch(e){}
     early:hours.some(h=>h<8),night:hours.some(h=>h>=22),measure:S.measures.length>0,pandaria:(S.applied||0)>=5};
   Object.entries(cond).forEach(([k,v])=>{ if(v && !got[k]){ got[k]=Date.now(); out.push(k); } });
   if (out.length){ save(); const a=ACHIEVEMENTS.find(x=>x.id===out[0]); setTimeout(()=>toast(`${a.ic} Logro: ${a.n}`),900); }
+  try{ if (!out.length) hitosRevisar(); else setTimeout(hitosRevisar,4000); }catch(e){}
   return out;
 }
+/* ---------- 1.9: logros que no se acaban (regla logros.infinitos) ----------
+   Hitos escalonados (10, 25, 50, 100, 250, 500, 1.000 y después uno cada 500) para todo lo que se usa de la app,
+   y logros que se repiten con contador: semana perfecta, mes perfecto y semana hidratada.
+   Reglas de salud: nada por peso ni por comer menos; ayunos solo los del plan; con peso bajo los de ayuno se pausan. */
+function rachaMejor(){ const W=[...new Set(S.sessions.map(s=>weekKey(s.end)))].sort((a,b)=>a-b); let mejor=0, act=0, prev=null;
+  W.forEach(w=>{ act=prev!=null&&weekShift(prev,1)===w?act+1:1; mejor=Math.max(mejor,act); prev=w; }); return mejor; }
+function diasCon(fn){ const ks=new Set(); fn(ks); return ks.size; }
+function aguaDiasMeta(){ const n=nut(), ks=new Set(Object.keys(n.water||{}).concat(Object.keys((S.nutri&&S.nutri.diario)||{}))); let c=0; ks.forEach(k=>{ if (k<=dayKey() && waterToday(k)>=wGoalDia(k)) c++; }); return c; }
+function checkinDias(){ return diasCon(ks=>{ Object.entries(S.diaLog||{}).forEach(([k,d])=>{ if (d&&d.ck) ks.add(k); }); S.sessions.forEach(x=>{ if (x.checkin) ks.add(dayKey(x.start||x.end)); }); }); }
+const HITOS=[
+  {id:'entrenos', ic:'🏋️', n:['entrenos','workouts'], esc:[150,250,500,1000], v:()=>S.sessions.length},
+  {id:'racha', ic:'🛡️', n:['semanas seguidas entrenando (tu mejor racha)','weeks in a row training (your best streak)'], esc:[26,52,104], cada:52, v:rachaMejor},
+  {id:'records', ic:'⭐', n:['récords personales','personal records'], esc:[50,100,250,500,1000], v:()=>S.sessions.reduce((a,x)=>a+(x.prs||[]).length,0)},
+  {id:'volumen', ic:'🦾', n:['toneladas levantadas','tonnes lifted'], esc:[250,500,1000], v:()=>Math.floor(S.sessions.reduce((a,x)=>a+(x.vol||0),0)/1000)},
+  {id:'agua', ic:'💧', n:['días con la meta de agua','days hitting your water goal'], v:aguaDiasMeta},
+  {id:'ayunos', ic:'🌙', n:['ayunos de tu plan completados','fasts from your plan completed'], v:()=>((nut().fast||{}).history||[]).filter(x=>x.ok).length, pausa:()=>!!riesgoPeso()},
+  {id:'diario', ic:'🥗', n:['días con diario de comida','days with a food diary'], v:()=>Object.values((S.nutri&&S.nutri.diario)||{}).filter(L=>(L||[]).length>=2).length},
+  {id:'checkin', ic:'🌤️', n:['check-ins','check-ins'], v:checkinDias},
+];
+function hitoUmbral(h,i){ const K=kb('logros.infinitos'), E=h.esc||K.escalones, c=h.cada||K.cada; return i<E.length?E[i]:E[E.length-1]+(i-E.length+1)*c; }
+function hitoNivel(h,v){ let i=0; while (v>=hitoUmbral(h,i) && i<200) i++; return i; }
+function semanaPerfecta(w){ const n=S.plan&&S.plan.days.length; if (!n) return false; return new Set(S.sessions.filter(x=>weekKey(x.end)===w).map(x=>new Date(x.end).getDay())).size>=n; }
+function semanaHidratada(w){ for (let i=0;i<7;i++){ const d=new Date(w); d.setDate(d.getDate()+i); const k=dayKey(d.getTime()); if (!(waterToday(k)>=wGoalDia(k))) return false; } return true; }
+function hitosRevisar(){ if (!S || !S.settings || !S.settings.onboarded) return; const H=S.hitos=S.hitos||{}, R=S.repes=S.repes||{sem:[],mes:[],agua:[]}; let nuevo=null, cambio=false;
+  HITOS.forEach(h=>{ let v=0; try{ v=h.v()||0; }catch(e){ return; } const lv=hitoNivel(h,v), o=H[h.id]=H[h.id]||{n:0,t:{}};
+    if (lv>o.n && !(h.pausa&&h.pausa())){ for (let i=o.n;i<lv;i++) o.t[i]=Date.now(); o.n=lv; cambio=true; nuevo={h,u:hitoUmbral(h,lv-1)}; } });
+  // semanas ya terminadas (las 8 últimas): lo ganado no se pierde aunque cambies el plan
+  const w0=weekKey(Date.now()), first=S.sessions.length?weekKey(Math.min(...S.sessions.map(x=>x.end))):w0;
+  const nW=R.visto?8:104, nM=R.visto?3:24; R.visto=1; // la primera vez se mira todo el historial (hasta 2 años)
+  for (let i=1;i<=nW;i++){ const w=weekShift(w0,-i);
+    if (w>=first && !R.sem.includes(w) && semanaPerfecta(w)){ R.sem.push(w); cambio=true; nuevo=nuevo||{rep:'sem'}; }
+    if (!R.agua.includes(w) && (nut().water||{})[dayKey(w)]!=null && semanaHidratada(w)){ R.agua.push(w); cambio=true; nuevo=nuevo||{rep:'agua'}; } }
+  // mes perfecto: un mes ya terminado con 4 semanas perfectas o más y todas las que empiezan en él perfectas
+  const m0=mesKey(Date.now()); for (let i=1;i<=nM;i++){ const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i); const mk=mesKey(d.getTime()); if (R.mes.includes(mk)) continue;
+    const [a,b]=mesRango(mk), ws=[]; for (let w=weekKey(a); w<b; w=weekShift(w,1)) if (w>=a) ws.push(w);
+    if (ws.length>=4 && ws.every(w=>R.sem.includes(w))){ R.mes.push(mk); cambio=true; nuevo={rep:'mes',mk}; } void m0; }
+  if (!cambio && nW===8) return; save(); if (!cambio) return;
+  const msg=nuevo.h?tx(`${nuevo.h.ic} Hito: ${nuevo.u.toLocaleString(LOC())} ${nuevo.h.n[0]}`,`${nuevo.h.ic} Milestone: ${nuevo.u} ${nuevo.h.n[1]}`)
+    :nuevo.rep==='mes'?tx(`🗓️ ¡Mes perfecto! ${mesN(+nuevo.mk.slice(5)-1)}`,`🗓️ Perfect month! ${mesN(+nuevo.mk.slice(5)-1)}`)
+    :nuevo.rep==='agua'?tx(`💧 Semana hidratada ×${R.agua.length}`,`💧 Hydrated week ×${R.agua.length}`):tx(`✅ Semana perfecta ×${R.sem.length}`,`✅ Perfect week ×${R.sem.length}`);
+  setTimeout(()=>{ toast(msg,'pr'); if (typeof sfx==='function') try{ sfx('ach'); }catch(e){} },1200); }
+let ACH_T=null; const achPronto=()=>{ if (ACH_T) return; ACH_T=setTimeout(()=>{ ACH_T=null; try{ hitosRevisar(); retosPremios(); }catch(e){} },3000); };
 
 /* ============ Modo intervalos ============ */
 const INT_FMT = {
@@ -7496,9 +7543,19 @@ function fotosLimite(nueva){
   else if (ph.length>=FOTOS_AVISO) setTimeout(()=>toast(tx(`Tienes ${ph.length} de ${FOTOS_MAX} fotos. Después se borrará la más antigua (la primera se conserva).`,`You have ${ph.length} of ${FOTOS_MAX} photos. After that the oldest will be deleted (the first is kept).`)),900);
 }
 function histLogros(){
-  const got=S.achievements; const n=Object.keys(got).length;
-  return `<div class="banner ok"><span class="ic">${I('trophy',22)}</span><div class="grow"><div class="b">${n} de ${ACHIEVEMENTS.length} logros</div><div class="sm mut">Cada entreno te acerca al siguiente.</div></div></div>
-  <div class="ach">${ACHIEVEMENTS.map(a=>`<div class="a ${got[a.id]?'on':''}"><div class="e">${a.ic}</div><div class="n">${esc(a.n)}</div><div class="dd">${got[a.id]?fmtDate(got[a.id]):esc(a.d)}</div></div>`).join('')}</div>`;
+  try{ hitosRevisar(); }catch(e){}
+  const got=S.achievements; const n=Object.keys(got).length, H=S.hitos||{}, R=S.repes||{sem:[],mes:[],agua:[]};
+  const total=n+Object.values(H).reduce((a,o)=>a+(o.n||0),0)+R.sem.length+R.mes.length+R.agua.length;
+  const rep=(ic,t,c,sub)=>`<div class="a ${c?'on':''}"><div class="e">${ic}</div><div class="n">${esc(t)}${c?` ×${c}`:''}</div><div class="dd">${esc(sub)}</div></div>`;
+  let h=`<div class="banner ok"><span class="ic">${I('trophy',22)}</span><div class="grow"><div class="b">${tx(`${total} ${total===1?'logro':'logros'} conseguidos`,`${total} ${total===1?'award':'awards'} earned`)}</div><div class="sm mut">${tx('Los hitos y los logros que se repiten no se acaban nunca.','Milestones and repeating awards never run out.')}${kbLink('logros.infinitos')}</div></div></div>`;
+  h+=`<div class="sec">${tx('Se repiten','They repeat')}</div><div class="ach">`+rep('✅',tx('Semana perfecta','Perfect week'),R.sem.length,S.plan&&S.plan.days.length?tx('Cumple tu plan semanal','Complete your weekly plan'):tx('Crea un plan semanal','Create a weekly plan'))
+    +rep('🗓️',tx('Mes perfecto','Perfect month'),R.mes.length,R.mes.length?R.mes.slice(-2).map(k=>mesN(+k.slice(5)-1)+' '+k.slice(0,4)).join(', '):tx('Todas las semanas del mes perfectas','Every week of the month perfect'))
+    +rep('💧',tx('Semana hidratada','Hydrated week'),R.agua.length,tx('Meta de agua los 7 días','Water goal all 7 days'))+`</div>`;
+  h+=`<div class="sec">${tx('Hitos','Milestones')}</div><div class="card" style="padding:4px 14px">`+HITOS.map((x,i)=>{ let v=0; try{ v=x.v()||0; }catch(e){} const o=H[x.id]||{n:0}, sig=hitoUmbral(x,o.n), ant=o.n?hitoUmbral(x,o.n-1):0, p=Math.max(0,Math.min(100,Math.round((v-ant)/Math.max(1,sig-ant)*100)));
+      return `<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="row" style="gap:10px"><span style="font-size:20px">${x.ic}</span><span class="grow sm"><b>${v.toLocaleString(LOC())}</b> ${esc(tx(x.n[0],x.n[1]))}</span><span class="xs mut">${o.n?tx(`nivel ${o.n}`,`level ${o.n}`):''}</span></div>
+        <div style="height:6px;border-radius:3px;background:var(--card2);overflow:hidden;margin-top:6px"><div style="height:100%;width:${p}%;background:var(--ac)"></div></div><div class="xs mut" style="margin-top:4px">${x.pausa&&x.pausa()?tx('En pausa mientras tu peso esté bajo','Paused while your weight is low'):tx(`Siguiente: ${sig.toLocaleString(LOC())}`,`Next: ${sig}`)}</div></div>`; }).join('')+`</div>`;
+  return h+`<div class="sec">${tx('Logros','Awards')}</div>`+`
+<div class="ach">${ACHIEVEMENTS.map(a=>`<div class="a ${got[a.id]?'on':''}"><div class="e">${a.ic}</div><div class="n">${esc(a.n)}</div><div class="dd">${got[a.id]?fmtDate(got[a.id]):esc(a.d)}</div></div>`).join('')}</div>`;
 }
 
 /* ---------- Pestaña Explorar ---------- */
@@ -9777,7 +9834,9 @@ const RETO_TIPOS={
   entrenos:{n:'Entrenos',en:'Workouts',ic:'🏋️',u:['entrenos','workouts']},
   minutos:{n:'Minutos entrenando',en:'Minutes training',ic:'⏱️',u:['min','min']},
   agua:{n:'Días con la meta de agua',en:'Days hitting your water goal',ic:'💧',u:['días','days']},
-  ayunos:{n:'Ayunos completados',en:'Completed fasts',ic:'🌙',u:['ayunos','fasts']}
+  ayunos:{n:'Ayunos completados',en:'Completed fasts',ic:'🌙',u:['ayunos','fasts']},
+  diario:{n:'Días con diario de comida',en:'Days with a food diary',ic:'🥗',u:['días','days']},
+  checkin:{n:'Días con check-in',en:'Days with a check-in',ic:'🌤️',u:['días','days']}
 };
 const mesKey=t=>{ const d=new Date(t); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); };
 const mesRango=k=>{ const [y,m]=k.split('-').map(Number); return [new Date(y,m-1,1).getTime(), new Date(y,m,1).getTime()]; };
@@ -9786,6 +9845,8 @@ function retoValor(tipo,d0,d1){
   if (tipo==='minutos') return Math.round(S.sessions.filter(s=>s.end>=d0&&s.end<d1).reduce((a,s)=>a+Math.max(0,(s.end-s.start)/60000),0));
   if (tipo==='agua'){ let n=0; const g=waterGoal(); for (let t=d0; t<Math.min(d1,Date.now()+DAY); t+=DAY) if (waterToday(dayKey(t))>=g) n++; return n; }
   if (tipo==='ayunos') return ((nut().fast||{}).history||[]).filter(x=>x.ok&&x.end>=d0&&x.end<d1).length;
+  if (tipo==='diario') return Object.entries((S.nutri&&S.nutri.diario)||{}).filter(([k,L])=>{ const t=new Date(k+'T12:00').getTime(); return t>=d0&&t<d1&&(L||[]).length>=2; }).length;
+  if (tipo==='checkin'){ const ks=new Set(); Object.entries(S.diaLog||{}).forEach(([k,d])=>{ const t=new Date(k+'T12:00').getTime(); if (d&&d.ck&&t>=d0&&t<d1) ks.add(k); }); S.sessions.forEach(x=>{ if (x.checkin&&x.end>=d0&&x.end<d1) ks.add(dayKey(x.end)); }); return ks.size; }
   return 0;
 }
 // Retos del mes: la meta se adapta a ti (días de tu plan, o 3 por semana)
@@ -9794,7 +9855,16 @@ function retosMes(k){
   const dias=S.plan&&S.plan.days.length?S.plan.days.length:3;
   const L=[{id:'entrenos',meta:Math.max(4,Math.round(dias*sem*0.8))},{id:'agua',meta:Math.round((d1-d0)/DAY*0.6)}];
   const f=nut().fast; if (f&&((f.history||[]).length||f.active)) L.push({id:'ayunos',meta:Math.max(4,Math.round(sem*3))});
+  // 1.9: reto estrella: cada mes uno distinto entre lo que usas, un 10 % más que tu mes anterior y con tope (regla logros.infinitos)
+  const es=retoEstrella(k,d0,d1,dias,sem); if (es) L.push(es);
   return L.map(r=>Object.assign(r,{v:retoValor(r.id,d0,d1),d0,d1,k}));
+}
+function retoEstrella(k,d0,d1,dias,sem){ const nd=Math.round((d1-d0)/DAY), hace=Date.now()-60*DAY, K=kb('logros.infinitos');
+  const usa={minutos:S.sessions.some(x=>x.end>=hace), diario:Object.keys((S.nutri&&S.nutri.diario)||{}).some(x=>new Date(x+'T12:00').getTime()>=hace), checkin:Object.keys(S.diaLog||{}).some(x=>S.diaLog[x]&&S.diaLog[x].ck)||S.sessions.some(x=>x.checkin)};
+  const C=['minutos','diario','checkin'].filter(t=>usa[t]); if (!C.length) return null;
+  const [y,m]=k.split('-').map(Number), t=C[(y*12+m)%C.length], pm=new Date(y,m-2,1).getTime(), ant=retoValor(t,pm,d0);
+  const base={minutos:Math.round(dias*sem*30), diario:Math.round(nd*0.5), checkin:Math.round(nd*0.5)}[t], tope={minutos:Math.round(dias*sem*75), diario:nd, checkin:nd}[t];
+  return {id:t, estrella:true, meta:Math.max(1,Math.min(tope, ant?Math.ceil(ant*K.subeReto):base))};
 }
 function retosPremios(){ const R0=S.retos=S.retos||{logros:{},amigos:[]}; let nuevo=null;
   retosMes().forEach(r=>{ const key=r.k+'|'+r.id; if (r.v>=r.meta && !R0.logros[key]){ R0.logros[key]=Date.now(); nuevo=r; } });
@@ -9807,7 +9877,7 @@ function barra(v,m){ const p=Math.min(100,Math.round(v/m*100)); return `<div sty
 function histRetos(){
   retosPremios(); const R0=S.retos=S.retos||{logros:{},amigos:[]}, now=Date.now();
   let h=`<div class="sec">${tx('Retos del mes','This month’s challenges')} · ${mesN(new Date().getMonth())}</div><div class="card" style="padding:4px 14px">`;
-  h+=retosMes().map((r,i)=>{ const T=RETO_TIPOS[r.id]; return `<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="row"><span style="font-size:20px">${T.ic}</span><span class="grow b">${tx(T.n,T.en)}</span><b style="color:${r.v>=r.meta?'var(--ok)':'var(--tx)'}">${r.v} / ${r.meta}${r.v>=r.meta?' ✓':''}</b></div>${barra(r.v,r.meta)}</div>`; }).join('')+`</div>`;
+  h+=retosMes().map((r,i)=>{ const T=RETO_TIPOS[r.id]; return `<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="row"><span style="font-size:20px">${r.estrella?'⭐':T.ic}</span><span class="grow b">${r.estrella?tx('Reto estrella: ','Star challenge: '):''}${tx(T.n,T.en)}</span><b style="color:${r.v>=r.meta?'var(--ok)':'var(--tx)'}">${r.v} / ${r.meta}${r.v>=r.meta?' ✓':''}</b></div>${barra(r.v,r.meta)}</div>`; }).join('')+`</div>`;
   const med=Object.keys(R0.logros).length; if (med) h+=`<div class="xs mut" style="margin:-4px 2px 10px">🏅 ${tx(`${med} ${med===1?'reto del mes cumplido':'retos del mes cumplidos'} en total`,`${med} monthly ${med===1?'challenge':'challenges'} completed in total`)}</div>`;
   h+=`<div class="sec">${tx('Retos con amigos','Challenges with friends')}</div>`;
   const act=R0.amigos.filter(r=>r.d1>now-14*DAY);
@@ -10968,11 +11038,12 @@ SCREENS.ciencia=p=>{
   <p class="xs mut" style="text-align:center;margin:16px 8px;line-height:1.5">PandarIA da orientación general sobre ejercicio y alimentación. No diagnostica ni reemplaza a un profesional de la salud.</p></div>`;
 };
 /* ---------- Créditos e historial de cambios ---------- */
-const APP_VERSION='1.8';
+const APP_VERSION='1.9';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
-const APP_PARCHE='2';
+const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.9',t:'Logros sin fin',items:['Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo', 'Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez', 'Reto estrella del mes: cada mes uno distinto, adaptado a ti']},
  {v:'1.8.2',t:'Te cuida mejor',items:['PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas', 'Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso', 'Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo', 'Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan', 'La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora', 'Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin', 'Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice', 'Después de unas vacaciones ya no propone quitar días de tu plan', 'Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso', 'Cambiar tu objetivo de calorías ahora se puede deshacer']},
  {v:'1.8.1',t:'Más ordenada',items:['Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes', 'Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos', 'El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección', 'Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan', 'Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados', 'El buscador de alimentos entiende plurales y errores de una letra', '39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate']},
  {v:'1.8',t:'PandarIA aprende de ti',items:['Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)', '10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas', 'PandarIA con 19 fuentes nuevas, entre ellas la postura del ACSM de 2026: vuelve de una pausa según tu edad (Bosquet 2013), descargas con una serie menos (Bell 2023), máximo estimado más fiable (Mayhew 2008), calorías con los factores de la FAO/OMS y el modelo de Hall, proteína por comida de 0,4 g/kg, meta de pasos según tu edad y calorías de cada entreno (Compendio 2024)', 'Tu primera serie de un ejercicio nuevo calibra el peso de las siguientes, el gasto real usa 3 semanas de datos, y cada fuente de la Biblioteca enlaza con las otras reglas que salen de ella', 'Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas', 'PandarIA elige mejor el peso: tras una descarga ya no lo baja dos veces, si anotas que te sobran muchas repeticiones lo recalcula con tu fuerza real, y tus repeticiones de sobra mandan sobre la nota de la sesión', 'Arreglos encontrados con 32 usuarios simulados durante un mes: récords sin peso, doble toque en Terminar o al elegir una ración, y metas de nutrición que podían salir en blanco']},
@@ -11017,7 +11088,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.8.2 · Te cuida mejor", "PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas", "Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso", "Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo", "Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan", "La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora", "Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin", "Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice", "Después de unas vacaciones ya no propone quitar días de tu plan", "Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso", "Cambiar tu objetivo de calorías ahora se puede deshacer"];
+const NOTAS_VERSION=["1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -14265,6 +14336,11 @@ Quitar plan semanal|Remove weekly plan
 ¿Quitar el plan semanal?|Remove the weekly plan?
 Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.|Your routines and history stay the same; you just won't see what is planned for each day.
 Quitar plan|Remove plan
+1.9 · Logros sin fin|1.9 · Never-ending awards
+Logros sin fin|Never-ending awards
+Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo|Awards that never run out: milestones for workouts, water, fasting, food diary, check-ins and records, with levels that keep going up
+Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez|Perfect week, perfect month and hydrated week can be earned again and again
+Reto estrella del mes: cada mes uno distinto, adaptado a ti|Monthly star challenge: a different one every month, adapted to you
 1.8.2 · Te cuida mejor|1.8.2 · Looks after you better
 Te cuida mejor|Looks after you better
 PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas|PandarIA no longer removes exercises it has just swapped in: your routines do not shrink on their own
@@ -15123,6 +15199,8 @@ const EN_09_RX = [
   [/^Minuto (\d+)\. (.*)$/,(m,n,a)=>`Minute ${n}. ${a?enN(a):''}`],[/^Trabajo\. (.*)$/,(m,a)=>'Work. '+(a?enN(a):'')]
 ];
 const EN_EXTRA = `Solo esta serie|This set only
+Logros que no se acaban|Awards that never run out
+Logros y retos del mes|Awards and monthly challenges
 Calorías y peso|Calories and weight
 El siguiente peso es un salto grande: suma una repetición más antes de subir|The next weight is a big jump: add one more rep before going up
 Saltos de peso grandes|Big weight jumps
