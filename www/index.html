@@ -976,11 +976,11 @@ const EXPLORE = [
 ];
 
 const ACHIEVEMENTS = [
-  {id:'first',n:'Primer paso',d:'Completa tu primer entrenamiento',ic:'👟'},
-  {id:'s5',n:'Constante',d:'5 entrenamientos',ic:'🔥'},
-  {id:'s25',n:'Disciplina',d:'25 entrenamientos',ic:'💪'},
-  {id:'s50',n:'Imparable',d:'50 entrenamientos',ic:'⚡'},
-  {id:'s100',n:'Leyenda',d:'100 entrenamientos',ic:'🏆'},
+  {id:'first',n:'Primer paso',d:'Completa tu primer entreno',ic:'👟'},
+  {id:'s5',n:'Constante',d:'5 entrenos',ic:'🔥'},
+  {id:'s25',n:'Disciplina',d:'25 entrenos',ic:'💪'},
+  {id:'s50',n:'Imparable',d:'50 entrenos',ic:'⚡'},
+  {id:'s100',n:'Leyenda',d:'100 entrenos',ic:'🏆'},
   {id:'w2',n:'Racha de 2',d:'2 semanas seguidas entrenando',ic:'📅'},
   {id:'w4',n:'Un mes firme',d:'4 semanas seguidas',ic:'🗓️'},
   {id:'w12',n:'Hábito de acero',d:'12 semanas seguidas',ic:'🛡️'},
@@ -6098,7 +6098,7 @@ SCREENS.routine = p => {
       ${s.why?`<div class="why">${esc(s.why)}${kbLink(KB_SUGG[s.kind]||kbWhy(s.why),'Por qué')}</div>`:''}
       <div class="acts"><button class="btn pri sm" data-a="applySugg" data-v="${r.id}|${s.id}">Aplicar</button><button class="btn sm" data-a="ignoreSugg" data-v="${r.id}|${s.id}">Ignorar</button></div></div></div></div>`;
   });
-  if (rec.length) b+=`<div class="banner blue"><span class="ic">${I('info',20)}</span><div class="grow sm">Entrenaste <b>${esc(rec.map(m=>MUSCLES[m].toLowerCase()).join(', '))}</b> hace menos de 48 h. Si notas agujetas fuertes, baja la intensidad o elige otra rutina hoy.</div></div>`;
+  if (rec.length) b+=`<div class="banner blue"><span class="ic">${I('info',20)}</span><div class="grow sm">${tx('Entrenaste','You trained')} <b>${esc(rec.map(m=>EN_LANG()?(EN_MAP.get(MUSCLES[m])||MUSCLES[m]).toLowerCase():MUSCLES[m].toLowerCase()).join(', '))}</b> ${tx('hace menos de 48 h.','less than 48 h ago.')} ${tx('Si notas agujetas fuertes, baja la intensidad o elige otra rutina hoy.','If you feel strong soreness, lower the intensity or pick another routine today.')}</div></div>`;
   if (deloadActive()) b+=`<div class="banner blue"><span class="ic">${I('refresh',20)}</span><div class="grow sm">Semana de descarga: hoy los pesos sugeridos son más livianos.</div></div>`;
   b+=`<div class="sec">Ejercicios</div>`;
   if (!r.items.length) b+=`<div class="empty">Esta rutina no tiene ejercicios.<br><button class="btn" style="margin-top:12px" data-a="editRoutine" data-v="${r.id}">Añadir ejercicios</button></div>`;
@@ -6674,7 +6674,7 @@ A.startWorkout=rid=>{
   };
   if (S.active){
     if (S.active.routineId===rid){ openLayer('workout'); return; }
-    confirmBox({title:'Ya tienes un entreno en curso',text:`Estás entrenando <b>${esc(S.active.name)}</b>. ¿Qué quieres hacer?`,okText:'Volver al entreno actual',ok:()=>openLayer('workout'),noText:'Descartarlo y empezar este',no:go});
+    confirmBox({title:tx('Ya tienes un entreno en curso','You already have a workout in progress'),text:tx(`Estás entrenando <b>${esc(S.active.name)}</b>. ¿Qué quieres hacer?`,`You are training <b>${esc(S.active.name)}</b>. What do you want to do?`),okText:tx('Volver al entreno actual','Back to the current workout'),ok:()=>openLayer('workout'),noText:tx('Descartarlo y empezar este','Discard it and start this one'),no:go});
     return;
   }
   go();
@@ -7007,7 +7007,7 @@ A.wkFinish=()=>{
       ${premOK()?'<div class="xs mut" style="text-align:center;margin-top:8px">PandarIA usa esta barra para ajustar tu progreso.</div>':''}</div>
     <button class="opt" data-a="finDo" data-v="update"><span class="oi">${I('refresh',24)}</span><span class="grow"><div class="b">Actualizar rutina</div><div class="od">Guarda en la rutina los pesos, series y ejercicios que cambiaste hoy.</div></span></button>
     <button class="opt" data-a="finDo" data-v="keep"><span class="oi">${I('check',24)}</span><span class="grow"><div class="b">Dejarla como antes</div><div class="od">La rutina no cambia.</div></span></button>
-    <div class="xs mut" style="padding:0 12px 6px">Con ambas opciones el entrenamiento se guarda en tu historial.</div>
+    <div class="xs mut" style="padding:0 12px 6px">Con ambas opciones el entreno se guarda en tu historial.</div>
     <button class="opt danger" data-a="finDo" data-v="discard"><span class="oi">${I('x',24)}</span><span class="grow"><div class="b">Descartar</div><div class="od">No se guarda nada de esta sesión.</div></span></button>`;
   }
   h+=`<button class="btn ghost wide" data-a="closeModal">Seguir entrenando</button></div>`;
@@ -7148,14 +7148,14 @@ function diasCon(fn){ const ks=new Set(); fn(ks); return ks.size; }
 function aguaDiasMeta(){ const n=nut(), ks=new Set(Object.keys(n.water||{}).concat(Object.keys((S.nutri&&S.nutri.diario)||{}))); let c=0; ks.forEach(k=>{ if (k<=dayKey() && waterToday(k)>=wGoalDia(k)) c++; }); return c; }
 function checkinDias(){ return diasCon(ks=>{ Object.entries(S.diaLog||{}).forEach(([k,d])=>{ if (d&&d.ck) ks.add(k); }); S.sessions.forEach(x=>{ if (x.checkin) ks.add(dayKey(x.start||x.end)); }); }); }
 const HITOS=[
-  {id:'entrenos', ic:'🏋️', n:['entrenos','workouts'], esc:[150,250,500,1000], v:()=>S.sessions.length},
+  {id:'entrenos', ic:'🏋️', n:['entrenos','workouts'], s:['entreno','workout'], esc:[150,250,500,1000], v:()=>S.sessions.length},
   {id:'racha', ic:'🛡️', n:['semanas seguidas entrenando (tu mejor racha)','weeks in a row training (your best streak)'], esc:[26,52,104], cada:52, v:rachaMejor},
-  {id:'records', ic:'⭐', n:['récords personales','personal records'], esc:[50,100,250,500,1000], v:()=>S.sessions.reduce((a,x)=>a+(x.prs||[]).length,0)},
+  {id:'records', ic:'⭐', n:['récords personales','personal records'], s:['récord personal','personal record'], esc:[50,100,250,500,1000], v:()=>S.sessions.reduce((a,x)=>a+(x.prs||[]).length,0)},
   {id:'volumen', ic:'🦾', n:['toneladas levantadas','tonnes lifted'], esc:[250,500,1000], v:()=>Math.floor(S.sessions.reduce((a,x)=>a+(x.vol||0),0)/1000)},
-  {id:'agua', ic:'💧', n:['días con la meta de agua','days hitting your water goal'], v:aguaDiasMeta},
-  {id:'ayunos', ic:'🌙', n:['ayunos de tu plan completados','fasts from your plan completed'], v:()=>((nut().fast||{}).history||[]).filter(x=>x.ok).length, pausa:()=>!!riesgoPeso()},
-  {id:'diario', ic:'🥗', n:['días con diario de comida','days with a food diary'], v:()=>Object.values((S.nutri&&S.nutri.diario)||{}).filter(L=>(L||[]).length>=2).length},
-  {id:'checkin', ic:'🌤️', n:['check-ins','check-ins'], v:checkinDias},
+  {id:'agua', ic:'💧', n:['días con la meta de agua','days hitting your water goal'], s:['día con la meta de agua','day hitting your water goal'], v:aguaDiasMeta},
+  {id:'ayunos', ic:'🌙', n:['ayunos de tu plan completados','fasts from your plan completed'], s:['ayuno de tu plan completado','fast from your plan completed'], v:()=>((nut().fast||{}).history||[]).filter(x=>x.ok).length, pausa:()=>!!riesgoPeso()},
+  {id:'diario', ic:'🥗', n:['días con diario de comida','days with a food diary'], s:['día con diario de comida','day with a food diary'], v:()=>Object.values((S.nutri&&S.nutri.diario)||{}).filter(L=>(L||[]).length>=2).length},
+  {id:'checkin', ic:'🌤️', n:['check-ins','check-ins'], s:['check-in','check-in'], v:checkinDias},
 ];
 function hitoUmbral(h,i){ const K=kb('logros.infinitos'), E=h.esc||K.escalones, c=h.cada||K.cada; return i<E.length?E[i]:E[E.length-1]+(i-E.length+1)*c; }
 function hitoNivel(h,v){ let i=0; while (v>=hitoUmbral(h,i) && i<200) i++; return i; }
@@ -7399,7 +7399,7 @@ function histResumen(){
   h+=fold('mapa',tx('Mapa muscular y recuperación','Muscle map and recovery'),top.length?tx(`Últimos 7 días: ${top.join(', ')}`,`Last 7 days: ${top.join(', ')}`):tx('Sin entrenos en los últimos 7 días','No workouts in the last 7 days'),()=>`${bodyMap(lv,{w:300})}<button class="btn wide sm" style="margin-top:10px" data-a="recuMapa">💪 ${tx('Recuperación por músculo','Recovery by muscle')}${premOK()?'':' 🔒'}</button>
     ${Object.keys(ms).length?`<div class="chips" style="margin-top:10px;justify-content:center">${Object.entries(ms).filter(([k])=>MUSCLES[k]&&!['cardio','movilidad'].includes(k)).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<span class="tag">${MUSCLES[k]} · ${fmtNum(v)}</span>`).join('')}</div><div class="xs mut" style="text-align:center;margin-top:8px">Series por músculo. Para ganar músculo se recomiendan 10–20 por semana.</div>`:'<div class="xs mut" style="text-align:center">Entrena para ver qué músculos trabajaste.</div>'}`,{st:'margin-top:4px'});
   // sesiones
-  h+=`<div class="sec">Entrenamientos</div>`;
+  h+=`<div class="sec">Entrenos</div>`;
   if (!S.sessions.length) return h+`<div class="empty"><div class="big">📅</div>Aún no hay entrenamientos.<br>Completa una rutina y aparecerá aquí.</div>`;
   // 1.8.1: los 5 últimos; «Ver todos» despliega el resto (hasta 60, como antes)
   let lastM=''; const todos=foldOpen('entrenos'), N=S.sessions.length;
@@ -7552,7 +7552,7 @@ function histLogros(){
     +rep('🗓️',tx('Mes perfecto','Perfect month'),R.mes.length,R.mes.length?R.mes.slice(-2).map(k=>mesN(+k.slice(5)-1)+' '+k.slice(0,4)).join(', '):tx('Todas las semanas del mes perfectas','Every week of the month perfect'))
     +rep('💧',tx('Semana hidratada','Hydrated week'),R.agua.length,tx('Meta de agua los 7 días','Water goal all 7 days'))+`</div>`;
   h+=`<div class="sec">${tx('Hitos','Milestones')}</div><div class="card" style="padding:4px 14px">`+HITOS.map((x,i)=>{ let v=0; try{ v=x.v()||0; }catch(e){} const o=H[x.id]||{n:0}, sig=hitoUmbral(x,o.n), ant=o.n?hitoUmbral(x,o.n-1):0, p=Math.max(0,Math.min(100,Math.round((v-ant)/Math.max(1,sig-ant)*100)));
-      return `<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="row" style="gap:10px"><span style="font-size:20px">${x.ic}</span><span class="grow sm"><b>${v.toLocaleString(LOC())}</b> ${esc(tx(x.n[0],x.n[1]))}</span><span class="xs mut">${o.n?tx(`nivel ${o.n}`,`level ${o.n}`):''}</span></div>
+      return `<div style="padding:10px 0;${i?'border-top:1px solid var(--line)':''}"><div class="row" style="gap:10px"><span style="font-size:20px">${x.ic}</span><span class="grow sm"><b>${v.toLocaleString(LOC())}</b> ${esc(v===1&&x.s?tx(x.s[0],x.s[1]):tx(x.n[0],x.n[1]))}</span><span class="xs mut">${o.n?tx(`nivel ${o.n}`,`level ${o.n}`):''}</span></div>
         <div style="height:6px;border-radius:3px;background:var(--card2);overflow:hidden;margin-top:6px"><div style="height:100%;width:${p}%;background:var(--ac)"></div></div><div class="xs mut" style="margin-top:4px">${x.pausa&&x.pausa()?tx('En pausa mientras tu peso esté bajo','Paused while your weight is low'):tx(`Siguiente: ${sig.toLocaleString(LOC())}`,`Next: ${sig}`)}</div></div>`; }).join('')+`</div>`;
   return h+`<div class="sec">${tx('Logros','Awards')}</div>`+`
 <div class="ach">${ACHIEVEMENTS.map(a=>`<div class="a ${got[a.id]?'on':''}"><div class="e">${a.ic}</div><div class="n">${esc(a.n)}</div><div class="dd">${got[a.id]?fmtDate(got[a.id]):esc(a.d)}</div></div>`).join('')}</div>`;
@@ -9625,7 +9625,7 @@ A.fastReanudar=()=>{ fastReanudar(); save(); render.keep=true; render(); toast(t
 function fastReanudarHtml(){ const d=nut().fast.deshacer; if (!d || Date.now()-d.end>15*60000) return '';
   return `<div class="row" style="gap:6px;justify-content:center;margin:0 auto 12px"><button class="link sm" data-a="fastReanudar">${I('refresh',14)} ${tx(`¿Lo terminaste sin querer? Reanudar el ayuno de las ${hhmm(d.a.start)}`,`Ended it by mistake? Resume the fast from ${hhmm(d.a.start)}`)}</button><button class="ibtn" style="width:30px;height:30px" data-a="fastReanudarNo" aria-label="${tx('Quitar','Dismiss')}">${I('close',14)}</button></div>`; }
 A.fastReanudarNo=()=>{ delete nut().fast.deshacer; save(); render.keep=true; render(); };
-A.fastUnwell=()=>confirmBox({title:'Escucha a tu cuerpo',text:'Si sientes mareo, debilidad, dolor de cabeza fuerte o malestar, lo recomendable es <b>terminar el ayuno ahora</b> y comer algo con hidratos y proteína. Si los síntomas son intensos o no pasan, busca atención médica.',okText:'Terminar ayuno y comer',ok:()=>A.fastEndNow(),noText:'Ya me siento mejor'});
+A.fastUnwell=()=>confirmBox({title:tx('Escucha a tu cuerpo','Listen to your body'),text:tx('Si sientes mareo, debilidad, dolor de cabeza fuerte o malestar, lo recomendable es <b>terminar el ayuno ahora</b> y comer algo con hidratos y proteína. Si los síntomas son intensos o no pasan, busca atención médica.','If you feel dizzy, weak, have a strong headache or feel unwell, the best thing is to <b>end the fast now</b> and eat something with carbs and protein. If the symptoms are intense or do not go away, seek medical care.'),okText:tx('Terminar ayuno y comer','End fast and eat'),ok:()=>A.fastEndNow(),noText:tx('Ya me siento mejor','I feel better now')});
 function fastTick(){ const f=S&&S.nutri&&S.nutri.fast&&S.nutri.fast.active; if(!f) return; const el=document.querySelectorAll('.tick-fast'); if(!el.length) return; const hh=(Date.now()-f.start)/3600000; el.forEach(e=>e.textContent=e.dataset.long?fmtHMl(hh):fmtHM(hh)); }
 setInterval(fastTick,10000);
 
@@ -11043,7 +11043,7 @@ const APP_VERSION='1.9';
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
- {v:'1.9',t:'Logros sin fin',items:['Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo', 'Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez', 'Reto estrella del mes: cada mes uno distinto, adaptado a ti']},
+ {v:'1.9',t:'Logros sin fin',items:['Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo', 'Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez', 'Reto estrella del mes: cada mes uno distinto, adaptado a ti', 'Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla']},
  {v:'1.8.2',t:'Te cuida mejor',items:['PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas', 'Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso', 'Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo', 'Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan', 'La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora', 'Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin', 'Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice', 'Después de unas vacaciones ya no propone quitar días de tu plan', 'Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso', 'Cambiar tu objetivo de calorías ahora se puede deshacer']},
  {v:'1.8.1',t:'Más ordenada',items:['Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes', 'Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos', 'El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección', 'Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan', 'Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados', 'El buscador de alimentos entiende plurales y errores de una letra', '39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate']},
  {v:'1.8',t:'PandarIA aprende de ti',items:['Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)', '10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas', 'PandarIA con 19 fuentes nuevas, entre ellas la postura del ACSM de 2026: vuelve de una pausa según tu edad (Bosquet 2013), descargas con una serie menos (Bell 2023), máximo estimado más fiable (Mayhew 2008), calorías con los factores de la FAO/OMS y el modelo de Hall, proteína por comida de 0,4 g/kg, meta de pasos según tu edad y calorías de cada entreno (Compendio 2024)', 'Tu primera serie de un ejercicio nuevo calibra el peso de las siguientes, el gasto real usa 3 semanas de datos, y cada fuente de la Biblioteca enlaza con las otras reglas que salen de ella', 'Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas', 'PandarIA elige mejor el peso: tras una descarga ya no lo baja dos veces, si anotas que te sobran muchas repeticiones lo recalcula con tu fuerza real, y tus repeticiones de sobra mandan sobre la nota de la sesión', 'Arreglos encontrados con 32 usuarios simulados durante un mes: récords sin peso, doble toque en Terminar o al elegir una ración, y metas de nutrición que podían salir en blanco']},
@@ -11088,7 +11088,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti"];
+const NOTAS_VERSION=["1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -14341,6 +14341,7 @@ Logros sin fin|Never-ending awards
 Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo|Awards that never run out: milestones for workouts, water, fasting, food diary, check-ins and records, with levels that keep going up
 Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez|Perfect week, perfect month and hydrated week can be earned again and again
 Reto estrella del mes: cada mes uno distinto, adaptado a ti|Monthly star challenge: a different one every month, adapted to you
+Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla|The whole app reviewed in Spanish and English, including what screen readers read out
 1.8.2 · Te cuida mejor|1.8.2 · Looks after you better
 Te cuida mejor|Looks after you better
 PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas|PandarIA no longer removes exercises it has just swapped in: your routines do not shrink on their own
@@ -14428,15 +14429,15 @@ Enviar mis votos al creador|Send my votes to the creator
 Premium · menos descanso en calentamientos y más si una serie cuesta|Premium · less rest on warm-ups and more when a set is hard
 menos descanso en calentamientos y más si una serie cuesta|less rest on warm-ups and more when a set is hard
 Primer paso|First step
-Completa tu primer entrenamiento|Complete your first workout
+Completa tu primer entreno|Complete your first workout
 Constante|Consistent
-5 entrenamientos|5 workouts
+5 entrenos|5 workouts
 Disciplina|Discipline
-25 entrenamientos|25 workouts
+25 entrenos|25 workouts
 Imparable|Unstoppable
-50 entrenamientos|50 workouts
+50 entrenos|50 workouts
 Leyenda|Legend
-100 entrenamientos|100 workouts
+100 entrenos|100 workouts
 Racha de 2|2-week streak
 2 semanas seguidas entrenando|2 weeks in a row training
 Un mes firme|A solid month
@@ -15134,6 +15135,21 @@ const LASTRE_COMO_EN={'cinturón con discos o una mancuerna entre los pies':'a d
 const enList=x=>x.split(/, | y /).map(enN).join(', ');
 const EN_MED={Peso:'Weight',Cintura:'Waist',Cadera:'Hips',Pecho:'Chest',Brazo:'Arm',Muslo:'Thigh',Cuello:'Neck',Hombros:'Shoulders',Pantorrilla:'Calf',Grasa:'Body fat',Glúteo:'Glutes',Antebrazo:'Forearm'};
 const EN_09_RX = [
+  [/^Dale más series a: (.+)\.$/,(m,x)=>'Give more sets to: '+x.split(', ').map(w=>{ const c=w.charAt(0).toUpperCase()+w.slice(1); return (EN_MAP.get(c)||w).toLowerCase(); }).join(', ')+'.'],
+  [/^Minutos por sesión: (\d+)$/,'Minutes per session: $1'],
+  [/^Premium activo · hasta el (.+)\. ¡Gracias por apoyar el proyecto!$/,'Premium active · until $1. Thanks for supporting the project!'],
+  [/^Premium activo · permanente\. ¡Gracias por apoyar el proyecto!$/,'Premium active · permanent. Thanks for supporting the project!'],
+  [/^hasta el (.+)$/,'until $1'],
+  [/^Añadir a (.+)$/,(m,x)=>'Add to '+(EN_MAP.get(x)||x)],
+  [/^Start (.+)$/,(m,x)=>{ const r=trText(x); return 'Start '+(r!=null?r:x); }],
+  [/^Iniciar descanso de (\S+)$/,'Start a $1 rest'],
+  [/^Prepárate (\d+)$/,'Get ready $1'],
+  [/^Faltan días de diario: (\d+) de (\d+)$/,'Missing diary days: $1 of $2'],
+  [/^Faltan pesajes: necesito al menos dos separados (\d+) días$/,'Missing weigh-ins: I need at least two $1 days apart'],
+  [/^Hoy llegas con poco descanso: (\d+) % menos de carga$/,'You are short on rest today: $1 % less load'],
+  [/^Sesión suave: (\d+) % menos de carga$/,'Easy session: $1 % less load'],
+  [/^Volviste tras (\d+) días: ajustamos el peso$/,'Back after $1 days: weight adjusted'],
+  [/^Mejor serie \((kg|lb)×reps\)$/,'Best set ($1×reps)'],
   [/^Ya tienes la versión (.+)$/,'You now have version $1'],
   [/^Versión nueva disponible: (.+)$/,'New version available: $1'],
   [/^Tienes la (\S+) · toca para ver los cambios$/,'You have $1 · tap to see the changes'],
@@ -15199,6 +15215,116 @@ const EN_09_RX = [
   [/^Minuto (\d+)\. (.*)$/,(m,n,a)=>`Minute ${n}. ${a?enN(a):''}`],[/^Trabajo\. (.*)$/,(m,a)=>'Work. '+(a?enN(a):'')]
 ];
 const EN_EXTRA = `Solo esta serie|This set only
+Guía de PandarIA (experimental)|PandarIA guide (experimental)
+Más masa muscular y mejor forma|More muscle mass and better shape
+Levantar más peso en los básicos|Lift more weight on the big lifts
+Circuitos que queman más calorías|Circuits that burn more calories
+Aguantar más y mejor condición física|Last longer and get fitter
+Moverte mejor y sentirte bien|Move better and feel good
+Yoga, movilidad y estiramientos|Yoga, mobility and stretching
+Empiezo o llevo menos de 6 meses|Just starting or under 6 months
+Entreno con constancia desde hace 6 meses a 2 años|Training consistently for 6 months to 2 years
+Más de 2 años entrenando en serio|Over 2 years of serious training
+PandarIA adapta series, repeticiones y descansos a tu meta.|PandarIA adapts sets, reps and rests to your goal.
+Si dudas, elige uno menos: PandarIA te subirá cuando estés listo.|If in doubt, pick one level lower: PandarIA will move you up when you are ready.
+Sé realista: la constancia gana a la intensidad.|Be realistic: consistency beats intensity.
+Minutos por sesión:|Minutes per session:
+Añadir 30 segundos|Add 30 seconds
+Saltar descanso|Skip rest
+Con ambas opciones el entreno se guarda en tu historial.|Either way the workout is saved in your history.
+Guarda en la rutina los pesos, series y ejercicios que cambiaste hoy.|Saves the weights, sets and exercises you changed today in the routine.
+La rutina no cambia.|The routine stays the same.
+No se guarda nada de esta sesión.|Nothing from this session is saved.
+No se guarda nada.|Nothing is saved.
+PandarIA usa esta barra para ajustar tu progreso.|PandarIA uses this slider to adjust your progress.
+PandarIA evitará este ejercicio al crear rutinas y te propondrá cambiarlo donde ya lo tengas.|PandarIA will avoid this exercise when building routines and will suggest swapping it wherever you already have it.
+PandarIA completo|Full PandarIA
+Sube pesos y repeticiones por ti, detecta estancamientos, renueva tus rutinas y planifica bloques y descargas.|Raises weights and reps for you, spots plateaus, refreshes your routines and plans blocks and deloads.
+Rutinas a tu medida|Routines made for you
+Rutina por grupo muscular y plan semanal completo «Confía en PandarIA».|Routines by muscle group and a full «Trust PandarIA» weekly plan.
+Todo Explorar|All of Explore
+Rutinas de nivel Medio y Difícil, y Fuerza pura, Kettlebell, Running y Boxeo.|Medium and Hard routines, plus Pure strength, Kettlebell, Running and Boxing.
+Progreso a fondo|In-depth progress
+Gráficas, series por músculo, informes semanales, desequilibrios y metas con fecha.|Charts, sets per muscle, weekly reports, imbalances and goals with a date.
+Intervalos sin límite|Unlimited intervals
+HIIT, EMOM y AMRAP personalizados.|Custom HIIT, EMOM and AMRAP.
+Fotos de progreso|Progress photos
+Guarda fotos y compáralas lado a lado.|Save photos and compare them side by side.
+Calorías y macros|Calories and macros
+Tu objetivo diario de calorías y macros, y tu diario de comidas comparado con él, día a día y semana a semana.|Your daily calorie and macro goal, and your food diary compared with it, day by day and week by week.
+Calidad de la dieta y menús|Diet quality and menus
+Fibra, sodio y proteína por comida en tu diario, y ejemplos de menú con tus calorías, tu alimentación y tus alergias.|Fibre, sodium and protein per meal in your diary, and sample menus with your calories, your diet and your allergies.
+Alimentos y recetas sin límite|Unlimited foods and recipes
+En la versión gratis, hasta 10. Registrar comidas es gratis.|Up to 10 in the free version. Logging meals is free.
+Rutinas ilimitadas|Unlimited routines
+En la versión gratis, hasta 3 (contando las archivadas).|Up to 3 in the free version (counting archived ones).
+Ejercicios propios ilimitados|Unlimited custom exercises
+En la versión gratis, hasta 5.|Up to 5 in the free version.
+Músculos en las animaciones|Muscles in the animations
+Mira en rojo qué músculos trabajan en cada ejercicio, y descansos ajustados por PandarIA en cada serie.|See in red which muscles work in each exercise, and rests adjusted by PandarIA for every set.
+Las rutinas diseñadas por PandarIA son parte de Premium.|Routines designed by PandarIA are part of Premium.
+Esta rutina es parte de Premium.|This routine is part of Premium.
+Este modo de intervalos es parte de Premium.|This interval mode is part of Premium.
+Esta sección del historial es parte de Premium.|This history section is part of Premium.
+Las fotos de progreso son parte de Premium.|Progress photos are part of Premium.
+Las calorías y macros son parte de Premium.|Calories and macros are part of Premium.
+Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.|Comparing your diary with your calorie and macro goal, and seeing your week, is part of Premium.
+En la versión gratis puedes crear hasta 10 alimentos y recetas propios.|In the free version you can create up to 10 custom foods and recipes.
+La calidad del día (fibra, sodio y proteína por comida) es parte de Premium.|The day's quality (fibre, sodium and protein per meal) is part of Premium.
+Los ejemplos de menú hechos con tus calorías y tus preferencias son parte de Premium.|Sample menus built with your calories and preferences are part of Premium.
+Escanear códigos de barras es parte de Premium.|Scanning barcodes is part of Premium.
+El análisis completo de Consulta a PandarIA (tu caso, explicación, ejemplos y qué hacer) es parte de Premium.|The full Ask PandarIA analysis (your case, explanation, examples and what to do) is part of Premium.
+En la versión gratis puedes crear hasta 5 ejercicios propios.|In the free version you can create up to 5 custom exercises.
+En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.|In the free version you can have up to 3 routines, counting archived ones. To create another, delete one (in My routines or Settings › Archived) or go Premium.
+Ver los músculos que trabajan en cada animación es parte de Premium.|Seeing the muscles worked in each animation is part of Premium.
+Este aviso es parte de Premium.|This notice is part of Premium.
+Premium recuperado con tu cuenta|Premium recovered with your account
+Ese código ya caducó. Pide uno nuevo.|That code has expired. Ask for a new one.
+Código no válido para este teléfono ni para tu cuenta. Revisa que esté completo.|Code not valid for this phone or your account. Check it is complete.
+Código no válido para este teléfono. Revisa que esté completo.|Code not valid for this phone. Check it is complete.
+Tu licencia|Your licence
+Duración|Duration
+permanente|permanent
+bloque de intensidad (menos reps, más peso)|intensity block (fewer reps, more weight)
+Aumentar el volumen es otra forma válida de progresar.|Adding volume is another valid way to progress.
+Completaste todas las series: sube el peso|You completed every set: weight goes up
+Dos sesiones sin llegar: bajamos 10 % para consolidar|Two sessions short: down 10 % to consolidate
+El sueño insuficiente reduce la fuerza y la recuperación muscular.|Too little sleep reduces strength and muscle recovery.
+Entrenar con molestias aumenta el riesgo de lesión. Si el dolor persiste, consulta a un profesional.|Training through discomfort raises the risk of injury. If the pain persists, see a professional.
+Intenta una repetición más|Try one more rep
+Las máquinas y la Smith guían el recorrido y son ideales para aprender. El peso libre exige más estabilidad y suma músculos estabilizadores.|Machines and the Smith machine guide the movement and are great for learning. Free weights demand more stability and work stabiliser muscles.
+Los datos no cuadran con la fórmula (¿faltan comidas en el diario?): no los uso|The data does not match the formula (missing meals in the diary?): not using it
+Mantén las repeticiones|Keep the reps
+Mismo peso que antes del día suave|Same weight as before the easy day
+Mismo peso: busca llegar al mínimo de repeticiones|Same weight: aim to reach the minimum reps
+Peso inicial estimado por PandarIA|Starting weight estimated by PandarIA
+Se recomienda una descarga cada 4–8 semanas de entrenamiento intenso o tras estancarse.|A deload is recommended every 4–8 weeks of hard training or after a plateau.
+Semana de descarga del bloque: más liviano|Block deload week: lighter
+Semana de descarga: más liviano|Deload week: lighter
+Serie de calentamiento|Warm-up set
+Sesión anterior muy exigente: mantén|Last session was very hard: hold
+Un poco más que la última vez|A little more than last time
+Favorito|Favourite
+Tiempo|Time
+Peso y reps|Weight and reps
+Solo reps|Reps only
+Cómo se registra|How it is logged
+Burbuja de PandarIA|PandarIA bubble
+Escucha a tu cuerpo|Listen to your body
+Ya me siento mejor|I feel better now
+Terminar ayuno y comer|End fast and eat
+terminar el ayuno ahora|end the fast now
+Peso máximo por sesión|Top weight per session
+Mejor tiempo por sesión (s)|Best time per session (s)
+Máximo de repeticiones por sesión|Most reps per session
+No evitas ningún ejercicio.|You are not avoiding any exercise.
+Cambiar hora de inicio|Change start time
+¿Cuándo empezaste a ayunar?|When did you start fasting?
+Día siguiente|Next day
+Temporizador de descanso|Rest timer
+propio|custom
+receta|recipe
+REPS|REPS
 Logros que no se acaban|Awards that never run out
 Logros y retos del mes|Awards and monthly challenges
 Calorías y peso|Calories and weight
@@ -15265,7 +15391,9 @@ let langObs=null;
 function trTree(root){
   const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null); const nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
   nodes.forEach(n=>{ if (n.parentNode && /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)) return; const r=trText(n.nodeValue); if (r!=null && r!==n.nodeValue) n.nodeValue=r; });
-  root.querySelectorAll && root.querySelectorAll('[placeholder]').forEach(el=>{ const r=trText(el.getAttribute('placeholder')); if(r) el.setAttribute('placeholder',r); });
+  // 1.9: también lo que leen los lectores de pantalla (aria-label) y los avisos al mantener pulsado (title), incluido el propio elemento
+  if (root.querySelectorAll){ const els=[...root.querySelectorAll('[placeholder],[aria-label],[title]')]; if (root.nodeType===1 && root.matches && root.matches('[placeholder],[aria-label],[title]')) els.push(root);
+    els.forEach(el=>{ for (const at of ['placeholder','aria-label','title']){ const v=el.getAttribute(at); if (!v) continue; const r=trText(v); if (r && r!==v) el.setAttribute(at,r); } }); }
 }
 const DS_ES=['D','L','M','X','J','V','S'], DS_EN=['S','M','T','W','T','F','S'];
 function applyLang(){

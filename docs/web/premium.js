@@ -205,7 +205,7 @@
       b += `</div><button class="link sm" style="display:block;margin:14px auto 0" data-a="pfRegalo">${tx('¿No puedes pagarlo?','Can\'t afford it?')}</button>`;
     } else if (!licOk() && subOk()){
       b += `<div class="sec">${tx('Tu suscripción','Your subscription')}</div><div class="card"><div class="kv"><span class="mut">${tx('Estado','Status')}</span><b style="color:var(--ok)">${tx('Activa en Google Play','Active in Google Play')}</b></div><button class="btn wide" style="margin-top:10px" data-a="pfManage">${tx('Administrar suscripción','Manage subscription')}</button></div>`;
-    } else {
+    } else if (PREM) {
       b += `<div class="sec">Tu licencia</div><div class="card" style="padding:4px 14px"><div class="kv"><span class="mut">Estado</span><b style="color:var(--ok)">Activa</b></div><div class="kv"><span class="mut">Duración</span><b>${cap1(fmtExp(PREM.exp))}</b></div><div class="kv"><span class="mut">Activada</span><b>${fmtDate(PREM.at)}</b></div>${PREM.kind === 'acct' ? `<div class="kv"><span class="mut">Cuenta</span><b style="font-size:13px">${esc((S.settings.cloud && S.settings.cloud.email) || fmtAcc(PREM.acc))}</b></div>` : `<div class="kv"><span class="mut">Teléfono</span><b style="font-family:ui-monospace,Menlo,monospace;font-size:13px">${fmtDev(DEV)}</b></div>`}</div>`;
     }
     return lhdr('Premium') + `<div class="lbody">${b}<p class="xs mut" style="text-align:center;margin:18px 8px 0;line-height:1.5">Tus datos siempre son tuyos: exportar, copias de seguridad, accesibilidad y seguridad nunca se bloquean.</p></div>`;
