@@ -99,6 +99,7 @@ jobs:
           N=$(grep -c "permission.health." permisos.txt || true)
           if [ -n "$MAL" ] || [ "$N" != "10" ]; then echo "ERROR: permisos que no deben estar: $MAL (salud: $N de 10)"; exit 1; fi
           echo "Permisos correctos: 10 de salud y ninguno prohibido"
+          node scripts/control-permisos.mjs permisos.txt
 
       - name: Control de funciones de hardware (ninguna obligatoria, para que Play no excluya dispositivos)
         run: |

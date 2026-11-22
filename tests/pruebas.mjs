@@ -269,12 +269,12 @@ if (fs.existsSync(COPIA07)) {
     const env2=JSON.parse(JSON.stringify(env)); S.routines=[]; S.sessions=[]; cloudApply(env2,'f1');
     const despues=JSON.stringify({r:S.routines,s:S.sessions,m:S.measures,p:S.profile,n:S.nutri});
     return JSON.stringify({sinCuenta: env.data.settings.cloud===undefined, app: env.app, igual: antes===despues, sigue: S.settings.cloud.sub==='123' && S.settings.cloud.fileId==='f1', resumen: env.resumen.entrenos===env.data.sessions.length,
-      pasos: obPasos({}).join(',') }); })()`));
+      pasos: obPasos({pf:{}}).join(',') }); })()`));
   comprobar('copia de Drive: no incluye los datos de la cuenta', r.sinCuenta && r.app === 'PandarIA Fit');
   comprobar('copia de Drive: guardar y recuperar devuelve los mismos datos', r.igual, 'los datos cambiaron');
   comprobar('copia de Drive: al recuperar sigue conectada la misma cuenta', r.sigue);
   comprobar('copia de Drive: el resumen cuenta bien los entrenos', r.resumen);
-  comprobar('bienvenida sin Google: no muestra el paso de la cuenta', !r.pasos.includes('cuenta') && r.pasos.startsWith('hola,nombre,perfil,equipo'), r.pasos);
+  comprobar('bienvenida sin Google: no muestra el paso de la cuenta', !r.pasos.includes('cuenta') && r.pasos.startsWith('hola,ia,nombre,edad,cuerpo,semana,lesiones,objetivos,analisis,partida'), r.pasos);
   a.cerrar();
 }
 
@@ -1197,9 +1197,65 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9.2 unidades: las metas usan la unidad de cada tipo', JSON.stringify(r.meta) === '["lb","in",68]', JSON.stringify(r.meta));
   comprobar('1.9.2 unidades: en métrico todo sigue igual', JSON.stringify(r.metrico) === '["80 kg","180 cm","2,5 L"]', JSON.stringify(r.metrico));
   comprobar('1.9.2 idiomas: registro, idioma desconocido vuelve a español y tx con tercer idioma', r.idiomas === 'es,en' && r.desconocido === 'es' && r.tx.join() === 'a,b', JSON.stringify([r.idiomas, r.desconocido, r.tx]));
-  comprobar('1.9.2 contacto: asunto filtrable con versión e idioma', /^\[PandarIA Fit 1\.9\.2 · es\] Sugerencias: Nutrición, Idioma y traducción$/.test(r.asunto) && r.cuerpo, r.asunto);
+  comprobar('1.9.2 contacto: asunto filtrable con versión e idioma', /^\[PandarIA Fit [\d.]+ · es\] Sugerencias: Nutrición, Idioma y traducción$/.test(r.asunto) && r.cuerpo, r.asunto);
   comprobar('1.9.2 contacto: abre con el apartado elegido, pide mensaje y limita a 1 al día', r.abre && r.pideMsg && r.enviado && r.limite, JSON.stringify([r.abre, r.pideMsg, r.enviado, r.limite]));
   comprobar('1.9.2 sin errores', !a.errores.length, a.errores.join(' | '));
+}
+
+/* ---------- 1.9.3: bienvenida nueva y discos en libras ---------- */
+for (const lang of ['es', 'en']) {
+  const a = abrir();
+  await espera(1200);
+  const w = a.w, ev = c => w.eval(c), txt = () => ev(`document.querySelector('#layers').textContent.replace(/\\s+/g,' ')`);
+  const es = new Set(); const mira = paso => { if (lang !== 'en') return; ev(`trTree(document.querySelector('#layers'))`); const t = txt().replace(/LunaDoggyBru Studios|PandarIA Fit|Español/g, ''); const m = t.match(/[^.!?]*(?:[áéíóúñ¿¡]|\b(?:días|tus|para|con|del|las|los|una)\b)[^.!?]*/gi); if (m) m.slice(0, 3).forEach(x => es.add(paso + ': ' + x.trim().slice(0, 90))); };
+  const r = {};
+  r.abre = ev(`LAYERS.length && LAYERS[LAYERS.length-1].t`) === 'onboard';
+  ev(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); window.isPremium=()=>false; pkP().premPaso=null; refreshTop();`);
+  const paso = () => ev(`pkP().paso`);
+  const sig = () => ev(`A.obNext()`);
+  mira('hola'); sig(); r.ia = paso(); mira('ia'); sig();
+  ev(`document.getElementById('ob_name').value='Ana'`); sig(); r.edad = paso();
+  ev(`document.getElementById('ob_age').value='30'; A.obSet('sex|m'); A.obSet('embarazo|1')`); r.embOn = ev(`!!pkP().pf.embarazo && /dando el pecho|breastfeeding/.test(document.querySelector('#layers').textContent)`); mira('edad');
+  ev(`A.obSet('embarazo|')`); r.embOff = ev(`!pkP().pf.embarazo && pkP().pf.age===30`); sig(); r.cuerpo = paso();
+  ev(`document.getElementById('ob_height').value='165'; document.getElementById('ob_weight').value='60'; A.obSet('fitness|activo'); A.obLevel('intermedio')`); mira('cuerpo'); sig();
+  ev(`A.obSet('dias|4'); A.obSet('min|45'); A.obPreset('3')`); mira('semana'); sig();
+  ev(`A.obInj('rodilla')`); mira('lesiones'); sig();
+  sig(); r.sinObj = paso() === 'objetivos';
+  ev(`A.obObj('grasa'); A.obSec('agua'); A.obSec('dormir'); A.obSec('ayuno')`); r.sec = ev(`pkP().sec.join()`); mira('objetivos'); sig();
+  r.analisis = paso() === 'analisis'; r.aplicado = ev(`JSON.stringify([S.profile.weight,S.profile.height,S.settings.obDias,S.settings.obMin,S.settings.objetivo,nut().goal,S.settings.level,(S.profile.injuries||[]).join()])`);
+  mira('analisis');
+  await espera(5200);
+  r.partida = paso(); const tp = txt(); r.tp = tp.slice(0, 900); mira('partida');
+  r.cartas = /4 (días: torso y pierna|days: upper and lower body)/.test(tp) && /kcal/.test(tp) && /(rodilla|knee)/i.test(tp) && /(agua|water)/i.test(tp) && /(Con Premium|With Premium)/.test(tp);
+  sig(); r.premium = paso(); const tq = txt(); r.premTxt = /(Seguir gratis|Continue free)/.test(tq) && /(Ver Premium|See Premium)/.test(tq) && /(Calorías que se corrigen|Calories that adjust)/.test(tq); mira('premium');
+  sig(); r.listo = paso(); mira('listo');
+  ev(`A.obEnd('propia')`); await espera(300);
+  r.fin = ev(`S.settings.onboarded===true && S.settings.partidaVista===true && !LAYERS.some(l=>l.t==='onboard')`);
+  // menores de 18 no siguen
+  ev(`openLayer('onboard',{pf:{injuries:[]},paso:'edad'}); refreshTop(); document.getElementById('ob_age').value='16'; A.obNext();`);
+  r.menor = paso() === 'menor' && !ev(`obPasos(pkP()).includes('cuerpo')`); mira('menor'); ev(`closeLayer()`);
+  // quien ya usaba la app ve una vez su punto de partida
+  ev(`S.settings.partidaVista=false; delete S.dismissed.partida;`); r.aviso = ev(`/(Ver mi punto de partida|See my starting point)/.test(banners())`);
+  ev(`A.verPartida()`); r.capa = ev(`LAYERS[LAYERS.length-1].t==='partida' && S.settings.partidaVista===true`); mira('partida-capa'); ev(`closeLayer()`);
+  // embarazo: sin dietas para bajar ni ayunos
+  r.emb = JSON.parse(ev(`(()=>{ S.profile.embarazo='1'; const c=calcNutrition(); let aviso=false; const cb=window.confirmBox; window.confirmBox=o=>{ aviso=/(embarazo|pregnancy)/.test(o.text); }; fastRiesgoAntes(()=>{}); window.confirmBox=cb; const o=[c.goal, aviso, embarazada()]; S.profile.sex='h'; o.push(embarazada()); S.profile.sex='m'; delete S.profile.embarazo; return JSON.stringify(o); })()`));
+  // discos en libras
+  r.lb = JSON.parse(ev(`(()=>{ S.settings.unit='lb'; S.settings.minPlateLb=2.5; plateCalc(225/2.20462); const t=document.querySelector('#modals').textContent; closeModal(); const inc=incFor(getEx('press_banca')); S.settings.unit='kg'; return JSON.stringify([/Cada lado: 45 \\+ 45 lb|Each side: 45 \\+ 45 lb/.test(t), /(Barra|Bar) 45 lb/.test(t), Math.round(inc*2.20462*100)/100]); })()`));
+  a.cerrar();
+  const L = lang === 'en' ? ' (inglés)' : '';
+  comprobar('1.9.3 bienvenida' + L + ': se abre sola y pasa por qué es PandarIA, edad y cuerpo', r.abre && r.ia === 'ia' && r.edad === 'edad' && r.cuerpo === 'cuerpo', JSON.stringify([r.abre, r.ia, r.edad, r.cuerpo]));
+  comprobar('1.9.3 bienvenida' + L + ': la casilla de embarazo solo aparece con mujer y se puede quitar', r.embOn && r.embOff, JSON.stringify([r.embOn, r.embOff]));
+  comprobar('1.9.3 bienvenida' + L + ': pide objetivo principal y como mucho 2 más', r.sinObj && r.sec === 'agua,dormir', JSON.stringify([r.sinObj, r.sec]));
+  comprobar('1.9.3 bienvenida' + L + ': antes del análisis guarda perfil, semana, nivel y objetivo', r.analisis && r.aplicado === '[60,165,4,45,"grasa","bajar","intermedio","rodilla"]', r.aplicado);
+  comprobar('1.9.3 bienvenida' + L + ': el análisis termina solo y el punto de partida usa sus datos', r.partida === 'partida' && r.cartas, JSON.stringify([r.partida, r.cartas, r.tp]));
+  comprobar('1.9.3 bienvenida' + L + ': Premium frente a gratis con «Seguir gratis» y luego listo', r.premium === 'premium' && r.premTxt && r.listo === 'listo', JSON.stringify([r.premium, r.premTxt, r.listo]));
+  comprobar('1.9.3 bienvenida' + L + ': al terminar queda hecha y no vuelve a salir el punto de partida', r.fin);
+  comprobar('1.9.3 bienvenida' + L + ': menores de 18 no siguen', r.menor);
+  comprobar('1.9.3 punto de partida' + L + ': quien ya usaba la app lo ve una vez', r.aviso && r.capa, JSON.stringify([r.aviso, r.capa]));
+  comprobar('1.9.3 embarazo' + L + ': sin déficit, aviso antes de ayunar y solo con mujer', JSON.stringify(r.emb) === '["mantener",true,true,false]', JSON.stringify(r.emb));
+  comprobar('1.9.3 discos en libras' + L + ': barra de 45 lb, 45 + 45 por lado y saltos de 5 lb', r.lb[0] && r.lb[1] && r.lb[2] === 5, JSON.stringify(r.lb));
+  if (lang === 'en') comprobar('1.9.3 bienvenida en inglés sin restos en español', !es.size, [...es].slice(0, 6).join(' | '));
+  comprobar('1.9.3 sin errores' + L, !a.errores.length, a.errores.join(' | '));
 }
 
 /* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */

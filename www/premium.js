@@ -56,9 +56,12 @@
     }catch(e){ PRODS = {}; }
     // si falló (sin conexión un momento), se reintenta una vez
     if (!Object.keys(PRODS).length && !intento && !IOS){ setTimeout(() => loadProducts(1), 1500); }
-    const t = LAYERS[LAYERS.length - 1]; if (t && t.t === 'premium') refreshTop();
+    const t = LAYERS[LAYERS.length - 1]; if (t && (t.t === 'premium' || t.t === 'onboard')) refreshTop();
   }
-  window.pfPlanDe = planDe; // para las pruebas
+  window.pfPlanDe = planDe;
+  // 1.9.3: la bienvenida enseña los planes con su precio real de Google Play
+  window.pfPlanes = () => PRODS && Object.keys(PRODS).length ? PRODS : null;
+  window.pfCargarPlanes = () => loadProducts(); // para las pruebas
   window.pfSubActive = () => subOk();
   const subtle = window.crypto && crypto.subtle;
   const enc = s => new TextEncoder().encode(s);

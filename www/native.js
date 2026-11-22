@@ -314,7 +314,10 @@
     if (!notifOk && !NS().asked && S.settings.onboarded) setTimeout(askNotifModal, 1500);
     rescheduleAll();
   }
-  window.pfNotif = { ok: () => !!notifOk, ask: async () => { NS().asked = true; save(); await enableNotifs(); return notifOk; } };
+  window.pfNotif = { ok: () => !!notifOk, ask: async () => { NS().asked = true; save(); await enableNotifs(); return notifOk; },
+    // 1.9.3: para la pantalla de permisos
+    exactOk: () => IOS || !!exactOk,
+    askExact: IOS ? null : async () => { try{ await LN.changeExactNotificationSetting(); }catch(e){} await refreshPerm(); rescheduleAll(); } };
   function askNotifModal(){
     NS().asked = true; save();
     openModal(`<div class="modal"><h3>🔔 Activa las notificaciones</h3><p class="mut" style="line-height:1.5;margin:0 0 18px">PandarIA te avisará cuando termine el descanso, cuándo toca entrenar, cuándo beber agua y las fases de tu ayuno. Eliges cada aviso en Ajustes › Notificaciones.</p>
