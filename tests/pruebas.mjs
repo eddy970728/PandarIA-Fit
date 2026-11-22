@@ -274,7 +274,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('copia de Drive: guardar y recuperar devuelve los mismos datos', r.igual, 'los datos cambiaron');
   comprobar('copia de Drive: al recuperar sigue conectada la misma cuenta', r.sigue);
   comprobar('copia de Drive: el resumen cuenta bien los entrenos', r.resumen);
-  comprobar('bienvenida sin Google: no muestra el paso de la cuenta', !r.pasos.includes('cuenta') && r.pasos.startsWith('hola,ia,nombre,edad,cuerpo,semana,lesiones,objetivos,analisis,partida'), r.pasos);
+  comprobar('bienvenida sin Google: no muestra el paso de la cuenta', !r.pasos.includes('cuenta') && r.pasos.startsWith('hola,ia,nombre,unidades,edad,cuerpo,semana,lesiones,objetivos,analisis,partida'), r.pasos);
   a.cerrar();
 }
 
@@ -1214,7 +1214,9 @@ for (const lang of ['es', 'en']) {
   const paso = () => ev(`pkP().paso`);
   const sig = () => ev(`A.obNext()`);
   mira('hola'); sig(); r.ia = paso(); mira('ia'); sig();
-  ev(`document.getElementById('ob_name').value='Ana'`); sig(); r.edad = paso();
+  ev(`document.getElementById('ob_name').value='Ana'`); sig(); r.unidades = paso(); mira('unidades');
+  ev(`A.obUnidad('unit|lb'); A.obUnidad('uLong|in'); A.obUnidad('uAgua|oz')`); r.uImp = ev(`uP()+uL()+uA()`);
+  ev(`A.obUnidad('unit|kg'); A.obUnidad('uLong|cm'); A.obUnidad('uAgua|ml')`); r.uMet = ev(`uP()+uL()+uA()+'|'+!!document.querySelector('#layers [data-v="unit|kg"].on')`); sig(); r.edad = paso();
   ev(`document.getElementById('ob_age').value='30'; A.obSet('sex|m'); A.obSet('embarazo|1')`); r.embOn = ev(`!!pkP().pf.embarazo && /dando el pecho|breastfeeding/.test(document.querySelector('#layers').textContent)`); mira('edad');
   ev(`A.obSet('embarazo|')`); r.embOff = ev(`!pkP().pf.embarazo && pkP().pf.age===30`); sig(); r.cuerpo = paso();
   ev(`document.getElementById('ob_height').value='165'; document.getElementById('ob_weight').value='60'; A.obSet('fitness|activo'); A.obLevel('intermedio')`); mira('cuerpo'); sig();
@@ -1243,6 +1245,7 @@ for (const lang of ['es', 'en']) {
   r.lb = JSON.parse(ev(`(()=>{ S.settings.unit='lb'; S.settings.minPlateLb=2.5; plateCalc(225/2.20462); const t=document.querySelector('#modals').textContent; closeModal(); const inc=incFor(getEx('press_banca')); S.settings.unit='kg'; return JSON.stringify([/Cada lado: 45 \\+ 45 lb|Each side: 45 \\+ 45 lb/.test(t), /(Barra|Bar) 45 lb/.test(t), Math.round(inc*2.20462*100)/100]); })()`));
   a.cerrar();
   const L = lang === 'en' ? ' (inglés)' : '';
+  comprobar('1.9.4 bienvenida' + L + ': tras el nombre se eligen las unidades (y se pueden pasar a métricas)', r.unidades === 'unidades' && r.uImp === 'lbinoz' && r.uMet === 'kgcmml|true', JSON.stringify([r.unidades, r.uImp, r.uMet]));
   comprobar('1.9.3 bienvenida' + L + ': se abre sola y pasa por qué es PandarIA, edad y cuerpo', r.abre && r.ia === 'ia' && r.edad === 'edad' && r.cuerpo === 'cuerpo', JSON.stringify([r.abre, r.ia, r.edad, r.cuerpo]));
   comprobar('1.9.3 bienvenida' + L + ': la casilla de embarazo solo aparece con mujer y se puede quitar', r.embOn && r.embOff, JSON.stringify([r.embOn, r.embOff]));
   comprobar('1.9.3 bienvenida' + L + ': pide objetivo principal y como mucho 2 más', r.sinObj && r.sec === 'agua,dormir', JSON.stringify([r.sinObj, r.sec]));
@@ -1303,6 +1306,59 @@ for (const lang of ['es', 'en']) {
   console.log(`3 años de uso: ${r.antesMB} MB → ${r.despuesMB} MB tras compactar · pantallas (ms): ${Object.entries(r.ms).map(([k, v]) => k + ' ' + v).join(', ')}`);
   comprobar('1.8: 3 años de uso intenso caben con margen (menos del 70 % del espacio)', r.despuesMB < 3.5, `${r.despuesMB} MB`);
   comprobar('1.8: con 3 años de datos cada pantalla se dibuja en menos de 1,5 s (en el simulador, más lento que un teléfono)', !lento.length, JSON.stringify(lento));
+}
+
+
+/* ---------- 1.9.4: Ajustes nuevos, tu tarjeta, foto de perfil y Hazte Premium ---------- */
+{
+  const a = abrir();
+  await espera(1200);
+  const w = a.w, ev = c => w.eval(c);
+  try { w.eval(fs.readFileSync('www/premium.js', 'utf8')); } catch (e) {}
+  await espera(300);
+  const r = {};
+  ev(`while(LAYERS.length) LAYERS.pop(); document.querySelector('#layers').innerHTML=''; S.settings.onboarded=true; S.settings.cloudIntro=true; S.profile={name:'',injuries:[]}; save(true); window.isPremium=()=>false; TAB='ajustes'; render();`);
+  const vista = () => ev(`document.querySelector('#view').textContent.replace(/\\s+/g,' ')`);
+  let t = vista();
+  r.sinNombre = /Sin nombre/.test(t) && /Cuenta gratuita/.test(t);
+  r.orden = ['Mi cuenta', 'Mis datos personales', 'PandarIA Premium', 'Hazte Premium', 'Entrenamiento'].map(x => t.indexOf(x)).every((v, i, A) => v > 0 && (!i || v > A[i - 1]));
+  r.sinTarjetaVieja = !/Desbloquea PandarIA completo/.test(t);
+  ev(`window.isPremium=()=>true; render();`); t = vista();
+  r.premium = /Cuenta Premium/.test(t) && !/Hazte Premium/.test(t);
+  ev(`S.profile.name='Ana'; S.profile.age=30; render(); A.verTarjeta()`);
+  const tj = ev(`document.querySelector('#layers').lastElementChild.textContent.replace(/\\s+/g,' ')`);
+  r.tarjeta = /Ana/.test(tj) && /30 años/.test(tj) && /Cuenta Premium/.test(tj) && ev(`document.querySelectorAll('#layers .layer:last-child input,#layers .layer:last-child textarea').length`) === 0;
+  ev(`A.fotoMenu()`); r.menu1 = ev(`[...document.querySelectorAll('.sheet .mi')].map(b=>b.textContent.trim()).join('|')`); ev(`closeModal()`);
+  ev(`fotoGuardar({foto:'data:image/jpeg;base64,QUJD',orig:'data:image/jpeg;base64,QUJD',pos:{z:1.5,cx:.5,cy:.4}})`);
+  r.guardada = ev(`S.profile.foto==='data:image/jpeg;base64,QUJD' && S.profile.fotoPos.z===1.5`) && ev(`!!document.querySelector('#layers img[src^="data:image/jpeg"]')`);
+  ev(`closeModal(); A.fotoMenu()`); r.menu2 = ev(`[...document.querySelectorAll('.sheet .mi')].map(b=>b.textContent.trim()).join('|')`); ev(`closeModal()`);
+  ev(`fotoGuardar(null)`); r.borrada = ev(`!S.profile.foto && !S.profile.fotoOrig`); ev(`closeModal(); closeLayer()`);
+  // la foto se conserva si se toca desde «Mis datos personales» y luego se guarda el perfil
+  ev(`A.openProfile(); fotoGuardar({foto:'data:image/jpeg;base64,WFla',orig:'x',pos:{z:1,cx:.5,cy:.5}}); closeModal(); A.pfSave();`);
+  r.perfilFoto = ev(`S.profile.foto==='data:image/jpeg;base64,WFla' && S.profile.name==='Ana'`);
+  ev(`while(LAYERS.length) closeLayer(); window.isPremium=()=>false; A.openHazte()`);
+  const hz = ev(`document.querySelector('#layers').lastElementChild.textContent.replace(/\\s+/g,' ')`);
+  r.hazte = /gratis y lo será siempre/.test(hz) && /gymbro/.test(hz) && /una serie más/.test(hz) && (hz.match(/GRATIS/g) || []).length >= 7 && /(Elige tu plan)/.test(hz) && /No puedes pagarlo/.test(hz);
+  // Mi cuenta: suscripción para Premium
+  ev(`closeLayer(); window.isPremium=()=>true; A.ajGrupo('cuenta')`);
+  r.cuentaSub = /Tu suscripción Premium/.test(ev(`document.querySelector('#layers').lastElementChild.textContent`)); ev(`closeLayer()`);
+  // Día de calor en onzas
+  ev(`S.settings.uAgua='oz'`); r.calorOz = ev(`(()=>{ const h=document.createElement('div'); TAB='nutricion'; render(); return /Suma [\\d.,]+ ?oz a la meta/.test(document.body.innerHTML) || !/Suma 500 ml/.test(document.body.innerHTML); })()`);
+  r.calorTxt = ev(`aguaTxt(kb('agua.calor').ml)`);
+  // copia de Drive: misma sección en cualquier idioma
+  ev(`cloudCardHtml=()=>'<div class="sec" data-sec="Copia en Google Drive">'+tx('Copia en Google Drive','Google Drive backup')+'</div><div class="card">DRIVECARD</div>'; S.settings.lang='en'; applyLang(); TAB='ajustes'; render(); A.ajGrupo('cuenta')`);
+  r.driveEnCuenta = /DRIVECARD/.test(ev(`document.querySelector('#layers').lastElementChild.textContent`)); ev(`closeLayer(); A.ajGrupo('acerca')`);
+  r.driveFueraAcerca = !/DRIVECARD/.test(ev(`document.querySelector('#layers').lastElementChild.textContent`)); ev(`closeLayer()`);
+  a.cerrar();
+  comprobar('1.9.4 Ajustes: arriba «Sin nombre · Cuenta gratuita» y el orden Mi cuenta › Mis datos personales › PandarIA Premium › Hazte Premium', r.sinNombre && r.orden && r.sinTarjetaVieja, JSON.stringify(r));
+  comprobar('1.9.4 Ajustes: con Premium dice «Cuenta Premium» y no muestra «Hazte Premium»', r.premium);
+  comprobar('1.9.4 tarjeta: nombre, edad y tipo de cuenta, sin campos que editar', r.tarjeta, tj.slice(0, 200));
+  comprobar('1.9.4 foto: menú hacer/elegir; con foto también recortar y eliminar; se guarda y se borra', r.menu1 === 'Hacer foto|Elegir de la galería' && r.menu2 === 'Hacer foto|Elegir de la galería|Recortar o mover|Eliminar foto' && r.guardada && r.borrada, JSON.stringify([r.menu1, r.menu2, r.guardada, r.borrada]));
+  comprobar('1.9.4 foto: ponerla en «Mis datos personales» y guardar el perfil no la pierde', r.perfilFoto);
+  comprobar('1.9.4 Hazte Premium: gratis para siempre, el gymbro, comparación punto por punto y compra', r.hazte, hz.slice(0, 300));
+  comprobar('1.9.4 Mi cuenta: con Premium aparece tu suscripción', r.cuentaSub);
+  comprobar('1.9.4 Día de calor en onzas', /oz/.test(r.calorTxt) && !/ml/.test(r.calorTxt), r.calorTxt);
+  comprobar('1.9.4 la copia de Drive va en Mi cuenta también en inglés (no en Acerca de)', r.driveEnCuenta && r.driveFueraAcerca, JSON.stringify([r.driveEnCuenta, r.driveFueraAcerca]));
 }
 
 /* ---------- Comparación con los resultados guardados ---------- */
