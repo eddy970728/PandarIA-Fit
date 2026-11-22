@@ -1,0 +1,2 @@
+# Solo para la CLI de Supabase (enlazar y aplicar migraciones desde GitHub Actions)
+project_id = "pandaria"
