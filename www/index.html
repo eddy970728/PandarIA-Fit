@@ -11792,7 +11792,7 @@ const PERMISOS_APP=[
   {id:'salud', ic:'heart', n:['Health Connect','Health Connect'], d:['Lee tus pasos, peso, sueño y pulso de tu reloj u otras apps, y guarda allí tus entrenos.','Reads your steps, weight, sleep and heart rate from your watch or other apps, and saves your workouts there.'],
    android:['health.*'], hay:()=>!!A.hcConnect, ok:()=>!!window.PF_HC_ON, pedir:()=>A.hcConnect()}
 ];
-const PERMISOS_SIN_PANTALLA=['INTERNET','ACCESS_NETWORK_STATE','WAKE_LOCK','VIBRATE','FOREGROUND_SERVICE','FOREGROUND_SERVICE_SPECIAL_USE','RECEIVE_BOOT_COMPLETED','DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION','ACCESS_WIFI_STATE','CHANGE_NETWORK_STATE','USE_BIOMETRIC','USE_FINGERPRINT','BILLING','CHECK_LICENSE','FOREGROUND_SERVICE_HEALTH','READ_HEALTH_DATA_IN_BACKGROUND'];
+const PERMISOS_SIN_PANTALLA=['INTERNET','ACCESS_NETWORK_STATE','WAKE_LOCK','VIBRATE','FOREGROUND_SERVICE','FOREGROUND_SERVICE_SPECIAL_USE','RECEIVE_BOOT_COMPLETED','DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION','ACCESS_WIFI_STATE','CHANGE_NETWORK_STATE','USE_BIOMETRIC','USE_FINGERPRINT','USE_CREDENTIALS','BILLING','CHECK_LICENSE','FOREGROUND_SERVICE_HEALTH','READ_HEALTH_DATA_IN_BACKGROUND'];
 function permisosHtml(){
   const L=PERMISOS_APP.filter(x=>x.hay()); if (!L.length) return `<div class="card sm mut" style="padding:16px">${tx('En este dispositivo la app no necesita permisos.','On this device the app needs no permissions.')}</div>`;
   return L.map(x=>{ const ok=x.ok(), nm=x.id==='salud'&&window.PF_IOS?['Salud','Health']:x.n;
