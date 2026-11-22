@@ -23,7 +23,10 @@ for (const [a, b] of [
   ['de Samsung Health u otras apps', 'del iPhone, del Apple Watch u otras apps'],
   ['Samsung Health or other apps', 'your iPhone, Apple Watch or other apps'],
   ['Pasos, peso y pulso de Samsung Health', 'Pasos, peso y pulso del iPhone o del Apple Watch'],
-  ['Steps, weight and heart rate from Samsung Health', 'Steps, weight and heart rate from your iPhone or Apple Watch']
+  ['Steps, weight and heart rate from Samsung Health', 'Steps, weight and heart rate from your iPhone or Apple Watch'],
+  // 1.9.5: portugués (PT_DATA)
+  ['do Samsung Health ou de outros apps', 'do iPhone, do Apple Watch ou de outros apps'],
+  ['Passos, peso e frequência cardíaca do Samsung Health', 'Passos, peso e frequência cardíaca do iPhone ou do Apple Watch']
 ]){ const n = (idx.includes(a) ? 1 : 0) + (nat.includes(a) ? 1 : 0); if (!n) fallo('no se encontró «' + a + '»'); idx = idx.split(a).join(b); nat = nat.split(a).join(b); }
 nat = cambiar(nat, 'Se guarda en Documentos › PandarIA Fit.', 'Se guarda en Archivos › En mi iPhone › PandarIA Fit.', 'texto de Documentos');
 

@@ -226,3 +226,10 @@ Activar|Ativar
 Ahora no|Agora não
 Copiado|Copiado
 En la bienvenida eliges el idioma; si tu teléfono está en portugués, la app ya empieza en portugués|Na tela de boas-vindas você escolhe o idioma; se seu celular está em português, o app já começa em português
+# iPhone (version-ios.mjs cambia estos textos)
+Apple Health no está disponible|O Apple Saúde não está disponível
+Este dispositivo no tiene la app Salud de Apple (algunos iPad no la tienen).|Este dispositivo não tem o app Saúde da Apple (alguns iPads não têm).
+Permisos de Apple Health|Permissões do Apple Saúde
+Abre la app <b>Salud</b> › tu foto (arriba a la derecha) › <b>Apps</b> › <b>PandarIA Fit</b> y elige qué datos compartes.|Abra o app <b>Saúde</b> › sua foto (no canto superior direito) › <b>Apps</b> › <b>PandarIA Fit</b> e escolha quais dados compartilhar.
+Se guarda en Documentos › PandarIA Fit.|É salvo em Documentos › PandarIA Fit.
+Se guarda en Archivos › En mi iPhone › PandarIA Fit.|É salvo em Arquivos › No meu iPhone › PandarIA Fit.
