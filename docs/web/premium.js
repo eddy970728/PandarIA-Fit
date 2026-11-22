@@ -56,7 +56,7 @@
     }catch(e){ PRODS = {}; }
     // si falló (sin conexión un momento), se reintenta una vez
     if (!Object.keys(PRODS).length && !intento && !IOS){ setTimeout(() => loadProducts(1), 1500); }
-    const t = LAYERS[LAYERS.length - 1]; if (t && (t.t === 'premium' || t.t === 'onboard')) refreshTop();
+    const t = LAYERS[LAYERS.length - 1]; if (t && (t.t === 'premium' || t.t === 'hazte' || t.t === 'onboard')) refreshTop();
   }
   window.pfPlanDe = planDe;
   // 1.9.3: la bienvenida enseña los planes con su precio real de Google Play
@@ -192,15 +192,8 @@
     consulta:'El análisis completo de Consulta a PandarIA (tu caso, explicación, ejemplos y qué hacer) es parte de Premium.',
     customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
-  SCREENS.premium = p => {
-    const on = isPremium();
-    let b = `<div style="text-align:center;padding:8px 0 4px"><div style="width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('trophy',40)}</div>
-      <div style="font-size:26px;font-weight:900;margin-top:14px">PandarIA Fit <span style="color:var(--ac)">Premium</span></div>
-      <p class="mut sm" style="margin:6px 12px 0;line-height:1.5">${on ? (licOk() ? `Premium activo · ${fmtExp(PREM.exp)}. ¡Gracias por apoyar el proyecto!` : tx('Premium activo con tu suscripción de Google Play. ¡Gracias por apoyar el proyecto!','Premium active with your Google Play subscription. Thanks for supporting the project!')) : 'Sin anuncios, nunca. Entrenar, la biblioteca de ejercicios, el agua y el ayuno son gratis para siempre.'}</p></div>`;
-    if (!on && subStale()) b += `<div class="banner" style="margin-top:14px"><span class="ic">${I('info',20)}</span><div class="grow sm">${tx('Tu suscripción no se ha podido comprobar en los últimos 7 días. Conéctate a internet y pulsa «Restaurar compras».','Your subscription could not be checked in the last 7 days. Connect to the internet and tap «Restore purchases».')}</div></div>`;
-    if (p.reason && !on) b += `<div class="banner" style="margin-top:14px"><span class="ic">${I('info',20)}</span><div class="grow sm">${esc(REASONS[p.reason] || '')}</div></div>`;
-    b += `<div class="sec">Qué incluye</div><div class="card" style="padding:4px 14px">${BENEFITS.map(([ic, t, d], i) => `<div class="row" style="align-items:flex-start;gap:12px;padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''}"><span style="color:var(--ac)">${I(ic,20)}</span><div class="grow"><div class="b">${t}</div><div class="xs mut" style="line-height:1.4;margin-top:2px">${d}</div></div>${on ? `<span style="color:var(--ok)">${I('check',18)}</span>` : ''}</div>`).join('')}</div>`;
-    if (!on){
+  // Opciones de compra (en Premium y en «Hazte Premium»)
+  function compraBloque(){ let b = '';
       b += `<div class="sec">${tx('Suscripción','Subscription')}</div><div class="card">`;
       if (!NP) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción se compra en la app instalada desde Google Play.','The subscription is bought in the app installed from Google Play.')}</p>`;
       else if (!PRODS) b += `<p class="sm mut" style="margin:0">${tx('Cargando precios…','Loading prices…')}</p>`;
@@ -217,6 +210,17 @@
       }
       if (NP) b += `<button class="btn ghost wide sm" style="margin-top:8px" data-a="pfRestore">${tx('Restaurar compras','Restore purchases')}</button>`;
       b += `</div><button class="link sm" style="display:block;margin:14px auto 0" data-a="pfRegalo">${tx('¿No puedes pagarlo?','Can\'t afford it?')}</button>`;
+      return b; }
+  SCREENS.premium = p => {
+    const on = isPremium();
+    let b = `<div style="text-align:center;padding:8px 0 4px"><div style="width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('trophy',40)}</div>
+      <div style="font-size:26px;font-weight:900;margin-top:14px">PandarIA Fit <span style="color:var(--ac)">Premium</span></div>
+      <p class="mut sm" style="margin:6px 12px 0;line-height:1.5">${on ? (licOk() ? `Premium activo · ${fmtExp(PREM.exp)}. ¡Gracias por apoyar el proyecto!` : tx('Premium activo con tu suscripción de Google Play. ¡Gracias por apoyar el proyecto!','Premium active with your Google Play subscription. Thanks for supporting the project!')) : 'Sin anuncios, nunca. Entrenar, la biblioteca de ejercicios, el agua y el ayuno son gratis para siempre.'}</p></div>`;
+    if (!on && subStale()) b += `<div class="banner" style="margin-top:14px"><span class="ic">${I('info',20)}</span><div class="grow sm">${tx('Tu suscripción no se ha podido comprobar en los últimos 7 días. Conéctate a internet y pulsa «Restaurar compras».','Your subscription could not be checked in the last 7 days. Connect to the internet and tap «Restore purchases».')}</div></div>`;
+    if (p.reason && !on) b += `<div class="banner" style="margin-top:14px"><span class="ic">${I('info',20)}</span><div class="grow sm">${esc(REASONS[p.reason] || '')}</div></div>`;
+    b += `<div class="sec">Qué incluye</div><div class="card" style="padding:4px 14px">${BENEFITS.map(([ic, t, d], i) => `<div class="row" style="align-items:flex-start;gap:12px;padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''}"><span style="color:var(--ac)">${I(ic,20)}</span><div class="grow"><div class="b">${t}</div><div class="xs mut" style="line-height:1.4;margin-top:2px">${d}</div></div>${on ? `<span style="color:var(--ok)">${I('check',18)}</span>` : ''}</div>`).join('')}</div>`;
+    if (!on){
+      b += compraBloque();
     } else if (!licOk() && subOk()){
       b += `<div class="sec">${tx('Tu suscripción','Your subscription')}</div><div class="card"><div class="kv"><span class="mut">${tx('Estado','Status')}</span><b style="color:var(--ok)">${tx('Activa en Google Play','Active in Google Play')}</b></div><button class="btn wide" style="margin-top:10px" data-a="pfManage">${tx('Administrar suscripción','Manage subscription')}</button></div>`;
     } else if (PREM) {
@@ -224,13 +228,37 @@
     }
     return lhdr('Premium') + `<div class="lbody">${b}<p class="xs mut" style="text-align:center;margin:18px 8px 0;line-height:1.5">Tus datos siempre son tuyos: exportar, copias de seguridad, accesibilidad y seguridad nunca se bloquean.</p></div>`;
   };
+  /* ---------- 1.9.4 · Hazte Premium (solo en cuentas gratuitas) ---------- */
+  const COMPARA = [
+    ['Rutinas y entrenos','Workouts and routines','Hasta 3 rutinas, 5 ejercicios propios y las rutinas fáciles de Explorar','Up to 3 routines, 5 custom exercises and the easy Explore routines','Rutinas ilimitadas, todo Explorar y rutinas que PandarIA diseña para ti y tu semana','Unlimited routines, all of Explore and routines PandarIA designs for you and your week'],
+    ['Progresión','Progression','Tú decides cuánto subir','You decide how much to add','PandarIA sube pesos y repeticiones por ti, detecta estancamientos y planifica descargas','PandarIA raises weights and reps for you, spots plateaus and plans deloads'],
+    ['Descansos','Rests','Temporizador fijo','Fixed timer','Descanso ajustado en cada serie según tu esfuerzo','Rest adjusted every set to your effort'],
+    ['Progreso','Progress','Historial y récords','History and records','Gráficas, series por músculo, desequilibrios, informes semanales y metas con fecha','Charts, sets per muscle, imbalances, weekly reports and dated goals'],
+    ['Nutrición','Nutrition','Registrar comidas y agua, hasta 10 alimentos y recetas propios','Log meals and water, up to 10 custom foods and recipes','Tus calorías y macros, tu diario comparado con ellos, calidad de la dieta, menús de ejemplo y escáner','Your calories and macros, your diary compared with them, diet quality, sample menus and scanner'],
+    ['Consulta a PandarIA','Ask PandarIA','Respuesta corta','Short answer','Tu caso explicado, ejemplos y qué hacer paso a paso','Your case explained, examples and step-by-step what to do'],
+    ['Intervalos y extras','Intervals and extras','Intervalos básicos','Basic intervals','HIIT, EMOM y AMRAP a medida, fotos de progreso y músculos en las animaciones','Custom HIIT, EMOM and AMRAP, progress photos and muscles in the animations'],
+    ['Tus datos','Your data','Siempre tuyos: copias, exportar y accesibilidad','Always yours: backups, export and accessibility','Igual: nunca se bloquean','The same: never locked','x']
+  ];
+  SCREENS.hazte = () => {
+    let b = `<div style="text-align:center;padding:6px 0 2px"><div style="width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('trophy',40)}</div>
+      <div style="font-size:26px;font-weight:900;margin-top:14px;line-height:1.15">${tx('Hazte <span style="color:var(--ac)">Premium</span>','Go <span style="color:var(--ac)">Premium</span>')}</div></div>
+      <p style="line-height:1.55;margin:14px 2px 0">${tx('PandarIA Fit es gratis y lo será siempre. Puedes entrenar, registrar tus comidas y guardar tus datos sin pagar nada.','PandarIA Fit is free and always will be. You can train, log your meals and keep your data without paying anything.')}</p>
+      <p style="line-height:1.55;margin:10px 2px 0">${tx('Pero si decides hacerte Premium, tendrás una <b>IA coach</b> que guía tu salud y tus metas: una mezcla de entrenador de gimnasio, orientador nutricional y ese gymbro que tanto te insiste y te grita que hagas una serie más.','But if you go Premium, you get an <b>AI coach</b> that guides your health and goals: a mix of gym trainer, nutrition guide and that gym buddy who keeps pushing you and yells at you to do one more set.')}</p>
+      <div class="sec">${tx('Gratis frente a Premium','Free vs Premium')}</div>`;
+    b += COMPARA.map(([t, ten, g, gen, p, pen, igual]) => `<div class="card" style="padding:12px 14px;margin-bottom:8px"><div class="b" style="margin-bottom:8px">${tx(t, ten)}</div>
+      <div class="row" style="gap:10px;align-items:stretch"><div class="grow" style="flex:1 1 0;min-width:0"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:3px">${tx('GRATIS','FREE')}</div><div class="sm mut" style="line-height:1.4">${tx(g, gen)}</div></div>
+      <div style="width:1px;background:var(--line)"></div><div class="grow" style="flex:1 1 0;min-width:0"><div class="xs b" style="letter-spacing:1px;margin-bottom:3px;color:var(--ac)">PREMIUM</div><div class="sm" style="line-height:1.4">${igual ? tx(p, pen) : `<b>${tx(p, pen)}</b>`}</div></div></div></div>`).join('');
+    b += `<div class="sec">${tx('Elige tu plan','Pick your plan')}</div>` + compraBloque().replace(/^<div class="sec">[^<]*<\/div>/, '');
+    return lhdr(tx('Hazte Premium','Go Premium')) + `<div class="lbody">${b}</div>`;
+  };
+  A.openHazte = () => { openLayer('hazte', {}); loadProducts(); subRefresh(); };
   SCREENS.premiumRegalo = () => {
     let b = `<p class="sm" style="line-height:1.5;margin-top:0">${tx('Envíale un mensaje al desarrollador con tu código y el motivo por el que no puedes pagarlo. Analizaremos tu petición y te diremos si podemos regalarte un tiempo de Premium.','Send the developer a message with your code and the reason you can\'t pay. We will review your request and let you know if we can give you some Premium time.')}</p>`;
     b += `<div class="card"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">${ACC ? tx('TU CÓDIGO DE CUENTA','YOUR ACCOUNT CODE') : tx('TU CÓDIGO DE TELÉFONO','YOUR PHONE CODE')}</div>
       <div class="codebox" style="font-size:19px">${ACC ? fmtAcc(ACC) : fmtDev(DEV)}</div>
       <div class="row" style="gap:8px;margin-top:10px"><button class="btn grow sm" data-a="pfCopyDev">${I('copy',16)} ${tx('Copiar','Copy')}</button><button class="btn grow sm" data-a="pfShareDev">${I('upload',16)} ${tx('Compartir','Share')}</button></div>
       <button class="btn pri wide" style="margin-top:8px" data-a="pfMail">${I('note',18)} ${tx('Escribir al desarrollador','Write to the developer')}</button>
-      ${ACC ? '' : `<p class="xs mut" style="margin:10px 0 0;line-height:1.45">${tx('Sin cuenta, el regalo solo funciona en este teléfono. Con tu cuenta de Google (Ajustes › Tu cuenta y tus datos), funciona en cualquier teléfono.','Without an account, the gift only works on this phone. With your Google account (Settings › Your account and data), it works on any phone.')}</p>`}</div>`;
+      ${ACC ? '' : `<p class="xs mut" style="margin:10px 0 0;line-height:1.45">${tx('Sin cuenta, el regalo solo funciona en este teléfono. Con tu cuenta de Google (Ajustes › Mi cuenta), funciona en cualquier teléfono.','Without an account, the gift only works on this phone. With your Google account (Settings › My account), it works on any phone.')}</p>`}</div>`;
     b += `<div class="sec">${tx('Código de regalo','Gift code')}</div><div class="card"><textarea id="pfcode" class="inp" rows="3" placeholder="${tx('Pega aquí el código que te enviaron','Paste the code you received here')}" style="font-family:ui-monospace,Menlo,monospace;font-size:13px"></textarea>
       <button class="btn ok wide" style="margin-top:10px" data-a="pfActivate">${I('check',18)} ${tx('Activar Premium','Activate Premium')}</button></div>`;
     return lhdr(tx('Pedir Premium','Ask for Premium')) + `<div class="lbody">${b}</div>`;
@@ -392,14 +420,6 @@
 
   // Ejercicios propios: hasta 5 gratis
   const _ce = A.ceSave; A.ceSave = () => { if (locked() && S.customEx.length >= 5) return pay('customEx'); _ce(); };
-
-  // Ajustes: fila de Premium
-  const _va = viewAjustes;
-  viewAjustes = function(){
-    const on = isPremium();
-    const row = `<div class="card row tap" data-a="openPremium" style="cursor:pointer;gap:14px;${on ? '' : 'border-color:rgba(255,122,26,.45);background:var(--acs)'}"><span style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;color:#1a0702;flex:0 0 auto">${I('trophy',22)}</span><div class="grow"><div class="b">PandarIA Fit Premium</div><div class="sm mut">${on ? (licOk() ? `Activo · ${fmtExp(PREM.exp)}` : tx('Activo · suscripción de Google Play','Active · Google Play subscription')) : 'Desbloquea PandarIA completo y más'}</div></div>${I('right',18)}</div>`;
-    return _va.apply(this, arguments).replace('<div class="sec">Entrenamiento</div>', row + '<div class="sec">Entrenamiento</div>');
-  };
 
   /* ---------- Arranque ---------- */
   (async () => {

@@ -7877,7 +7877,7 @@ function readProfileForm(p, prefix){
 SCREENS.profile = p => {
   if (!p.d) p.d=clone(S.profile||{injuries:[]});
   const d=p.d;
-  return lhdr('Mi perfil')+`<div class="lbody"><p class="mut sm" style="margin-top:0;line-height:1.45">PandarIA usa estos datos para elegir ejercicios, estimar pesos iniciales, ajustar descansos y calcular tu nutrición. Todo es opcional y se queda en tu teléfono.</p>
+  return lhdr(tx('Mis datos personales','My personal details'))+`<div class="lbody"><div class="row" style="gap:14px;margin-bottom:14px"><button data-a="fotoMenu" aria-label="${tx('Foto de perfil','Profile photo')}" style="background:none;padding:0;border:0;position:relative">${avatarHtml(64)}<span style="position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;background:var(--ac);color:#1a0702;display:grid;place-items:center">${I('camera',14)}</span></button><div class="grow sm mut" style="line-height:1.4">${tx('Toca la foto para ponerla, cambiarla o quitarla.','Tap the photo to add, change or remove it.')}</div></div><p class="mut sm" style="margin-top:0;line-height:1.45">PandarIA usa estos datos para elegir ejercicios, estimar pesos iniciales, ajustar descansos y calcular tu nutrición. Todo es opcional y se queda en tu teléfono.</p>
   ${profileForm(d)}</div><div class="lfoot"><button class="btn pri big" data-a="pfSave">Guardar perfil</button></div>`;
 };
 const pfData=()=>{ const t=LAYERS[LAYERS.length-1]; return t.p.d||t.p.pf; };
@@ -9950,7 +9950,7 @@ function waterGoalBase(){ const w=bodyWeight(), K=kb('agua'), sx=(S.profile||{})
 function wGuardaMeta(){ const n=nut(); n.waterGoalDia=n.waterGoalDia||{}; n.waterGoalDia[dayKey()]=waterGoal(); const ks=Object.keys(n.waterGoalDia).sort(); if (ks.length>120) ks.slice(0,ks.length-120).forEach(k=>delete n.waterGoalDia[k]); }
 // 1.8.1: «Día de calor» va dentro de la tarjeta del agua; el registro de hoy es un bloque desplegable
 function aguaCalorHtml(){ const ex=waterExtraHoy();
-  return `<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:4px"><button class="srow" style="width:100%" data-a="wCalor"><span class="grow"><div class="b sm">${tx('Día de calor o de mucho sudor','Hot day or heavy sweating')}</div><div class="xs mut">${ex?tx(`Meta de hoy +${aguaTxt(ex)}`,`Today's goal +${aguaTxt(ex)}`):tx(`Suma ${kb('agua.calor').ml} ml a la meta de hoy`,`Adds ${kb('agua.calor').ml} ml to today's goal`)}</div></span><span class="toggle ${ex?'on':''}"></span></button><div class="xs" style="margin-top:-4px">${kbLink('agua.calor',tx('Por qué medio litro','Why half a litre'))}</div></div>`; }
+  return `<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:4px"><button class="srow" style="width:100%" data-a="wCalor"><span class="grow"><div class="b sm">${tx('Día de calor o de mucho sudor','Hot day or heavy sweating')}</div><div class="xs mut">${ex?tx(`Meta de hoy +${aguaTxt(ex)}`,`Today's goal +${aguaTxt(ex)}`):tx(`Suma ${aguaTxt(kb('agua.calor').ml)} a la meta de hoy`,`Adds ${aguaTxt(kb('agua.calor').ml)} to today's goal`)}</div></span><span class="toggle ${ex?'on':''}"></span></button><div class="xs" style="margin-top:-4px">${kbLink('agua.calor',uA()==='oz'?tx('Por qué esta cantidad','Why this amount'):tx('Por qué medio litro','Why half a litre'))}</div></div>`; }
 function aguaHoyHtml(){ const n=nut(), k=dayKey(), L=wLog(k), sum=L.reduce((a,x)=>a+x.ml,0), resto=Math.max(0,((n.water||{})[k]||0)-sum);
   const body=`<button class="link sm" style="white-space:nowrap;margin:-2px 0 4px" data-a="wHora">${I('plus',14)} ${tx('Añadir con otra hora','Add at another time')}</button>${!L.length&&!resto?`<div class="sm mut" style="padding:4px 0">${tx('Todavía no registraste agua hoy.','You have not logged any water today.')}</div>`:`${L.map((x,i)=>[x,i]).reverse().map(([x,i])=>`<div class="kv"><span>${I('drop',14)} <b>${aguaTxt(x.ml)}</b>${x.n?` <span class="mut xs">${esc(x.n)}</span>`:''}</span><span class="row" style="gap:6px"><span class="mut sm">${hhmm(x.t)}</span><button class="ibtn" style="width:32px;height:32px" data-a="wDel" data-v="${i}" aria-label="${tx('Borrar','Delete')}">${I('close',16)}</button></span></div>`).join('')}
     ${resto?`<div class="kv"><span>${I('drop',14)} <b>${aguaTxt(resto)}</b></span><span class="mut xs">${tx('sin hora (widget o aviso)','no time (widget or notification)')}</span></div>`:''}`}`;
@@ -10537,7 +10537,7 @@ const CQ=[
   corta:tx('En tu teléfono. Solo si inicias sesión con Google, también una copia en una carpeta oculta de tu propio Google Drive.','On your phone. Only if you sign in with Google, also a copy in a hidden folder of your own Google Drive.'),
   caso:[(S.settings.cloud&&S.settings.cloud.email)?tx(`Copia en Drive activa con ${S.settings.cloud.email}.`,`Drive backup active with ${S.settings.cloud.email}.`):tx('Sin copia en Drive.','No Drive backup.')],
   exp:[tx('PandarIA Fit no tiene servidores: no vemos tus datos, no los vendemos y no hay anuncios. Esta consulta también funciona en tu teléfono, sin internet.','PandarIA Fit has no servers: we do not see your data, we do not sell it and there are no ads. This consultation also runs on your phone, offline.')],
-  ej:[],hacer:[],acciones:[['ajGrupo','cuenta',tx('Tu cuenta y tus datos','Your account and data')]]})}
+  ej:[],hacer:[],acciones:[['ajGrupo','cuenta',tx('Mi cuenta','My account')]]})}
 ];
 const cap1es=s=>String(s).charAt(0).toUpperCase()+String(s).slice(1)+'.';
 function cqPerfil(){ return {corta:tx('Completa tu perfil (peso, altura, edad) para que PandarIA pueda calcularlo.','Complete your profile (weight, height, age) so PandarIA can work it out.'),caso:[],exp:[],ej:[],hacer:[],acciones:[['openProfile','',tx('Completar perfil','Complete profile')]]}; }
@@ -11261,9 +11261,10 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='1.9';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
-const APP_PARCHE='3';
+const APP_PARCHE='4';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.9.4',t:'Ajustes nuevos y tu foto de perfil',items:['Ajustes nuevos: arriba tu nombre y tu tipo de cuenta; debajo Mi cuenta, Mis datos personales y PandarIA Premium', 'Tu tarjeta: toca tu nombre para verla, con tu foto, tu edad y tus entrenos', 'Foto de perfil: hazla, elígela de la galería, recórtala o quítala', 'Hazte Premium: qué ganas frente a la versión gratis, punto por punto', 'En la bienvenida eliges tus unidades justo después de tu nombre', 'Día de calor muestra el agua en tus unidades (oz o ml)', 'La copia en Google Drive ya no aparece en Acerca de cuando la app está en inglés']},
  {v:'1.9.3',t:'Nueva bienvenida',items:['Nueva bienvenida: unas preguntas por pasos y tu punto de partida en entreno, comida y hábitos', 'Pantalla de permisos en Ajustes › Avisos y sonido: qué usa la app y para qué', 'Embarazo o lactancia en tu perfil: sin dietas para bajar ni ayunos', 'Calculadora de discos y saltos de peso en libras si usas libras']},
  {v:'1.9.2',t:'Idiomas y unidades',items:['Unidades de tu país: kilos o libras, centímetros o pies y pulgadas, litros u onzas, en Ajustes › Pantalla e idioma', 'Contacta al creador: envía tus sugerencias desde Ajustes › Acerca de', 'La app queda preparada para nuevos idiomas', 'Política de privacidad ampliada con tus derechos según la ley europea de datos']},
  {v:'1.9.01',t:'Arreglos de Premium',items:['Los precios de Premium salen siempre: antes, a veces no cargaban','La prueba gratis de 3 días se muestra y se aplica al suscribirte, si Google Play te la ofrece']},
@@ -11312,7 +11313,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=false;
-const NOTAS_VERSION=["1.9.3 · Nueva bienvenida", "Nueva bienvenida: unas preguntas por pasos y tu punto de partida en entreno, comida y hábitos", "Pantalla de permisos en Ajustes › Avisos y sonido: qué usa la app y para qué", "Embarazo o lactancia en tu perfil: sin dietas para bajar ni ayunos", "Calculadora de discos y saltos de peso en libras si usas libras", "1.9.2 · Idiomas y unidades", "Unidades de tu país: kilos o libras, centímetros o pies y pulgadas, litros u onzas, en Ajustes › Pantalla e idioma", "Contacta al creador: envía tus sugerencias desde Ajustes › Acerca de", "La app queda preparada para nuevos idiomas", "Política de privacidad ampliada con tus derechos según la ley europea de datos", "1.9.01 · Arreglos de Premium: precios y prueba gratis", "1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla", "Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan", "Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro", "Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso"];
+const NOTAS_VERSION=["1.9.4 · Ajustes nuevos y tu foto de perfil", "Ajustes nuevos: arriba tu nombre y tu tipo de cuenta; debajo Mi cuenta, Mis datos personales y PandarIA Premium", "Tu tarjeta: toca tu nombre para verla, con tu foto, tu edad y tus entrenos", "Foto de perfil: hazla, elígela de la galería, recórtala o quítala", "Hazte Premium: qué ganas frente a la versión gratis, punto por punto", "En la bienvenida eliges tus unidades justo después de tu nombre", "Día de calor muestra el agua en tus unidades (oz o ml)", "La copia en Google Drive ya no aparece en Acerca de cuando la app está en inglés", "1.9.3 · Nueva bienvenida", "Nueva bienvenida: unas preguntas por pasos y tu punto de partida en entreno, comida y hábitos", "Pantalla de permisos en Ajustes › Avisos y sonido: qué usa la app y para qué", "Embarazo o lactancia en tu perfil: sin dietas para bajar ni ayunos", "Calculadora de discos y saltos de peso en libras si usas libras", "1.9.2 · Idiomas y unidades", "Unidades de tu país: kilos o libras, centímetros o pies y pulgadas, litros u onzas, en Ajustes › Pantalla e idioma", "Contacta al creador: envía tus sugerencias desde Ajustes › Acerca de", "La app queda preparada para nuevos idiomas", "Política de privacidad ampliada con tus derechos según la ley europea de datos", "1.9.01 · Arreglos de Premium: precios y prueba gratis", "1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla", "Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan", "Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro", "Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 const updOn=()=>false; function updPending(){ return null; } function updCard(){ return ''; } function updCardNew(){ return ''; } function updInit(){}
@@ -11340,7 +11341,7 @@ function cloudErrTxt(e){ const m=String(e&&e.message||e||'');
   if (/drive-scope/.test(m)) return tx('Sin el permiso de Drive no se puede guardar la copia. Vuelve a intentarlo y marca la casilla de Google Drive.','Without the Drive permission the backup cannot be saved. Try again and tick the Google Drive box.');
   if (/No credentials|no account|NoCredential/i.test(m)) return tx('No hay ninguna cuenta de Google en este teléfono. Añádela en los Ajustes de Android › Cuentas.','There is no Google account on this phone. Add one in Android Settings › Accounts.');
   if (/offline|network|Failed to fetch|NetworkError/i.test(m)) return tx('Sin conexión a internet. Lo intentaremos más tarde.','No internet connection. We will try again later.');
-  if (/auth/.test(m)) return tx('Tu sesión de Google caducó. Vuelve a iniciar sesión en Ajustes › Tu cuenta y tus datos.','Your Google session expired. Sign in again in Settings › Your account and data.');
+  if (/auth/.test(m)) return tx('Tu sesión de Google caducó. Vuelve a iniciar sesión en Ajustes › Mi cuenta.','Your Google session expired. Sign in again in Settings › My account.');
   if (/drive 403/.test(m)) return tx('Google Drive no dejó guardar la copia (¿espacio lleno?).','Google Drive did not allow saving the backup (storage full?).');
   return tx('No se pudo conectar con Google Drive. Inténtalo de nuevo.','Could not connect to Google Drive. Try again.'); }
 
@@ -11392,7 +11393,7 @@ async function cloudBackup(o){
     // Otra instalación guardó después de nuestra última copia: no se pisa sin preguntar
     if (info && info.dev && info.dev!==cloudDev() && info.at>(c.at||0) && !o.force){
       c.conflict={at:info.at, modelo:info.modelo, r:info.r, id:info.id}; save(true); CLOUD_BUSY=false;
-      if (o.manual) cloudConflictAsk(); else toast(tx('Hay una copia más nueva de otro teléfono en tu Drive. Revisa Ajustes › Tu cuenta y tus datos.','There is a newer backup from another phone in your Drive. Check Settings › Your account and data.'));
+      if (o.manual) cloudConflictAsk(); else toast(tx('Hay una copia más nueva de otro teléfono en tu Drive. Revisa Ajustes › Mi cuenta.','There is a newer backup from another phone in your Drive. Check Settings › My account.'));
       return false; }
     const env=cloudEnvelope(), r=env.resumen;
     const props={at:String(env.at), dev:env.dev, modelo:String(env.modelo||'').slice(0,60), ver:APP_VERSION, entrenos:String(r.entrenos), rutinas:String(r.rutinas), dias:String(r.dias), fotos:String(r.fotos)};
@@ -11473,11 +11474,11 @@ A.cloudDelete=()=>confirmBox({title:tx('¿Borrar tu copia de Drive?','Delete you
 function cloudCardHtml(){
   if (!cloudAvail()) return '';
   const c=cloudS();
-  if (!c) return `<div class="sec">${tx('Copia en Google Drive','Google Drive backup')}</div><div class="card"><div class="row" style="gap:12px;align-items:flex-start"><span style="color:var(--blue)">${I('upload',24)}</span><div class="grow"><div class="b">${tx('Guarda tus datos en tu Google Drive','Save your data in your Google Drive')}</div><div class="sm mut" style="line-height:1.45;margin-top:2px">${tx('Si cambias o pierdes el teléfono, inicias sesión y recuperas tus entrenos, rutinas, diario, fotos y tu Premium. Gratis y opcional.','If you change or lose your phone, sign in and get back your workouts, routines, diary, photos and Premium. Free and optional.')}</div></div></div>
+  if (!c) return `<div class="sec" data-sec="Copia en Google Drive">${tx('Copia en Google Drive','Google Drive backup')}</div><div class="card"><div class="row" style="gap:12px;align-items:flex-start"><span style="color:var(--blue)">${I('upload',24)}</span><div class="grow"><div class="b">${tx('Guarda tus datos en tu Google Drive','Save your data in your Google Drive')}</div><div class="sm mut" style="line-height:1.45;margin-top:2px">${tx('Si cambias o pierdes el teléfono, inicias sesión y recuperas tus entrenos, rutinas, diario, fotos y tu Premium. Gratis y opcional.','If you change or lose your phone, sign in and get back your workouts, routines, diary, photos and Premium. Free and optional.')}</div></div></div>
     <button class="btn pri wide" style="margin-top:12px" data-a="cloudSignIn">${I('user',18)} ${tx('Continuar con Google','Continue with Google')}</button>
     <div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('La copia va a una carpeta oculta de tu Drive: PandarIA Fit no ve tus otros archivos y nadie más ve tus datos.','The backup goes to a hidden folder in your Drive: PandarIA Fit cannot see your other files and nobody else sees your data.')}</div></div>`;
   const estado=c.conflict?`<span style="color:var(--gold)">${tx('Hay una copia distinta de otro teléfono','There is a different backup from another phone')}</span>`:c.pending?`<span style="color:var(--gold)">${tx('Pendiente de guardar','Waiting to save')}${c.err?' · '+esc(c.err):''}</span>`:`${tx('Última copia','Last backup')}: ${hace(c.at)}`;
-  return `<div class="sec">${tx('Copia en Google Drive','Google Drive backup')}</div><div class="card">
+  return `<div class="sec" data-sec="Copia en Google Drive">${tx('Copia en Google Drive','Google Drive backup')}</div><div class="card">
     <div class="row" style="gap:12px"><span style="width:40px;height:40px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;flex:0 0 auto">${esc((c.name||c.email||'?').charAt(0).toUpperCase())}</span><div class="grow" style="min-width:0"><div class="b" style="overflow-wrap:anywhere">${esc(c.name||c.email)}</div><div class="xs mut" style="overflow-wrap:anywhere">${esc(c.email)}</div></div></div>
     <div class="sm" style="margin-top:10px;line-height:1.45">${estado}</div>
     ${c.conflict?`<button class="btn pri wide" style="margin-top:10px" data-a="cloudConflict">${tx('Elegir qué datos usar','Choose which data to keep')}</button>`:''}
@@ -11501,7 +11502,7 @@ const OB_SEC=[['agua','Beber más agua','Drink more water','drop'],['comer','Com
   ['ayuno','Probar el ayuno','Try fasting','history'],['moverme','Moverme más','Move more','compass']];
 function obPasos(p){
   if (p.premPaso==null) p.premPaso=!(typeof isPremium==='function'&&isPremium());
-  const L=['hola','cuenta']; if (p.info) L.push('recuperar'); L.push('ia','nombre','edad');
+  const L=['hola','cuenta']; if (p.info) L.push('recuperar'); L.push('ia','nombre','unidades','edad');
   if (p.pf.age!=null && p.pf.age!=='' && +p.pf.age<18) L.push('menor');
   else { L.push('cuerpo','semana','lesiones','objetivos','analisis','partida'); if (p.premPaso) L.push('premium'); if (PERMISOS_APP.some(x=>x.hay())) L.push('permisos'); L.push('listo'); }
   if (!cloudAvail()) L.splice(L.indexOf('cuenta'),1); return L; }
@@ -11520,7 +11521,7 @@ SCREENS.onboard = p => {
       ${[['dumbbell',tx('Rutinas a tu medida','Routines made for you'),tx('Crea las tuyas, elige de Explorar o deja que PandarIA diseñe tu plan.','Build your own, pick from Explore or let PandarIA design your plan.')],['spark',tx('Te ayuda a progresar','Helps you progress'),tx('Sugiere pesos, detecta estancamientos y renueva tus rutinas.','Suggests weights, spots plateaus and refreshes your routines.')],['leaf',tx('Nutrición y ayuno','Nutrition and fasting'),tx('Diario de comidas, agua y ayuno supervisado.','Food diary, water and supervised fasting.')],['chart',tx('Todo tu progreso','All your progress'),tx('Récords, gráficas, metas, informes y fotos.','Records, charts, goals, reports and photos.')]].map(([ic,t,d])=>`<div class="row" style="gap:14px;align-items:flex-start;margin-bottom:16px"><span style="color:var(--ac);flex:0 0 auto">${I(ic,24)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4;margin-top:2px">${d}</div></div></div>`).join('')}`;
     foot=`<button class="btn pri big" data-a="obNext">${tx('Empezar','Get started')}</button><div class="xs mut" style="text-align:center;margin-top:10px">${tx('Una app de','An app by')} <b style="color:var(--ac)">LunaDoggyBru Studios</b> · v${verTxt()}</div>`;
   } else if (p.paso==='cuenta'){
-    b=titulo(tx('¿Cómo quieres usar PandarIA?','How do you want to use PandarIA?'),tx('Puedes cambiarlo cuando quieras en Ajustes › Tu cuenta y tus datos.','You can change it anytime in Settings › Your account and data.'))+
+    b=titulo(tx('¿Cómo quieres usar PandarIA?','How do you want to use PandarIA?'),tx('Puedes cambiarlo cuando quieras en Ajustes › Mi cuenta.','You can change it anytime in Settings › My account.'))+
       `<button class="opt card" style="margin-bottom:10px;padding:16px;${p.modo==='google'?'border-color:var(--ac)':''}" data-a="obGoogle"><span class="oi" style="color:var(--blue)">${I('user',24)}</span><span class="grow"><div class="b">${tx('Continuar con Google','Continue with Google')} <span class="xs" style="color:var(--ok);font-weight:800;margin-left:4px">${tx('RECOMENDADO','RECOMMENDED')}</span></div><div class="od" style="line-height:1.4">${tx('Copia automática en tu Google Drive: si cambias de teléfono, recuperas todo.','Automatic backup to your Google Drive: if you change phones, you get everything back.')}</div></span></button>
       <button class="opt card" style="padding:16px;${p.modo==='local'?'border-color:var(--ac)':''}" data-a="obLocal"><span class="oi">${I('lock',24)}</span><span class="grow"><div class="b">${tx('Usar sin cuenta','Use without an account')}</div><div class="od" style="line-height:1.4">${tx('Todo se guarda solo en este teléfono. Puedes conectar Google más tarde.','Everything stays on this phone only. You can connect Google later.')}</div></span></button>
       ${p.u?`<div class="banner" style="margin-top:14px"><span class="ic" style="color:var(--ok)">${I('check',20)}</span><div class="grow sm">${tx('Sesión iniciada como','Signed in as')} <b>${esc(p.u.email||p.u.name)}</b></div></div>`:''}
@@ -11532,7 +11533,7 @@ SCREENS.onboard = p => {
       `<div class="card" style="padding:16px"><div class="row" style="gap:12px"><span style="color:var(--ok)">${I('history',26)}</span><div class="grow"><div class="b">${tx('Copia del','Backup from')} ${fmtDate(k.at)} · ${hhmm(k.at)}</div><div class="sm mut" style="line-height:1.45;margin-top:2px">${resumenTxt(k.r)}${k.modelo?' · '+esc(k.modelo):''}</div></div></div></div>
       <button class="btn pri big" style="margin-top:16px" data-a="obRestore">${I('download',20)} ${tx('Recuperar mis datos','Restore my data')}</button>
       <button class="btn wide" style="margin-top:10px" data-a="obFresh">${tx('Empezar de cero en este teléfono','Start from scratch on this phone')}</button>
-      <p class="xs mut" style="line-height:1.5;margin-top:12px">${tx('Si empiezas de cero, tu copia de Drive no se toca hasta que decidas en Ajustes › Tu cuenta y tus datos qué datos usar.','If you start from scratch, your Drive backup is not touched until you choose in Settings › Your account and data which data to keep.')}</p>`;
+      <p class="xs mut" style="line-height:1.5;margin-top:12px">${tx('Si empiezas de cero, tu copia de Drive no se toca hasta que decidas en Ajustes › Mi cuenta qué datos usar.','If you start from scratch, your Drive backup is not touched until you choose in Settings › My account which data to keep.')}</p>`;
     foot=`<div class="row" style="gap:8px">${atras}</div>`;
   } else if (p.paso==='ia'){
     b=titulo(tx('Así trabaja PandarIA','How PandarIA works'),tx('Antes de las preguntas, tres cosas que conviene saber.','Before the questions, three things worth knowing.'))+
@@ -11544,6 +11545,14 @@ SCREENS.onboard = p => {
   } else if (p.paso==='nombre'){
     b=titulo(tx('¿Cómo te llamamos?','What should we call you?'),tx('Así te saludará PandarIA.','This is how PandarIA will greet you.'))+
       `<input id="ob_name" class="inp" style="height:56px;font-size:20px" value="${esc(p.pf.name||'')}" placeholder="${tx('Tu nombre','Your name')}" maxlength="30" autocomplete="given-name">`;
+    foot=sig();
+  } else if (p.paso==='unidades'){
+    // 1.9.4: las unidades se eligen aquí (vienen marcadas las del país del teléfono)
+    const op=[['unit',tx('Peso','Weight'),[['kg',tx('Kilos (kg)','Kilograms (kg)')],['lb',tx('Libras (lb)','Pounds (lb)')]]],
+      ['uLong',tx('Altura y medidas','Height and measurements'),[['cm',tx('Metros y centímetros','Metres and centimetres')],['in',tx('Pies y pulgadas','Feet and inches')]]],
+      ['uAgua',tx('Agua','Water'),[['ml',tx('Litros y ml','Litres and ml')],['oz',tx('Onzas (oz)','Ounces (oz)')]]]];
+    b=titulo(tx('¿Cómo mides?','How do you measure?'),tx('Elige tus unidades. Puedes cambiarlas cuando quieras en Ajustes › Pantalla e idioma.','Pick your units. You can change them anytime in Settings › Display and language.'))+
+      op.map(([k,n,o])=>`<div class="field"><label>${n}</label><div class="seg">${o.map(([v,l])=>`<button class="${(k==='unit'?uP():k==='uLong'?uL():uA())===v?'on':''}" data-a="obUnidad" data-v="${k}|${v}">${l}</button>`).join('')}</div></div>`).join('');
     foot=sig();
   } else if (p.paso==='edad'){
     b=titulo(tx(`Tu edad y tu sexo${p.pf.name?', '+esc(p.pf.name):''}`,`Your age and sex${p.pf.name?', '+esc(p.pf.name):''}`),tx('Cambian lo que tu cuerpo gasta y cómo se recupera.','They change what your body burns and how it recovers.'))+
@@ -11618,6 +11627,7 @@ A.obSet=v=>{ const p=pkP(); obCommit(); const [k,val]=String(v).split('|');
   if (k==='dias'||k==='min') p[k]=+val; else if (k==='embarazo') { if (val) p.pf.embarazo=true; else delete p.pf.embarazo; }
   else { p.pf[k]=val; if (k==='sex' && val!=='m') delete p.pf.embarazo; }
   refreshTop(); };
+A.obUnidad=v=>{ const [k,u]=String(v).split('|'); if (['unit','uLong','uAgua'].includes(k)){ S.settings[k]=u; save(); } refreshTop(); };
 A.obInj=k=>{ const p=pkP(); const L=p.pf.injuries=p.pf.injuries||[]; const i=L.indexOf(k); if (i>=0) L.splice(i,1); else L.push(k); refreshTop(); };
 A.obSinLes=()=>{ pkP().pf.injuries=[]; refreshTop(); };
 A.obObj=k=>{ pkP().obj=k; refreshTop(); };
@@ -11661,6 +11671,65 @@ A.obEnd=v=>{
   const goal=GOALS[p.obj]?p.obj:'musculo';
   setTimeout(()=>{ if (v==='pandaria') openLayer('wizPandaria',{step:0,goal,days:p.dias||3,minutes:p.min||60,level:S.settings.level,priorities:[]}); else if (v==='explorar'){ TAB='rutinas'; render(); A.openExplorar(); } },120);
 };
+
+/* ---------- 1.9.4 · Tu tarjeta y tu foto de perfil ----------
+   Arriba de Ajustes: nombre (o «Sin nombre») y tipo de cuenta. Al tocarla se abre la tarjeta de presentación;
+   lo único que se toca es la foto, con un menú como el de WhatsApp. La foto se guarda pequeña (256 px) dentro de tus datos,
+   así entra en las copias; también se guarda la original reducida (800 px) para poder recortarla o moverla después. */
+const esPrem=()=>typeof isPremium==='function'&&isPremium();
+function avatarHtml(px){ const P=S.profile||{}, f=P.foto;
+  if (f) return `<img src="${f}" alt="" style="width:${px}px;height:${px}px;border-radius:50%;object-fit:cover;display:block;flex:0 0 auto">`;
+  return `<span style="width:${px}px;height:${px}px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;font-size:${Math.round(px*0.4)}px;flex:0 0 auto">${P.name?esc(P.name.trim()[0].toUpperCase()):I('user',Math.round(px*0.46))}</span>`; }
+const tipoCuenta=()=>esPrem()?tx('Cuenta Premium','Premium account'):tx('Cuenta gratuita','Free account');
+function tarjetaFila(){ const P=S.profile||{};
+  return `<button class="card row" data-a="verTarjeta" style="width:100%;gap:14px;text-align:left;margin-top:4px">${avatarHtml(52)}<div class="grow" style="min-width:0"><div class="b" style="font-size:18px;overflow-wrap:anywhere">${P.name?esc(P.name):tx('Sin nombre','No name')}</div><div class="sm" style="margin-top:2px;color:${esPrem()?'var(--ac)':'var(--mut)'};font-weight:${esPrem()?800:500}">${tipoCuenta()}</div></div>${I('right',18)}</button>`; }
+SCREENS.tarjeta = () => { const P=S.profile||{}, ses=S.sessions.length, desde=S.firstSession||(S.sessions[0]&&S.sessions[0].end);
+  const dato=(v,l)=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  return lhdr('')+`<div class="lbody" style="text-align:center;padding-top:10px">
+    <button data-a="fotoMenu" aria-label="${tx('Foto de perfil','Profile photo')}" style="background:none;border:0;padding:0;position:relative;display:inline-block">${avatarHtml(132)}<span style="position:absolute;right:4px;bottom:4px;width:36px;height:36px;border-radius:50%;background:var(--ac);color:#1a0702;display:grid;place-items:center;box-shadow:0 0 0 4px var(--bg)">${I('camera',18)}</span></button>
+    <div style="font-size:26px;font-weight:900;margin-top:14px;overflow-wrap:anywhere">${P.name?esc(P.name):tx('Sin nombre','No name')}</div>
+    <div class="sm mut" style="margin-top:4px">${[P.age?tx(`${P.age} años`,`${P.age} years old`):'',tipoCuenta()].filter(Boolean).join(' · ')}</div>
+    ${esPrem()?`<div style="display:inline-flex;gap:6px;align-items:center;margin-top:12px;padding:6px 12px;border-radius:999px;background:var(--acs);color:var(--ac);font-weight:800;font-size:13px">${I('trophy',16)} Premium</div>`:''}
+    <div class="stats" style="margin-top:22px;text-align:left">${dato(fmtNum(ses),tx('Entrenos','Workouts'))}${dato(fmtNum(rachaMejor?rachaMejor():0),tx('Mejor racha (sem.)','Best streak (wks)'))}${desde?dato(new Date(desde).toLocaleDateString(LOC(),{month:'short',year:'numeric'}),tx('Con PandarIA desde','With PandarIA since')):''}</div>
+  </div>`; };
+A.verTarjeta=()=>openLayer('tarjeta',{});
+A.fotoMenu=()=>{ const hay=!!(S.profile||{}).foto, O=[
+  {icon:'camera',label:tx('Hacer foto','Take photo'),fn:()=>fotoElegir(true)},
+  {icon:'upload',label:tx('Elegir de la galería','Choose from gallery'),fn:()=>fotoElegir(false)}];
+  if (hay && (S.profile||{}).fotoOrig) O.push({icon:'edit',label:tx('Recortar o mover','Crop or move'),fn:()=>fotoEditor(S.profile.fotoOrig,S.profile.fotoPos)});
+  if (hay) O.push({icon:'trash',label:tx('Eliminar foto','Remove photo'),fn:()=>confirmBox({title:tx('¿Eliminar la foto de perfil?','Remove profile photo?'),okText:tx('Eliminar','Remove'),danger:true,ok:()=>fotoGuardar(null)})});
+  sheet(tx('Foto de perfil','Profile photo'),O); };
+function fotoElegir(camara){ const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; if (camara) inp.setAttribute('capture','user');
+  inp.style.display='none'; document.body.appendChild(inp);
+  inp.onchange=()=>{ const f=inp.files&&inp.files[0]; inp.remove(); if (!f) return; const r=new FileReader();
+    r.onload=()=>fotoReducir(r.result,800,0.82).then(src=>fotoEditor(src,null)).catch(()=>toast(tx('No se pudo abrir la imagen','Could not open the image'))); r.readAsDataURL(f); };
+  inp.click(); }
+function fotoReducir(src,max,q){ return new Promise((ok,ko)=>{ const im=new Image(); im.onload=()=>{ const k=Math.min(1,max/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k); c.getContext('2d').drawImage(im,0,0,c.width,c.height); ok(c.toDataURL('image/jpeg',q)); }; im.onerror=ko; im.src=src; }); }
+// Recorte redondo: se arrastra para mover y se acerca con la barra; se guarda a 256 px
+function fotoEditor(src,pos){ const D=260;
+  openModal(`<div class="modal"><h3>${tx('Recortar foto','Crop photo')}</h3><p class="mut sm" style="margin-top:0">${tx('Arrastra para moverla y usa la barra para acercar.','Drag to move it and use the bar to zoom.')}</p>
+    <div id="fotoStage" style="position:relative;width:${D}px;height:${D}px;margin:8px auto 14px;overflow:hidden;border-radius:16px;background:#000;touch-action:none;cursor:grab"><img id="fotoImg" src="${src}" alt="" style="position:absolute;left:0;top:0;transform-origin:0 0;user-select:none;-webkit-user-drag:none;max-width:none" draggable="false"><div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent ${D/2-1}px,rgba(0,0,0,.6) ${D/2}px)"></div></div>
+    <input id="fotoZoom" type="range" min="1" max="3" step="0.01" value="${pos&&pos.z||1}" style="width:100%" aria-label="${tx('Acercar','Zoom')}">
+    <div class="row" style="gap:8px;margin-top:16px"><button class="btn grow" data-a="closeModal">${tx('Cancelar','Cancel')}</button><button class="btn pri grow" id="fotoOk">${tx('Guardar','Save')}</button></div></div>`,{center:true});
+  setTimeout(()=>{ const st=document.getElementById('fotoStage'), im=document.getElementById('fotoImg'), zr=document.getElementById('fotoZoom'), ok=document.getElementById('fotoOk'); if (!st||!im) return;
+    const E={z:pos&&pos.z||1,x:0,y:0,w:0,h:0}; let drag=null;
+    const s0=()=>D/Math.min(E.w,E.h), esc_=()=>s0()*E.z;
+    const fija=()=>{ const s=esc_(); E.x=Math.min(0,Math.max(D-E.w*s,E.x)); E.y=Math.min(0,Math.max(D-E.h*s,E.y)); im.style.transform=`translate(${E.x}px,${E.y}px) scale(${s})`; };
+    const listo=()=>{ E.w=im.naturalWidth; E.h=im.naturalHeight; const s=esc_();
+      if (pos&&pos.cx!=null){ E.x=D/2-pos.cx*E.w*s; E.y=D/2-pos.cy*E.h*s; } else { E.x=(D-E.w*s)/2; E.y=(D-E.h*s)/2; } fija(); };
+    if (im.complete&&im.naturalWidth) listo(); else im.onload=listo;
+    st.addEventListener('pointerdown',e=>{ drag={x:e.clientX,y:e.clientY,ox:E.x,oy:E.y}; try{ st.setPointerCapture(e.pointerId); }catch(_){} });
+    st.addEventListener('pointermove',e=>{ if (!drag) return; E.x=drag.ox+e.clientX-drag.x; E.y=drag.oy+e.clientY-drag.y; fija(); });
+    const fin=()=>{ drag=null; }; st.addEventListener('pointerup',fin); st.addEventListener('pointercancel',fin);
+    zr.addEventListener('input',()=>{ const s1=esc_(), cx=(D/2-E.x)/s1, cy=(D/2-E.y)/s1; E.z=+zr.value; const s2=esc_(); E.x=D/2-cx*s2; E.y=D/2-cy*s2; fija(); });
+    ok.addEventListener('click',()=>{ const c=document.createElement('canvas'), k=256/D, s=esc_(); c.width=c.height=256; const g=c.getContext('2d'); g.fillStyle='#000'; g.fillRect(0,0,256,256);
+      g.drawImage(im,E.x*k,E.y*k,E.w*s*k,E.h*s*k);
+      fotoGuardar({foto:c.toDataURL('image/jpeg',0.85),orig:src,pos:{z:E.z,cx:(D/2-E.x)/s/E.w,cy:(D/2-E.y)/s/E.h}}); closeModal(); });
+  },60); }
+function fotoGuardar(f){ S.profile=S.profile||{injuries:[]};
+  const pon=o=>{ if (!o) return; if (f){ o.foto=f.foto; o.fotoOrig=f.orig; o.fotoPos=f.pos; } else { delete o.foto; delete o.fotoOrig; delete o.fotoPos; } };
+  pon(S.profile); LAYERS.forEach(l=>{ if (l.p&&l.p.d) pon(l.p.d); }); // si «Mis datos personales» está abierto, no se pierde al guardar
+  save(); toast(f?tx('Foto de perfil guardada','Profile photo saved'):tx('Foto eliminada','Photo removed')); if (LAYERS.length) refreshTop(); render.keep=true; render(); }
 
 // nombre de una lesión en el idioma de la app y en minúsculas, para meterlo dentro de una frase
 const injN=k=>{ const nm=INJURIES[k]?INJURIES[k].n:k; return String((LANG()!=='es'&&trText(nm))||nm).toLowerCase(); };
@@ -11762,7 +11831,7 @@ A.verPermisos=()=>openLayer('permisos',{});
 SCREENS.cloudIntro = () => `<div class="lbody" style="padding-top:34px"><div style="text-align:center"><div style="width:80px;height:80px;border-radius:24px;background:var(--acs);color:var(--ac);display:grid;place-items:center;margin:0 auto">${I('upload',40)}</div>
   <div style="font-size:24px;font-weight:900;margin-top:18px;line-height:1.2;text-wrap:balance">${tx('Novedad: guarda tus datos en tu Google Drive','New: save your data in your Google Drive')}</div></div>
   ${[[tx('Recupera todo si cambias de teléfono','Get everything back if you change phones'),tx('Entrenos, rutinas, diario, medidas, fotos y Premium.','Workouts, routines, diary, measurements, photos and Premium.')],[tx('Se guarda solo','It saves itself'),tx('Al terminar cada entreno y una vez al día.','After each workout and once a day.')],[tx('Privado','Private'),tx('Va a una carpeta oculta de tu Drive. Nadie más la ve.','It goes to a hidden folder in your Drive. Nobody else sees it.')]].map(([t,d])=>`<div class="row" style="gap:12px;align-items:flex-start;margin-top:16px"><span style="color:var(--ok)">${I('check',22)}</span><div><div class="b">${t}</div><div class="sm mut" style="line-height:1.4">${d}</div></div></div>`).join('')}
-  </div><div class="lfoot"><button class="btn pri big" data-a="ciGoogle">${I('user',20)} ${tx('Continuar con Google','Continue with Google')}</button><button class="btn wide" style="margin-top:8px" data-a="ciLater">${tx('Ahora no','Not now')}</button><div class="xs mut" style="text-align:center;margin-top:8px">${tx('Siempre disponible en Ajustes › Tu cuenta y tus datos.','Always available in Settings › Your account and data.')}</div></div>`;
+  </div><div class="lfoot"><button class="btn pri big" data-a="ciGoogle">${I('user',20)} ${tx('Continuar con Google','Continue with Google')}</button><button class="btn wide" style="margin-top:8px" data-a="ciLater">${tx('Ahora no','Not now')}</button><div class="xs mut" style="text-align:center;margin-top:8px">${tx('Siempre disponible en Ajustes › Mi cuenta.','Always available in Settings › My account.')}</div></div>`;
 A.ciLater=()=>{ S.settings.cloudIntro=true; save(); closeLayer(); };
 A.ciGoogle=async()=>{ S.settings.cloudIntro=true; save(); closeLayer(); await cloudSignIn('intro'); };
 function cloudBoot(){
@@ -11817,7 +11886,6 @@ function viewAjustes(){
   const arch=S.routines.filter(r=>r.archived).length, nAv=Object.keys(st.avoid||{}).length;
   const prof=[pr.age?pr.age+' años':'',pr.weight?pesoTxt(pr.weight):''].filter(Boolean).join(' · ')||'Completar';
   return `<div class="hdr"><h1>Ajustes</h1></div>${(()=>{ try{ const v=updPending(); return v?updCardNew(v):''; }catch(e){ return ''; } })()}
-  <div class="card row" data-a="openProfile" style="cursor:pointer;gap:14px"><span style="width:52px;height:52px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;font-size:20px;flex:0 0 auto">${pr.name?esc(pr.name[0].toUpperCase()):I('user',24)}</span><div class="grow"><div class="b">${esc(pr.name||'Mi perfil')}</div><div class="sm mut">${prof}${(pr.injuries||[]).length?` · ${plural(pr.injuries.length,'zona sensible','zonas sensibles')}`:''}</div></div>${I('right',18)}</div>
   <div class="sec">Entrenamiento</div><div class="card" style="padding:0 12px">
     ${nav('openEquip','dumbbell','Mis equipos',`${st.equip.filter(q=>!['pc','est'].includes(q)).length} elegidos`)}
     <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('chart',20)}</span><span class="b grow">Dificultad</span></div>
@@ -11896,11 +11964,11 @@ function viewAjustes(){
    La pantalla de Ajustes se arma igual que antes (con lo que añaden los archivos nativo y de Premium) y después se reparte:
    la principal queda corta (perfil, Premium y 8 grupos) y cada grupo abre su propia pantalla con sus ajustes de siempre. */
 const AJ_GRUPOS=[
-  {id:'cuenta',ic:'user',t:'Tu cuenta y tus datos',en:'Your account and data',d:'Copia en Google Drive, exportar e importar',den:'Google Drive backup, export and import',
-   parts:[{sec:'Copia en Google Drive',whole:true},{sec:'Tus datos',keys:['exportData','importData','exportCSV','premigOpen','limpiarPruebas'],rest:['Tus datos']},{keys:['wipeData']}]},
+  {id:'cuenta',ic:'user',t:'Mi cuenta',en:'My account',d:'Google, copia en Drive, suscripción, exportar e importar',den:'Google, Drive backup, subscription, export and import',
+   parts:[{html:()=>typeof A.openPremium==='function'&&typeof isPremium==='function'&&isPremium()?`<div class="card" style="padding:0 12px;margin-bottom:12px"><button class="srow" style="width:100%" data-a="openPremium"><span class="si">${I('trophy',20)}</span><span class="grow"><span class="b">${tx('Tu suscripción Premium','Your Premium subscription')}</span><br><span class="xs mut">${tx('Estado, gestionar y restaurar compras','Status, manage and restore purchases')}</span></span>${I('right',18)}</button></div>`:''},{sec:'Copia en Google Drive',whole:true},{sec:'Tus datos',keys:['exportData','importData','exportCSV','premigOpen','limpiarPruebas'],rest:['Tus datos']},{keys:['wipeData']}]},
   {id:'entreno',ic:'dumbbell',t:'Entrenamiento',en:'Training',d:'Equipos, nivel, plan semanal, unidades',den:'Equipment, level, weekly plan, units',
    parts:[{keys:['openEquip','setLevel','openPlan','setUnit','setPlate','setRestDef','openAvoid','openArchived'],rest:['Entrenamiento']}]},
-  {id:'pandaria',ic:'spark',t:'PandarIA',en:'PandarIA',d:'Descansos, esfuerzo, check-in e informes',den:'Rests, effort, check-in and reports',
+  {id:'pandaria',ic:'spark',t:'PandarIA Premium',en:'PandarIA Premium',d:'Tu IA coach: descansos, esfuerzo, check-in e informes',den:'Your AI coach: rests, effort, check-in and reports',
    parts:[{keys:['toggleSet:restSmart','toggleSet:rirAuto','toggleSet:rir','toggleSet:checkin','toggleSet:period','toggleSet:report','toggleSet:tips','toggleSet:burbuja','gustosReset'],rest:['PandarIA']}]},
   {id:'nutri',ic:'leaf',t:'Nutrición y ayuno',en:'Nutrition and fasting',d:'Objetivo nutricional y ayuno',den:'Nutrition goal and fasting',
    parts:[{keys:[],rest:['Nutrición y ayuno']}]},
@@ -11917,7 +11985,7 @@ const AJ_OUT=new Set(['openRev']); // filas que ya no se muestran
 function ajPiezas(html){
   const tp=document.createElement('template'); tp.innerHTML=html; const top=[], secs=[], tail=[]; let cur=null;
   [...tp.content.childNodes].forEach(n=>{
-    if (n.nodeType===1 && n.classList.contains('sec')){ cur={name:n.textContent.trim(),nodes:[]}; secs.push(cur); return; }
+    if (n.nodeType===1 && n.classList.contains('sec')){ cur={name:(n.dataset&&n.dataset.sec)||n.textContent.trim(),nodes:[]}; secs.push(cur); return; }
     if (n.nodeType===1 && n.classList.contains('hdr')) return;
     if (!cur){ top.push(n); return; }
     if (n.nodeType===1 && /^(INPUT)$/.test(n.nodeName)){ tail.push(n); return; }
@@ -11956,8 +12024,13 @@ function ajInstall(){
   if (AJ_BASE) return; AJ_BASE=viewAjustes;
   viewAjustes=function(){
     const P=ajPiezas(AJ_BASE.apply(this,arguments));
-    const rows=AJ_GRUPOS.map(g=>`<button class="srow" data-a="ajGrupo" data-v="${g.id}"><span class="si">${I(g.ic,20)}</span><span class="grow"><div class="b">${tx(g.t,g.en)}</div><div class="xs mut">${tx(g.d,g.den)}</div></span><span class="mut" style="font-size:22px;line-height:1">›</span></button>`).join('');
-    return `<div class="hdr"><h1>Ajustes</h1></div>${P.top}<div class="card" style="padding:0 12px;margin-top:14px">${rows}</div>
+    const fila=(act,v,ic,t,d,dest)=>`<button class="srow" data-a="${act}" ${v?`data-v="${v}"`:''}><span class="si" ${dest?'style="color:var(--ac)"':''}>${I(ic,20)}</span><span class="grow"><div class="b" ${dest?'style="color:var(--ac)"':''}>${t}</div><div class="xs mut">${d}</div></span><span class="mut" style="font-size:22px;line-height:1">›</span></button>`;
+    const G=id=>AJ_GRUPOS.find(g=>g.id===id), gf=g=>fila('ajGrupo',g.id,g.ic,tx(g.t,g.en),tx(g.d,g.den));
+    const libre=typeof isPremium==='function'&&!isPremium()&&typeof A.openHazte==='function';
+    const arriba=gf(G('cuenta'))+fila('openProfile','','heart',tx('Mis datos personales','My personal details'),tx('Nombre, foto, edad, sexo, altura, peso, condición física y lesiones','Name, photo, age, sex, height, weight, fitness and injuries'))
+      +gf(G('pandaria'))+(libre?fila('openHazte','','trophy',tx('Hazte Premium','Go Premium'),tx('Tu IA coach: entrenador, nutricionista y gymbro en uno','Your AI coach: trainer, nutrition guide and gym buddy in one'),true):'');
+    const rows=AJ_GRUPOS.filter(g=>!['cuenta','pandaria'].includes(g.id)).map(g=>`<button class="srow" data-a="ajGrupo" data-v="${g.id}"><span class="si">${I(g.ic,20)}</span><span class="grow"><div class="b">${tx(g.t,g.en)}</div><div class="xs mut">${tx(g.d,g.den)}</div></span><span class="mut" style="font-size:22px;line-height:1">›</span></button>`).join('');
+    return `<div class="hdr"><h1>Ajustes</h1></div>${tarjetaFila()}${P.top}<div class="card" style="padding:0 12px;margin-top:14px">${arriba}</div><div class="card" style="padding:0 12px;margin-top:14px">${rows}</div>
       <p class="xs mut" style="text-align:center;margin:16px 0 8px">PandarIA Fit ${verTxt()} · LunaDoggyBru Studios</p>${P.tail}`;
   };
 }
@@ -15583,6 +15656,14 @@ const EN_EXTRA = `Solo esta serie|This set only
 Datos del reloj en tus entrenos|Watch data in your workouts
 Arreglos de Premium|Premium fixes
 Idiomas y unidades|Languages and units
+Ajustes nuevos y tu foto de perfil|New Settings and your profile photo
+Ajustes nuevos: arriba tu nombre y tu tipo de cuenta; debajo Mi cuenta, Mis datos personales y PandarIA Premium|New Settings: your name and account type at the top; below, My account, My personal details and PandarIA Premium
+Tu tarjeta: toca tu nombre para verla, con tu foto, tu edad y tus entrenos|Your card: tap your name to see it, with your photo, age and workouts
+Foto de perfil: hazla, elígela de la galería, recórtala o quítala|Profile photo: take it, pick it from the gallery, crop it or remove it
+Hazte Premium: qué ganas frente a la versión gratis, punto por punto|Go Premium: what you get over the free version, point by point
+En la bienvenida eliges tus unidades justo después de tu nombre|In the welcome you pick your units right after your name
+Día de calor muestra el agua en tus unidades (oz o ml)|Hot day shows water in your units (oz or ml)
+La copia en Google Drive ya no aparece en Acerca de cuando la app está en inglés|The Google Drive backup no longer shows under About when the app is in English
 Nueva bienvenida|New welcome
 1.9.3 · Nueva bienvenida|1.9.3 · New welcome
 Nueva bienvenida: unas preguntas por pasos y tu punto de partida en entreno, comida y hábitos|New welcome: a few step-by-step questions and your starting point for training, food and habits
