@@ -887,6 +887,7 @@
       const prev = L.slice(1, 15);
       window.PF_SUENO = HD.sleep != null ? {last: HD.sleep, avg: prev.length ? Math.round(prev.reduce((a, y) => a + y.min, 0) / prev.length) : null, n: prev.length, at: L[0].fin} : null;
     }catch(e){}
+    relojPend();
     if (s.hrv) try{
       const r = await HC.readSamples({dataType:'heartRateVariability', startDate: iso(now - 28 * 86400000), endDate: iso(now), limit: 60});
       const L = (r.samples || []).filter(y => +y.value > 5 && +y.value < 300).sort((a, b) => Date.parse(b.startDate) - Date.parse(a.startDate));
@@ -896,11 +897,36 @@
       else { HD.hrv = null; window.PF_HRV = null; }
     }catch(e){}
   }
+  // 1.9 · Datos del reloj: pulso y pasos del rato que duró cada entreno (Health Connect / Salud ya los tiene con los permisos de siempre).
+  // El reloj sincroniza con retraso, así que se reintenta: a los 30 s, a los 3 min y cada vez que la app sincroniza, hasta 4 veces en 24 h.
+  async function relojLeer(sess){
+    const t0 = sess.start, t1 = sess.end + 60000; let hrs = [], pasos = 0;
+    try{ const r = await HC.readSamples({dataType:'heartRate', startDate: iso(t0), endDate: iso(t1), limit: 5000});
+      hrs = (r.samples || []).filter(x => { const t = Date.parse(x.startDate); return t >= t0 - 30000 && t <= t1; }).map(x => +x.value); }catch(e){}
+    try{ const r = await HC.readSamples({dataType:'steps', startDate: iso(t0), endDate: iso(t1), limit: 2000});
+      (r.samples || []).forEach(x => { const a = Date.parse(x.startDate), b = Date.parse(x.endDate || x.startDate), v = +x.value || 0;
+        if (b <= a){ if (a >= t0 && a <= t1) pasos += v; return; }
+        const ov = Math.max(0, Math.min(b, t1) - Math.max(a, t0)); pasos += v * ov / (b - a); }); }catch(e){}
+    return {hrs, pasos};
+  }
+  let relojOcupado = false;
+  async function relojPend(){
+    const s = HCS(); window.PF_HC_ON = !!(HC && s.on && s.hr !== false);
+    if (!window.PF_HC_ON || relojOcupado || typeof relojGuardar !== 'function') return;
+    const now = Date.now(), L = S.sessions.filter(x => !x.reloj && x.end && x.start && now - x.end > 20000 && now - x.end < 24 * 3600000 && (x.relojN || 0) < 4).slice(-3);
+    if (!L.length) return; relojOcupado = true; let cambio = false;
+    try{ for (const x of L){ const d = await relojLeer(x); relojGuardar(x.id, d.hrs, d.pasos); cambio = true; } }catch(e){}
+    relojOcupado = false;
+    if (cambio){ save(); const top = LAYERS.length && LAYERS[LAYERS.length - 1]; if (top && (top.t === 'summary' || top.t === 'session')) refreshTop(); }
+  }
+  const relojTras = () => { setTimeout(relojPend, 30000); setTimeout(relojPend, 180000); };
+  try{ window.PF_HC_ON = !!(HC && HCS().on); }catch(e){}
   function refreshHc(){ if (LAYERS.length && LAYERS[LAYERS.length - 1].t === 'hcMenu') refreshTop(); else { render.keep = true; render(); } }
   // Escribir entrenos (calorías activas estimadas) y peso en Health Connect (Premium)
   const _fw = finishWorkout;
   finishWorkout = function(mode){
     _fw.apply(this, arguments);
+    relojTras();
     const s = HCS(), sess = S.sessions[S.sessions.length - 1];
     if (HC && s.on && s.writeWorkouts && isPrem() && sess){
       const hours = Math.max(0.05, (sess.end - sess.start) / 3600000), met = 3 + (sess.intensity || 6) * 0.45;
@@ -912,6 +938,7 @@
     const _si = saveIntSession;
     saveIntSession = function(sess){
       _si.apply(this, arguments);
+      relojTras();
       const s = HCS();
       if (HC && s.on && s.writeWorkouts && isPrem() && sess && sess.end > sess.start){
         const hours = Math.max(0.05, (sess.end - sess.start) / 3600000), met = 3 + (sess.intensity || 6) * 0.45;
@@ -960,7 +987,7 @@
         <div class="stats"><div class="stat"><div class="v">${HD.sleep != null ? Math.floor(HD.sleep / 60) + ' h ' + String(HD.sleep % 60).padStart(2, '0') : '—'}</div><div class="l">${tx('Sueño anoche','Sleep last night')}</div></div><div class="stat"><div class="v">${HD.hrv ? HD.hrv + ' ms' : '—'}</div><div class="l">${tx('Variabilidad del pulso','Heart rate variability')}</div></div></div>
         ${s.perm13 ? '' : `<div class="banner blue"><span class="ic">${I('spark',20)}</span><div class="grow sm" style="line-height:1.45">${tx('Nuevo: PandarIA puede tener en cuenta tu sueño y la variabilidad del pulso para tu recuperación.','New: PandarIA can take your sleep and heart rate variability into account for your recovery.')}<br><button class="link sm" style="margin-top:8px" data-a="hcPerm13">${tx('Dar permiso','Allow')}</button></div></div>`}
         <button class="btn wide" data-a="hcSyncNow">${I('refresh',18)} Actualizar ahora</button>
-        <div class="sec">Leer de Health Connect</div><div class="card" style="padding:4px 12px">${tg('steps','Pasos','Hoy y media de 7 días')}${tg('weight','Peso','Se añade solo a Mi historial › Cuerpo')}${tg('hr','Pulso','En reposo o la última medida')}${tg('sleep',tx('Sueño','Sleep'),tx('Horas de la última noche','Hours last night'))}${tg('hrv',tx('Variabilidad del pulso','Heart rate variability'),tx('Una señal más de recuperación','One more recovery signal'))}</div>
+        <div class="sec">Leer de Health Connect</div><div class="card" style="padding:4px 12px">${tg('steps','Pasos',tx('Hoy, media de 7 días y en tus entrenos','Today, 7-day average and during workouts'))}${tg('weight','Peso','Se añade solo a Mi historial › Cuerpo')}${tg('hr','Pulso',tx('En reposo y durante tus entrenos','At rest and during your workouts'))}${tg('sleep',tx('Sueño','Sleep'),tx('Horas de la última noche','Hours last night'))}${tg('hrv',tx('Variabilidad del pulso','Heart rate variability'),tx('Una señal más de recuperación','One more recovery signal'))}</div>
         <div class="sec">Guardar en Health Connect</div><div class="card" style="padding:4px 12px">${tg('writeWorkouts','Entrenos','Como calorías activas estimadas por duración e intensidad', true)}${tg('writeWeight','Peso','Cuando registras tu peso en Cuerpo', true)}${tg('writeFood','Comidas','Las calorías de lo que añades hoy a tu diario', true)}${tg('writeWater','Agua','Cada vaso o botella que sumas', true)}</div>
         <div class="xs mut" style="margin:-4px 4px 8px;line-height:1.4">Si quitas algo del diario o del agua, bórralo también en Health Connect: PandarIA solo añade.</div>
         <div class="sec">PandarIA</div><div class="card" style="padding:4px 12px">${tg('useInPandaria','Usar mis pasos en las recomendaciones','Ajusta tus calorías diarias según tu actividad', true)}</div>

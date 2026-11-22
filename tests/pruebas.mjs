@@ -1125,6 +1125,38 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9 fase 4 sin errores', !a.errores.length, a.errores.join(' | '));
 }
 
+/* ---------- 1.9 fase 5: datos del reloj tras el entreno ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); S.profile.age=30; S.profile.weight=75; S.profile.sex='h'; window.isPremium=()=>true; const out={}; const t=Date.now()-3600e3;
+    S.sessions.push({id:'c1',routineId:'__cardio',routineName:'Cardio · Correr',start:t,end:t+30*60000,intensity:8,items:[],prs:[],vol:0,cardio:{act:'correr',int:'fuerte',work:1800}});
+    S.sessions.push({id:'f1',routineId:'r',routineName:'Fuerza',start:t,end:t+60*60000,intensity:7,items:[],prs:[],vol:1000});
+    out.fc=fcMax();
+    out.pocas=relojGuardar('c1',[120,130],0)===false && S.sessions[0].relojN===1 && !S.sessions[0].reloj;
+    const hrs=[...Array(60).keys()].map(i=>130+(i%21)); relojGuardar('c1',hrs,3120.4); const c=S.sessions[0]; out.c=[c.reloj.hr,c.reloj.max,c.reloj.pasos,c.relojN===undefined];
+    out.kc=relojKcal(c); out.gasto=gastoSesion(c); out.zona=relojZona(c);
+    relojGuardar('f1',hrs,0); out.fuerzaKc=relojKcal(S.sessions[1])===null && gastoSesion(S.sessions[1])>0;
+    const h=relojHtml(c); out.html=/Tu reloj/.test(h)&&/Pulso medio/.test(h)&&/Lo marcaste fuerte/.test(h)&&/3120/.test(h.replace(/[.,\\s]/g,''));
+    window.isPremium=()=>false; out.gratis=/Tu reloj/.test(relojHtml(c)) && !/Lo marcaste/.test(relojHtml(c));
+    window.isPremium=()=>true; replaceLayer('summary',{sid:'c1',created:[],ach:[]}); out.resumen=/Tu reloj/.test(document.querySelector('#layers').textContent);
+    window.PF_HC_ON=true; S.sessions.push({id:'c2',routineId:'__cardio',routineName:'x',start:Date.now()-60000,end:Date.now(),intensity:6,items:[],prs:[],vol:0,cardio:{act:'caminar',int:'moderada',work:60}});
+    out.espera=/Esperando los datos de tu reloj/.test(relojHtml(S.sessions[2])); window.PF_HC_ON=false; out.sinHc=relojHtml(S.sessions[2])==='';
+    return JSON.stringify(out); })()`));
+  a.cerrar();
+  comprobar('1.9 reloj: pulso máximo con Tanaka (208 − 0,7 × edad)', r.fc === 187, String(r.fc));
+  comprobar('1.9 reloj: con menos de 5 medidas de pulso y sin pasos no guarda nada y lo reintenta', r.pocas);
+  comprobar('1.9 reloj: guarda pulso medio, máximo y pasos', JSON.stringify(r.c) === '[140,150,3120,true]', JSON.stringify(r.c));
+  comprobar('1.9 reloj: en el cardio las calorías salen del pulso (Keytel) y se usan en el resumen', r.kc === 390 && r.gasto === 390, JSON.stringify([r.kc, r.gasto]));
+  comprobar('1.9 reloj: 140 de 187 es zona moderada (75 %)', r.zona && r.zona.pct === 75 && r.zona.z === 'mod', JSON.stringify(r.zona));
+  comprobar('1.9 reloj: en las pesas no se usa el pulso para las calorías', r.fuerzaKc);
+  comprobar('1.9 reloj: el resumen muestra tu reloj y PandarIA avisa si lo marcaste fuerte y fue moderado', r.html && r.resumen, JSON.stringify([r.html, r.resumen]));
+  comprobar('1.9 reloj: gratis ve sus datos; la interpretación es de Premium', r.gratis);
+  comprobar('1.9 reloj: avisa que espera los datos solo si Health Connect está conectado', r.espera && r.sinHc, JSON.stringify([r.espera, r.sinHc]));
+  comprobar('1.9 fase 5 sin errores', !a.errores.length, a.errores.join(' | '));
+}
+
 /* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */
 {
   const dirC = new URL('./copias/', import.meta.url), fallosC = [];
