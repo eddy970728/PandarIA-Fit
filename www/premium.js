@@ -20,6 +20,10 @@
   const iosActiva = x => Object.values(IOS_IDS).includes(x.productIdentifier) && (x.isActive === true || (!!x.expirationDate && Date.parse(x.expirationDate) > Date.now()));
   let SUB = null; try{ SUB = JSON.parse(localStorage.getItem(LSS) || 'null'); }catch(e){}
   let PRODS = null, BUSY = false;
+  // 1.9.1: el plugin de compras de Android cierra la conexión con Google Play al empezar cada llamada, así que dos llamadas
+  // a la vez (precios y estado de la suscripción) se cortaban entre sí y a veces no salían los precios. Ahora van en fila.
+  let NPQ = Promise.resolve();
+  const npCall = fn => { const r = NPQ.then(() => fn()); NPQ = r.catch(() => {}); return r; };
   const saveSub = () => { try{ localStorage.setItem(LSS, JSON.stringify(SUB)); }catch(e){} };
   // 1.1: la suscripción comprobada vale 7 días sin conexión. Después hay que volver a comprobarla con Google Play.
   // Si la fecha del teléfono va hacia atrás respecto a la última comprobación, también se pide comprobar.
@@ -29,25 +33,32 @@
   async function subRefresh(){
     if (!NP) return;
     try{
-      const r = await NP.getPurchases({productType:'subs'});
+      const r = await npCall(() => NP.getPurchases({productType:'subs'}));
       const p = (r.purchases || []).find(x => IOS ? iosActiva(x) : (x.productIdentifier === SUB_ID && String(x.purchaseState) === '1'));
       const was = subOk();
       SUB = {active: !!p, at: Date.now()}; saveSub();
       if (was !== subOk() && typeof render === 'function'){ render.keep = true; render(); if (LAYERS.length) refreshTop(); if (typeof scheduleNotifs === 'function') scheduleNotifs(); }
     }catch(e){}
   }
-  async function loadProducts(){
+  // 1.9.1: en Android, Google Play solo devuelve las ofertas (la prueba de 3 días) a quien puede usarlas, y el plugin no marca
+  // la prueba en esas ofertas. Si un plan trae una oferta además del plan base, esa oferta es la prueba: se muestra y se compra.
+  function planDe(pl, os){
+    const base = os.find(x => !x.offerId) || os[0], oferta = IOS ? null : os.find(x => x.offerId);
+    return {plan: pl, price: base.price, priceString: base.priceString, offerToken: (oferta || base).offerToken, trial: !!oferta || !!base.introductoryPrice};
+  }
+  async function loadProducts(intento){
     if (!NP) return;
     try{
-      const r = await NP.getProducts({productIdentifiers: IOS ? Object.values(IOS_IDS) : [SUB_ID], productType:'subs'});
+      const r = await npCall(() => NP.getProducts({productIdentifiers: IOS ? Object.values(IOS_IDS) : [SUB_ID], productType:'subs'}));
       const L = r.products || [], out = {};
-      PLANS.forEach(pl => { const os = L.filter(x => x.identifier === (IOS ? IOS_IDS[pl] : pl)); if (!os.length) return;
-        const o = os.find(x => x.introductoryPrice) || os.find(x => !x.offerId) || os[0];
-        out[pl] = {plan: pl, price: o.price, priceString: o.priceString, offerToken: o.offerToken, trial: !!o.introductoryPrice}; });
+      PLANS.forEach(pl => { const os = L.filter(x => x.identifier === (IOS ? IOS_IDS[pl] : pl)); if (os.length) out[pl] = planDe(pl, os); });
       PRODS = out;
     }catch(e){ PRODS = {}; }
+    // si falló (sin conexión un momento), se reintenta una vez
+    if (!Object.keys(PRODS).length && !intento && !IOS){ setTimeout(() => loadProducts(1), 1500); }
     const t = LAYERS[LAYERS.length - 1]; if (t && t.t === 'premium') refreshTop();
   }
+  window.pfPlanDe = planDe; // para las pruebas
   window.pfSubActive = () => subOk();
   const subtle = window.crypto && crypto.subtle;
   const enc = s => new TextEncoder().encode(s);
@@ -195,8 +206,8 @@
       else {
         const m = PRODS.mensual, q = PRODS.trimestral;
         const ahorro = m && q && m.price > 0 ? Math.round((1 - q.price / (m.price * 3)) * 100) : 0;
-        if (q) b += `<button class="btn pri wide" data-a="pfBuy" data-v="trimestral"${BUSY ? ' disabled' : ''}>${tx('Trimestral','Quarterly')} · ${esc(q.priceString)} ${tx('cada 3 meses','every 3 months')}${ahorro > 0 ? ` · ${tx('ahorras','save')} ${ahorro} %` : ''}</button>`;
-        if (m) b += `<button class="btn wide" style="margin-top:8px" data-a="pfBuy" data-v="mensual"${BUSY ? ' disabled' : ''}>${tx('Mensual','Monthly')} · ${esc(m.priceString)} ${tx('al mes','a month')}</button>`;
+        if (q) b += `<button class="btn pri wide" style="height:auto;min-height:48px;padding:10px 14px;line-height:1.3;text-align:center" data-a="pfBuy" data-v="trimestral"${BUSY ? ' disabled' : ''}>${tx('Trimestral','Quarterly')} · ${q.trial ? tx('3 días gratis, luego ','3 free days, then ') : ''}${esc(q.priceString)} ${tx('cada 3 meses','every 3 months')}${ahorro > 0 ? ` · ${tx('ahorras','save')} ${ahorro} %` : ''}</button>`;
+        if (m) b += `<button class="btn wide" style="margin-top:8px;height:auto;min-height:48px;padding:10px 14px;line-height:1.3;text-align:center" data-a="pfBuy" data-v="mensual"${BUSY ? ' disabled' : ''}>${tx('Mensual','Monthly')} · ${m.trial ? tx('3 días gratis, luego ','3 free days, then ') : ''}${esc(m.priceString)} ${tx('al mes','a month')}</button>`;
         // Los dos planes tienen 3 días gratis. Google Play solo ofrece la prueba a quien nunca tuvo una suscripción ni una prueba de esta app (así se configuró en Play Console).
         if ((m && m.trial) || (q && q.trial)) b += `<div class="sm" style="text-align:center;margin-top:10px;color:var(--ok);line-height:1.45"><b>${tx('3 días gratis si es tu primera suscripción.','3 free days if this is your first subscription.')}</b> ${tx('Si cancelas antes de que terminen, no se te cobra.','Cancel before they end and you are not charged.')}</div>`;
         b += `<div class="xs mut" style="text-align:center;margin-top:10px;line-height:1.45">${tx('Se renueva sola hasta que la canceles en Google Play. Puedes cancelar cuando quieras y sigues con Premium hasta el final del período pagado.','It renews automatically until you cancel it in Google Play. You can cancel any time and keep Premium until the end of the paid period.')}</div>`;
@@ -226,8 +237,8 @@
     const o = PRODS && PRODS[plan]; if (!NP || !o || BUSY) return;
     BUSY = true; refreshTop();
     try{
-      if (IOS) await NP.purchaseProduct({productIdentifier: IOS_IDS[plan], productType: 'subs'});
-      else await NP.purchaseProduct({productIdentifier: SUB_ID, planIdentifier: plan, offerToken: o.offerToken, productType: 'subs'});
+      if (IOS) await npCall(() => NP.purchaseProduct({productIdentifier: IOS_IDS[plan], productType: 'subs'}));
+      else await npCall(() => NP.purchaseProduct({productIdentifier: SUB_ID, planIdentifier: plan, offerToken: o.offerToken, productType: 'subs'}));
       await subRefresh();
       if (subOk()){ if (typeof sfx === 'function') sfx('finish'); if (typeof confetti === 'function') confetti({n:150}); toast(tx('🎉 ¡Premium activado! Gracias por apoyar el proyecto','🎉 Premium activated! Thanks for supporting the project')); }
     }catch(e){ const m = String(e && (e.message || e)); if (!/cancel/i.test(m)) toast(tx('No se pudo completar la compra.','The purchase could not be completed.')); }
@@ -235,7 +246,7 @@
   };
   A.pfRestore = async () => {
     if (!NP) return; toast(tx('Buscando tus compras…','Looking for your purchases…'));
-    try{ await NP.restorePurchases(); }catch(e){}
+    try{ await npCall(() => NP.restorePurchases()); }catch(e){}
     await subRefresh(); toast(subOk() ? tx('Premium restaurado','Premium restored') : tx('No encontramos una suscripción activa en esta cuenta de Google Play','We found no active subscription on this Google Play account'));
   };
   A.pfManage = () => { if (NP) NP.manageSubscriptions().catch(() => {}); };

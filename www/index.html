@@ -11163,9 +11163,10 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='1.9';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
-const APP_PARCHE='';
+const APP_PARCHE='01';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.9.01',t:'Arreglos de Premium',items:['Los precios de Premium salen siempre: antes, a veces no cargaban','La prueba gratis de 3 días se muestra y se aplica al suscribirte, si Google Play te la ofrece']},
  {v:'1.9',t:'Logros sin fin',items:['Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo', 'Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez', 'Reto estrella del mes: cada mes uno distinto, adaptado a ti', 'Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla', 'Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan', 'Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro', 'Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso']},
  {v:'1.8.2',t:'Te cuida mejor',items:['PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas', 'Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso', 'Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo', 'Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan', 'La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora', 'Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin', 'Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice', 'Después de unas vacaciones ya no propone quitar días de tu plan', 'Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso', 'Cambiar tu objetivo de calorías ahora se puede deshacer']},
  {v:'1.8.1',t:'Más ordenada',items:['Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes', 'Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos', 'El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección', 'Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan', 'Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados', 'El buscador de alimentos entiende plurales y errores de una letra', '39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate']},
@@ -11211,7 +11212,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla", "Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan", "Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro", "Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso"];
+const NOTAS_VERSION=["1.9.01 · Arreglos de Premium: precios y prueba gratis", "1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla", "Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan", "Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro", "Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -15342,6 +15343,10 @@ const EN_09_RX = [
 ];
 const EN_EXTRA = `Solo esta serie|This set only
 Datos del reloj en tus entrenos|Watch data in your workouts
+Arreglos de Premium|Premium fixes
+1.9.01 · Arreglos de Premium: precios y prueba gratis|1.9.01 · Premium fixes: prices and free trial
+Los precios de Premium salen siempre: antes, a veces no cargaban|Premium prices always show: before, they sometimes did not load
+La prueba gratis de 3 días se muestra y se aplica al suscribirte, si Google Play te la ofrece|The 3-day free trial is shown and applied when you subscribe, if Google Play offers it to you
 Guía de PandarIA (experimental)|PandarIA guide (experimental)
 Más masa muscular y mejor forma|More muscle mass and better shape
 Levantar más peso en los básicos|Lift more weight on the big lifts

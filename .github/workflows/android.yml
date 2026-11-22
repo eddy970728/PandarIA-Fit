@@ -26,6 +26,9 @@ jobs:
       - name: Instalar Capacitor
         run: npm install
 
+      - name: Parche del plugin de compras (respetar la prueba gratis elegida)
+        run: node scripts/parche-compras.mjs
+
       - name: Leer la version de la app
         run: |
           VER=$(grep -oP "const APP_VERSION='\K[^']+" www/index.html)
