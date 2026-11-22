@@ -51,6 +51,21 @@ jobs:
           node -e "const h=require('fs').readFileSync('www/index.html','utf8');const m=h.match(/const NOTAS_VERSION=(\[[^\n]*\]);/);const n=m?JSON.parse(m[1]):[];require('fs').writeFileSync('notas.md','Versión ${{ env.VNOM }}.${{ github.run_number }}. PandarIA-Fit.apk se instala encima de la anterior; PandarIA-Fit.aab es el paquete para Google Play.\n\n'+n.map(x=>'- '+x).join('\n')+'\n')"
           cat notas.md
 
+      # Mi PandarIA: solo en la rama lab-mi-pandaria. Es la única APK que lleva Mi PandarIA; nunca sale AAB ni release de ella.
+      - name: Añadir Mi PandarIA (solo rama lab-mi-pandaria)
+        if: github.ref == 'refs/heads/lab-mi-pandaria'
+        run: |
+          node tests/lab-mipandaria.mjs
+          cp lab/mipandaria.js www/mipandaria.js
+          sed -i 's#<script src="premium.js"></script></body>#<script src="premium.js"></script><script src="mipandaria.js"></script></body>#' www/index.html
+          grep -q '<script src="mipandaria.js"></script></body>' www/index.html || { echo "ERROR: Mi PandarIA no quedó conectado"; exit 1; }
+          echo "MPLAB=-mipandaria" >> $GITHUB_ENV
+
+      - name: Control (fuera de la rama de Mi PandarIA, la app no puede llevarlo)
+        if: github.ref != 'refs/heads/lab-mi-pandaria'
+        run: |
+          if [ -f www/mipandaria.js ] || grep -q 'mipandaria' www/index.html; then echo "ERROR: Mi PandarIA no puede ir en la APK ni el AAB normales"; exit 1; fi
+
       - name: Crear proyecto Android
         run: |
           npx cap add android
@@ -110,6 +125,7 @@ jobs:
           if [ -n "$OBL" ]; then echo "ERROR: funciones obligatorias que excluyen dispositivos en Play:"; echo "$OBL"; exit 1; fi
           echo "Funciones correctas: ninguna obligatoria"
       - name: Paquete para Google Play (AAB, sin aviso de versiones de GitHub)
+        if: github.ref != 'refs/heads/lab-mi-pandaria'
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -127,6 +143,7 @@ jobs:
           rm firma.jks
 
       - name: Comprobar que el AAB lleva el archivo de desofuscación (R8)
+        if: github.ref != 'refs/heads/lab-mi-pandaria'
         run: |
           unzip -l PandarIA-Fit.aab | grep -q "BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map" || { echo "ERROR: el AAB no lleva el archivo de mapeo de R8"; exit 1; }
           echo "El AAB lleva el archivo de mapeo: Google Play lo toma solo"
@@ -137,11 +154,12 @@ jobs:
         if: github.ref != 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
-          name: PandarIA-Fit-${{ env.VNOM }}.${{ github.run_number }}-prueba
+          name: PandarIA-Fit-${{ env.VNOM }}.${{ github.run_number }}${{ env.MPLAB || '-prueba' }}
           path: |
             PandarIA-Fit.apk
             PandarIA-Fit.aab
             notas.md
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Publicar en Releases
