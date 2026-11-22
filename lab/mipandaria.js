@@ -19,8 +19,9 @@
 
   /* ---------- Estado propio ---------- */
   let M;
-  const nuevo = () => ({v: 1, cuentas: {}, activa: null, duenos: {}, dias: {}, enviado: {}, retos: {}, seasons: null, cache: {}});
+  const nuevo = () => ({v: 2, cuentas: {}, activa: null, duenos: {}, dias: {}, enviado: {}, retos: {}, retosEnv: {}, srv: {}, seasons: null, cache: {}});
   try { M = Object.assign(nuevo(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { M = nuevo(); }
+  if (M.v !== 2) { M.v = 2; M.retosEnv = M.retosEnv || {}; M.srv = M.srv || {}; M.cache = {}; if (M.activa && M.cuentas[M.activa]) M.cuentas = {[M.activa]: M.cuentas[M.activa]}; } // 1 sola cuenta (la de la app)
   const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(M)); } catch (e) {} };
   window.MP = {estado: () => M, reiniciar: () => { M = nuevo(); guardar(); }};
   const cuenta = () => M.activa && M.cuentas[M.activa] || null;
@@ -55,29 +56,37 @@
     const j = await sbFetch('/auth/v1/token?grant_type=refresh_token', {method: 'POST', body: {refresh_token: c.rt}, sinSesion: true});
     Object.assign(c, {at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000}); guardar();
   }
-  // Tu cuenta de Google → sesión de Supabase (no pide permisos nuevos: solo nombre y correo)
-  async function tokenGoogle(elegir) {
+  // Mi PandarIA usa siempre la cuenta de Google de la app (la de la copia en Drive): ni otra ni ninguna
+  const gApp = () => (S && S.settings && S.settings.cloud && S.settings.cloud.sub) ? S.settings.cloud : null;
+  const claims = jwt => { try { const b = String(jwt).split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4))))); } catch (e) { return {}; } };
+  async function tokenGoogle() {
     if (window.MP_TEST_ID_TOKEN) return window.MP_TEST_ID_TOKEN();
     const C = window.Capacitor, SL = C && C.Plugins && C.Plugins.SocialLogin;
     if (!SL) throw new Error(tx('Inicia sesión desde la app del teléfono', 'Sign in from the phone app'));
     await SL.initialize({google: {webClientId: WEB_ID, mode: 'online'}});
-    if (elegir) { try { await SL.logout({provider: 'google'}); } catch (e) {} }
-    const res = await SL.login({provider: 'google', options: {forcePrompt: !!elegir}});
+    // solo cuentas ya autorizadas en la app y, si hay una, sin preguntar
+    const res = await SL.login({provider: 'google', options: {filterByAuthorizedAccounts: true, autoSelectEnabled: true}});
     const r = (res && res.result) || {};
     if (!r.idToken) throw new Error(tx('Google no devolvió la sesión', 'Google did not return a session'));
     return r.idToken;
   }
-  async function entrar(elegir) {
-    const idt = await tokenGoogle(elegir);
+  async function entrar() {
+    const g = gApp(); if (!g) throw new Error(tx('Primero vincula tu cuenta de Google en la app', 'First link your Google account in the app'));
+    const idt = await tokenGoogle(), c = claims(idt);
+    if (!c.sub || String(c.sub) !== String(g.sub)) throw new Error(tx(`Elige la misma cuenta que usa la app (${g.email || ''})`, `Pick the same account the app uses (${g.email || ''})`));
     const j = await sbFetch('/auth/v1/token?grant_type=id_token', {method: 'POST', body: {provider: 'google', id_token: idt}, sinSesion: true});
-    const u = j.user || {};
-    M.cuentas[u.id] = Object.assign(M.cuentas[u.id] || {desde: Date.now()}, {email: u.email || '', at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000});
-    M.activa = u.id; guardar();
-    const nombre = (S.profile && S.profile.name) || (u.user_metadata && (u.user_metadata.given_name || u.user_metadata.name)) || '';
-    const p = await rpc('mp_entrar', {p_nombre: M.cuentas[u.id].jugador ? null : nombre});
-    M.cuentas[u.id].jugador = p; guardar();
-    try { const s = await sbFetch('/rest/v1/mp_seasons?select=id,name,starts,ends&order=starts'); if (Array.isArray(s) && s.length) { M.seasons = s; guardar(); } } catch (e) {}
-    asignar(); await sincronizar(true);
+    const u = j.user || {}, prev = (M.cuentas || {})[u.id];
+    M.cuentas = {[u.id]: Object.assign(prev || {desde: Date.now()}, {email: u.email || g.email || '', gsub: String(g.sub), at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000})};
+    M.activa = u.id; M.cache = {}; cuenta().ultEnvio = Date.now(); guardar(); // el primer envío automático llega a los 30 min (o al salir de la app)
+    const nombre = (S.profile && S.profile.name) || g.given || g.name || '';
+    cuenta().jugador = await rpc('mp_entrar', {p_nombre: prev && prev.jugador ? null : nombre}); guardar();
+    asignar(); await sincronizar('forzar');
+  }
+  // Si la app cierra la sesión de Google o cambia de cuenta, Mi PandarIA se cierra en este teléfono (los puntos quedan en el servidor)
+  function vinculo() {
+    const c = cuenta(), g = gApp();
+    if (c && (!g || String(g.sub) !== String(c.gsub))) { M.cuentas = {}; M.activa = null; M.cache = {}; guardar(); return false; }
+    return !!c;
   }
 
   /* ---------- De quién es cada entreno (dos cuentas en el mismo teléfono) ---------- */
@@ -114,12 +123,13 @@
   const semilla = k => k.split('-').reduce((a, x) => a * 31 + (+x), 7);
   function extrasDe(k) { const n = semilla(k), a = n % EXTRAS.length; let b = (n * 7 + 3) % EXTRAS.length; if (b === a) b = (b + 1) % EXTRAS.length; return [EXTRAS[a], EXTRAS[b]]; }
   const contenidoDe = k => CONTENIDO[semilla(k) % CONTENIDO.length];
-  const extraHecho = (k, x, uid) => sesionesDe(k, uid || M.activa).some(s => s.mp && s.mp.k === x.k);
+  const extraHecho = (k, x, uid) => sesionesDe(k, uid || M.activa).some(s => s.mp && s.mp.k === x.k && s.mp.ok !== false);
 
   /* ---------- Puntos de un día ---------- */
   function puntosDia(k, uid) {
     uid = uid || M.activa; const d = (M.dias[uid] || {})[k] || {};
-    const ss = sesionesDe(k, uid), norm = ss.filter(s => !s.mp), ext = new Set(ss.filter(s => s.mp).map(s => s.mp.k));
+    // contra trampas: un entreno suma si dura 10 minutos o más; una actividad extra, si se terminó el temporizador
+    const ss = sesionesDe(k, uid), norm = ss.filter(s => !s.mp && (s.end - s.start) >= 10 * 60000), ext = new Set(ss.filter(s => s.mp && s.mp.ok !== false).map(s => s.mp.k));
     const plan = !!(S.plan && S.plan.days && S.plan.days.includes(new Date(kDe(k)).getDay()));
     const comidas = ((typeof nd === 'function' ? nd().diario : {})[k] || []).length;
     const n = typeof nut === 'function' ? nut() : {}; const agua = (typeof wLog === 'function' ? wLog(k) : []).reduce((a, x) => a + (x.ml || 0), 0);
@@ -159,74 +169,92 @@
     if (cambio) guardar(); return cambio;
   }
 
-  /* ---------- Enviar tus puntos (hoy y los 3 días anteriores) ---------- */
+  /* ---------- Servidor de bajo consumo ----------
+     Un solo envío (mp_sync) con los últimos días cambiados, como mucho cada 30 minutos y al salir de la app.
+     La respuesta trae rango, puesto, división, top 10 y amigos; se guarda y se reutiliza 15 minutos. */
+  const MIN_ENVIO = 30 * 60000, MIN_LEER = 15 * 60000;
   let sincT = null, sincEnCurso = false;
-  async function sincronizar(forzar) {
-    if (!cuenta() || sincEnCurso) return; sincEnCurso = true;
+  function pendientes() {
+    const E = (M.enviado[M.activa] = M.enviado[M.activa] || {}), out = [];
+    for (let i = 3; i >= 0; i--) { const k = sumaDias(hoyK(), -i); if (!temporadaDe(k)) continue; const p = puntosDia(k).total; if (E[k] !== p && (p > 0 || E[k] != null)) out.push({d: k, p}); }
+    return out;
+  }
+  function retosSinEnviar() { const R = M.retos[M.activa] || {}, V = (M.retosEnv[M.activa] = M.retosEnv[M.activa] || {}), o = {}; for (const id in R) if (!V[id]) o[id] = R[id]; return o; }
+  function aplicar(r) {
+    if (!r) return; const uid = M.activa, c = cuenta();
+    M.cache = {t: Date.now(), r};
+    if (r.jugador && c) c.jugador = r.jugador;
+    if (r.temporada && r.temporada.id && !temporadas().some(x => x.id === r.temporada.id)) M.seasons = temporadas().concat([r.temporada]);
+    if (r.yo) {
+      const R = (M.retos[uid] = M.retos[uid] || {}), V = (M.retosEnv[uid] = M.retosEnv[uid] || {});
+      for (const id in (r.yo.retos || {})) { if (!R[id]) R[id] = r.yo.retos[id]; V[id] = 1; } // otro teléfono: no se vuelven a premiar
+      M.srv[uid] = {s: r.temporada.id, dias: r.yo.dias || []};
+    }
+  }
+  async function sincronizar(modo) { // 'forzar' al entrar o tras añadir amigos · 'leer' al abrir la pestaña · 'salir' al dejar la app
+    if (!vinculo() || sincEnCurso) return false; sincEnCurso = true;
     try {
       asignar(); premiarRetos();
-      const E = (M.enviado[M.activa] = M.enviado[M.activa] || {});
-      for (let i = 3; i >= 0; i--) {
-        const k = sumaDias(hoyK(), -i); if (!temporadaDe(k)) continue;
-        const p = puntosDia(k); if (!forzar && E[k] === p.total) continue;
-        if (!p.total && E[k] == null && !forzar) continue;
-        const det = {e: p.entreno ? 1 : 0, x: p.extra / PUNTOS.extra, c: p.contenido ? 1 : 0, m: p.comida ? 1 : 0, a: p.agua ? 1 : 0, r: p.retos};
-        const ent = await rpc('mp_dia', {p_dia: k, p_puntos: p.total, p_detalle: det});
-        E[k] = p.total; M.cache.entrada = ent; guardar();
-      }
-      M.cache.err = null;
-    } catch (e) { M.cache.err = e.message; } finally { sincEnCurso = false; guardar(); }
+      const c = cuenta(), ahora = Date.now(), dias = pendientes(), desdeEnvio = ahora - (c.ultEnvio || 0);
+      const enviar = dias.length > 0 && desdeEnvio > 61000 && (modo === 'forzar' || modo === 'salir' || desdeEnvio >= MIN_ENVIO);
+      const leer = modo === 'forzar' || (modo === 'leer' && ahora - (M.cache.t || 0) >= MIN_LEER);
+      if (!enviar && !leer) return false;
+      const rt = enviar ? retosSinEnviar() : {};
+      const r = await rpc('mp_sync', {p_dias: enviar ? dias : [], p_retos: rt});
+      if (enviar) { const E = M.enviado[M.activa]; dias.forEach(x => { E[x.d] = x.p; }); c.ultEnvio = ahora; Object.keys(rt).forEach(id => { M.retosEnv[M.activa][id] = 1; }); }
+      aplicar(r); M.err = null; M.n = (M.n || 0) + 1; return true;
+    } catch (e) { if (!/demasiado pronto/.test(e.message || '')) M.err = e.message || String(e); return false; }
+    finally { sincEnCurso = false; guardar(); }
   }
-  const sincPronto = () => { clearTimeout(sincT); sincT = setTimeout(() => sincronizar(false).then(() => { if (TAB === 'mipandaria' && !LAYERS.length) { render.keep = true; render(); } }), 2500); };
-  async function cargarLiga() {
-    const s = temporada(); if (!cuenta()) return;
-    try {
-      const [liga, amigos] = await Promise.all([rpc('mp_liga', {p_temporada: s.id, p_limite: 100}), sbFetch('/rest/v1/mp_players?select=user_id,mote,display_name')]);
-      M.cache.liga = {s: s.id, t: Date.now(), filas: liga || []}; M.cache.jugadores = (amigos || []).filter(x => x.user_id !== M.activa);
-      const ids = M.cache.jugadores.map(x => x.user_id);
-      M.cache.diasAmigos = ids.length ? await sbFetch('/rest/v1/mp_days?select=user_id,day,points&season_id=eq.' + s.id + '&order=day.desc&limit=200') : [];
-      M.cache.trofeos = await rpc('mp_trofeos');
-      M.cache.err = null;
-    } catch (e) { M.cache.err = e.message; }
-    guardar();
+  const redibujar = () => { if (TAB === 'mipandaria' && !LAYERS.length) { render.keep = true; render(); } else if (LAYERS.length && /^mp/.test(LAYERS[LAYERS.length - 1].t)) { try { refreshTop(); } catch (e) {} } };
+  const sincPronto = modo => { clearTimeout(sincT); sincT = setTimeout(() => sincronizar(modo).then(hubo => { if (hubo) redibujar(); }), 2500); };
+  async function trofeos() {
+    if (M.trof && M.trof.dia === hoyK()) return M.trof.lista;
+    try { const t = await rpc('mp_trofeos'); M.trof = {dia: hoyK(), lista: t || []}; guardar(); } catch (e) {}
+    return (M.trof || {}).lista || [];
   }
 
   /* ---------- Pantalla principal ---------- */
   const fmtD = (k, o) => new Date(kDe(k)).toLocaleDateString(LOC(), o || {weekday: 'short', day: 'numeric'});
+  const R0 = () => (M.cache && M.cache.r) || null;
   function nivelActual() {
-    const s = temporada(), e = M.cache.entrada && M.cache.entrada.season_id === s.id ? M.cache.entrada : null;
-    const ini = e ? e.start_level : 0, pts = e ? e.points : 0, p = paso(s), n = Math.min(34, ini + Math.floor(pts / p));
-    return {s, pts, p, n, resto: n >= 34 ? 0 : p - (pts % p), pct: n >= 34 ? 100 : Math.round((pts % p) / p * 100)};
+    const s = temporada(), r = R0(), y = r && r.yo && r.temporada && r.temporada.id === s.id ? r.yo : null;
+    const ini = y ? y.start_level : 0, pts = y ? y.points : 0, p = paso(s), n = Math.min(34, ini + Math.floor(pts / p));
+    return {s, pts, p, n, y, resto: n >= 34 ? 0 : p - (pts % p), pct: n >= 34 ? 100 : Math.round((pts % p) / p * 100)};
   }
   function viewMP() {
-    const c = cuenta();
     let h = `<div class="hdr"><h1>Mi PandarIA</h1></div>`;
-    if (!c) return h + bienvenida();
-    const s = temporada(), k = hoyK(), en = !!temporadaDe(k), N = nivelActual(), R = rango(N.n), j = c.jugador || {};
-    const quedan = entre(k, s.ends) + 1;
+    if (!vinculo()) return h + bienvenida();
+    const c = cuenta(), s = temporada(), k = hoyK(), en = !!temporadaDe(k), N = nivelActual(), R = rango(N.n), j = c.jugador || {};
+    const quedan = entre(k, s.ends) + 1, r = R0(), div = r && r.division;
+    const puesto = N.y && N.y.pos_div ? tx(`#${N.y.pos_div} de ${div ? div.jugadores : '—'} en tu división`, `#${N.y.pos_div} of ${div ? div.jugadores : '—'} in your division`) : tx('Puesto: se calcula cada 15 min', 'Place: updated every 15 min');
     h += `<button class="card row" data-a="mpCuenta" style="width:100%;gap:12px;text-align:left"><span style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--ac),#ff4f3a);color:#1a0702;display:grid;place-items:center;font-weight:900;flex:0 0 auto">${R.sub}</span>
-      <span class="grow" style="min-width:0"><span class="b" style="font-size:17px">${R.txt}</span><br><span class="xs mut">${esc(j.mote || '')} · ${nombreT(s)}${en ? ' · ' + tx(`quedan ${quedan} días`, `${quedan} days left`) : ' · ' + tx('empieza el ', 'starts ') + fmtD(s.starts, {day: 'numeric', month: 'short'})}</span>
+      <span class="grow" style="min-width:0"><span class="b" style="font-size:17px">${R.txt}</span><br><span class="xs mut">${esc(j.mote || '')} · ${puesto}</span><br><span class="xs mut">${nombreT(s)}${en ? ' · ' + tx(`quedan ${quedan} días`, `${quedan} days left`) : ' · ' + tx('empieza el ', 'starts ') + fmtD(s.starts, {day: 'numeric', month: 'short'})}</span>
       <span style="display:block;height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden"><span style="display:block;height:100%;width:${N.pct}%;background:var(--ac)"></span></span>
-      <span class="xs mut">${N.n >= 34 ? tx('Nivel máximo', 'Top level') : tx(`${N.resto} puntos para ${rango(N.n + 1).txt}`, `${N.resto} points to ${rango(N.n + 1).txt}`)} · ${fmtNum(N.pts)} ${tx('puntos', 'points')}</span></span></button>`;
-    if (M.cache.err) h += `<div class="banner"><span class="ic">${I('alert', 18)}</span><div class="grow xs">${tx('Sin conexión con el servidor. Tus puntos se envían cuando vuelva.', 'No connection to the server. Your points will be sent when it is back.')}</div></div>`;
+      <span class="xs mut">${N.n >= 34 ? tx('Nivel máximo', 'Top level') : tx(`${N.resto} puntos para ${rango(N.n + 1).txt}`, `${N.resto} points to ${rango(N.n + 1).txt}`)} · ${fmtNum(N.pts)} ${tx('puntos en el servidor', 'points on the server')}</span></span></button>`;
+    if (M.err) h += `<div class="banner"><span class="ic">${I('alert', 18)}</span><div class="grow xs">${tx('Sin conexión con el servidor. Tus puntos se envían cuando vuelva.', 'No connection to the server. Your points will be sent when it is back.')}</div></div>`;
     if (en) h += hoyHtml(k);
     h += `<div class="sec">${tx('Calendario', 'Calendar')}</div>` + calendarioHtml(s);
     h += `<div class="sec">${tx('Retos', 'Challenges')}</div>` + retosHtml();
     h += `<div class="card" style="padding:0 12px;margin-top:14px">` +
-      fila('mpLiga', 'trophy', tx('Liga', 'League'), tx('Clasificación de la temporada por rango y puntos', 'Season ranking by rank and points')) +
+      fila('mpLiga', 'trophy', tx('Liga', 'League'), tx('Tu división y el top 10 global', 'Your division and the global top 10')) +
       fila('mpAmigos', 'user', tx('Amigos', 'Friends'), tx('Tu código, añadir amigos y su actividad', 'Your code, add friends and their activity')) +
       fila('mpTrofeos', 'flame', tx('Trofeos', 'Trophies'), tx('Lo que queda de cada temporada terminada', 'What remains from each finished season')) +
       fila('mpComo', 'info', tx('Cómo se ganan puntos', 'How to earn points'), tx('Entrenos, actividades, retos y rangos', 'Workouts, activities, challenges and ranks')) + `</div>`;
     return h;
   }
-  const fila = (a, ic, t, d) => `<button class="srow" data-a="${a}"><span class="si">${I(ic, 20)}</span><span class="grow"><div class="b">${t}</div><div class="xs mut">${d}</div></span><span class="mut" style="font-size:22px;line-height:1">›</span></button>`;
+  const fila = (a, ic, t, d, v) => `<button class="srow" data-a="${a}"${v ? ` data-v="${v}"` : ''}><span class="si">${I(ic, 20)}</span><span class="grow"><div class="b">${t}</div><div class="xs mut">${d}</div></span><span class="mut" style="font-size:22px;line-height:1">›</span></button>`;
   function bienvenida() {
+    const g = gApp();
+    const pie = g ? `<button class="btn pri big" data-a="mpEntrar" style="margin-top:8px">${tx('Entrar con ', 'Sign in as ')}<span translate="no">${esc(g.email || g.name || '')}</span></button><button class="btn ghost wide" data-a="mpAhoraNo" style="margin-top:6px">${tx('Ahora no', 'Not now')}</button>`
+      : `<div class="banner" style="text-align:left;margin-top:6px"><span class="ic">${I('lock', 18)}</span><div class="grow sm">${tx('Mi PandarIA usa la misma cuenta de Google que la app. Vincúlala primero en Ajustes › tu nombre › Mi cuenta.', 'Mi PandarIA uses the same Google account as the app. Link it first in Settings › your name › My account.')}</div></div><button class="btn pri big" data-a="mpVincular" style="margin-top:8px">${tx('Vincular mi cuenta de Google', 'Link my Google account')}</button>`;
     return `<div class="card" style="text-align:center;padding:22px 18px"><div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--ac),#ff4f3a);display:grid;place-items:center;margin:0 auto;color:#1a0702">${I('trophy', 38)}</div>
       <div style="font-size:22px;font-weight:900;margin-top:12px">${tx('Compite por temporadas', 'Compete by seasons')}</div>
       <p class="sm mut" style="line-height:1.5">${tx('Cada día tienes tu rutina, 2 actividades extra de PandarIA y un contenido. Suma puntos, sube de rango, completa retos y mide tu temporada con tus amigos.', 'Every day you get your routine, 2 extra PandarIA activities and some content. Earn points, climb ranks, complete challenges and compare your season with your friends.')}</p>
       <p class="xs mut" style="line-height:1.5">${tx('Al servidor solo van un mote aleatorio, tus puntos por día y tus amigos. Tu nombre solo lo ven tus amigos. Tus entrenos y tus datos de salud se quedan en el teléfono.', 'Only a random nickname, your daily points and your friends go to the server. Only your friends see your name. Your workouts and health data stay on the phone.')}</p>
-      <button class="btn pri big" data-a="mpEntrar" style="margin-top:8px">${tx('Entrar con Google', 'Sign in with Google')}</button></div>`;
+      ${pie}</div>`;
   }
+
   function hoyHtml(k) {
     const P = puntosDia(k), r = typeof rutinaHoyPendiente === 'function' ? rutinaHoyPendiente() : null, hecho = P.entreno > 0, [x1, x2] = extrasDe(k), cont = contenidoDe(k), d = misDias()[k] || {};
     const check = ok => ok ? `<span style="color:var(--good,#3ecf8e)">${I('check', 20)}</span>` : '';
@@ -238,13 +266,17 @@
       <div class="row" style="gap:10px;padding:10px 0;border-top:1px solid var(--line);align-items:flex-start"><span class="si">${I('book', 20)}</span><div class="grow"><div class="b sm">${tx('Contenido del día', 'Content of the day')} · +${PUNTOS.contenido}</div><div class="sm" style="line-height:1.45;margin-top:4px">${d.contenido ? tx(cont[0], cont[1]) : `<span class="mut">${tx('Toca «Ver» para descubrirlo.', 'Tap «Show» to reveal it.')}</span>`}</div></div>${check(d.contenido)}${d.contenido ? '' : `<button class="btn sm pri" data-a="mpContenido">${tx('Ver', 'Show')}</button>`}</div>
       <div class="xs mut" style="padding:8px 0;border-top:1px solid var(--line)">${tx(`También suman: 2 comidas registradas (+${PUNTOS.comida}) y tu meta de agua (+${PUNTOS.agua}).`, `Also counts: 2 meals logged (+${PUNTOS.comida}) and your water goal (+${PUNTOS.agua}).`)} ${P.comida ? '✓ ' + tx('comidas', 'meals') : ''} ${P.agua ? '✓ ' + tx('agua', 'water') : ''}</div></div>`;
   }
+  // Puntos de un día para mostrar: los 4 últimos días se calculan aquí; los anteriores, como quedaron en el servidor
+  function puntosVer(k) { const sv = M.srv[M.activa], s = sv && temporadas().find(x => x.id === sv.s);
+    if (s && entre(k, hoyK()) > 3 && k >= s.starts && k <= s.ends) { const v = sv.dias[entre(s.starts, k)]; if (v != null) { const P = puntosDia(k); return P.total === v ? P : {total: v, servidor: true, entreno: 0, plan: 0, extra: 0, contenido: 0, comida: 0, agua: 0, retos: 0}; } }
+    return puntosDia(k); }
   function calendarioHtml(s) {
     const k0 = s.starts, hoy = hoyK(), first = new Date(kDe(k0)), pad = (first.getDay() + 6) % 7, n = largo(s);
     const dias = [...Array(7)].map((_, i) => new Date(2026, 10, 23 + i).toLocaleDateString(LOC(), {weekday: 'narrow'}));
     let h = `<div class="card" style="padding:12px"><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">` + dias.map(d => `<div class="xs mut b">${d}</div>`).join('');
     for (let i = 0; i < pad; i++) h += '<div></div>';
     for (let i = 0; i < n; i++) {
-      const k = sumaDias(k0, i), fut = k > hoy, p = fut ? null : puntosDia(k), plan = S.plan && S.plan.days && S.plan.days.includes(new Date(kDe(k)).getDay());
+      const k = sumaDias(k0, i), fut = k > hoy, p = fut ? null : puntosVer(k), plan = S.plan && S.plan.days && S.plan.days.includes(new Date(kDe(k)).getDay());
       const a = p ? Math.min(1, p.total / 100) : 0, bg = p && p.total ? `rgba(255,122,26,${0.18 + a * 0.62})` : 'var(--bg2,rgba(255,255,255,.04))';
       h += `<button data-a="mpDia" data-v="${k}" style="aspect-ratio:1;border-radius:10px;border:${k === hoy ? '2px solid var(--ac)' : '1px solid var(--line)'};background:${bg};color:inherit;padding:0;position:relative;opacity:${fut ? .55 : 1}"><span class="xs b">${+k.slice(8)}</span>${plan ? `<span style="position:absolute;left:50%;bottom:4px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:${fut ? 'var(--mut)' : 'var(--fg,#fff)'}"></span>` : ''}</button>`;
     }
@@ -258,32 +290,42 @@
   }
 
   /* ---------- Capas ---------- */
+  const nombresAmigos = () => { const m = {}; ((R0() || {}).amigos || []).forEach(f => { m[f.mote] = f.nombre || ''; }); return m; };
+  function tablaLiga(filas, desde, yo) {
+    const am = nombresAmigos();
+    return `<div class="card" style="padding:4px 12px">` + filas.map(([mote, nivel, puntos], i) => { const soy = mote === yo, nom = soy ? ((cuenta() || {}).jugador || {}).display_name : am[mote];
+      return `<div class="row" style="gap:10px;padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''};${soy ? 'color:var(--ac)' : ''}"><b style="width:28px;text-align:right">${desde + i}</b><div class="grow" style="min-width:0"><div class="b sm">${esc(nom || mote)}${soy ? ' · ' + tx('tú', 'you') : ''}</div><div class="xs mut">${nom ? `<span translate="no">${esc(mote)}</span> · ` : ''}${rango(nivel).txt}</div></div><b class="sm">${fmtNum(puntos)}</b></div>`; }).join('') + `</div>`;
+  }
   SCREENS.mpLiga = () => {
-    const L = M.cache.liga && M.cache.liga.s === temporada().id ? M.cache.liga.filas : null;
-    let b = `<p class="sm mut" style="margin-top:0">${nombreT(temporada())}. ${tx('Primero cuenta el rango; a igual rango, los puntos. Todos ven tu mote; tu nombre, solo tus amigos.', 'Rank comes first; with the same rank, points. Everyone sees your nickname; only friends see your name.')}</p>`;
-    if (!L) b += `<div class="card sm mut">${tx('Cargando…', 'Loading…')}</div>`;
-    else if (!L.length) b += `<div class="card sm mut">${tx('Todavía nadie ha sumado puntos esta temporada.', 'Nobody has scored this season yet.')}</div>`;
-    else b += `<div class="card" style="padding:4px 12px">` + L.map((f, i) => `<div class="row" style="gap:10px;padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''};${f.soy_yo ? 'color:var(--ac)' : ''}"><b style="width:28px;text-align:right">${f.pos}</b><div class="grow" style="min-width:0"><div class="b sm">${esc(f.nombre || f.mote)}${f.soy_yo ? ' · ' + tx('tú', 'you') : ''}</div><div class="xs mut">${f.nombre ? esc(f.mote) + ' · ' : ''}${rango(f.nivel).txt}</div></div><b class="sm">${fmtNum(f.puntos)}</b></div>`).join('') + `</div>`;
+    const r = R0(), yo = ((cuenta() || {}).jugador || {}).mote, d = r && r.division, t = r && r.top;
+    let b = `<p class="sm mut" style="margin-top:0">${nombreT(temporada())}. ${tx('Compites en una división de hasta 50 jugadores de tu rango. Primero cuenta el rango; a igual rango, los puntos. Todos ven tu mote; tu nombre, solo tus amigos.', 'You compete in a division of up to 50 players of your rank. Rank comes first; with the same rank, points. Everyone sees your nickname; only friends see your name.')}</p>`;
+    if (!r) b += `<div class="card sm mut">${tx('Cargando…', 'Loading…')}</div>`;
+    else {
+      const dv = r.yo && r.yo.division != null ? r.yo.division : null;
+      b += `<div class="sec">${tx('Tu división', 'Your division')}${dv != null ? ' · ' + rango((Math.floor(dv / 1000)) * 5).nombre + ' ' + (dv % 1000 + 1) : ''}</div>` + (d && d.filas.length ? tablaLiga(d.filas, 1, yo) : `<div class="card sm mut">${tx('Tu división aparece en unos minutos (se actualiza cada 15 min).', 'Your division appears in a few minutes (updated every 15 min).')}</div>`);
+      b += `<div class="sec">${tx('Top 10 global', 'Global top 10')}${t ? ` · ${fmtNum(t.jugadores)} ${tx('jugadores', 'players')}` : ''}</div>` + (t && t.filas.length ? tablaLiga(t.filas, 1, yo) : `<div class="card sm mut">${tx('Todavía nadie ha sumado puntos esta temporada.', 'Nobody has scored this season yet.')}</div>`);
+      if (d && d.t) b += `<div class="xs mut" style="margin:10px 4px">${tx('Actualizado: ', 'Updated: ')}${new Date(d.t).toLocaleTimeString(LOC(), {hour: '2-digit', minute: '2-digit'})}</div>`;
+    }
     return lhdr(tx('Liga', 'League')) + `<div class="lbody">${b}</div>`;
   };
   SCREENS.mpAmigos = () => {
-    const j = (cuenta() || {}).jugador || {}, A0 = M.cache.jugadores || [], D = M.cache.diasAmigos || [];
+    const j = (cuenta() || {}).jugador || {}, A0 = (R0() || {}).amigos || [];
     let b = `<div class="card" style="text-align:center"><div class="xs mut b" style="letter-spacing:1px">${tx('TU CÓDIGO DE AMIGO', 'YOUR FRIEND CODE')}</div><div style="font-size:30px;font-weight:900;letter-spacing:4px;margin:6px 0" translate="no">${esc(j.friend_code || '······')}</div>
       <button class="btn sm" data-a="mpCopiar">${I('copy', 16)} ${tx('Copiar', 'Copy')}</button><p class="xs mut" style="margin-bottom:0">${tx('Pásaselo a tu amigo para que te añada. Al añadirse, los dos veis vuestro nombre y vuestra actividad.', 'Give it to your friend so they can add you. Once added, you both see each other’s name and activity.')}</p></div>
       <div class="field" style="margin-top:12px"><label>${tx('Añadir con un código', 'Add with a code')}</label><div class="row" style="gap:8px"><input id="mpCod" maxlength="6" autocapitalize="characters" placeholder="ABC123" style="text-transform:uppercase;flex:1"><button class="btn pri" data-a="mpAnadir">${tx('Añadir', 'Add')}</button></div></div>`;
     b += `<div class="sec">${tx('Tus amigos', 'Your friends')}</div>`;
     if (!A0.length) b += `<div class="card sm mut">${tx('Aún no tienes amigos en Mi PandarIA.', 'No friends in Mi PandarIA yet.')}</div>`;
-    else b += `<div class="card" style="padding:4px 12px">` + A0.map((f, i) => { const ds = D.filter(x => x.user_id === f.user_id), sem = ds.filter(x => x.day > sumaDias(hoyK(), -7)), hoy = ds.find(x => x.day === hoyK());
-      return `<div class="row" style="gap:10px;padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''}"><div class="grow"><div class="b sm">${esc(f.display_name || f.mote)}</div><div class="xs mut">${esc(f.mote)} · ${tx('hoy', 'today')} ${hoy ? hoy.points : 0} · ${tx('7 días', '7 days')} ${sem.reduce((a, x) => a + x.points, 0)} ${tx('pts', 'pts')}</div></div><button class="ibtn" data-a="mpQuitar" data-v="${f.user_id}" aria-label="${tx('Quitar', 'Remove')}">${I('x', 18)}</button></div>`; }).join('') + `</div>`;
+    else b += `<div class="card" style="padding:4px 12px">` + A0.map((f, i) => `<div class="row" style="gap:10px;padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''}"><div class="grow"><div class="b sm">${esc(f.nombre || f.mote)}</div><div class="xs mut"><span translate="no">${esc(f.mote)}</span>${f.nivel != null ? ' · ' + rango(f.nivel).txt : ''} · ${tx('hoy', 'today')} ${f.hoy} · ${tx('7 días', '7 days')} ${f.sem} ${tx('pts', 'pts')}</div></div><button class="ibtn" data-a="mpQuitar" data-v="${f.id}" aria-label="${tx('Quitar', 'Remove')}">${I('x', 18)}</button></div>`).join('') + `</div>`;
     return lhdr(tx('Amigos', 'Friends')) + `<div class="lbody">${b}</div>`;
   };
   SCREENS.mpTrofeos = () => {
-    const T = M.cache.trofeos || [];
+    const T = (M.trof || {}).lista || [];
     let b = `<p class="sm mut" style="margin-top:0">${tx('Los retos y los puntos se reinician cada temporada. Lo único que queda es el trofeo de cómo la terminaste.', 'Challenges and points reset each season. All that remains is the trophy for how you finished it.')}</p>`;
     b += T.length ? `<div class="card" style="padding:4px 12px">` + T.map((t, i) => `<div class="row" style="gap:10px;padding:12px 0;${i ? 'border-top:1px solid var(--line)' : ''}"><span style="color:var(--ac)">${I('trophy', 26)}</span><div class="grow"><div class="b">${rango(t.nivel).txt}</div><div class="xs mut">${esc(nombreT({id: t.temporada, name: t.nombre}))} · ${tx(`puesto ${t.pos} de ${t.jugadores}`, `place ${t.pos} of ${t.jugadores}`)} · ${fmtNum(t.puntos)} ${tx('pts', 'pts')}</div></div></div>`).join('') + `</div>`
       : `<div class="card sm mut">${tx('Tu primer trofeo llegará cuando termine la temporada.', 'Your first trophy arrives when the season ends.')}</div>`;
     return lhdr(tx('Trofeos', 'Trophies')) + `<div class="lbody">${b}</div>`;
   };
+
   SCREENS.mpComo = () => {
     const s = temporada(), filas = [[tx('Entreno del día (cualquiera)', 'Workout of the day (any)'), PUNTOS.entreno], [tx('…y si es un día de tu plan', '…and if it is a plan day'), PUNTOS.plan], [tx('Cada actividad extra de PandarIA (2 al día)', 'Each extra PandarIA activity (2 a day)'), PUNTOS.extra], [tx('Contenido del día', 'Content of the day'), PUNTOS.contenido], [tx('2 comidas registradas', '2 meals logged'), PUNTOS.comida], [tx('Meta de agua cumplida', 'Water goal reached'), PUNTOS.agua]];
     const b = `<div class="card" style="padding:4px 12px">${filas.map(([t, p], i) => `<div class="row" style="padding:10px 0;${i ? 'border-top:1px solid var(--line)' : ''}"><span class="grow sm">${t}</span><b>+${p}</b></div>`).join('')}</div>
@@ -300,36 +342,39 @@
     return lhdr(fmtD(k, {weekday: 'long', day: 'numeric', month: 'long'})) + `<div class="lbody">${b}</div>`;
   };
   SCREENS.mpCuenta = () => {
-    const c = cuenta() || {}, j = c.jugador || {}, otras = Object.entries(M.cuentas).filter(([id]) => id !== M.activa);
-    const b = `<div class="card"><div class="xs mut b" style="letter-spacing:1px">${tx('CUENTA ACTIVA', 'ACTIVE ACCOUNT')}</div><div class="b" style="margin-top:4px">${esc(c.email || '')}</div><div class="sm mut">${tx('Mote', 'Nickname')}: <b translate="no">${esc(j.mote || '')}</b> · ${tx('Nombre para amigos', 'Name for friends')}: ${esc(j.display_name || '—')}</div></div>
-      <div class="card" style="padding:0 12px;margin-top:12px">${otras.map(([id, o]) => fila('mpUsar', 'user', tx('Usar ', 'Use ') + esc(o.email || ''), tx('Cambiar a esta cuenta', 'Switch to this account')).replace('data-a="mpUsar"', `data-a="mpUsar" data-v="${id}"`)).join('')}
-      ${fila('mpOtra', 'plus', tx('Entrar con otra cuenta de Google', 'Sign in with another Google account'), tx('Tus entrenos de hoy en adelante cuentan para la cuenta activa', 'Your workouts from now on count for the active account'))}
+    const c = cuenta() || {}, j = c.jugador || {};
+    const b = `<div class="card"><div class="xs mut b" style="letter-spacing:1px">${tx('TU CUENTA', 'YOUR ACCOUNT')}</div><div class="b" style="margin-top:4px" translate="no">${esc(c.email || '')}</div><div class="sm mut">${tx('Es la cuenta de Google de la app. Para usar otra, cambia la cuenta en Ajustes › tu nombre › Mi cuenta.', 'It is the app’s Google account. To use another one, change the account in Settings › your name › My account.')}</div><div class="sm" style="margin-top:8px">${tx('Mote', 'Nickname')}: <b translate="no">${esc(j.mote || '')}</b> · ${tx('Nombre para amigos', 'Name for friends')}: ${esc(j.display_name || '—')}</div></div>
+      <div class="card" style="padding:0 12px;margin-top:12px">
       ${fila('mpNombre', 'edit', tx('Cambiar el nombre para amigos', 'Change the name for friends'), tx('El mote no se puede cambiar', 'The nickname cannot be changed'))}
-      ${fila('mpCerrar', 'lock', tx('Cerrar sesión en Mi PandarIA', 'Sign out of Mi PandarIA'), tx('Tus puntos se quedan en el servidor', 'Your points stay on the server'))}
-      ${fila('mpSalir', 'trash', tx('Salir de Mi PandarIA y borrar mis datos del servidor', 'Leave Mi PandarIA and delete my server data'), tx('Mote, puntos y amigos de esta cuenta', 'Nickname, points and friends of this account'))}</div>`;
+      ${fila('mpCerrar', 'lock', tx('Cerrar sesión en Mi PandarIA', 'Sign out of Mi PandarIA'), tx('Tus puntos se quedan en el servidor y vuelven al entrar', 'Your points stay on the server and come back when you sign in'))}
+      ${fila('mpSalir', 'trash', tx('Borrar mis datos del servidor', 'Delete my server data'), tx('Mote, puntos, trofeos y amigos de esta cuenta', 'Nickname, points, trophies and friends of this account'))}</div>`;
     return lhdr(tx('Tu cuenta de Mi PandarIA', 'Your Mi PandarIA account')) + `<div class="lbody">${b}</div>`;
   };
 
   /* ---------- Acciones ---------- */
   const conEspera = async (fn, ok) => { try { toast(tx('Conectando…', 'Connecting…')); await fn(); if (ok) toast(ok); } catch (e) { toast(tx('No se pudo: ', 'Could not: ') + (e.message || e)); } render.keep = true; render(); if (LAYERS.length) { try { refreshTop(); } catch (e) {} } };
-  A.mpEntrar = () => conEspera(() => entrar(false).then(cargarLiga), tx('¡Dentro de Mi PandarIA!', 'You are in Mi PandarIA!'));
-  A.mpOtra = () => { closeLayer(); conEspera(() => entrar(true).then(cargarLiga), tx('Cuenta cambiada', 'Account switched')); };
-  A.mpUsar = id => { if (!M.cuentas[id]) return; M.activa = id; M.cache = {}; guardar(); closeLayer(); conEspera(() => sincronizar(true).then(cargarLiga), tx('Cuenta cambiada', 'Account switched')); };
+  A.mpEntrar = () => conEspera(() => entrar(), tx('¡Dentro de Mi PandarIA!', 'You are in Mi PandarIA!'));
+  A.mpAhoraNo = () => { A.tab(M.tabAntes && M.tabAntes !== 'mipandaria' ? M.tabAntes : 'rutinas'); };
+  A.mpVincular = () => { A.tab('ajustes'); if (typeof A.verTarjeta === 'function') A.verTarjeta(); if (typeof A.ajGrupo === 'function') A.ajGrupo('cuenta'); };
   A.mpCuenta = () => openLayer('mpCuenta', {});
-  A.mpCerrar = () => { const id = M.activa; delete M.cuentas[id]; M.activa = Object.keys(M.cuentas)[0] || null; M.cache = {}; guardar(); closeLayer(); render(); };
-  A.mpSalir = () => confirmBox({title: tx('¿Borrar tus datos de Mi PandarIA?', 'Delete your Mi PandarIA data?'), text: tx('Se borran del servidor tu mote, tus puntos y tus amistades de esta cuenta. Tus entrenos de la app no se tocan.', 'Your nickname, points and friendships for this account are deleted from the server. Your app workouts are not touched.'), okText: tx('Borrar', 'Delete'), danger: true,
-    ok: () => conEspera(async () => { await rpc('mp_salir'); const id = M.activa; delete M.cuentas[id]; delete M.dias[id]; delete M.enviado[id]; delete M.retos[id]; M.activa = Object.keys(M.cuentas)[0] || null; M.cache = {}; guardar(); closeLayer(); }, tx('Datos borrados', 'Data deleted'))});
+  const cerrarLocal = () => { M.cuentas = {}; M.activa = null; M.cache = {}; guardar(); };
+  A.mpCerrar = () => { cerrarLocal(); closeLayer(); render(); toast(tx('Sesión cerrada. Tus puntos siguen en el servidor.', 'Signed out. Your points stay on the server.')); };
+  // Borrar del servidor: siempre posible (si no hay sesión, entra un momento con la cuenta de la app para confirmar que eres tú)
+  A.mpSalir = () => confirmBox({title: tx('¿Borrar tus datos de Mi PandarIA?', 'Delete your Mi PandarIA data?'), text: tx('Se borran del servidor tu mote, tus puntos, tus trofeos y tus amistades. Tus entrenos de la app no se tocan.', 'Your nickname, points, trophies and friendships are deleted from the server. Your app workouts are not touched.'), okText: tx('Borrar', 'Delete'), danger: true,
+    ok: () => conEspera(async () => { if (!vinculo()) await entrar(); await rpc('mp_salir'); const id = M.activa; delete M.dias[id]; delete M.enviado[id]; delete M.retos[id]; delete M.retosEnv[id]; delete M.srv[id]; M.trof = null; cerrarLocal(); while (LAYERS.length && /^mp/.test(LAYERS[LAYERS.length - 1].t)) closeLayer(); }, tx('Datos borrados del servidor', 'Data deleted from the server'))});
   A.mpNombre = () => { const j = (cuenta() || {}).jugador || {}; openModal(`<div class="modal"><h3>${tx('Nombre para tus amigos', 'Name for your friends')}</h3><input id="mpNom" maxlength="40" value="${esc(j.display_name || '')}"><div class="row" style="gap:8px;margin-top:14px"><button class="btn grow" data-a="closeModal">${tx('Cancelar', 'Cancel')}</button><button class="btn pri grow" data-a="mpNombreOk">${tx('Guardar', 'Save')}</button></div></div>`, {center: true}); };
   A.mpNombreOk = () => { const v = (document.getElementById('mpNom') || {}).value || ''; closeModal(); conEspera(async () => { cuenta().jugador = await rpc('mp_entrar', {p_nombre: v.trim()}); guardar(); }, tx('Nombre guardado', 'Name saved')); };
-  A.mpLiga = () => { openLayer('mpLiga', {}); cargarLiga().then(() => { try { refreshTop(); } catch (e) {} }); };
-  A.mpAmigos = () => { openLayer('mpAmigos', {}); cargarLiga().then(() => { try { refreshTop(); } catch (e) {} }); };
-  A.mpTrofeos = () => { openLayer('mpTrofeos', {}); cargarLiga().then(() => { try { refreshTop(); } catch (e) {} }); };
+  const abrirCon = (scr, modo) => { openLayer(scr, {}); sincronizar(modo || 'leer').then(h => { if (h) redibujar(); }); };
+  A.mpLiga = () => abrirCon('mpLiga');
+  A.mpAmigos = () => abrirCon('mpAmigos');
+  A.mpTrofeos = () => { openLayer('mpTrofeos', {}); trofeos().then(() => { try { refreshTop(); } catch (e) {} }); };
   A.mpComo = () => openLayer('mpComo', {});
   A.mpDia = k => openLayer('mpDia', {k});
   A.mpCopiar = () => { const c = ((cuenta() || {}).jugador || {}).friend_code || ''; try { navigator.clipboard.writeText(c).then(() => toast(tx('Código copiado', 'Code copied')), () => toast(c)); } catch (e) { toast(c); } };
   A.mpAnadir = () => { const v = ((document.getElementById('mpCod') || {}).value || '').trim().toUpperCase(); if (v.length !== 6) { toast(tx('El código tiene 6 caracteres', 'The code has 6 characters')); return; }
-    conEspera(async () => { const r = await rpc('mp_amigo_anadir', {p_codigo: v}); await cargarLiga(); const f = Array.isArray(r) ? r[0] : r; toast(tx('Añadido: ', 'Added: ') + ((f && (f.display_name || f.mote)) || '')); }); };
-  A.mpQuitar = id => confirmBox({title: tx('¿Quitar a este amigo?', 'Remove this friend?'), okText: tx('Quitar', 'Remove'), danger: true, ok: () => conEspera(async () => { await rpc('mp_amigo_quitar', {p_user: id}); await cargarLiga(); })});
+    conEspera(async () => { const r = await rpc('mp_amigo_anadir', {p_codigo: v}); M.cache.t = 0; await sincronizar('forzar'); const f = Array.isArray(r) ? r[0] : r; toast(tx('Añadido: ', 'Added: ') + ((f && (f.display_name || f.mote)) || '')); }); };
+  A.mpQuitar = id => confirmBox({title: tx('¿Quitar a este amigo?', 'Remove this friend?'), okText: tx('Quitar', 'Remove'), danger: true, ok: () => conEspera(async () => { await rpc('mp_amigo_quitar', {p_user: id}); M.cache.t = 0; await sincronizar('forzar'); })});
+
   A.mpContenido = () => { const d = misDias()[hoyK()] = misDias()[hoyK()] || {}; d.contenido = true; guardar(); sincPronto(); render.keep = true; render(); };
   A.mpRutina = id => { if (typeof A.startWorkout === 'function') A.startWorkout(id); };
   // Actividad extra: usa el temporizador de intervalos de la app y se guarda en el historial marcada como de Mi PandarIA
@@ -337,13 +382,14 @@
   A.mpExtra = kx => {
     const x = EXTRAS.find(e => e.k === kx); if (!x) return;
     const repe = extraHecho(hoyK(), x); if (repe && !(typeof isPremium === 'function' && isPremium())) { toast(tx('Con la cuenta gratuita cada actividad se hace una vez al día', 'With the free account each activity is done once a day')); return; }
-    const c = Object.assign(intDefaults(), clone(x.cfg)); extraEnCurso = {k: x.k, day: hoyK(), name: 'Mi PandarIA · ' + tx(x.es, x.en), repe};
+    const c = Object.assign(intDefaults(), clone(x.cfg)), plan = intPhases(c).filter(f => f.type === 'work').reduce((a, f) => a + f.dur, 0);
+    extraEnCurso = {k: x.k, day: hoyK(), name: 'Mi PandarIA · ' + tx(x.es, x.en), repe, plan};
     INT = {cfg: c, ph: intPhases(c), i: 0, t0: Date.now(), paused: null, rounds: 0, start: Date.now(), done: [], lastSec: null};
     openLayer('intRun', {}); keepAwake(); intAnnounce();
   };
   const _sis = saveIntSession;
   saveIntSession = function (session) {
-    if (extraEnCurso && session && session.routineId === '__int') { session.mp = {k: extraEnCurso.k, day: extraEnCurso.day, repe: extraEnCurso.repe || undefined}; session.routineName = extraEnCurso.name; if (M.activa) M.duenos[session.id] = M.activa; guardar(); }
+    if (extraEnCurso && session && session.routineId === '__int') { const hecho = ((session.int && session.int.work) || 0) >= extraEnCurso.plan * 0.8; session.mp = {k: extraEnCurso.k, day: extraEnCurso.day, repe: extraEnCurso.repe || undefined, ok: hecho}; session.routineName = extraEnCurso.name; if (M.activa) M.duenos[session.id] = M.activa; guardar(); }
     extraEnCurso = null; const r = _sis.apply(this, arguments); sincPronto(); return r;
   };
   // una repetición (Premium) no suma: solo cuenta la primera de cada actividad (ya lo hace el Set de puntosDia)
@@ -361,14 +407,20 @@
   // Se instala después de que Ajustes monte su pantalla (al cargar la página); si no, Mi PandarIA salía dentro de Ajustes
   function instalarVista() {
     const _va = viewAjustes;
-    viewAjustes = function () { if (TAB === 'mipandaria') { setTimeout(() => { if (cuenta()) sincPronto(); }, 0); return viewMP(); } return _va.apply(this, arguments); };
+    viewAjustes = function () { if (TAB === 'mipandaria') { setTimeout(() => { if (cuenta()) sincPronto('leer'); }, 0); return viewMP(); } return _va.apply(this, arguments); };
     if (TAB === 'mipandaria') { try { render(); } catch (e) {} }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(instalarVista, 0)); else instalarVista();
   const _save = save;
   save = function () { const r = _save.apply(this, arguments); try { if (cuenta() && asignar()) sincPronto(); } catch (e) {} return r; };
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && cuenta()) sincPronto(); });
-  window.MP.puntosDia = puntosDia; window.MP.retos = retos; window.MP.sincronizar = sincronizar; window.MP.cargarLiga = cargarLiga; window.MP.rango = rango; window.MP.extrasDe = extrasDe; window.MP.entrar = entrar;
+  // al salir de la app se envía lo pendiente; al volver solo se lee si la foto tiene más de 15 minutos y estás en la pestaña
+  document.addEventListener('visibilitychange', () => { if (!cuenta()) return; if (document.hidden) sincronizar('salir'); else if (TAB === 'mipandaria') sincPronto('leer'); });
+  // la cuenta de la app manda: si se cierra o cambia, Mi PandarIA se cierra aquí
+  const _acc = window.pfAccountChanged; window.pfAccountChanged = function () { try { if (typeof _acc === 'function') _acc.apply(this, arguments); } finally { if (cuenta() && !vinculo()) { render.keep = true; render(); } } };
+  const _tab = A.tab; A.tab = function (v) { if (v === 'mipandaria' && TAB !== 'mipandaria') { M.tabAntes = TAB; } return _tab.apply(this, arguments); };
+  // Ajustes › tu nombre › Mi cuenta: borrar tus datos de Mi PandarIA en cualquier momento
+  try { const g = AJ_GRUPOS.find(x => x.id === 'cuenta'); if (g && !g.mp) { g.mp = true; g.parts.push({html: () => gApp() ? `<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" style="width:100%" data-a="mpSalir"><span class="si" style="color:var(--bad)">${I('trash', 20)}</span><span class="grow"><span class="b">${tx('Borrar mis datos de Mi PandarIA', 'Delete my Mi PandarIA data')}</span><br><span class="xs mut">${tx('Mote, puntos, trofeos y amigos guardados en el servidor', 'Nickname, points, trophies and friends stored on the server')}</span></span></button></div>` : ''}); } } catch (e) {}
+  window.MP.puntosDia = puntosDia; window.MP.retos = retos; window.MP.sincronizar = sincronizar; window.MP.rango = rango; window.MP.extrasDe = extrasDe; window.MP.entrar = entrar;
   try { renderNav(); } catch (e) {}
-  if (cuenta()) setTimeout(() => sincronizar(false), 4000);
+  if (cuenta()) setTimeout(() => sincronizar(), 4000);
 })();
