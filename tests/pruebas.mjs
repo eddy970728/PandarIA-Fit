@@ -284,7 +284,7 @@ if (fs.existsSync(COPIA07)) {
   const PELIGRO = /wipe|del|Del|Remove|import|export|Export|share|Share|Url|Mail|upd(Download|Open)|hcPrivacy|Discard|kbUrl|copy|Copy|photo|Photo|mPhoto|backup|Backup|xjump|mFile/;
   for (const lang of ['es', 'en']) {
     let toques = 0; const fallosR = [], sinTraducir = new Set();
-    for (const t of ['rutinas', 'explorar', 'nutricion', 'agua', 'ayuno', 'historial', 'ajustes']) { // 1.3: Nutrición › Agua y la pestaña Ayuno
+    for (const t of ['rutinas', 'explorar', 'nutricion', 'agua', 'ayuno', 'historial', 'ajustes', 'tarjeta']) { // 1.9.4: tu tarjeta (Mi cuenta, Mis datos personales, PandarIA Premium) // 1.3: Nutrición › Agua y la pestaña Ayuno
       const a = abrir({ 'pandaria-fit-v1': fs.readFileSync(COPIA07, 'utf8') });
       await espera(900);
       const w = a.w;
@@ -296,7 +296,7 @@ if (fs.existsSync(COPIA07)) {
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
       // 1.8.1: Explorar es una capa de Rutinas y Ayuno una sección de Nutrición; los bloques desplegables se recorren abiertos
       const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); S.settings.orden181=1; S.settings.fold=Object.fromEntries([...Object.keys(FOLD_DEF),...MEALS.map(m=>'meal-'+m[0])].map(k=>[k,true]));
-        TAB=${JSON.stringify(['agua', 'ayuno'].includes(t) ? 'nutricion' : t === 'explorar' ? 'rutinas' : t)}; NSEG=${JSON.stringify(['agua', 'ayuno'].includes(t) ? t : 'comida')}; render(); ${t === 'explorar' ? 'A.openExplorar();' : ''}`);
+        TAB=${JSON.stringify(['agua', 'ayuno'].includes(t) ? 'nutricion' : t === 'explorar' ? 'rutinas' : t === 'tarjeta' ? 'ajustes' : t)}; NSEG=${JSON.stringify(['agua', 'ayuno'].includes(t) ? t : 'comida')}; render(); ${t === 'explorar' ? 'A.openExplorar();' : t === 'tarjeta' ? 'A.verTarjeta();' : ''}`);
       const botones = () => [...w.document.querySelectorAll('[data-a]')].map(e => [e.dataset.a, e.dataset.v || '']).filter(([x]) => !PELIGRO.test(x) && x !== 'tab');
       const tocar = (x, v) => { const e = [...w.document.querySelectorAll('[data-a]')].find(e => e.dataset.a === x && (e.dataset.v || '') === v); if (!e) return false; ultimo = null; const n0 = a.errores.length;
         try { e.click(); } catch (er) { ultimo = er.message; } if (!ultimo && a.errores.length > n0) ultimo = a.errores[a.errores.length - 1]; return true; };
@@ -1321,13 +1321,14 @@ for (const lang of ['es', 'en']) {
   const vista = () => ev(`document.querySelector('#view').textContent.replace(/\\s+/g,' ')`);
   let t = vista();
   r.sinNombre = /Sin nombre/.test(t) && /Cuenta gratuita/.test(t);
-  r.orden = ['Mi cuenta', 'Mis datos personales', 'PandarIA Premium', 'Hazte Premium', 'Entrenamiento'].map(x => t.indexOf(x)).every((v, i, A) => v > 0 && (!i || v > A[i - 1]));
+  r.orden = ['Sin nombre', 'Hazte Premium', 'Entrenamiento'].map(x => t.indexOf(x)).every((v, i, A) => v >= 0 && (!i || v > A[i - 1])) && !/Mis datos personales|Mi cuenta/.test(t);
   r.sinTarjetaVieja = !/Desbloquea PandarIA completo/.test(t);
   ev(`window.isPremium=()=>true; render();`); t = vista();
   r.premium = /Cuenta Premium/.test(t) && !/Hazte Premium/.test(t);
   ev(`S.profile.name='Ana'; S.profile.age=30; render(); A.verTarjeta()`);
   const tj = ev(`document.querySelector('#layers').lastElementChild.textContent.replace(/\\s+/g,' ')`);
-  r.tarjeta = /Ana/.test(tj) && /30 años/.test(tj) && /Cuenta Premium/.test(tj) && ev(`document.querySelectorAll('#layers .layer:last-child input,#layers .layer:last-child textarea').length`) === 0;
+  r.tarjeta = /Ana/.test(tj) && /30 años/.test(tj) && /Cuenta Premium/.test(tj) && ['Mi cuenta', 'Mis datos personales', 'PandarIA Premium'].map(x => tj.indexOf(x)).every((v, i, A) => v > 0 && (!i || v > A[i - 1])) && ev(`document.querySelectorAll('#layers .layer:last-child input,#layers .layer:last-child textarea').length`) === 0;
+  ev(`A.ajGrupo('cuenta')`); r.desdeTarjeta = ev(`LAYERS[LAYERS.length-1].t==='ajGrupo' && LAYERS.length===2`); ev(`closeLayer()`);
   ev(`A.fotoMenu()`); r.menu1 = ev(`[...document.querySelectorAll('.sheet .mi')].map(b=>b.textContent.trim()).join('|')`); ev(`closeModal()`);
   ev(`fotoGuardar({foto:'data:image/jpeg;base64,QUJD',orig:'data:image/jpeg;base64,QUJD',pos:{z:1.5,cx:.5,cy:.4}})`);
   r.guardada = ev(`S.profile.foto==='data:image/jpeg;base64,QUJD' && S.profile.fotoPos.z===1.5`) && ev(`!!document.querySelector('#layers img[src^="data:image/jpeg"]')`);
@@ -1350,10 +1351,10 @@ for (const lang of ['es', 'en']) {
   r.driveEnCuenta = /DRIVECARD/.test(ev(`document.querySelector('#layers').lastElementChild.textContent`)); ev(`closeLayer(); A.ajGrupo('acerca')`);
   r.driveFueraAcerca = !/DRIVECARD/.test(ev(`document.querySelector('#layers').lastElementChild.textContent`)); ev(`closeLayer()`);
   a.cerrar();
-  comprobar('1.9.4 Ajustes: arriba «Sin nombre · Cuenta gratuita» y el orden Mi cuenta › Mis datos personales › PandarIA Premium › Hazte Premium', r.sinNombre && r.orden && r.sinTarjetaVieja, JSON.stringify(r));
+  comprobar('1.9.4 Ajustes: arriba «Sin nombre · Cuenta gratuita», luego Hazte Premium y los grupos (las secciones de la cuenta van dentro de la tarjeta)', r.sinNombre && r.orden && r.sinTarjetaVieja, JSON.stringify(r));
   comprobar('1.9.4 Ajustes: con Premium dice «Cuenta Premium» y no muestra «Hazte Premium»', r.premium);
-  comprobar('1.9.4 tarjeta: nombre, edad y tipo de cuenta, sin campos que editar', r.tarjeta, tj.slice(0, 200));
-  comprobar('1.9.4 foto: menú hacer/elegir; con foto también recortar y eliminar; se guarda y se borra', r.menu1 === 'Hacer foto|Elegir de la galería' && r.menu2 === 'Hacer foto|Elegir de la galería|Recortar o mover|Eliminar foto' && r.guardada && r.borrada, JSON.stringify([r.menu1, r.menu2, r.guardada, r.borrada]));
+  comprobar('1.9.4 tarjeta: nombre, edad, tipo de cuenta y dentro Mi cuenta › Mis datos personales › PandarIA Premium', r.tarjeta && r.desdeTarjeta, tj.slice(0, 300));
+  comprobar('1.9.4 foto: menú hacer/elegir; con foto también recortar y eliminar; se guarda y se borra', r.menu1 === 'Elegir foto' && r.menu2 === 'Cambiar foto|Recortar o mover|Eliminar foto' && r.guardada && r.borrada, JSON.stringify([r.menu1, r.menu2, r.guardada, r.borrada]));
   comprobar('1.9.4 foto: ponerla en «Mis datos personales» y guardar el perfil no la pierde', r.perfilFoto);
   comprobar('1.9.4 Hazte Premium: gratis para siempre, el gymbro, comparación punto por punto y compra', r.hazte, hz.slice(0, 300));
   comprobar('1.9.4 Mi cuenta: con Premium aparece tu suscripción', r.cuentaSub);

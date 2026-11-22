@@ -190,7 +190,7 @@
     history:'Esta sección del historial es parte de Premium.', photos:'Las fotos de progreso son parte de Premium.', nutrition:'Las calorías y macros son parte de Premium.', diario:'Comparar tu diario con tu objetivo de calorías y macros, y ver tu semana, es parte de Premium.', alimProp:'En la versión gratis puedes crear hasta 10 alimentos y recetas propios.', calidad:'La calidad del día (fibra, sodio y proteína por comida) es parte de Premium.', menu:'Los ejemplos de menú hechos con tus calorías y tus preferencias son parte de Premium.',
     scan:'Escanear códigos de barras es parte de Premium.',
     consulta:'El análisis completo de Consulta a PandarIA (tu caso, explicación, ejemplos y qué hacer) es parte de Premium.',
-    customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
+    customEx:'En la versión gratis puedes crear hasta 5 ejercicios propios.', routines:'En la versión gratis puedes tener hasta 3 rutinas, contando las archivadas. Para crear otra, elimina alguna (en Mis rutinas o en Ajustes › Entrenamiento › Archivadas) o hazte Premium.', anim:'Ver los músculos que trabajan en cada animación es parte de Premium.', notif:'Este aviso es parte de Premium.'
   };
   // Opciones de compra (en Premium y en «Hazte Premium»)
   function compraBloque(){ let b = '';
@@ -258,7 +258,7 @@
       <div class="codebox" style="font-size:19px">${ACC ? fmtAcc(ACC) : fmtDev(DEV)}</div>
       <div class="row" style="gap:8px;margin-top:10px"><button class="btn grow sm" data-a="pfCopyDev">${I('copy',16)} ${tx('Copiar','Copy')}</button><button class="btn grow sm" data-a="pfShareDev">${I('upload',16)} ${tx('Compartir','Share')}</button></div>
       <button class="btn pri wide" style="margin-top:8px" data-a="pfMail">${I('note',18)} ${tx('Escribir al desarrollador','Write to the developer')}</button>
-      ${ACC ? '' : `<p class="xs mut" style="margin:10px 0 0;line-height:1.45">${tx('Sin cuenta, el regalo solo funciona en este teléfono. Con tu cuenta de Google (Ajustes › Mi cuenta), funciona en cualquier teléfono.','Without an account, the gift only works on this phone. With your Google account (Settings › My account), it works on any phone.')}</p>`}</div>`;
+      ${ACC ? '' : `<p class="xs mut" style="margin:10px 0 0;line-height:1.45">${tx('Sin cuenta, el regalo solo funciona en este teléfono. Con tu cuenta de Google (Ajustes › tu nombre › Mi cuenta), funciona en cualquier teléfono.','Without an account, the gift only works on this phone. With your Google account (Settings › your name › My account), it works on any phone.')}</p>`}</div>`;
     b += `<div class="sec">${tx('Código de regalo','Gift code')}</div><div class="card"><textarea id="pfcode" class="inp" rows="3" placeholder="${tx('Pega aquí el código que te enviaron','Paste the code you received here')}" style="font-family:ui-monospace,Menlo,monospace;font-size:13px"></textarea>
       <button class="btn ok wide" style="margin-top:10px" data-a="pfActivate">${I('check',18)} ${tx('Activar Premium','Activate Premium')}</button></div>`;
     return lhdr(tx('Pedir Premium','Ask for Premium')) + `<div class="lbody">${b}</div>`;
