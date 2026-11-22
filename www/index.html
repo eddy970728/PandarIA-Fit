@@ -11596,7 +11596,7 @@ SCREENS.onboard = p => {
     const op=[['unit',tx('Peso','Weight'),[['kg',tx('Kilos (kg)','Kilograms (kg)')],['lb',tx('Libras (lb)','Pounds (lb)')]]],
       ['uLong',tx('Altura y medidas','Height and measurements'),[['cm',tx('Metros y centímetros','Metres and centimetres')],['in',tx('Pies y pulgadas','Feet and inches')]]],
       ['uAgua',tx('Agua','Water'),[['ml',tx('Litros y ml','Litres and ml')],['oz',tx('Onzas (oz)','Ounces (oz)')]]]];
-    b=titulo(tx('¿Cómo mides?','How do you measure?'),tx('Elige tus unidades. Puedes cambiarlas cuando quieras en Ajustes › Pantalla e idioma.','Pick your units. You can change them anytime in Settings › Display and language.'))+
+    b=titulo(tx('¿Cómo mides?','How do you measure?'),tx('Elige tus unidades. Puedes cambiarlas cuando quieras en Ajustes › Idioma de la app.','Pick your units. You can change them anytime in Settings › App language.'))+
       op.map(([k,n,o])=>`<div class="field"><label>${n}</label><div class="seg">${o.map(([v,l])=>`<button class="${(k==='unit'?uP():k==='uLong'?uL():uA())===v?'on':''}" data-a="obUnidad" data-v="${k}|${v}">${l}</button>`).join('')}</div></div>`).join('');
     foot=sig();
   } else if (p.paso==='edad'){
@@ -11976,9 +11976,9 @@ function viewAjustes(){
     <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('info',20)}</span><span class="b grow">Tamaño del texto</span></div>
       <div class="seg">${[['n','Normal'],['g','Grande'],['mg','Muy grande']].map(([k,n])=>`<button class="${textoNivel()===k?'on':''}" data-a="setTexto" data-v="${k}">${n}</button>`).join('')}</div></div>
     ${tg('contrast',st.contrast,'eyeoff','Alto contraste')}
-    <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('compass',20)}</span><span class="b grow">${tx('Idioma y unidades','Language and units')}</span></div>
-      <div class="seg">${Object.entries(IDIOMAS).map(([k,L])=>`<button class="${LANG()===k?'on':''}" data-a="setLang" data-v="${k}" lang="${k}" translate="no">${L.n}${L.beta?' · beta':''}</button>`).join('')}</div>
-      ${IDIOMAS[LANG()].beta?`<div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('Traducción en beta: si algo suena raro, cuéntaselo al creador.','Beta translation: if something sounds odd, tell the creator.')} <button class="link xs" data-a="contacto" data-v="idioma">${tx('Contactar','Contact')}</button></div>`:''}
+    ${Object.entries(IDIOMAS).map(([k,L])=>`<button class="srow" data-a="setLang" data-v="${k}" lang="${k}" translate="no"><span class="si">${LANG()===k?I('check',20):''}</span><span class="grow"><span class="b">${L.n}</span>${L.beta?' <span class="tag">beta</span>':''}</span></button>`).join('')}
+    ${IDIOMAS[LANG()].beta?`<div class="srow" style="display:block"><div class="xs mut" style="line-height:1.4">${tx('Traducción en beta: si algo suena raro, cuéntaselo al creador.','Beta translation: if something sounds odd, tell the creator.')} <button class="link xs" data-a="contacto" data-v="idioma">${tx('Contactar','Contact')}</button></div></div>`:''}
+    <div class="srow" style="display:block"><div class="row" style="margin-bottom:4px"><span class="si">${I('ruler',20)}</span><span class="b grow">${tx('Unidades de medida','Units of measurement')}</span></div>
       ${[['unit',tx('Peso','Weight'),[['kg',tx('Kilos (kg)','Kilograms (kg)')],['lb',tx('Libras (lb)','Pounds (lb)')]]],
          ['uLong',tx('Altura y medidas','Height and measurements'),[['cm',tx('Centímetros','Centimetres')],['in',tx('Pies y pulgadas','Feet and inches')]]],
          ['uAgua',tx('Agua','Water'),[['ml',tx('Litros y ml','Litres and ml')],['oz',tx('Onzas (oz)','Ounces (oz)')]]]]
@@ -12019,9 +12019,10 @@ const AJ_GRUPOS=[
    parts:[{keys:[],rest:['Nutrición y ayuno']}]},
   {id:'avisos',ic:'bell',t:'Avisos y sonido',en:'Reminders and sound',d:'Notificaciones, sonido, vibración y voz',den:'Notifications, sound, vibration and voice',
    parts:[{keys:['nfMenu'],rest:['Notificaciones','Recordatorios'],whole:true},{html:()=>`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" style="width:100%" data-a="verPermisos"><span class="si">${I('lock',20)}</span><span class="grow"><span class="b">${tx('Permisos','Permissions')}</span><br><span class="xs mut">${tx('Qué usa la app y para qué; actívalos o revísalos','What the app uses and why; turn them on or review them')}</span></span>${I('right',18)}</button></div>`},{sec:'Durante el entreno',keys:['toggleSet:sound','toggleSet:vibrate','toggleSet:voice','toggleSet:uiSound']}]},
-  {id:'pantalla',ic:'moon',t:'Pantalla e idioma',en:'Display and language',d:'Idioma, unidades, tema, tamaño del texto y animaciones',den:'Language, units, theme, text size and animations',
-   parts:[{keys:['setLang','setUi','setThemeMode','setTexto','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
+  {id:'pantalla',ic:'moon',t:'Pantalla',en:'Display',d:'Tema, interfaz, tamaño del texto y animaciones',den:'Theme, interface, text size and animations',
+   parts:[{keys:['setUi','setThemeMode','setTexto','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
   {id:'salud',ic:'heart',t:'Salud',en:'Health',d:'Health Connect',den:'Health Connect',parts:[{keys:[],rest:['Salud'],whole:true}]},
+  {id:'idioma',ic:'compass',t:'Idioma de la app',en:'App language',d:'Idioma y unidades de medida',den:'Language and units of measurement',parts:[{keys:[...Object.keys(IDIOMAS).map(k=>'setLang:'+k),'contacto','setUnidad']}]},
   {id:'acerca',ic:'info',t:'Acerca de',en:'About',d:'Ciencia, historial de cambios, créditos y versión',den:'Science, change history, credits and version',
    parts:[{sec:'Acerca de',whole:true,noHead:true},{html:()=>`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" style="width:100%" data-a="contacto"><span class="si">${I('edit',20)}</span><span class="grow"><span class="b">${tx('Contacta al creador','Contact the creator')}</span><br><span class="xs mut">${tx('Sugerencias, ideas o algo que no funciona · 1 al día','Suggestions, ideas or something not working · 1 a day')}</span></span>${I('right',18)}</button></div>`},{html:()=>typeof A.hcPrivacy==='function'?`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" data-a="hcPrivacy"><span class="si">${I('lock',20)}</span><span class="grow b">${tx('Política de privacidad','Privacy policy')}</span><span class="mut" style="font-size:22px;line-height:1">›</span></button></div>`:''},{sec:'Créditos',whole:true},{otros:true}]}
 ];
@@ -12041,7 +12042,7 @@ function ajPiezas(html){
   secs.forEach(s=>{ s.rows=[]; s.blocks=[];
     s.nodes.forEach(n=>{ if (n.nodeType!==1) return;
       const rows=n.classList.contains('card')?[...n.children].filter(c=>c.classList.contains('srow')):[];
-      if (rows.length && rows.length===[...n.children].length){ rows.forEach(r=>{ const a=r.dataset.a?r:r.querySelector('[data-a]'); const act=a?a.dataset.a:''; const v=a&&a.dataset.a==='toggleSet'?a.dataset.v:'';
+      if (rows.length && rows.length===[...n.children].length){ rows.forEach(r=>{ const a=r.dataset.a?r:r.querySelector('[data-a]'); const act=a?a.dataset.a:''; const v=a&&(a.dataset.a==='toggleSet'||a.dataset.a==='setLang')?a.dataset.v:'';
         s.rows.push({key:v?act+':'+v:act,html:r.outerHTML}); }); }
       else s.blocks.push(n.outerHTML); }); });
   return {top:top.map(n=>n.nodeType===1?n.outerHTML:(n.textContent||'')).join(''),secs,tail:tail.map(n=>n.outerHTML).join('')};
