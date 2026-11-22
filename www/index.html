@@ -29,8 +29,10 @@
 }
 :root[data-theme="light"]{
   --bg:#f3f4f7; --bg2:#ffffff; --card:#ffffff; --card2:#eef0f4; --line:#e1e4ea;
-  --tx:#161a20; --mut:#69717f; --mut2:#9aa1ad;
-  --acs:rgba(255,122,26,.12); --oks:rgba(47,180,100,.14); --ok:#22b465;
+  --tx:#161a20; --mut:#5f6774; --mut2:#7a818d;
+  --acs:rgba(255,122,26,.12); --oks:rgba(47,180,100,.14); --ok:#16874a;
+  /* 1.9 · accesibilidad: en modo claro los colores de texto se oscurecen para llegar al contraste mínimo (WCAG AA) sobre blanco */
+  --ac:#e0620a; --bad:#d63341; --blue:#1f74d1;
   color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -111,6 +113,10 @@ svg{display:block}
 .chip{height:34px}
 button.chip,button.link,[data-a=kbOpen]{position:relative}
 button.chip::after{content:'';position:absolute;left:-2px;right:-2px;top:-5px;bottom:-5px}
+/* 1.9 · accesibilidad: zona táctil de al menos 48 px sin cambiar el dibujo (los botones de icono miden 42 y los de ± 28 de alto) */
+button.ibtn,button.stb{position:relative}
+button.ibtn::after{content:'';position:absolute;inset:-3px}
+button.stb::after{content:'';position:absolute;left:0;right:0;top:-10px;bottom:-10px}
 button.link::after,[data-a=kbOpen]::after{content:'';position:absolute;left:-6px;right:-6px;top:-9px;bottom:-9px}
 .ibtn[data-a=dPrefs]{width:42px!important;height:42px!important}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
@@ -216,7 +222,7 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .sprev{color:var(--mut);font-size:13.5px;overflow-wrap:anywhere}
 .sinp{width:100%;height:36px;border-radius:10px;border:0;background:var(--card2);text-align:center;font-size:17px;font-weight:600;outline:none;padding:0 4px;-moz-appearance:textfield}
 .sinp::-webkit-outer-spin-button,.sinp::-webkit-inner-spin-button{-webkit-appearance:none}
-.sinp::placeholder{color:var(--mut2);font-weight:500}
+.sinp::placeholder{color:var(--mut);font-weight:500}
 .sinp:focus{box-shadow:0 0 0 2px var(--ac)}
 .srw.done .sinp{background:transparent}
 .sck{position:relative;width:38px;height:36px;border-radius:10px;background:var(--card2);display:grid;place-items:center;color:var(--mut2)}
@@ -5504,7 +5510,7 @@ function animLoop(ts){
   });
   animRAF=requestAnimationFrame(animLoop);
 }
-function startAnims(){ if (!animRAF && document.querySelector('[data-anim]') && !(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){ animLast=0; animRAF=requestAnimationFrame(animLoop); } }
+function startAnims(){ if (typeof a11ySoon==='function') a11ySoon(); if (!animRAF && document.querySelector('[data-anim]') && !(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){ animLast=0; animRAF=requestAnimationFrame(animLoop); } }
 
 /* ---- Comprobación automática de posturas (se usa al revisar las animaciones) ---- */
 function animIssues(ex){
@@ -5854,6 +5860,23 @@ const A = {
   cbm(k){ const f=CB[k]; const box=document.querySelector('#modals .scrim:last-child'); MV={}; if(box) box.querySelectorAll('input,textarea,select').forEach(el=>{ if(el.id) MV[el.id]=el.value; }); closeModal(); setTimeout(()=>f&&f(),90); },
   cb(k,el,e){ const f=CB[k]; f&&f(el,e); },
 };
+/* 1.9 · accesibilidad: los botones que solo tienen un icono reciben un nombre para los lectores de pantalla (TalkBack, VoiceOver).
+   Se hace en un solo sitio para que ningún botón nuevo se quede sin nombre. */
+const A11Y_LBL={back:['Atrás','Back'],closeLayer:['Cerrar','Close'],closeModal:['Cerrar','Close'],dismiss:['Cerrar aviso','Dismiss'],
+  fsNav:['Mes anterior','Previous month','Mes siguiente','Next month'],calNav:['Mes anterior','Previous month','Mes siguiente','Next month'],
+  plMove:['Subir','Move up','Bajar','Move down'],edMove:['Subir','Move up','Bajar','Move down'],wkTimer:['Temporizador de descanso','Rest timer'],
+  wkMin:['Minimizar entreno','Minimize workout'],restMin:['Minimizar descanso','Minimize rest'],wkMenu:['Más opciones','More options'],routineMenu:['Más opciones','More options'],
+  edItemMenu:['Más opciones','More options'],plTog:['Quitar del plan','Remove from plan'],openLib:['Biblioteca de ejercicios','Exercise library'],openEx:['Ver ejercicio','View exercise'],
+  intStop:['Terminar','Finish'],intDelEx:['Quitar ejercicio','Remove exercise'],goalDel:['Borrar objetivo','Delete goal'],edDelSet:['Borrar serie','Delete set'],delMeasure:['Borrar medida','Delete measurement'],
+  animPause:['Pausar o seguir la animación','Pause or play the animation']};
+function a11yFix(root){ try{ (root||document).querySelectorAll('button:not([aria-label]),[data-a]:not(button):not([aria-label])').forEach(el=>{
+    if (el.tagName!=='BUTTON' && !el.matches('.ibtn')) return;
+    if ((el.textContent||'').trim()) return; const L=A11Y_LBL[el.dataset.a]; if (!L) return;
+    const sig=/(^|\|)-1$/.test(el.dataset.v||'')?0:/(^|\|)1$/.test(el.dataset.v||'')&&L.length>2?2:0;
+    el.setAttribute('aria-label',tx(L[sig],L[sig+1])); });
+  (root||document).querySelectorAll('button svg:not([aria-hidden])').forEach(v=>v.setAttribute('aria-hidden','true')); }catch(e){} }
+// se llama desde startAnims(), que corre tras cada render, capa o ventana
+var a11yPend=false; function a11ySoon(){ if (a11yPend) return; a11yPend=true; setTimeout(()=>{ a11yPend=false; a11yFix(); },60); }
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-a]'); if(!el) return;
   const f=A[el.dataset.a]; if (f){ e.preventDefault(); f(el.dataset.v, el, e); }
@@ -5942,6 +5965,7 @@ A.newRoutine=()=>{ const crea=fn=>()=>{ if (window.pfRoomFor && !pfRoomFor(1)) r
   {icon:'spark',label:'Confía en PandarIA',desc:'Usamos nuestro potente algoritmo para diseñar tu rutina perfecta, te ayudaremos a mejorar y la iremos actualizando cuando sea necesario.',fn:crea(()=>openLayer('wizPandaria',{step:0,goal:'musculo',days:3,minutes:60,level:S.settings.level,priorities:[]}))},
   {icon:'copy',label:'Importar con código',desc:'Pega el código de una rutina que te compartieron.',fn:()=>A.importCode()},
   {head:tx('Entrenar ahora','Train now')},
+  {icon:'heart',label:tx('Cardio ahora','Cardio now'),desc:tx('Eliges actividad, minutos e intensidad y arrancas. Cuenta para tu racha.','Pick an activity, minutes and intensity and go. It counts for your streak.'),fn:()=>A.openCardio()},
   {icon:'timer',label:'Modo intervalos',desc:'Tabata, HIIT, EMOM o AMRAP con temporizador automático, avisos y registro en tu historial.',fn:()=>A.openIntervals()}
 ]); };
 function newRoutine(o){ return Object.assign({id:uid(),name:'Rutina',items:[],created:Date.now(),archived:false,pandaria:true,goal:'musculo',level:S.settings.level,sugg:[],completions:0,exCount:{},source:'propia'},o); }
@@ -7050,12 +7074,14 @@ SCREENS.summary = p => {
   const lines=[];
   if (prevS && prevS.vol && s.vol){ const d=(s.vol-prevS.vol)/prevS.vol*100; lines.push(d>=0?`Moviste un ${Math.round(d)} % más de volumen que la última vez.`:`Volumen ${Math.round(-d)} % menor que la última vez: está bien alternar días más suaves.`); }
   if (s.intensity>=9) lines.push('Sesión muy exigente. Duerme bien y come proteína: la recuperación es donde creces.');
-  else if (s.intensity<=4) lines.push('Te resultó fácil: en las próximas sesiones PandarIA subirá la exigencia.');
+  else if (s.intensity<=4 && !s.cardio && !s.int) lines.push('Te resultó fácil: en las próximas sesiones PandarIA subirá la exigencia.');
   (p.created||[]).forEach(c=>lines.push(`Nueva sugerencia: <b>${esc(c.title)}</b>. La verás al abrir la rutina.`));
   { const pc=protCorta(); if (pc) lines.push(esc(protCortaTxt(pc))); }
   { const kc=gastoSesion(s); if (kc) lines.push(`${tx(`Gastaste unas ${kc.toLocaleString(LOC())} kcal en este entreno (estimación con el Compendio de Actividades 2024).`,`You burned about ${kc} kcal in this workout (estimate from the 2024 Compendium of Physical Activities).`)}${kbLink('gasto.sesion',tx('Por qué','Why'))}`); }
   if (!lines.length) lines.push('Sigue así. Cada entreno registrado ayuda a PandarIA a afinar tus sugerencias.');
   if (premOK()) b+=`<div class="sec">PandarIA</div><div class="card">`+lines.map(l=>`<div class="row" style="align-items:flex-start;padding:5px 0"><span style="color:var(--ac)">${I('spark',16)}</span><span class="sm" style="line-height:1.45">${l}</span></div>`).join('')+'</div>';
+  // 1.9 · el cardio libre no sustituye la rutina del plan: si hoy toca y sigue pendiente, la ofrecemos
+  if (esCardioLibre(s)){ const pend=rutinaHoyPendiente(); if (pend) b+=`<div class="card row" style="gap:10px;margin-top:12px"><span style="color:var(--ac)">${I('dumbbell',22)}</span><div class="grow sm"><b>${tx('¿Empiezas ahora tu rutina de hoy?','Start today\'s routine now?')}</b><br><span class="mut">${esc(pend.name)} ${tx('sigue pendiente. El cardio de antes sirve de calentamiento.','is still pending. The cardio works as a warm-up.')}</span></div><button class="btn pri" style="flex:0 0 auto;padding:0 16px" data-a="cardioRutina" data-v="${pend.id}">${tx('Empezar','Start')}</button></div>`; }
   if ((p.ach||[]).length) b+=`<div class="sec">Logros desbloqueados</div><div class="ach">${p.ach.map(id=>{const a=ACHIEVEMENTS.find(x=>x.id===id);return `<div class="a on"><div class="e">${a.ic}</div><div class="n">${esc(a.n)}</div></div>`;}).join('')}</div>`;
   return `<div class="lhdr"><span style="width:12px"></span><h2>Resumen</h2></div><div class="lbody">${b}</div><div class="lfoot"><div class="row" style="gap:8px"><button class="btn" style="height:58px" data-a="shareSession" data-v="${s.id}">${I('upload',20)}</button><button class="btn pri big grow" data-a="back">Listo</button></div></div>`;
 };
@@ -7159,7 +7185,7 @@ const HITOS=[
 ];
 function hitoUmbral(h,i){ const K=kb('logros.infinitos'), E=h.esc||K.escalones, c=h.cada||K.cada; return i<E.length?E[i]:E[E.length-1]+(i-E.length+1)*c; }
 function hitoNivel(h,v){ let i=0; while (v>=hitoUmbral(h,i) && i<200) i++; return i; }
-function semanaPerfecta(w){ const n=S.plan&&S.plan.days.length; if (!n) return false; return new Set(S.sessions.filter(x=>weekKey(x.end)===w).map(x=>new Date(x.end).getDay())).size>=n; }
+function semanaPerfecta(w){ const n=S.plan&&S.plan.days.length; if (!n) return false; return new Set(S.sessions.filter(x=>weekKey(x.end)===w&&!esCardioLibre(x)).map(x=>new Date(x.end).getDay())).size>=n; }
 function semanaHidratada(w){ for (let i=0;i<7;i++){ const d=new Date(w); d.setDate(d.getDate()+i); const k=dayKey(d.getTime()); if (!(waterToday(k)>=wGoalDia(k))) return false; } return true; }
 function hitosRevisar(){ if (!S || !S.settings || !S.settings.onboarded) return; const H=S.hitos=S.hitos||{}, R=S.repes=S.repes||{sem:[],mes:[],agua:[]}; let nuevo=null, cambio=false;
   HITOS.forEach(h=>{ let v=0; try{ v=h.v()||0; }catch(e){ return; } const lv=hitoNivel(h,v), o=H[h.id]=H[h.id]||{n:0,t:{}};
@@ -7242,7 +7268,8 @@ function intCur(){ return INT&&INT.ph[INT.i]; }
 function intLeft(){ const p=intCur(); if(!p) return 0; const now=INT.paused||Date.now(); return Math.max(0,p.dur-(now-INT.t0)/1000); }
 function intAnnounce(){
   const p=intCur(); if(!p) return;
-  if (p.type==='work'){ const n=p.ex?getEx(p.ex).n:''; speak(p.amrap?'¡Adelante! Máximo de rondas':p.emom?`Minuto ${p.round}. ${n}`:`Trabajo. ${n}`); shortBeep(1); vibrate([180]); }
+  if (p.type==='work' && INT.cfg.fmt==='cardio'){ speak(tx(`¡A moverse! ${INT.cfg.min} minutos`,`Let's go! ${INT.cfg.min} minutes`)); shortBeep(1); vibrate([180]); }
+  else if (p.type==='work'){ const n=p.ex?getEx(p.ex).n:''; speak(p.amrap?'¡Adelante! Máximo de rondas':p.emom?`Minuto ${p.round}. ${n}`:`Trabajo. ${n}`); shortBeep(1); vibrate([180]); }
   else if (p.type==='rest'){ speak(p.label||'Descanso'); shortBeep(1); vibrate([80,60,80]); }
   else speak('Prepárate');
 }
@@ -7252,19 +7279,21 @@ SCREENS.intRun = () => {
   const p=intCur(), c=INT.cfg;
   if (!p) return '';
   const nextWork=INT.ph.slice(INT.i+1).find(x=>x.type==='work');
-  const label = p.type==='work'?(p.amrap?'AMRAP':p.emom?'EMOM':'TRABAJO'):p.type==='rest'?(p.label||'DESCANSO').toUpperCase():'PREPÁRATE';
+  const cdo=c.fmt==='cardio', CI=cdo?CARDIO_INT[c.int]:null;
+  const label = p.type==='work'?(cdo?cardioActN(c.act):p.amrap?'AMRAP':p.emom?'EMOM':'TRABAJO'):p.type==='rest'?(p.label||'DESCANSO').toUpperCase():'PREPÁRATE';
   const showEx = p.type==='work'?p.ex:(nextWork&&nextWork.ex);
   const ex=showEx?getEx(showEx):null;
-  const sub = p.amrap?`${INT.rounds} rondas completadas`: p.emom?`Minuto ${p.round} de ${p.rounds} · ${c.emomReps} reps`:p.round?`Ronda ${p.round} de ${p.rounds}${p.sets>1?` · Tanda ${p.set} de ${p.sets}`:''}`:'';
+  const sub = cdo?(p.type==='work'?`${tx(CI.n,CI.en)} · ${tx(CI.d,CI.den)}`:''):p.amrap?`${INT.rounds} rondas completadas`: p.emom?`Minuto ${p.round} de ${p.rounds} · ${c.emomReps} reps`:p.round?`Ronda ${p.round} de ${p.rounds}${p.sets>1?` · Tanda ${p.set} de ${p.sets}`:''}`:'';
   return `<div class="intrun" style="background:${phaseColor(p)}">
-    <div class="ovtop"><button class="ibtn" style="color:#fff" data-a="intStop">${I('x',26)}</button><span class="b" style="letter-spacing:1.5px">${INT_FMT[c.fmt].n.toUpperCase()}</span><span class="tick-int" style="font-variant-numeric:tabular-nums;opacity:.8">${fmtTime((Date.now()-INT.start)/1000)}</span></div>
-    <div style="text-align:center"><div class="b" style="font-size:22px;letter-spacing:3px">${label}</div><div class="sm" style="opacity:.85;margin-top:4px">${sub}</div></div>
+    <div class="ovtop"><button class="ibtn" style="color:#fff" data-a="intStop">${I('x',26)}</button><span class="b" style="letter-spacing:1.5px">${cdo?'CARDIO':INT_FMT[c.fmt].n.toUpperCase()}</span><span class="tick-int" style="font-variant-numeric:tabular-nums;opacity:.8">${fmtTime((Date.now()-INT.start)/1000)}</span></div>
+    <div style="text-align:center"><div class="b" style="font-size:22px;letter-spacing:3px;text-transform:uppercase">${label}</div><div class="sm" style="opacity:.85;margin-top:4px">${sub}</div></div>
     <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"/><circle id="iarc" cx="60" cy="60" r="52" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="326.7" transform="rotate(-90 60 60)"/></svg><div class="rt" id="it">${fmtTime(Math.ceil(intLeft()))}</div></div>
     ${ex?`<div class="ovnext">${exAnim(ex,'ovanim')}<div class="grow" style="min-width:0"><div class="xs" style="opacity:.7;letter-spacing:1px;text-transform:uppercase">${p.type==='work'?'Ahora':'Siguiente'}</div><div class="b" style="font-size:18px;line-height:1.25">${esc(ex.n)}</div></div></div>`:''}
     <div class="row" style="gap:${p.type==='rest'?8:12}px;justify-content:center">
       ${p.amrap?`<button class="btn ovb pri" style="min-width:150px;height:58px;font-size:18px" data-a="intRound">+1 ronda</button>`:''}
+      ${cdo&&p.type==='work'?`<button class="btn ovb" style="min-width:0;padding:0 12px;white-space:nowrap" data-a="cardioMas">+5 min</button>`:''}
       ${p.type==='rest'?`<button class="btn ovb" style="min-width:0;padding:0 12px;white-space:nowrap" data-a="intAdj" data-v="-10">−10 s</button>`:''}
-      <button class="btn ovb" data-a="intPause">${INT.paused?I('play',20)+' Seguir':'❚❚ Pausa'}</button><button class="btn ovb" data-a="intSkip">Saltar ⏭</button>${p.type==='rest'?`<button class="btn ovb" style="min-width:0;padding:0 12px;white-space:nowrap" data-a="intAdj" data-v="10">+10 s</button>`:''}</div>
+      <button class="btn ovb" data-a="intPause">${INT.paused?I('play',20)+' '+tx('Seguir','Resume'):'❚❚ '+tx('Pausa','Pause')}</button><button class="btn ovb" data-a="intSkip">${cdo&&p.type==='work'?tx('Terminar','Finish'):'Saltar ⏭'}</button>${p.type==='rest'?`<button class="btn ovb" style="min-width:0;padding:0 12px;white-space:nowrap" data-a="intAdj" data-v="10">+10 s</button>`:''}</div>
     ${p.type==='rest'?`<div class="xs" style="text-align:center;opacity:.75;margin-top:-8px">El cambio se aplica también a los siguientes descansos ${p.kind==='tanda'?'entre tandas':'entre series'}</div>`:''}
   </div>`;
 };
@@ -7289,7 +7318,7 @@ function intNext(skipped){
   if (!intCur()){ intFinish(); return; }
   intAnnounce(); refreshTop();
 }
-A.intStop=()=>confirmBox({title:'¿Terminar los intervalos?',text:'Puedes guardar lo que hiciste hasta ahora o descartarlo.',okText:'Guardar y terminar',ok:()=>intFinish(),noText:'Descartar',no:()=>{ INT=null; releaseAwake(); closeLayer(); toast('Intervalos descartados'); }});
+A.intStop=()=>confirmBox({title:INT&&INT.cfg.fmt==='cardio'?tx('¿Terminar el cardio?','Finish cardio?'):'¿Terminar los intervalos?',text:'Puedes guardar lo que hiciste hasta ahora o descartarlo.',okText:'Guardar y terminar',ok:()=>intFinish(),noText:'Descartar',no:()=>{ INT=null; releaseAwake(); closeLayer(); toast('Intervalos descartados'); }});
 function intTick(){
   if (!INT || INT.paused) return;
   const p=intCur(); if(!p) return;
@@ -7297,23 +7326,29 @@ function intTick(){
   const t=document.getElementById('it'); if(t) t.textContent=fmtTime(sec);
   const arc=document.getElementById('iarc'); if(arc) arc.setAttribute('stroke-dashoffset',(326.7*(1-left/p.dur)).toFixed(1));
   document.querySelectorAll('.tick-int').forEach(e=>e.textContent=fmtTime((Date.now()-INT.start)/1000));
-  if (sec!==INT.lastSec){ INT.lastSec=sec; if (sec<=3 && sec>0) shortBeep(); if (p.amrap && sec===60) speak('Último minuto'); }
+  if (sec!==INT.lastSec){ INT.lastSec=sec; if (sec<=3 && sec>0) shortBeep(); if ((p.amrap||(INT.cfg.fmt==='cardio'&&p.type==='work'&&p.dur>120)) && sec===60) speak(tx('Último minuto','Last minute')); }
   if (left<=0) intNext(false);
 }
 setInterval(intTick,200);
 function intFinish(){
   const c=INT.cfg; const end=Date.now();
+  // 1.9: si terminas con la X a mitad de un tramo de trabajo, ese tramo también cuenta
+  const pc=intCur(); if (pc && pc.type==='work'){ const el=Math.round(((INT.paused||end)-INT.t0)/1000); if (el>=1) INT.done.push({ex:pc.ex,time:Math.min(pc.dur,el)}); }
   if (!INT.done.length && !INT.rounds){ INT=null; releaseAwake(); closeLayer(); toast('No se registró ningún intervalo'); return; }
   const by={};
   INT.done.forEach(d=>{ const k=d.ex||'_t'; (by[k]=by[k]||[]).push({t:'n',time:d.time,reps:null,kg:null,done:true}); });
-  const name = `Intervalos · ${INT_FMT[c.fmt].n}`;
+  const cdo=c.fmt==='cardio';
+  const name = cdo?`Cardio · ${cardioActN(c.act)}`:`Intervalos · ${INT_FMT[c.fmt].n}`;
   const items = Object.entries(by).filter(([k])=>k!=='_t').map(([exId,sets])=>({exId,note:'',sets}));
-  const session={id:uid(),routineId:'__int',routineName:name,start:INT.start,end,intensity:7,items,prs:[],vol:0,int:{fmt:c.fmt,rounds:INT.rounds||null,work:INT.done.reduce((a,d)=>a+d.time,0)}};
-  INT=null; releaseAwake(); beep(); vibrate([300,100,300]); speak('¡Terminaste! Gran trabajo.');
+  const work=INT.done.reduce((a,d)=>a+d.time,0);
+  const session=cdo?{id:uid(),routineId:'__cardio',routineName:name,start:INT.start,end,intensity:CARDIO_INT[c.int].v,items,prs:[],vol:0,cardio:{act:c.act,int:c.int,work}}
+    :{id:uid(),routineId:'__int',routineName:name,start:INT.start,end,intensity:7,items,prs:[],vol:0,int:{fmt:c.fmt,rounds:INT.rounds||null,work}};
+  if (cdo && work<60){ INT=null; releaseAwake(); closeLayer(); toast(tx('Menos de un minuto: no se guardó','Under a minute: not saved')); return; }
+  INT=null; releaseAwake(); beep(); vibrate([300,100,300]); speak(tx('¡Terminaste! Gran trabajo.','Done! Great work.'));
   // pedir intensidad
   const k=cb(v=>{});
-  const iv=7;
-  openModal(`<div class="sheet"><div class="grab"></div><h3>¡Intervalos completados!</h3>
+  const iv=session.intensity;
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${cdo?tx('¡Cardio completado!','Cardio done!'):'¡Intervalos completados!'}</h3>
     <div class="card int-wrap"><div class="b" style="text-align:center">¿Cómo te fue hoy?</div><div class="int-val" id="intv">${INT_EMO[iv]} ${iv}/10 · ${INT_LBL[iv]}</div>
     <input type="range" min="1" max="10" step="1" value="${iv}" data-in="intInt"></div>
     <button class="btn pri big" data-a="cbm" data-v="${cb(()=>saveIntSession(session))}">Guardar en el historial</button>
@@ -7325,6 +7360,55 @@ function saveIntSession(session){
   const ach=checkAch();
   replaceLayer('summary',{sid:session.id,created:[],ach});
 }
+/* ============ 1.9 · Cardio ahora ============
+   Una sesión de cardio con solo actividad, minutos e intensidad. Usa el mismo temporizador que el modo intervalos
+   (una sola fase de trabajo). Cuenta para la racha, los minutos y las calorías, pero NO sustituye la rutina del plan:
+   el día sigue pendiente y la rotación del plan no avanza. */
+const CARDIO_ACTS=[
+  {id:'caminar',n:'Caminar',en:'Walk',ex:'caminata'},{id:'correr',n:'Correr',en:'Run'},{id:'bici',n:'Bicicleta',en:'Cycling'},
+  {id:'nadar',n:'Nadar',en:'Swim'},{id:'comba',n:'Saltar la comba',en:'Jump rope',ex:'saltar_comba'},{id:'boxeo',n:'Boxeo de sombra',en:'Shadow boxing',ex:'sombra_boxeo'},
+  {id:'marcha',n:'Marcha en casa',en:'Marching in place',ex:'marcha_sitio'},
+  ...['correr_cinta','cinta_inclinada','cinta_curva','bici_estatica','spinning','bici_reclinada','eliptica','arc_trainer','remo_ergometro','escaladora','stepper','skierg','air_bike','versaclimber','ergometro_brazos'].map(id=>({id,ex:id,maq:1})),
+  {id:'otro',n:'Otro',en:'Other'}];
+const CARDIO_INT={
+  suave:{v:4,n:'Suave',en:'Easy',d:'Puedes hablar sin esfuerzo',den:'You can talk easily'},
+  moderada:{v:6,n:'Moderada',en:'Moderate',d:'Puedes hablar, pero no cantar',den:'You can talk, but not sing'},
+  fuerte:{v:8,n:'Fuerte',en:'Hard',d:'Solo dices frases cortas',den:'Only short phrases'}};
+function cardioAct(id){ return CARDIO_ACTS.find(a=>a.id===id)||CARDIO_ACTS[0]; }
+function cardioActN(id){ const a=cardioAct(id); if (a.ex && !a.n){ const e=getEx(a.ex); return e?e.n:id; } return tx(a.n,a.en); }
+function cardioActs(){ return CARDIO_ACTS.filter(a=>{ if (!a.ex) return true; const e=getEx(a.ex); return e && (!a.maq || hasEquip(e)); }); }
+SCREENS.cardio = p => {
+  const c=p.cfg, acts=cardioActs(), quick=[10,20,30,45,60];
+  if (!acts.some(a=>a.id===c.act)) c.act=acts[0].id;
+  const libre=acts.filter(a=>!a.maq), maq=acts.filter(a=>a.maq);
+  const chip=a=>`<button class="chip ${c.act===a.id?'on':''}" data-a="cardioAct" data-v="${a.id}" aria-pressed="${c.act===a.id}">${esc(cardioActN(a.id))}</button>`;
+  let b=`<div class="sec">${tx('Actividad','Activity')}</div><div class="chips">${libre.map(chip).join('')}</div>`;
+  if (maq.length) b+=`<div class="xs mut" style="margin:12px 2px 6px">${tx('Máquinas de tu equipamiento','Machines in your equipment')}</div><div class="chips">${maq.map(chip).join('')}</div>`;
+  b+=`<div class="sec">${tx('Tiempo','Time')}</div><div class="card"><div class="chips" style="margin-bottom:10px">${quick.map(m=>`<button class="chip ${c.min===m?'on':''}" data-a="cardioMin" data-v="${m}" aria-pressed="${c.min===m}">${m} min</button>`).join('')}</div>
+    <div class="row"><span class="grow">${tx('Minutos','Minutes')}</span><button class="stb" style="flex:0 0 44px" data-a="cardioNum" data-v="-5" aria-label="${tx('Quitar 5 minutos','Remove 5 minutes')}">−</button><b style="min-width:70px;text-align:center">${c.min} min</b><button class="stb" style="flex:0 0 44px" data-a="cardioNum" data-v="5" aria-label="${tx('Añadir 5 minutos','Add 5 minutes')}">+</button></div></div>`;
+  b+=`<div class="sec">${tx('Intensidad','Intensity')}</div><div class="card" style="padding:4px 14px">${Object.entries(CARDIO_INT).map(([k,v],i)=>`<button class="row wide" style="padding:12px 0;min-height:48px;text-align:left;background:none;color:inherit;${i?'border-top:1px solid var(--line)':''}" data-a="cardioInt" data-v="${k}" aria-pressed="${c.int===k}"><span style="color:${c.int===k?'var(--ac)':'var(--mut)'}">${c.int===k?I('check',18):'<span style="display:inline-block;width:16px;height:16px;border-radius:50%;border:2px solid currentColor"></span>'}</span><span class="grow"><b>${tx(v.n,v.en)}</b><br><span class="sm mut">${tx(v.d,v.den)}</span></span></button>`).join('')}</div>`;
+  const ses={start:0,end:c.min*60000,intensity:CARDIO_INT[c.int].v}, kc=gastoSesion(ses);
+  b+=`<div class="banner blue"><span class="ic">${I('heart',20)}</span><div class="grow sm">${kc?tx(`Unas <b>${kc} kcal</b> estimadas. `,`About <b>${kc} kcal</b> estimated. `):''}${tx('Cuenta para tu racha y tus minutos activos. No sustituye la rutina de tu plan: si hoy te toca, sigue pendiente.','It counts for your streak and active minutes. It does not replace your plan routine: if one is due today, it stays pending.')}</div></div>`;
+  return lhdr(tx('Cardio ahora','Cardio now'))+`<div class="lbody">${b}</div><div class="lfoot"><button class="btn pri big" data-a="cardioStart">${I('play',20)} ${tx('Empezar','Start')}</button></div>`;
+};
+A.openCardio=()=>{ openLayer('cardio',{cfg:Object.assign({act:'caminar',min:20,int:'moderada'},clone(S.cardioCfg||{}))}); };
+A.cardioAct=v=>{ pkP().cfg.act=v; refreshTop(); };
+A.cardioMin=v=>{ pkP().cfg.min=+v; refreshTop(); };
+A.cardioNum=v=>{ const c=pkP().cfg; c.min=Math.max(5,Math.min(240,c.min+(+v))); refreshTop(); };
+A.cardioInt=v=>{ if (CARDIO_INT[v]) pkP().cfg.int=v; refreshTop(); };
+A.cardioStart=()=>{
+  const c=Object.assign({fmt:'cardio'},clone(pkP().cfg)); S.cardioCfg={act:c.act,min:c.min,int:c.int}; save();
+  const ex=cardioAct(c.act).ex||null;
+  INT={cfg:c, ph:[{type:'prep',dur:5,label:'Prepárate'},{type:'work',dur:c.min*60,ex}], i:0, t0:Date.now(), paused:null, rounds:0, start:Date.now(), done:[], lastSec:null};
+  replaceLayer('intRun',{}); keepAwake(); intAnnounce();
+};
+A.cardioMas=()=>{ const p=intCur(); if (!INT||!p||p.type!=='work') return; p.dur+=300; INT.cfg.min+=5; INT.lastSec=null; vibrate(20); refreshTop(); toast(tx('+5 minutos','+5 minutes')); };
+// sesiones que no cuentan como la rutina del plan (el día sigue pendiente)
+function esCardioLibre(s){ return !!s && s.routineId==='__cardio'; }
+function rutinaHoyPendiente(){ if (!S.plan || !planRoutines().length) return null; const dow=new Date().getDay(); if (!S.plan.days.includes(dow)) return null;
+  const wk=weekKey(Date.now()); if (S.sessions.some(x=>weekKey(x.end)===wk&&!esCardioLibre(x)&&new Date(x.end).getDay()===dow)) return null;
+  const nx=nextInPlan(); return nx&&nx.r||null; }
+A.cardioRutina=rid=>{ closeLayer(); A.startWorkout(rid); };
 
 /* ============ Historial y Explorar ============ */
 let HSEG='resumen', HM=null, PEX=null;
@@ -7741,7 +7825,7 @@ function hoyCard(){
     return `<div class="card row" data-a="openPlan" style="cursor:pointer"><span style="color:var(--ac)">${I('calendar',24)}</span><div class="grow"><div class="b">Arma tu plan semanal</div><div class="sm mut">${premOK()?'PandarIA te dirá cada día qué rutina toca.':'Elige tus días y el orden de tus rutinas.'}</div></div>${I('right',18)}</div>`;
   }
   const today=new Date(); const dow=today.getDay();
-  const wk=weekKey(Date.now()); const doneDays=new Set(S.sessions.filter(s=>weekKey(s.end)===wk).map(s=>new Date(s.end).getDay()));
+  const wk=weekKey(Date.now()); const doneDays=new Set(S.sessions.filter(s=>weekKey(s.end)===wk&&!esCardioLibre(s)).map(s=>new Date(s.end).getDay()));
   const order=[1,2,3,4,5,6,0];
   const strip=`<div class="wstrip">${order.map(d=>`<div class="wd ${S.plan.days.includes(d)?'tr':''} ${d===dow?'td':''} ${doneDays.has(d)?'dn':''}"><span>${DAYS_SHORT[d]}</span>${doneDays.has(d)?I('check',12):''}</div>`).join('')}</div>`;
   const trainedToday=doneDays.has(dow);
@@ -7768,7 +7852,7 @@ function hoyCard(){
 // 1.6 · Minimalista: la rutina de hoy en una línea con Empezar
 function hoyMini(){
   if (!S.plan || !planRoutines().length) return '';
-  const dow=new Date().getDay(), wk=weekKey(Date.now()), hecho=S.sessions.some(s=>weekKey(s.end)===wk&&new Date(s.end).getDay()===dow), nx=nextInPlan();
+  const dow=new Date().getDay(), wk=weekKey(Date.now()), hecho=S.sessions.some(s=>weekKey(s.end)===wk&&!esCardioLibre(s)&&new Date(s.end).getDay()===dow), nx=nextInPlan();
   if (hecho) return `<div class="card row" style="gap:10px;padding:12px 14px"><span style="color:var(--ok)">${I('check',20)}</span><div class="grow sm"><b>${tx('Hoy ya entrenaste','You trained today')}</b> · <span class="mut">${tx('Próxima','Next')}: ${esc(nx.r.name)}</span></div></div>`;
   if (!S.plan.days.includes(dow)) return `<div class="card row" style="gap:10px;padding:12px 14px"><span class="mut">${I('moon',20)}</span><div class="grow sm"><b>${tx('Día de descanso','Rest day')}</b> · <span class="mut">${esc(nx.r.name)} ${tx('es la próxima','is next')}</span></div><button class="link sm" data-a="hoyChange">${tx('Entrenar','Train')}</button></div>`;
   const rs=premOK()?recoveryState(nx.r):{lvl:'buena'};
@@ -7844,7 +7928,7 @@ function suenoCorto(){ if (!premOK()) return null; const z=window.PF_SUENO, K=kb
 function hrvBaja(){ if (!premOK()) return null; const z=window.PF_HRV, K=kb('conexion.hrv'); if (!z||!z.avg||z.n<K.min||Date.now()-z.at>36*3600000) return null; const pct=Math.round((1-z.last/z.avg)*100); return pct>=K.pct?Object.assign({pct},z):null; }
 // 1.3 · Hora habitual de entreno (Premium): la mediana de las horas de inicio de tus últimos entrenos, y el aviso 30 minutos antes
 function horaHabitual(){
-  const L=S.sessions.filter(s=>s.start && s.routineId!=='__int').slice(-12); if (L.length<5) return null;
+  const L=S.sessions.filter(s=>s.start && s.routineId!=='__int' && !esCardioLibre(s)).slice(-12); if (L.length<5) return null;
   const m=L.map(s=>{ const d=new Date(s.start); return d.getHours()*60+d.getMinutes(); }).sort((a,b)=>a-b);
   const med=m[Math.floor(m.length/2)], av=Math.max(6*60,med-30), hh=x=>`${String(Math.floor(x/60)).padStart(2,'0')}:${String(Math.round(x%60)).padStart(2,'0')}`;
   return {hora:hh(med), aviso:hh(av)};
@@ -10555,7 +10639,7 @@ function comidaProgresoTxt(o){ const p=[];
 function habitosPlan(){ if (!premOK()||!S.plan||!planRoutines().length) return null; const K=kb('habitos.plan'), wk0=weekKey(Date.now()), out={};
   const first=S.sessions.length?Math.min(...S.sessions.map(s=>s.end||Date.now())):Date.now(), sems=[...Array(K.semanas).keys()].map(i=>weekShift(wk0,-(i+1))).filter(w=>w>=weekKey(first));
   // 1.8.2: una semana sin ningún entreno es una pausa (vacaciones, enfermedad), no un hábito: no cuenta como días saltados
-  const todas=sems.map(w=>new Set(S.sessions.filter(s=>weekKey(s.end)===w).map(s=>new Date(s.end).getDay()))), hechos=todas.filter(h=>h.size>0);
+  const todas=sems.map(w=>new Set(S.sessions.filter(s=>weekKey(s.end)===w&&!esCardioLibre(s)).map(s=>new Date(s.end).getDay()))), hechos=todas.filter(h=>h.size>0);
   if (hechos.length<K.minSem) return null;
   // con un plan de 2 días ya no se propone quitar ninguno (solo cambiarlo por el día en que de verdad entrenas)
   const salta=S.plan.days.map(d=>({d,n:hechos.filter(h=>!h.has(d)).length})).filter(x=>x.n>=Math.ceil(hechos.length*K.fallo)).sort((a,b)=>b.n-a.n)[0];
@@ -11043,7 +11127,7 @@ const APP_VERSION='1.9';
 const APP_PARCHE='';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
- {v:'1.9',t:'Logros sin fin',items:['Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo', 'Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez', 'Reto estrella del mes: cada mes uno distinto, adaptado a ti', 'Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla']},
+ {v:'1.9',t:'Logros sin fin',items:['Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo', 'Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez', 'Reto estrella del mes: cada mes uno distinto, adaptado a ti', 'Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla', 'Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan', 'Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro']},
  {v:'1.8.2',t:'Te cuida mejor',items:['PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas', 'Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso', 'Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo', 'Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan', 'La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora', 'Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin', 'Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice', 'Después de unas vacaciones ya no propone quitar días de tu plan', 'Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso', 'Cambiar tu objetivo de calorías ahora se puede deshacer']},
  {v:'1.8.1',t:'Más ordenada',items:['Menú de 4 pestañas: Rutinas, Nutrición, Historial y Ajustes', 'Explorar ejercicios y rutinas y el Modo intervalos están ahora en el + de Rutinas, ordenado en tres grupos', 'El ayuno vuelve a Nutrición junto a Comida y Agua; si estás ayunando, lo ves arriba en cualquier sección', 'Comida, Agua, Ayuno e Historial más cortos: lo importante a la vista y el resto en bloques que se despliegan', 'Arreglado el buscador de ingredientes al crear una receta, que no mostraba resultados', 'El buscador de alimentos entiende plurales y errores de una letra', '39 ingredientes nuevos (especias, repostería, casabe, ñoquis, tasajo, pescados…) y más nombres de Cuba, México y Uruguay, como yerba mate']},
  {v:'1.8',t:'PandarIA aprende de ti',items:['Lastre en dominadas, fondos, flexiones y otros ejercicios de peso corporal: en el menú del ejercicio toca «Añadir lastre» y anota los kg que añades. PandarIA calcula el primer lastre con tus repeticiones y te propone añadirlo cuando superas tu rango (pedido por un tester)', '10 ejercicios nuevos: extensión de tríceps con peso corporal (las «bayitas»), fondos en barra recta, curl de bíceps con peso corporal, pies a la barra, pino contra la pared, crunch inverso, zancadas con salto, búlgara sin peso, flexiones hindúes y remo renegado. Y la búsqueda entiende nombres de otros países: planchas, lagartijas, barras o paralelas', 'PandarIA con 19 fuentes nuevas, entre ellas la postura del ACSM de 2026: vuelve de una pausa según tu edad (Bosquet 2013), descargas con una serie menos (Bell 2023), máximo estimado más fiable (Mayhew 2008), calorías con los factores de la FAO/OMS y el modelo de Hall, proteína por comida de 0,4 g/kg, meta de pasos según tu edad y calorías de cada entreno (Compendio 2024)', 'Tu primera serie de un ejercicio nuevo calibra el peso de las siguientes, el gasto real usa 3 semanas de datos, y cada fuente de la Biblioteca enlaza con las otras reglas que salen de ella', 'Estado del día: un número de 0 a 100 con una palabra (Listo, Normal, Suave, Descansa), lo que más pesa hoy y cómo cambia tu sesión. En la tarjeta de Hoy y en el widget Mi día', 'Tu línea base: sueño, pulso, variabilidad, agua, calorías, proteína y rendimiento frente a tu propia media de 4 semanas', 'PandarIA aprende de ti y te lo propone por el panda (siempre con Aplicar o Ahora no): adelantar una descarga por cansancio acumulado, una serie más o menos según cómo respondes, cambiar el día que siempre saltas, mover tu aviso a tu hora real, quitar un ejercicio que siempre saltas y más', 'Novedades y en Informes: qué días rindes mejor, la mejor hora para entrenar con tu ayuno, si el agua se nota en tus entrenos, por qué un ejercicio no sube cuando estás en déficit y la fecha de tu meta como un rango de meses', 'El panda explica lo que estás viendo: tu estado del día, tu línea base, los colores del mapa de recuperación y por qué cambió el peso sugerido', 'Historial en 4 pestañas: Resumen (con Informes), Progreso (con Récords y Metas), Cuerpo y Logros (con Retos)', 'Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo', 'Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas', 'PandarIA elige mejor el peso: tras una descarga ya no lo baja dos veces, si anotas que te sobran muchas repeticiones lo recalcula con tu fuerza real, y tus repeticiones de sobra mandan sobre la nota de la sesión', 'Arreglos encontrados con 32 usuarios simulados durante un mes: récords sin peso, doble toque en Terminar o al elegir una ración, y metas de nutrición que podían salir en blanco']},
@@ -11088,7 +11172,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla"];
+const NOTAS_VERSION=["1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla", "Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan", "Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -14342,6 +14426,8 @@ Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, ch
 Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez|Perfect week, perfect month and hydrated week can be earned again and again
 Reto estrella del mes: cada mes uno distinto, adaptado a ti|Monthly star challenge: a different one every month, adapted to you
 Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla|The whole app reviewed in Spanish and English, including what screen readers read out
+Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan|Cardio now: pick an activity, minutes and intensity and go; it counts for your streak without replacing your plan routine
+Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro|Easier to use with screen readers, easier-to-tap buttons and better contrast in light mode
 1.8.2 · Te cuida mejor|1.8.2 · Looks after you better
 Te cuida mejor|Looks after you better
 PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas|PandarIA no longer removes exercises it has just swapped in: your routines do not shrink on their own

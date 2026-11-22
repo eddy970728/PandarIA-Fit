@@ -1091,6 +1091,40 @@ if (fs.existsSync(COPIA07)) {
   a.cerrar();
 }
 
+/* ---------- 1.9 fase 4: Cardio ahora ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  a.w.eval(`(()=>{ __reset(HOMBRE); window.isPremium=()=>true; const out={};
+    const rt=newRoutine({name:'Fuerza A',items:['press_banca','sentadilla','remo_barra'].map(id=>buildItem(id,'musculo',3))}); S.routines=[rt]; S.plan={days:[0,1,2,3,4,5,6],order:[rt.id]};
+    S.settings.equip=['man']; out.sinCinta=!cardioActs().some(x=>x.id==='correr_cinta') && cardioActs().some(x=>x.id==='caminar');
+    S.settings.equip=['man','cin']; out.conCinta=cardioActs().some(x=>x.id==='correr_cinta');
+    A.openCardio(); const scr=SCREENS.cardio(pkP()); out.pantalla=/Actividad/.test(scr)&&/Moderada/.test(scr)&&/No sustituye/.test(scr)&&/kcal/.test(scr);
+    A.cardioAct('correr'); A.cardioMin('30'); A.cardioInt('fuerte'); A.cardioNum('-5'); out.cfg=[pkP().cfg.act,pkP().cfg.min,pkP().cfg.int];
+    A.cardioStart(); out.fases=INT.ph.length; INT.i=1; INT.t0=Date.now()-12*60000; INT.start=Date.now()-12*60000-5000;
+    out.run=/Correr/.test(SCREENS.intRun())&&/\\+5 min/.test(SCREENS.intRun()); A.cardioMas(); out.mas=INT.ph[1].dur===30*60;
+    intFinish(); const bt=[...document.querySelectorAll('[data-a="cbm"]')].find(b=>/Guardar/.test(b.textContent)); bt.click(); window.__c={out,rt}; return '{}'; })()`); await espera(300); const r = JSON.parse(a.w.eval(`(()=>{ const {out,rt}=window.__c;
+    const s=S.sessions[S.sessions.length-1]; out.ses=[s.routineId,s.intensity,Math.round(s.cardio.work/60),s.items.length,s.routineName];
+    out.racha=streakWeeks()>=1; out.pendiente=(rutinaHoyPendiente()||{}).id===rt.id; out.mini=!/Hoy ya entrenaste/.test(hoyMini());
+    out.perfecta=!semanaPerfecta(weekKey(Date.now())); out.siguiente=nextInPlan().r.id===rt.id;
+    const sum=SCREENS.summary(pkP()); out.oferta=/Empiezas ahora tu rutina/.test(sum)&&!/Te resultó fácil/.test(sum);
+    // menos de un minuto: no se guarda
+    const n0=S.sessions.length; closeLayer(); A.openCardio(); A.cardioStart(); INT.i=1; INT.t0=Date.now()-20000; intFinish(); out.corto=S.sessions.length===n0 && !INT;
+    // con la rutina hecha hoy ya no se ofrece
+    S.sessions.push({id:'hoyR',routineId:rt.id,routineName:'Fuerza A',start:Date.now()-60000,end:Date.now(),items:[],vol:0,prs:[]}); out.hecha=!rutinaHoyPendiente();
+    return JSON.stringify(out); })()`));
+  a.cerrar();
+  comprobar('1.9 cardio: solo ofrece las máquinas de tu equipamiento', r.sinCinta && r.conCinta, JSON.stringify([r.sinCinta, r.conCinta]));
+  comprobar('1.9 cardio: la pantalla pide actividad, tiempo e intensidad y avisa de que no sustituye el plan', r.pantalla && JSON.stringify(r.cfg) === '["correr",25,"fuerte"]', JSON.stringify([r.pantalla, r.cfg]));
+  comprobar('1.9 cardio: temporizador de una fase con +5 min', r.fases === 2 && r.run && r.mas, JSON.stringify([r.fases, r.run, r.mas]));
+  comprobar('1.9 cardio: terminar a mitad guarda el tiempo hecho con la intensidad elegida', r.ses[0] === '__cardio' && r.ses[1] === 8 && r.ses[2] === 12 && r.ses[3] === 0, JSON.stringify(r.ses));
+  comprobar('1.9 cardio: cuenta para la racha pero la rutina de hoy sigue pendiente', r.racha && r.pendiente && r.mini && r.perfecta && r.siguiente, JSON.stringify([r.racha, r.pendiente, r.mini, r.perfecta, r.siguiente]));
+  comprobar('1.9 cardio: el resumen ofrece empezar la rutina de hoy', r.oferta && r.hecha);
+  comprobar('1.9 cardio: menos de un minuto no se guarda', r.corto);
+  comprobar('1.9 fase 4 sin errores', !a.errores.length, a.errores.join(' | '));
+}
+
 /* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */
 {
   const dirC = new URL('./copias/', import.meta.url), fallosC = [];

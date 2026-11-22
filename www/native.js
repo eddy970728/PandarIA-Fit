@@ -907,6 +907,18 @@
       HC.saveSample({dataType:'calories', value: Math.round(met * bodyWeight() * hours), startDate: iso(sess.start), endDate: iso(sess.end), metadata: {source:'PandarIA Fit', workout: sess.routineName}}).catch(() => {});
     }
   };
+  // 1.9: el cardio libre y los intervalos también se guardan en Health Connect / Salud
+  if (typeof saveIntSession === 'function'){
+    const _si = saveIntSession;
+    saveIntSession = function(sess){
+      _si.apply(this, arguments);
+      const s = HCS();
+      if (HC && s.on && s.writeWorkouts && isPrem() && sess && sess.end > sess.start){
+        const hours = Math.max(0.05, (sess.end - sess.start) / 3600000), met = 3 + (sess.intensity || 6) * 0.45;
+        HC.saveSample({dataType:'calories', value: Math.round(met * bodyWeight() * hours), startDate: iso(sess.start), endDate: iso(sess.end), metadata: {source:'PandarIA Fit', workout: sess.routineName}}).catch(() => {});
+      }
+    };
+  }
   const _ms = A.mSave;
   A.mSave = () => {
     const n0 = S.measures.length; _ms();
