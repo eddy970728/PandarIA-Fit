@@ -7720,7 +7720,7 @@ SCREENS.tpl = p => {
   return lhdr(t.n)+`<div class="lbody">${b}</div><div class="lfoot"><button class="btn pri big" data-a="tplAdd">${I('plus',20)} Añadir a mis rutinas</button></div>`;
 };
 A.tplAdd=()=>{
-  const p=pkP(); const sec=EXPLORE.find(s=>s.id===p.sid), t=sec.r[p.i];
+  const p=pkP(); const sec=EXPLORE.find(s=>s.id===p.sid), t=sec&&sec.r[p.i]; if (!t) return;
   const r=newRoutine({name:t.n,items:clone(p.items),pandaria:true,goal:t.g,level:S.settings.level,source:'explorar',tpl:p.sid+'|'+p.i});
   S.routines.push(r); save(); closeLayer();
   toast('Añadida a Mis rutinas');
