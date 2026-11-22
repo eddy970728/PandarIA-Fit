@@ -27,6 +27,7 @@ function abrir(storage) {
   const dom = new JSDOM(fs.readFileSync(HTML, 'utf8'), {
     runScripts: 'dangerously', pretendToBeVisual: true, url: 'https://localhost/', virtualConsole: vc,
     beforeParse(w) {
+      w.PF_REGION = 'ES'; // 1.9.2: unidades métricas en las pruebas, aunque el navegador simulado sea de EE. UU.
       let now = NOW;
       const RD = w.Date;
       class FD extends RD { constructor(...a) { if (a.length === 0) super(now); else super(...a); } static now() { return now; } }
@@ -1155,6 +1156,50 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9 reloj: gratis ve sus datos; la interpretación es de Premium', r.gratis);
   comprobar('1.9 reloj: avisa que espera los datos solo si Health Connect está conectado', r.espera && r.sinHc, JSON.stringify([r.espera, r.sinHc]));
   comprobar('1.9 fase 5 sin errores', !a.errores.length, a.errores.join(' | '));
+}
+
+/* ---------- 1.9.2: idiomas, unidades del país y Contacta al creador ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={};
+    window.PF_REGION='US'; unidadesIniciales(); out.us=[S.settings.unit,S.settings.uLong,S.settings.uAgua];
+    window.PF_REGION='UY'; unidadesIniciales(); out.uy=[S.settings.unit,S.settings.uLong,S.settings.uAgua];
+    S.settings.unit='lb'; S.settings.uLong='in'; S.settings.uAgua='oz';
+    out.peso=pesoTxt(80); out.pesoDe=pesoDe(176.4); out.alt=altTxt(180); out.agua=aguaTxt(500); out.aguaL=aguaLTxt(2500); out.aguaDe=aguaDe(17);
+    // perfil en pies y pulgadas
+    openLayer('profile',{}); const h=document.getElementById('pf_hft'), i=document.getElementById('pf_hin'), w=document.getElementById('pf_weight');
+    out.form=!!h&&!!i&&!document.getElementById('pf_height'); if (h){ h.value='5'; i.value='11'; w.value='176'; } const d={}; readProfileForm(d,'pf'); out.leido=[d.height,Math.round(d.weight*10)/10];
+    out.rango=fueraDeRango('weight',500); closeLayer();
+    // medidas: se guardan en kg y cm aunque se escriban en lb e in
+    openLayer('measure',{}); document.getElementById('m_peso').value='165'; document.getElementById('m_cintura').value='32'; S.measures=[]; A.mSave();
+    const m=S.measures[S.measures.length-1]||{}; out.medida=[Math.round(m.peso*10)/10, m.cintura];
+    // metas en las unidades de cada tipo
+    out.meta=[metaU('peso'),metaU('cintura'),Math.round(metaDe('peso',150)*10)/10];
+    S.settings.unit='kg'; S.settings.uLong='cm'; S.settings.uAgua='ml'; out.metrico=[pesoTxt(80),altTxt(180),aguaLTxt(2500)];
+    // idiomas: registro y tercer argumento de tx
+    out.idiomas=Object.keys(IDIOMAS).join(','); S.settings.lang='xx'; out.desconocido=LANG(); S.settings.lang='es';
+    out.tx=[tx('a','b',{pt:'c'}), (S.settings.lang='en', tx('a','b',{pt:'c'}))]; S.settings.lang='es';
+    // contacto: correo ordenado y como mucho uno al día
+    const c=contactoCorreo(['idioma','nutricion'],'Hola, una idea'); out.asunto=c.asunto; out.cuerpo=/Apartados: Nutrición, Idioma y traducción/.test(c.cuerpo)&&/Hola, una idea/.test(c.cuerpo)&&/Versión: /.test(c.cuerpo)&&c.url.startsWith('mailto:lunadoggybrustudios@gmail.com?subject=');
+    delete S.contactoDia; A.contacto('idioma'); out.abre=LAYERS.length&&LAYERS[LAYERS.length-1].t==='contacto'&&pkP().sel.join()==='idioma';
+    A.ctEnviar(); out.pideMsg=LAYERS[LAYERS.length-1].t==='contacto';
+    document.getElementById('ct_msg').value='Me gustaría una opción para copiar comidas'; let fue=''; window.abrirMailto=u=>{ fue=u; };
+    A.ctEnviar(); out.enviado=S.contactoDia===dayKey()&&fue.startsWith('mailto:'); A.contacto(); out.limite=!LAYERS.some(l=>l.t==='contacto');
+    return JSON.stringify(out); })()`));
+  a.cerrar();
+  comprobar('1.9.2 unidades: EE. UU. empieza en libras, pulgadas y onzas; Uruguay en kilos, cm y ml', r.us.join() === 'lb,in,oz' && r.uy.join() === 'kg,cm,ml', JSON.stringify([r.us, r.uy]));
+  comprobar('1.9.2 unidades: conversiones de peso, altura y agua', r.peso === '176,4 lb' && r.pesoDe === 80.01 && r.alt === '5 ft 11 in' && r.agua === '17 oz' && r.aguaL === '85 oz' && r.aguaDe === 503, JSON.stringify([r.peso, r.pesoDe, r.alt, r.agua, r.aguaL, r.aguaDe]));
+  comprobar('1.9.2 unidades: el perfil pide pies y pulgadas y guarda cm y kg', r.form && r.leido[0] === 180 && r.leido[1] === 79.8, JSON.stringify([r.form, r.leido]));
+  comprobar('1.9.2 unidades: el aviso de valor imposible sale en libras', /lb/.test(r.rango || ''), r.rango);
+  comprobar('1.9.2 unidades: las medidas escritas en lb e in se guardan en kg y cm', r.medida[0] === 74.8 && r.medida[1] === 81.3, JSON.stringify(r.medida));
+  comprobar('1.9.2 unidades: las metas usan la unidad de cada tipo', JSON.stringify(r.meta) === '["lb","in",68]', JSON.stringify(r.meta));
+  comprobar('1.9.2 unidades: en métrico todo sigue igual', JSON.stringify(r.metrico) === '["80 kg","180 cm","2,5 L"]', JSON.stringify(r.metrico));
+  comprobar('1.9.2 idiomas: registro, idioma desconocido vuelve a español y tx con tercer idioma', r.idiomas === 'es,en' && r.desconocido === 'es' && r.tx.join() === 'a,b', JSON.stringify([r.idiomas, r.desconocido, r.tx]));
+  comprobar('1.9.2 contacto: asunto filtrable con versión e idioma', /^\[PandarIA Fit 1\.9\.2 · es\] Sugerencias: Nutrición, Idioma y traducción$/.test(r.asunto) && r.cuerpo, r.asunto);
+  comprobar('1.9.2 contacto: abre con el apartado elegido, pide mensaje y limita a 1 al día', r.abre && r.pideMsg && r.enviado && r.limite, JSON.stringify([r.abre, r.pideMsg, r.enviado, r.limite]));
+  comprobar('1.9.2 sin errores', !a.errores.length, a.errores.join(' | '));
 }
 
 /* ---------- 1.8: copias de seguridad de cada versión publicada (de la 0.7 a la actual) ---------- */

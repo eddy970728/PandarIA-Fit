@@ -18,6 +18,7 @@ export async function abrirApp({ t0, storage = {}, seed = 1 } = {}) {
   const dom = new JSDOM(HTML, {
     runScripts: 'dangerously', pretendToBeVisual: false, url: 'https://localhost/', virtualConsole: vc,
     beforeParse(w) {
+      w.PF_REGION = 'ES'; // 1.9.2: unidades métricas en las pruebas, aunque el navegador simulado sea de EE. UU.
       w.__T = t0;
       const RD = w.Date;
       class FD extends RD { constructor(...a) { if (a.length === 0) super(w.__T); else super(...a); } static now() { return w.__T; } }

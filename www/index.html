@@ -5653,7 +5653,7 @@ window.datosCompletosJSON=datosCompletosJSON; window.fotosListo=fotosListo;
 let S;
 function load(){
   let migrated=false;
-  try { const raw=localStorage.getItem(KEY); if (raw){ const d=JSON.parse(raw); migrated=migrateData(d, raw); S=Object.assign(DEF(), d); } else S=DEF(); }
+  try { const raw=localStorage.getItem(KEY); if (raw){ const d=JSON.parse(raw); migrated=migrateData(d, raw); S=Object.assign(DEF(), d); } else { S=DEF(); unidadesIniciales(); } }
   catch(e){ S = DEF(); }
   premigCleanup();
   S.settings = Object.assign(DEF().settings, S.settings||{});
@@ -5690,16 +5690,47 @@ const toUnit = kg => kg==null||kg==='' ? '' : (S.settings.unit==='lb' ? Math.rou
 const fromUnit = v => v===''||v==null||isNaN(v) ? null : (S.settings.unit==='lb' ? +v/2.20462 : +v);
 const fmtNum = n => (Math.round(n*100)/100).toLocaleString(LOC(),{maximumFractionDigits:2});
 const fmtKg = kg => kg==null||kg==='' ? '—' : `${fmtNum(toUnit(kg))} ${S.settings.unit}`;
+/* 1.9.2 · Unidades del país. Por dentro todo se guarda en kilos, centímetros y mililitros; solo cambia lo que se ve y se escribe.
+   - peso (corporal y cargas): S.settings.unit 'kg' | 'lb'
+   - longitudes (altura y medidas): S.settings.uLong 'cm' | 'in'   (la altura en pulgadas se muestra como pies y pulgadas)
+   - agua: S.settings.uAgua 'ml' | 'oz'
+   En una instalación nueva se eligen según el país del teléfono (EE. UU., Liberia y Birmania usan libras, pulgadas y onzas). */
+const LB=2.20462, PULG=2.54, OZ=29.5735, IMPERIAL_REG=['US','LR','MM'];
+function regionUsuario(){ try{ if (window.PF_REGION) return String(window.PF_REGION).toUpperCase();
+  const L=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];
+  for (const l of L){ const m=String(l).match(/[-_]([A-Za-z]{2})(?:$|[-_])/); if (m) return m[1].toUpperCase(); } }catch(e){} return ''; }
+function unidadesIniciales(){ const imp=IMPERIAL_REG.includes(regionUsuario()); S.settings.unit=imp?'lb':'kg'; S.settings.uLong=imp?'in':'cm'; S.settings.uAgua=imp?'oz':'ml'; }
+const uP=()=>S.settings.unit==='lb'?'lb':'kg', uL=()=>S.settings.uLong==='in'?'in':'cm', uA=()=>S.settings.uAgua==='oz'?'oz':'ml';
+const pesoN=kg=>kg==null||kg===''||isNaN(kg)?null:(uP()==='lb'?Math.round(kg*LB*10)/10:Math.round(kg*10)/10);
+const pesoTxt=kg=>kg==null||kg===''||isNaN(kg)?'—':`${fmtNum(pesoN(+kg))} ${uP()}`;
+const pesoDe=v=>v===''||v==null||isNaN(v)?null:(uP()==='lb'?Math.round(+v/LB*100)/100:+v);
+const largoN=cm=>cm==null||cm===''||isNaN(cm)?null:(uL()==='in'?Math.round(cm/PULG*10)/10:Math.round(cm*10)/10);
+const largoTxt=cm=>cm==null||cm===''?'—':`${fmtNum(largoN(+cm))} ${uL()}`;
+const largoDe=v=>v===''||v==null||isNaN(v)?null:(uL()==='in'?Math.round(+v*PULG*10)/10:+v);
+const altTxt=cm=>{ if (!cm) return '—'; if (uL()!=='in') return `${Math.round(cm)} cm`; const t=Math.round(cm/PULG); return `${Math.floor(t/12)} ft ${t%12} in`; };
+const aguaN=ml=>uA()==='oz'?Math.round((+ml||0)/OZ):Math.round(+ml||0);
+const aguaTxt=ml=>`${fmtNum(aguaN(ml))} ${uA()}`;
+const aguaLTxt=ml=>uA()==='oz'?aguaTxt(ml):`${fmtNum(Math.round((+ml||0)/100)/10)} L`;
+const aguaDe=v=>v===''||v==null||isNaN(v)?null:(uA()==='oz'?Math.round(+v*OZ):Math.round(+v));
 const fmtTime = s => { s=Math.max(0,Math.round(+s||0)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; };
 const fmtDur = ms => { const m=Math.round(ms/60000); return m>=60?`${Math.floor(m/60)} h ${m%60} min`:`${m} min`; };
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const MESES_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const mesN=i=>EN_LANG()?MESES_EN[i]:MESES[i];
+const mesN=i=>LANG()==='es'?MESES[i]:new Date(2000,i,1).toLocaleDateString(LOC(),{month:'long'});
 const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const EN_LANG=()=>S&&S.settings&&S.settings.lang==='en';
-const LOC=()=>EN_LANG()?'en':'es'; window.LOC=LOC;
-const fmtDate = ts => { const d=new Date(ts); return EN_LANG()?d.toLocaleDateString('en-US',{month:'long',day:'numeric'}):`${d.getDate()} de ${MESES[d.getMonth()]}`; };
-const fmtDateL = ts => { const d=new Date(ts); return EN_LANG()?d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}):`${DIAS[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`; };
+/* 1.9.2 · Idiomas: cada idioma es una entrada de este registro y una tabla en TR (más abajo, junto a la traducción).
+   El español es la referencia: todo se escribe en español y cada idioma traduce desde ahí.
+   Al añadir un idioma: su entrada aquí (beta:true mientras no lo confirmen sus usuarios), su tabla en TR, y revisar los
+   sitios que usan EN_LANG() para cosas propias del inglés (voces, nombres de días en frases, consejos solo en español). */
+const IDIOMAS={
+  es:{n:'Español', loc:'es', ds:['D','L','M','X','J','V','S'], lun:['L','M','X','J','V','S','D']},
+  en:{n:'English', loc:'en-US', ds:['S','M','T','W','T','F','S'], lun:['M','T','W','T','F','S','S']}
+};
+const LANG=()=>{ const l=S&&S.settings&&S.settings.lang; return IDIOMAS[l]?l:'es'; };
+const LOC=()=>IDIOMAS[LANG()].loc; window.LOC=LOC; window.LANG=LANG;
+const fmtDate = ts => { const d=new Date(ts); return LANG()!=='es'?d.toLocaleDateString(LOC(),{month:'long',day:'numeric'}):`${d.getDate()} de ${MESES[d.getMonth()]}`; };
+const fmtDateL = ts => { const d=new Date(ts); return LANG()!=='es'?d.toLocaleDateString(LOC(),{weekday:'long',month:'long',day:'numeric',year:'numeric'}):`${DIAS[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`; };
 function ago(ts){
   if (!ts) return 'Nunca';
   const d=Math.floor((Date.now()-ts)/DAY);
@@ -5988,6 +6019,7 @@ A.setTexto=v=>{ S.settings.texto=v; S.settings.bigText=v!=='n'; applyA11y(); sav
 A.toggleSet=k=>{ const s=S.settings; if(k==='theme'){ s.theme=s.theme==='dark'?'light':'dark'; applyTheme(); } else if(['checkin','period','report','tips','awake','rirAuto','burbuja'].includes(k)) s[k]=s[k]===false; else s[k]=!s[k]; applyA11y(); if(k==='voice'&&s.voice) speak('Avisos por voz activados'); save(); render.keep=true; render(); };
 A.setLevel=v=>{ S.settings.level=v; save(); render.keep=true; render(); toast('Dificultad: '+LEVEL_NAMES[LEVELS[v]]); };
 A.setUnit=v=>{ S.settings.unit=v; save(); render.keep=true; render(); };
+A.setUnidad=v=>{ const [k,u]=String(v).split('|'); if (!['unit','uLong','uAgua'].includes(k)) return; S.settings[k]=u; save(); render.keep=true; render(); };
 A.setRestDef=()=>sheet('Descanso por defecto',[30,45,60,90,120,150,180,240].map(s=>({icon:'timer',label:fmtTime(s)+(S.settings.rest===s?'  ✓':''),fn:()=>{S.settings.rest=s;save();render.keep=true;render();}})));
 A.setPlate=()=>sheet('Disco más pequeño disponible',[0.5,1,1.25,2.5].map(p=>({icon:'calc',label:`${p} kg`+(S.settings.minPlate===p?'  ✓':''),fn:()=>{S.settings.minPlate=p;save();render.keep=true;render();}})));
 A.remDay=v=>{ const d=S.settings.reminders.days, i=+v; const k=d.indexOf(i); if(k>=0) d.splice(k,1); else { d.push(i); askNotif(); } save(); render.keep=true; render(); scheduleReminder(); };
@@ -7385,6 +7417,39 @@ const CARDIO_INT={
 function cardioAct(id){ return CARDIO_ACTS.find(a=>a.id===id)||CARDIO_ACTS[0]; }
 function cardioActN(id){ const a=cardioAct(id); if (a.ex && !a.n){ const e=getEx(a.ex); return e?e.n:id; } return tx(a.n,a.en); }
 function cardioActs(){ return CARDIO_ACTS.filter(a=>{ if (!a.ex) return true; const e=getEx(a.ex); return e && (!a.maq || hasEquip(e)); }); }
+/* ============ 1.9.2 · Contacta al creador ============
+   Prepara un correo ordenado en la app de correo del usuario (sin servidor). El usuario lo ve y lo puede cambiar antes de enviarlo.
+   Asunto siempre igual, para filtrarlo en Gmail por idioma o apartado. Nunca lleva datos de salud. Como mucho 1 al día. */
+const CONTACTO_MAIL='lunadoggybrustudios@gmail.com';
+const CONTACTO_AP=[['entreno','Entreno','Workouts'],['nutricion','Nutrición','Nutrition'],['agua','Agua','Water'],['ayuno','Ayuno','Fasting'],['pandaria','PandarIA','PandarIA'],
+  ['logros','Logros y retos','Achievements and challenges'],['premium','Premium','Premium'],['idioma','Idioma y traducción','Language and translation'],['otro','Otro','Other']];
+function contactoTel(){ const u=navigator.userAgent||''; const a=u.match(/Android [\d.]+;\s*([^;)]+)/); if (a) return 'Android '+(u.match(/Android ([\d.]+)/)||[])[1]+' · '+a[1].trim();
+  const i=u.match(/(iPhone|iPad)[^)]*OS ([\d_]+)/); if (i) return i[1]+' · iOS '+i[2].replace(/_/g,'.'); return ''; }
+function contactoCorreo(sel, msg){
+  const ap=CONTACTO_AP.filter(([k])=>sel.includes(k)), nombres=ap.map(([k,es])=>es);
+  const asunto=`[PandarIA Fit ${verTxt()} · ${LANG()}] Sugerencias: ${nombres.join(', ')||'General'}`;
+  const cuerpo=[`Apartados: ${nombres.join(', ')||'—'}`,'',(msg||'').trim()||'—','','—',`Versión: ${verTxt()}`,`Idioma: ${IDIOMAS[LANG()].n} (${LANG()})`,contactoTel()?`Teléfono: ${contactoTel()}`:''].filter(x=>x!==null).join('\n').replace(/\n{3,}/g,'\n\n');
+  return {asunto, cuerpo, url:`mailto:${CONTACTO_MAIL}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`};
+}
+A.contacto=v=>{ if (S.contactoDia===dayKey()) return toast(tx('Ya enviaste una sugerencia hoy. Mañana puedes enviar otra.','You already sent a suggestion today. You can send another tomorrow.'));
+  closeModal(); openLayer('contacto',{sel:v&&CONTACTO_AP.some(([k])=>k===v)?[v]:[],msg:''}); };
+SCREENS.contacto = p => {
+  const todos=p.sel.length===CONTACTO_AP.length;
+  let b=`<p class="sm mut" style="margin:0 4px 14px;line-height:1.5">${tx('Cuéntale al creador qué mejorarías. Se abrirá tu app de correo con el mensaje listo; lo puedes revisar antes de enviarlo. Puedes enviar una sugerencia al día.','Tell the creator what you would improve. Your email app will open with the message ready; you can check it before sending. You can send one suggestion a day.')}</p>
+  <div class="sec">${tx('¿Sobre qué?','About what?')}</div><div class="chips"><button class="chip ${todos?'on':''}" data-a="ctTodos" aria-pressed="${todos}">${tx('Todos','All')}</button>${CONTACTO_AP.map(([k,es,en])=>`<button class="chip ${p.sel.includes(k)?'on':''}" data-a="ctTog" data-v="${k}" aria-pressed="${p.sel.includes(k)}">${tx(es,en)}${k==='idioma'?` (${IDIOMAS[LANG()].n})`:''}</button>`).join('')}</div>
+  <div class="sec">${tx('Tu mensaje','Your message')}</div><textarea id="ct_msg" class="inp" rows="6" maxlength="2000" style="height:auto;padding:12px;line-height:1.45;resize:vertical" placeholder="${tx('Por ejemplo: en Nutrición me gustaría poder copiar las comidas de ayer…','For example: in Nutrition I would like to copy yesterday\'s meals…')}">${esc(p.msg||'')}</textarea>
+  <div class="xs mut" style="margin:8px 4px 0;line-height:1.45">${tx('Se añaden la versión de la app, el idioma y el modelo de tu teléfono para entender mejor tu mensaje. Nunca se envían tus datos de salud.','The app version, language and your phone model are added to understand your message better. Your health data is never sent.')}</div>`;
+  return lhdr(tx('Contacta al creador','Contact the creator'))+`<div class="lbody">${b}</div><div class="lfoot"><button class="btn pri big" data-a="ctEnviar">${I('edit',20)} ${tx('Preparar correo','Prepare email')}</button></div>`;
+};
+const ctMsg=()=>{ const el=document.getElementById('ct_msg'); if (el) pkP().msg=el.value; };
+A.ctTog=k=>{ ctMsg(); const p=pkP(); p.sel=p.sel.includes(k)?p.sel.filter(x=>x!==k):p.sel.concat(k); refreshTop(); };
+A.ctTodos=()=>{ ctMsg(); const p=pkP(); p.sel=p.sel.length===CONTACTO_AP.length?[]:CONTACTO_AP.map(([k])=>k); refreshTop(); };
+A.ctEnviar=()=>{ ctMsg(); const p=pkP();
+  if (!p.sel.length) return toast(tx('Elige al menos un apartado','Pick at least one topic'));
+  if ((p.msg||'').trim().length<5) return toast(tx('Escribe tu sugerencia','Write your suggestion'));
+  const c=contactoCorreo(p.sel,p.msg); S.contactoDia=dayKey(); save(); closeLayer(); toast(tx('Abriendo tu app de correo…','Opening your email app…'));
+  window.abrirMailto(c.url); };
+window.abrirMailto=u=>{ try{ location.href=u; }catch(e){} };
 SCREENS.cardio = p => {
   const c=p.cfg, acts=cardioActs(), quick=[10,20,30,45,60];
   if (!acts.some(a=>a.id===c.act)) c.act=acts[0].id;
@@ -7603,30 +7668,33 @@ function histCuerpo(){
   const ms=S.measures;
   let h=`<button class="btn pri wide" style="margin-bottom:14px" data-a="addMeasure">${I('plus',20)} Registrar medidas</button>`;
   if (!ms.length) return h+`<div class="empty"><div class="big">📏</div>Registra tu peso y medidas para ver tu evolución. También puedes guardar fotos de progreso.</div>`;
-  const wp=ms.filter(m=>m.peso).map(m=>({x:m.date,y:+m.peso}));
-  if (wp.length>1) h+=`<div class="sec">Peso corporal</div><div class="card">${lineChart(wp,{unit:'kg'})}</div>`;
+  const wp=ms.filter(m=>m.peso).map(m=>({x:m.date,y:pesoN(+m.peso)}));
+  if (wp.length>1) h+=`<div class="sec">Peso corporal</div><div class="card">${lineChart(wp,{unit:uP()})}</div>`;
   h+=pesoTendenciaHtml();
-  const F=[['peso','Peso','kg'],['cintura','Cintura','cm'],['pecho','Pecho','cm'],['brazo','Brazo','cm'],['cadera','Cadera','cm'],['muslo','Muslo','cm'],['grasa','Grasa corporal','%']];
+  const F=[['peso','Peso',uP()],['cintura','Cintura',uL()],['pecho','Pecho',uL()],['brazo','Brazo',uL()],['cadera','Cadera',uL()],['muslo','Muslo',uL()],['grasa','Grasa corporal','%']];
+  // 1.9.2: cada medida se muestra en las unidades elegidas (se guarda en kg y cm)
+  const vU=(k,v)=>k==='peso'?pesoN(+v):k==='grasa'?+v:largoN(+v);
   const last={}, first={};
-  ms.forEach(m=>F.forEach(([k])=>{ if(m[k]){ if(first[k]==null) first[k]=+m[k]; last[k]=+m[k]; } }));
+  ms.forEach(m=>F.forEach(([k])=>{ if(m[k]){ if(first[k]==null) first[k]=vU(k,m[k]); last[k]=vU(k,m[k]); } }));
   h+=`<div class="sec">Últimas medidas</div><div class="card" style="padding:4px 14px">${F.filter(([k])=>last[k]!=null).map(([k,n,u])=>{ const d=last[k]-first[k];
     return `<div class="kv"><span class="mut">${n}</span><span><b>${fmtNum(last[k])} ${u}</b> ${Math.abs(d)>0.01?`<span class="xs" style="color:${d<0?'var(--ok)':'var(--ac)'}">${d>0?'+':''}${fmtNum(d)}</span>`:''}</span></div>`; }).join('')}</div>`;
   const ph=ms.filter(m=>m.foto);
   if (ph.length>=2) h+=`<button class="btn wide" style="margin-top:14px" data-a="photoCmp">${I('layers',18)} Comparar fotos lado a lado</button>`;
   if (ph.length) h+=`<div class="sec">Fotos de progreso</div><div class="photos">${ph.slice().reverse().map(m=>`<div><img src="${m.foto}" alt="Foto ${fmtDate(m.date)}"><div class="xs mut" style="text-align:center;margin-top:4px">${fmtDate(m.date)}</div></div>`).join('')}</div>`;
-  h+=`<div class="sec">Registros</div>${ms.slice().reverse().map(m=>`<div class="card row"><div class="grow"><div class="b">${fmtDate(m.date)}</div><div class="xs mut">${F.filter(([k])=>m[k]).map(([k,n,u])=>`${n} ${m[k]} ${u}`).join(' · ')}${m.foto?' · 📷':''}</div></div><button class="ibtn" data-a="delMeasure" data-v="${m.id}">${I('trash',18)}</button></div>`).join('')}`;
+  h+=`<div class="sec">Registros</div>${ms.slice().reverse().map(m=>`<div class="card row"><div class="grow"><div class="b">${fmtDate(m.date)}</div><div class="xs mut">${F.filter(([k])=>m[k]).map(([k,n,u])=>`${n} ${fmtNum(vU(k,m[k]))} ${u}`).join(' · ')}${m.foto?' · 📷':''}</div></div><button class="ibtn" data-a="delMeasure" data-v="${m.id}">${I('trash',18)}</button></div>`).join('')}`;
   return h;
 }
 A.addMeasure=()=>openLayer('measure',{foto:null});
 A.delMeasure=id=>confirmBox({title:'¿Eliminar registro?',danger:true,okText:'Eliminar',ok:()=>{ const L0=S.measures.slice(); S.measures=S.measures.filter(m=>m.id!==id); save(); render.keep=true; render(); toastUndo(tx('Registro eliminado','Entry deleted'),()=>{ S.measures=L0; }); }});
 SCREENS.measure = p => {
   const last=S.measures[S.measures.length-1]||{};
-  const f=(k,n,u)=>`<div class="field" style="flex:1"><label>${n} (${u})</label><input id="m_${k}" class="inp" type="number" inputmode="decimal" step="any" placeholder="${last[k]||''}"></div>`;
+  const vU=(k,v)=>v==null||v===''?'':k==='peso'?pesoN(+v):k==='grasa'?+v:largoN(+v);
+  const f=(k,n,u)=>`<div class="field" style="flex:1"><label>${n} (${u})</label><input id="m_${k}" class="inp" type="number" inputmode="decimal" step="any" placeholder="${vU(k,last[k])}"></div>`;
   return lhdr('Registrar medidas')+`<div class="lbody">
-    <div class="row" style="gap:10px">${f('peso','Peso','kg')}${f('grasa','Grasa','%')}</div>
-    <div class="row" style="gap:10px">${f('cintura','Cintura','cm')}${f('pecho','Pecho','cm')}</div>
-    <div class="row" style="gap:10px">${f('brazo','Brazo','cm')}${f('cadera','Cadera','cm')}</div>
-    <div class="row" style="gap:10px">${f('muslo','Muslo','cm')}<div style="flex:1"></div></div>
+    <div class="row" style="gap:10px">${f('peso','Peso',uP())}${f('grasa','Grasa','%')}</div>
+    <div class="row" style="gap:10px">${f('cintura','Cintura',uL())}${f('pecho','Pecho',uL())}</div>
+    <div class="row" style="gap:10px">${f('brazo','Brazo',uL())}${f('cadera','Cadera',uL())}</div>
+    <div class="row" style="gap:10px">${f('muslo','Muslo',uL())}<div style="flex:1"></div></div>
     <div class="field"><label>Foto de progreso (opcional)</label>
     ${p.foto?`<img src="${p.foto}" class="photo" style="max-height:260px;object-fit:cover"><button class="link sm" style="margin-top:8px" data-a="mPhotoDel">Quitar foto</button>`:`<button class="btn wide" data-a="mPhoto">${I('camera',20)} Añadir foto</button>`}
     <input type="file" id="mfile" accept="image/*" class="hide" data-ch="mFile"></div>
@@ -7645,7 +7713,7 @@ CH.mFile=el=>{
 A.mSave=()=>{
   const m={id:uid(),date:Date.now()}; let any=false;
   let er=null;
-  ['peso','grasa','cintura','pecho','brazo','cadera','muslo'].forEach(k=>{ const v=$('#m_'+k).value.replace(',','.'); if(v!==''){ m[k]=+v; any=true; er=er||fueraDeRango(k,+v); } });
+  ['peso','grasa','cintura','pecho','brazo','cadera','muslo'].forEach(k=>{ const v=$('#m_'+k).value.replace(',','.'); if(v!==''&&!isNaN(+v)){ m[k]=k==='peso'?pesoDe(+v):k==='grasa'?+v:largoDe(+v); any=true; er=er||fueraDeRango(k,m[k]); } });
   if (er) return toast(er);
   if (pkP().foto){ m.foto=pkP().foto; any=true; }
   if (!any){ toast('Escribe al menos una medida'); return; }
@@ -7653,7 +7721,7 @@ A.mSave=()=>{
   // un cambio de peso muy grande en pocos días suele ser un error de tecleo
   const ult=S.measures.filter(x=>x.peso).sort((a,b)=>b.date-a.date)[0];
   if (m.peso && ult){ const dias=Math.max(1,(m.date-ult.date)/DAY), dif=Math.abs(m.peso-ult.peso)/ult.peso;
-    if (dif>0.05+0.01*Math.min(dias,30)) return confirmBox({title:tx('¿El peso es correcto?','Is the weight right?'),text:tx(`Hace ${Math.round(dias)} ${Math.round(dias)===1?'día':'días'} pesabas ${fmtNum(ult.peso)} kg y ahora escribiste <b>${fmtNum(m.peso)} kg</b>. Un cambio tan grande suele ser un error al escribir.`,`${Math.round(dias)} day${Math.round(dias)===1?'':'s'} ago you weighed ${ult.peso} kg and now you entered <b>${m.peso} kg</b>. Such a big change is usually a typo.`),okText:tx('Sí, es correcto','Yes, it is right'),ok:guardar,noText:tx('Corregir','Fix it')}); }
+    if (dif>0.05+0.01*Math.min(dias,30)) return confirmBox({title:tx('¿El peso es correcto?','Is the weight right?'),text:tx(`Hace ${Math.round(dias)} ${Math.round(dias)===1?'día':'días'} pesabas ${pesoTxt(ult.peso)} y ahora escribiste <b>${pesoTxt(m.peso)}</b>. Un cambio tan grande suele ser un error al escribir.`,`${Math.round(dias)} day${Math.round(dias)===1?'':'s'} ago you weighed ${pesoTxt(ult.peso)} and now you entered <b>${pesoTxt(m.peso)}</b>. Such a big change is usually a typo.`),okText:tx('Sí, es correcto','Yes, it is right'),ok:guardar,noText:tx('Corregir','Fix it')}); }
   guardar();
 };
 // Fotos de progreso: máximo 40. Se conserva siempre la primera (el «antes») y se borra la más antigua de las demás.
@@ -7767,8 +7835,10 @@ function profileForm(p, prefix){
   prefix=prefix||'pf';
   return `<div class="field"><label>Nombre</label><input id="${prefix}_name" class="inp" value="${esc(p.name||'')}" placeholder="Cómo te llamamos" maxlength="30"></div>
   <div class="row" style="gap:10px"><div class="field grow"><label>Edad</label><input id="${prefix}_age" class="inp" type="number" inputmode="numeric" value="${p.age||''}" placeholder="años"></div>
-  <div class="field grow"><label>Altura (cm)</label><input id="${prefix}_height" class="inp" type="number" inputmode="numeric" value="${p.height||''}"></div>
-  <div class="field grow"><label>Peso (kg)</label><input id="${prefix}_weight" class="inp" type="number" inputmode="decimal" value="${p.weight||''}"></div></div>
+  ${uL()==='in'?(()=>{ const t=p.height?Math.round(p.height/PULG):null; return `<div class="field grow"><label>${tx('Altura','Height')} (ft)</label><input id="${prefix}_hft" class="inp" type="number" inputmode="numeric" value="${t!=null?Math.floor(t/12):''}"></div>
+  <div class="field grow"><label>(in)</label><input id="${prefix}_hin" class="inp" type="number" inputmode="numeric" value="${t!=null?t%12:''}"></div>`; })()
+  :`<div class="field grow"><label>${tx('Altura (cm)','Height (cm)')}</label><input id="${prefix}_height" class="inp" type="number" inputmode="numeric" value="${p.height||''}"></div>`}
+  <div class="field grow"><label>${tx('Peso','Weight')} (${uP()})</label><input id="${prefix}_weight" class="inp" type="number" inputmode="decimal" value="${p.weight?pesoN(p.weight):''}"></div></div>
   <div class="field"><label>Sexo</label><div class="seg">${Object.entries(SEXES).map(([k,n])=>`<button class="${p.sex===k?'on':''}" data-a="pfSet" data-v="sex|${k}">${n}</button>`).join('')}</div></div>
   <div class="field"><label>Condición física actual</label><div class="seg">${Object.entries(FITNESS).map(([k,n])=>`<button class="${p.fitness===k?'on':''}" data-a="pfSet" data-v="fitness|${k}">${n}</button>`).join('')}</div></div>
   <div class="field"><label>Lesiones o zonas sensibles</label><div class="chips">${Object.entries(INJURIES).map(([k,v])=>`<button class="chip ${(p.injuries||[]).includes(k)?'on':''}" data-a="pfInj" data-v="${k}">${v.n}</button>`).join('')}</div>
@@ -7777,13 +7847,15 @@ function profileForm(p, prefix){
 // Valores posibles: un error de tecleo (800 kg, 2 años) no puede llegar a los cálculos
 const LIMITES={age:[12,100,'La edad','años'], height:[100,230,'La altura','cm'], weight:[30,300,'El peso','kg'], peso:[30,300,'El peso','kg'], grasa:[3,60,'La grasa corporal','%'],
   cintura:[40,200,'La cintura','cm'], pecho:[50,200,'El pecho','cm'], brazo:[15,70,'El brazo','cm'], cadera:[50,200,'La cadera','cm'], muslo:[25,100,'El muslo','cm']};
-function fueraDeRango(k, v){ const L=LIMITES[k]; if (!L || v==null || v==='' || isNaN(v)) return null; if (v<L[0] || v>L[1]) return tx(`${L[2]} debe estar entre ${L[0]} y ${L[1]} ${L[3]}. Revisa el número.`,`${({age:'Age',height:'Height',weight:'Weight',peso:'Weight',grasa:'Body fat',cintura:'Waist',pecho:'Chest',brazo:'Arm',cadera:'Hips',muslo:'Thigh'})[k]} must be between ${L[0]} and ${L[1]} ${L[3]==='años'?'years':L[3]}. Check the number.`); return null; }
+function fueraDeRango(k, v){ const L0=LIMITES[k]; if (!L0 || v==null || v==='' || isNaN(v)) return null; const L=L0.slice(); if (L[3]==='kg'){ L[0]=Math.round(pesoN(L0[0])); L[1]=Math.round(pesoN(L0[1])); L[3]=uP(); } else if (L[3]==='cm'){ L[0]=Math.round(largoN(L0[0])); L[1]=Math.round(largoN(L0[1])); L[3]=uL(); } if (v<L0[0] || v>L0[1]) return tx(`${L[2]} debe estar entre ${L[0]} y ${L[1]} ${L[3]}. Revisa el número.`,`${({age:'Age',height:'Height',weight:'Weight',peso:'Weight',grasa:'Body fat',cintura:'Waist',pecho:'Chest',brazo:'Arm',cadera:'Hips',muslo:'Thigh'})[k]} must be between ${L[0]} and ${L[1]} ${L[3]==='años'?'years':L[3]}. Check the number.`); return null; }
 function perfilErr(p){ for (const k of ['age','height','weight']){ const e=fueraDeRango(k,p[k]); if (e) return e; } return null; }
 function readProfileForm(p, prefix){
   prefix=prefix||'pf';
   const el=k=>document.getElementById(prefix+'_'+k), g=k=>el(k)?el(k).value.trim().replace(',','.'):'';
   // solo se leen los campos que están en pantalla (la bienvenida pide el nombre en otro paso)
-  if (el('name')) p.name=g('name'); ['age','height','weight'].forEach(k=>{ if (!el(k)) return; const v=g(k); p[k]=v===''?null:+v; });
+  if (el('name')) p.name=g('name'); ['age','height','weight'].forEach(k=>{ if (!el(k)) return; const v=g(k); p[k]=v===''?null:k==='weight'?pesoDe(+v):+v; });
+  // altura en pies y pulgadas (unidades de EE. UU.)
+  if (el('hft')){ const f=g('hft'), i=g('hin'); p.height=f===''&&i===''?null:Math.round(((+f||0)*12+(+i||0))*PULG); }
   return p;
 }
 SCREENS.profile = p => {
@@ -8019,6 +8091,10 @@ function goalSeries(g){
   if (g.type==='fuerza') return exHistory(g.exId,30).reverse().map(e=>({x:e.date,y:Math.max(...e.sets.map(s=>+s.kg||0))}));
   return S.measures.filter(m=>m[g.type]).map(m=>({x:m.date,y:+m[g.type]}));
 }
+// 1.9.2: cada tipo de meta en sus unidades (fuerza: cargas; peso: peso corporal; cintura: longitudes)
+const metaU=t=>t==='fuerza'?S.settings.unit:t==='peso'?uP():uL();
+const metaN=(t,v)=>v==null?v:t==='fuerza'?toUnit(v):t==='peso'?pesoN(v):largoN(v);
+const metaDe=(t,v)=>t==='fuerza'?fromUnit(v):t==='peso'?pesoDe(v):largoDe(v);
 function goalStatus(g){
   if (!g.deadline && g.date) g.deadline=g.date; if (g.startVal==null && g.start!=null) g.startVal=g.start; // metas guardadas con nombres antiguos
   const pts=goalSeries(g).filter(p=>p.x>=g.created-30*DAY);
@@ -8037,16 +8113,16 @@ function goalStatus(g){
   if (reached) msg='¡Meta cumplida! Crea una nueva para seguir avanzando.';
   else if (!pts.length || pts.length<2) msg='Necesito al menos 2 registros para proyectar tu ritmo.';
   else if (proj && proj<=g.deadline) msg=`Vas bien: a este ritmo llegas hacia el ${fmtDate(proj)}.`;
-  else if (proj) msg=`A tu ritmo llegarías el ${fmtDate(proj)}, después de la fecha. Necesitas ${fmtNum(Math.abs(needWeek))} ${g.type==='fuerza'?S.settings.unit:g.type==='peso'?'kg':'cm'} por semana.`;
+  else if (proj) msg=`A tu ritmo llegarías el ${fmtDate(proj)}, después de la fecha. Necesitas ${fmtNum(Math.abs(metaN(g.type,needWeek)))} ${metaU(g.type)} por semana.`;
   else msg=`Sin avance en la dirección de la meta todavía. Necesitas ${fmtNum(Math.abs(needWeek||0))} por semana.`;
   return {cur,pct,reached,msg,pts};
 }
 function histMetas(){
   let h=`<button class="btn pri wide" style="margin-bottom:14px" data-a="goalNew">${I('target',20)} Nueva meta</button>`;
   if (!(S.goals||[]).length) return h+`<div class="empty"><div class="big">🎯</div>Ponte una meta con fecha: un peso en un ejercicio, tu peso corporal o tu cintura. PandarIA te dirá si vas a tiempo.</div>`;
-  S.goals.forEach(g=>{ const st=goalStatus(g); const u=g.type==='fuerza'?S.settings.unit:g.type==='peso'?'kg':'cm';
+  S.goals.forEach(g=>{ const st=goalStatus(g); const u=metaU(g.type);
     const name=g.type==='fuerza'?getEx(g.exId).n:GOAL_TYPES[g.type];
-    h+=`<div class="card"><div class="row"><div class="grow"><div class="b">${esc(name)}: ${fmtNum(g.type==='fuerza'?toUnit(g.target):g.target)} ${u}</div><div class="xs mut">Antes del ${fmtDate(g.deadline)} · ahora ${fmtNum(g.type==='fuerza'?toUnit(st.cur):st.cur)} ${u}</div></div><button class="ibtn" data-a="goalDel" data-v="${g.id}">${I('trash',18)}</button></div>
+    h+=`<div class="card"><div class="row"><div class="grow"><div class="b">${esc(name)}: ${fmtNum(metaN(g.type,g.target))} ${u}</div><div class="xs mut">Antes del ${fmtDate(g.deadline)} · ahora ${fmtNum(metaN(g.type,st.cur))} ${u}</div></div><button class="ibtn" data-a="goalDel" data-v="${g.id}">${I('trash',18)}</button></div>
     <div class="pbar"><div style="width:${st.pct}%;background:${st.reached?'var(--ok)':'var(--ac)'}"></div></div>
     <div class="row xs" style="margin-top:6px"><span class="grow mut">${st.pct} %</span></div>
     <div class="sm" style="margin-top:6px;line-height:1.45"><span style="color:var(--ac)">${I('spark',13).replace('<svg','<svg style="display:inline;vertical-align:-2px"')}</span> ${esc(st.msg)}</div></div>`; });
@@ -8058,7 +8134,7 @@ SCREENS.goalForm = p => {
   const d=new Date(Date.now()+84*DAY).toISOString().slice(0,10);
   return lhdr('Nueva meta')+`<div class="lbody"><div class="field"><label>Tipo de meta</label><div class="seg">${Object.entries(GOAL_TYPES).map(([k,n])=>`<button class="${p.type===k?'on':''}" data-a="goalType" data-v="${k}">${n}</button>`).join('')}</div></div>
   ${p.type==='fuerza'?`<div class="field"><label>Ejercicio</label><select id="g_ex" class="inp">${(trained.length?trained:['press_banca','sentadilla','peso_muerto','press_militar']).map(id=>`<option value="${id}" ${p.exId===id?'selected':''}>${esc(getEx(id).n)}</option>`).join('')}</select></div>`:''}
-  <div class="field"><label>Objetivo (${p.type==='fuerza'?S.settings.unit:p.type==='peso'?'kg':'cm'})</label><input id="g_t" class="inp" type="number" inputmode="decimal" placeholder="Ej.: ${p.type==='fuerza'?80:p.type==='peso'?72:80}"></div>
+  <div class="field"><label>Objetivo (${metaU(p.type)})</label><input id="g_t" class="inp" type="number" inputmode="decimal" placeholder="Ej.: ${Math.round(metaN(p.type,p.type==='fuerza'?80:p.type==='peso'?72:80))}"></div>
   <div class="field"><label>Fecha límite</label><input id="g_d" class="inp" type="date" value="${d}"></div>
   <p class="xs mut">Una meta realista para fuerza es subir entre 2 y 5 % por mes; para bajar de peso, entre 0,5 y 1 % del peso por semana.</p></div>
   <div class="lfoot"><button class="btn pri big" data-a="goalSave">Crear meta</button></div>`;
@@ -8067,7 +8143,7 @@ A.goalType=v=>{ pkP().type=v; refreshTop(); };
 A.goalSave=()=>{
   const p=pkP(); const t=+$('#g_t').value; const dl=new Date($('#g_d').value+'T12:00').getTime();
   if (!t||!dl||dl<Date.now()){ toast('Revisa el objetivo y la fecha'); return; }
-  const g={id:uid(),type:p.type,target:p.type==='fuerza'?fromUnit(t):t,deadline:dl,created:Date.now()};
+  const g={id:uid(),type:p.type,target:metaDe(p.type,t),deadline:dl,created:Date.now()};
   if (p.type==='fuerza') g.exId=$('#g_ex').value;
   const ser=goalSeries(g); g.startVal=ser.length?ser[ser.length-1].y:(p.type==='peso'?bodyWeight():0);
   if (!ser.length && p.type!=='fuerza'){ toast(p.type==='peso'?'Registra tu peso en Cuerpo para seguir esta meta':'Registra tu cintura en Cuerpo para seguir esta meta'); }
@@ -8414,7 +8490,7 @@ function viewNutricion(){
     h+=`<div class="card"><div class="row" style="align-items:flex-end"><div class="grow"><div class="xs mut b" style="letter-spacing:1px">CALORÍAS</div><div style="font-size:34px;font-weight:900;line-height:1.1">${c.kcal.toLocaleString(LOC())} <span class="sm mut" style="font-weight:600">kcal</span></div></div><div class="xs mut" style="text-align:right">${c.adapt&&c.adapt.ok?`Mantenimiento ajustado ${c.adapt.tdee.toLocaleString(LOC())}`:`Mantenimiento ${c.tdee.toLocaleString(LOC())}`}<br>Basal ${c.bmr.toLocaleString(LOC())}</div></div>
     <div class="macros">${[['Proteína',c.prot,'#ff7a1a',c.prot*4],['Carbohidratos',c.carbs,'#3f9cff',c.carbs*4],['Grasas',c.fat,'#f5b82e',c.fat*9]].map(([l,g,col,k])=>`<div class="mac"><div class="mbar"><div style="width:${Math.round(k/c.kcal*100)}%;background:${col}"></div></div><div class="row"><span class="b grow">${l}</span><span class="b">${g} g</span></div></div>`).join('')}</div>
     ${c.goal!=='mantener'?`<div class="xs mut b" style="letter-spacing:1px;margin-top:14px">RITMO ${c.goal==='bajar'?'PARA BAJAR':'PARA GANAR'}</div><div class="seg" style="margin-top:6px">${[['lento','Lento'],['normal','Normal'],['rapido','Rápido']].map(([k,l])=>`<button class="${c.ritmo===k?'on':''}" data-a="nRitmo" data-v="${k}">${l}</button>`).join('')}</div>
-      <div class="xs mut" style="margin-top:6px;line-height:1.4">${c.goal==='bajar'?`Alrededor de ${fmtNum(c.semana)} kg por semana (${fmtNum(Math.round(c.semana/c.w*1000)/10)} % de tu peso).${c.limite?' PandarIA aplicó su límite de seguridad: no quita más del 25 % de tu gasto ni baja de tu metabolismo en reposo.':''}`:`${Math.round((kb('nut.superavit')[c.ritmo]-1)*100)} % más de calorías que tu mantenimiento.`}${kbLink(c.goal==='bajar'?'nut.deficit':'nut.superavit','Por qué')}</div>`:''}
+      <div class="xs mut" style="margin-top:6px;line-height:1.4">${c.goal==='bajar'?`Alrededor de ${pesoTxt(c.semana)} por semana (${fmtNum(Math.round(c.semana/c.w*1000)/10)} % de tu peso).${c.limite?' PandarIA aplicó su límite de seguridad: no quita más del 25 % de tu gasto ni baja de tu metabolismo en reposo.':''}`:`${Math.round((kb('nut.superavit')[c.ritmo]-1)*100)} % más de calorías que tu mantenimiento.`}${kbLink(c.goal==='bajar'?'nut.deficit':'nut.superavit','Por qué')}</div>`:''}
     ${c.adapt?`<div class="sm" style="margin-top:12px;line-height:1.45;color:${c.adapt.ok?'var(--ok)':'var(--mut)'}">${c.adapt.ok?`Ajustado con tu diario: en ${c.adapt.days} días comiste de media ${fmtK(c.adapt.intake)} y tu peso cambió ${fmtNum(c.adapt.kgWeek)} kg por semana, así que tu gasto real ronda ${fmtK(c.adapt.obs)}.`:`Objetivo que se ajusta solo: ${esc(c.adapt.why)}.`}${kbLink('nut.adaptativo','Cómo funciona')}</div>`:''}
     ${typeof isPremium!=='function'||isPremium()?`<button class="link xs" style="margin-top:6px" data-a="nAdapt">${nut().adaptOff?'Activar':'Desactivar'} el ajuste automático</button>`:''}
     <div class="xs mut" style="margin-top:10px;line-height:1.4">Fórmula de Mifflin-St Jeor <button class="link xs" data-a="kbOpen" data-v="nut.metabolismo">(fuente)</button> con tu perfil y tus entrenos de la semana. Proteína: ${fmtNum(c.pk)} g por kg (la ISSN recomienda 1,4–2,0 g/kg si entrenas, y algo más en déficit). <button class="link xs" data-a="kbOpen" data-v="nut.proteina">Ver fuente</button></div>
@@ -8431,10 +8507,10 @@ function viewNutricion(){
   const wg=waterGoal(), dd=diaryDrinks(dayKey()), wv=waterToday(), pct=Math.min(100,Math.round(wv/wg*100));
   const tt=trainedToday(), ttMin=tt.reduce((a,x)=>a+Math.max(0,((x.end||0)-(x.start||0))/60000),0), KA=kb('agua');
   const extraTxt=!tt.length?'':ttMin>KA.largo+29?tx(`, + agua extra por tu entreno de ${Math.round(ttMin)} min`,`, + extra water for your ${Math.round(ttMin)}-min workout`):tx(', + 500 ml porque hoy entrenaste',', + 500 ml because you trained today');
-  h+=`<div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${(wv/1000).toLocaleString(LOC(),{maximumFractionDigits:2})}</b><span class="xs mut"> / ${(wg/1000).toLocaleString(LOC(),{maximumFractionDigits:1})} L</span></div></div>
-    <div class="grow col" style="gap:8px">${vasos().map((v,i)=>`<button class="btn sm" data-a="wVaso" data-v="${i}">${I('drop',16)} + ${esc(v.n)} ${v.ml} ml</button>`).join('')}<div class="row" style="gap:6px"><button class="btn sm grow" data-a="wOther">${I('plus',16)} ${tx('Otra bebida','Other drink')}</button><button class="btn sm ghost" data-a="water" data-v="-250" aria-label="${tx('Deshacer el último','Undo the last one')}">${tx('Deshacer','Undo')}</button></div><button class="link xs" style="align-self:flex-start" data-a="wVasos">${I('edit',13)} ${tx('Tus recipientes','Your containers')}</button></div></div>
+  h+=`<div class="card"><div class="row" style="gap:16px"><div class="wring" style="--p:${pct}"><div><b>${uA()==='oz'?fmtNum(aguaN(wv)):(wv/1000).toLocaleString(LOC(),{maximumFractionDigits:2})}</b><span class="xs mut"> / ${uA()==='oz'?fmtNum(aguaN(wg))+' oz':(wg/1000).toLocaleString(LOC(),{maximumFractionDigits:1})+' L'}</span></div></div>
+    <div class="grow col" style="gap:8px">${vasos().map((v,i)=>`<button class="btn sm" data-a="wVaso" data-v="${i}">${I('drop',16)} + ${esc(v.n)} ${aguaTxt(v.ml)}</button>`).join('')}<div class="row" style="gap:6px"><button class="btn sm grow" data-a="wOther">${I('plus',16)} ${tx('Otra bebida','Other drink')}</button><button class="btn sm ghost" data-a="water" data-v="-250" aria-label="${tx('Deshacer el último','Undo the last one')}">${tx('Deshacer','Undo')}</button></div><button class="link xs" style="align-self:flex-start" data-a="wVasos">${I('edit',13)} ${tx('Tus recipientes','Your containers')}</button></div></div>
     ${cafLine(dd.caf)}${aguaCalorHtml()}
-    ${fold('aguaMeta',tx('Cómo se calcula tu meta','How your goal is worked out'),'',`${dd.n?`<div class="xs" style="color:var(--blue);line-height:1.4;margin-bottom:6px">${tx(`Incluye ${fmtNum(Math.round(dd.ml/10)/100)} L de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${Math.round(dd.ml/10)/100} L from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}<div class="xs mut" style="line-height:1.4">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}${waterExtraHoy()?tx(`, + ${waterExtraHoy()} ml por el calor`,`, + ${waterExtraHoy()} ml for the heat`):''}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>`,{flat:true,st:'border-top:1px solid var(--line);margin-top:10px'})}
+    ${fold('aguaMeta',tx('Cómo se calcula tu meta','How your goal is worked out'),'',`${dd.n?`<div class="xs" style="color:var(--blue);line-height:1.4;margin-bottom:6px">${tx(`Incluye ${aguaLTxt(dd.ml)} de ${plural(dd.n,'bebida','bebidas')} de tu diario.`,`Includes ${aguaLTxt(dd.ml)} from ${dd.n} drink${dd.n===1?'':'s'} in your diary.`)}${kbLink('agua.bebidas',tx('Cómo se cuenta','How it counts'))}</div>`:''}<div class="xs mut" style="line-height:1.4">${tx('Meta según tu peso y la referencia de la EFSA','Goal based on your weight and the EFSA reference')}${extraTxt}${waterExtraHoy()?tx(`, + ${waterExtraHoy()} ml por el calor`,`, + ${waterExtraHoy()} ml for the heat`):''}. <button class="link xs" data-a="kbOpen" data-v="agua">${tx('Ver fuente','See source')}</button></div>`,{flat:true,st:'border-top:1px solid var(--line);margin-top:10px'})}
 <button class="btn sm wide" style="margin-top:6px" data-a="aguaStats">${I('chart',16)} ${tx('Estadísticas del agua','Water stats')}</button></div>`;
     h+=aguaHoyHtml();
   }
@@ -9280,10 +9356,10 @@ function pesoTendenciaHtml(){
   if (!premOK()){ return S.measures.filter(m=>m.peso).length>=3?`<button class="link xs" style="margin:-4px 0 12px;display:block" data-a="pfGo" data-v="pandaria">🔒 ${tx('Tendencia de peso y fecha estimada de tu meta · Premium','Weight trend and estimated date for your goal · Premium')}</button>`:''; }
   const T=pesoTendencia(); if (!T) return '';
   const r=T.rate;
-  let b=`<div class="sec">${tx('Tendencia de peso','Weight trend')}</div><div class="card"><div class="stats"><div class="stat"><div class="v">${fmtNum(T.now)} kg</div><div class="l">${tx('Tendencia','Trend')}</div></div><div class="stat"><div class="v">${r==null?'—':(r>0?'+':'')+fmtNum(r)+' kg'}</div><div class="l">${tx('Por semana','Per week')}</div></div></div>`;
-  if (T.tr.length>1) b+=lineChart(T.tr,{unit:'kg'});
+  let b=`<div class="sec">${tx('Tendencia de peso','Weight trend')}</div><div class="card"><div class="stats"><div class="stat"><div class="v">${pesoTxt(T.now)}</div><div class="l">${tx('Tendencia','Trend')}</div></div><div class="stat"><div class="v">${r==null?'—':(r>0?'+':'')+fmtNum(r)+' kg'}</div><div class="l">${tx('Por semana','Per week')}</div></div></div>`;
+  if (T.tr.length>1) b+=lineChart(T.tr.map(p=>({x:p.x,y:pesoN(p.y)})),{unit:uP()});
   if (r==null) b+=`<div class="xs mut" style="margin-top:8px">${tx('Con 2 semanas de medidas verás cuánto cambias por semana.','With 2 weeks of measurements you will see how much you change per week.')}</div>`;
-  if (T.goal!=null) b+=`<div class="sm" style="margin-top:8px;line-height:1.45">${T.eta?tx(`A este ritmo llegarías a ${fmtNum(T.goal)} kg hacia el ${fmtDate(T.eta)}.`,`At this pace you would reach ${fmtNum(T.goal)} kg around ${fmtDate(T.eta)}.`):tx(`Tu meta es ${fmtNum(T.goal)} kg. Con la tendencia actual todavía no se puede estimar la fecha.`,`Your goal is ${fmtNum(T.goal)} kg. With the current trend the date cannot be estimated yet.`)}</div>`;
+  if (T.goal!=null) b+=`<div class="sm" style="margin-top:8px;line-height:1.45">${T.eta?tx(`A este ritmo llegarías a ${pesoTxt(T.goal)} hacia el ${fmtDate(T.eta)}.`,`At this pace you would reach ${pesoTxt(T.goal)} around ${fmtDate(T.eta)}.`):tx(`Tu meta es ${fmtNum(T.goal)} kg. Con la tendencia actual todavía no se puede estimar la fecha.`,`Your goal is ${fmtNum(T.goal)} kg. With the current trend the date cannot be estimated yet.`)}</div>`;
   b+=`<div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('La tendencia suaviza los cambios de un día a otro por agua, sal o comida.','The trend smooths out day-to-day changes from water, salt or food.')}${kbLink('peso.tendencia',tx('Cómo se calcula','How it is calculated'))}</div></div>`;
   return b;
 }
@@ -9827,7 +9903,7 @@ SCREENS.fastStats=p=>{ const f=nut().fast, H=f.history, d30=H.filter(x=>x.end>=D
   <div class="stats" style="margin-top:8px"><div class="stat"><div class="v">${d30.filter(x=>x.goalH).length?Math.round(d30.filter(x=>x.ok&&x.goalH).length/d30.filter(x=>x.goalH).length*100)+' %':'—'}</div><div class="l">${tx('Metas cumplidas','Goals met')}</div></div><div class="stat"><div class="v">${R.act}</div><div class="l">${tx('Racha actual','Current streak')}</div></div><div class="stat"><div class="v">${R.mej}</div><div class="l">${tx('Mejor racha','Best streak')}</div></div></div>`;
   const first=new Date(p.y,p.m,1), st=(first.getDay()+6)%7, days=new Date(p.y,p.m+1,0).getDate(), hoy=new Date().toDateString(), dia={};
   H.forEach(x=>{ const k=new Date(x.start).toDateString(); dia[k]=dia[k]||x.ok; }); // 1.5: el día en que empezó
-  let cal=(EN_LANG()?['M','T','W','T','F','S','S']:['L','M','X','J','V','S','D']).map(d=>`<div class="dh">${d}</div>`).join(''); for (let i=0;i<st;i++) cal+='<div></div>';
+  let cal=IDIOMAS[LANG()].lun.map(d=>`<div class="dh">${d}</div>`).join(''); for (let i=0;i<st;i++) cal+='<div></div>';
   for (let d=1;d<=days;d++){ const k=new Date(p.y,p.m,d).toDateString(); cal+=`<div class="d ${k===hoy?'today':''}" ${dia[k]===true?'style="background:var(--ok);color:#06210f;font-weight:800"':dia[k]===false?'style="background:rgba(53,196,107,.5)"':''}>${d}</div>`; }
   const ahora=new Date(), esteMes=p.y===ahora.getFullYear()&&p.m===ahora.getMonth();
   b+=`<div class="card" style="margin-top:12px"><div class="row" style="margin-bottom:10px"><button class="ibtn" data-a="fsNav" data-v="-1">${I('back',20)}</button><div class="grow b" style="text-align:center;text-transform:capitalize">${EN_LANG()?first.toLocaleDateString('en-US',{month:'long'}):mesN(p.m)} ${p.y}</div><button class="ibtn" data-a="fsNav" data-v="1" ${esteMes?'disabled style="opacity:.3"':''}>${I('right',20)}</button></div><div class="cal">${cal}</div>
@@ -9853,29 +9929,29 @@ function waterGoalBase(){ const w=bodyWeight(), K=kb('agua'), sx=(S.profile||{})
 function wGuardaMeta(){ const n=nut(); n.waterGoalDia=n.waterGoalDia||{}; n.waterGoalDia[dayKey()]=waterGoal(); const ks=Object.keys(n.waterGoalDia).sort(); if (ks.length>120) ks.slice(0,ks.length-120).forEach(k=>delete n.waterGoalDia[k]); }
 // 1.8.1: «Día de calor» va dentro de la tarjeta del agua; el registro de hoy es un bloque desplegable
 function aguaCalorHtml(){ const ex=waterExtraHoy();
-  return `<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:4px"><button class="srow" style="width:100%" data-a="wCalor"><span class="grow"><div class="b sm">${tx('Día de calor o de mucho sudor','Hot day or heavy sweating')}</div><div class="xs mut">${ex?tx(`Meta de hoy +${ex} ml`,`Today's goal +${ex} ml`):tx(`Suma ${kb('agua.calor').ml} ml a la meta de hoy`,`Adds ${kb('agua.calor').ml} ml to today's goal`)}</div></span><span class="toggle ${ex?'on':''}"></span></button><div class="xs" style="margin-top:-4px">${kbLink('agua.calor',tx('Por qué medio litro','Why half a litre'))}</div></div>`; }
+  return `<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:4px"><button class="srow" style="width:100%" data-a="wCalor"><span class="grow"><div class="b sm">${tx('Día de calor o de mucho sudor','Hot day or heavy sweating')}</div><div class="xs mut">${ex?tx(`Meta de hoy +${aguaTxt(ex)}`,`Today's goal +${aguaTxt(ex)}`):tx(`Suma ${kb('agua.calor').ml} ml a la meta de hoy`,`Adds ${kb('agua.calor').ml} ml to today's goal`)}</div></span><span class="toggle ${ex?'on':''}"></span></button><div class="xs" style="margin-top:-4px">${kbLink('agua.calor',tx('Por qué medio litro','Why half a litre'))}</div></div>`; }
 function aguaHoyHtml(){ const n=nut(), k=dayKey(), L=wLog(k), sum=L.reduce((a,x)=>a+x.ml,0), resto=Math.max(0,((n.water||{})[k]||0)-sum);
-  const body=`<button class="link sm" style="white-space:nowrap;margin:-2px 0 4px" data-a="wHora">${I('plus',14)} ${tx('Añadir con otra hora','Add at another time')}</button>${!L.length&&!resto?`<div class="sm mut" style="padding:4px 0">${tx('Todavía no registraste agua hoy.','You have not logged any water today.')}</div>`:`${L.map((x,i)=>[x,i]).reverse().map(([x,i])=>`<div class="kv"><span>${I('drop',14)} <b>${x.ml} ml</b>${x.n?` <span class="mut xs">${esc(x.n)}</span>`:''}</span><span class="row" style="gap:6px"><span class="mut sm">${hhmm(x.t)}</span><button class="ibtn" style="width:32px;height:32px" data-a="wDel" data-v="${i}" aria-label="${tx('Borrar','Delete')}">${I('close',16)}</button></span></div>`).join('')}
-    ${resto?`<div class="kv"><span>${I('drop',14)} <b>${resto} ml</b></span><span class="mut xs">${tx('sin hora (widget o aviso)','no time (widget or notification)')}</span></div>`:''}`}`;
+  const body=`<button class="link sm" style="white-space:nowrap;margin:-2px 0 4px" data-a="wHora">${I('plus',14)} ${tx('Añadir con otra hora','Add at another time')}</button>${!L.length&&!resto?`<div class="sm mut" style="padding:4px 0">${tx('Todavía no registraste agua hoy.','You have not logged any water today.')}</div>`:`${L.map((x,i)=>[x,i]).reverse().map(([x,i])=>`<div class="kv"><span>${I('drop',14)} <b>${aguaTxt(x.ml)}</b>${x.n?` <span class="mut xs">${esc(x.n)}</span>`:''}</span><span class="row" style="gap:6px"><span class="mut sm">${hhmm(x.t)}</span><button class="ibtn" style="width:32px;height:32px" data-a="wDel" data-v="${i}" aria-label="${tx('Borrar','Delete')}">${I('close',16)}</button></span></div>`).join('')}
+    ${resto?`<div class="kv"><span>${I('drop',14)} <b>${aguaTxt(resto)}</b></span><span class="mut xs">${tx('sin hora (widget o aviso)','no time (widget or notification)')}</span></div>`:''}`}`;
   const ult=L.length?L[L.length-1]:null;
   return fold('aguaHoy',tx('Registro de agua hoy','Water log today'),L.length?tx(`${plural(L.length,'registro','registros')} · el último a las ${hhmm(ult.t)}`,`${L.length} ${L.length===1?'entry':'entries'} · last at ${hhmm(ult.t)}`):tx('Sin registros todavía','No entries yet'),body,{st:'margin-top:4px'}); }
-A.wDel=i=>{ const n=nut(), k=dayKey(), L=wLog(k), x=L[+i]; if (!x) return; L.splice(+i,1); n.water[k]=Math.max(0,(n.water[k]||0)-x.ml); save(); render.keep=true; render(); toastUndo(tx(`${x.ml} ml borrados`,`${x.ml} ml removed`),()=>{ L.splice(+i,0,x); n.water[k]=(n.water[k]||0)+x.ml; }); };
+A.wDel=i=>{ const n=nut(), k=dayKey(), L=wLog(k), x=L[+i]; if (!x) return; L.splice(+i,1); n.water[k]=Math.max(0,(n.water[k]||0)-x.ml); save(); render.keep=true; render(); toastUndo(tx(`${aguaTxt(x.ml)} borrados`,`${aguaTxt(x.ml)} removed`),()=>{ L.splice(+i,0,x); n.water[k]=(n.water[k]||0)+x.ml; }); };
 A.wCalor=()=>{ const n=nut(), k=dayKey(); n.waterExtra=n.waterExtra||{}; if (n.waterExtra[k]) delete n.waterExtra[k]; else n.waterExtra[k]=kb('agua.calor').ml;
   Object.keys(n.waterExtra).forEach(x=>{ if (x<dayKey(Date.now()-30*DAY)) delete n.waterExtra[x]; }); save(); render.keep=true; render(); };
-A.wHora=()=>{ const V=vasos(); const ok=cb(()=>{ const [H,M]=String(MV.whT||'').split(':').map(Number), ml=Math.round(+MV.whM); if (isNaN(H)) return toast(tx('Elige una hora','Pick a time'));
-    if (!(ml>=20&&ml<=3000)) return toast(tx('Entre 20 y 3000 ml','Between 20 and 3000 ml')); const d=new Date(); d.setHours(H,M||0,0,0); if (d.getTime()>Date.now()) return toast(tx('La hora no puede ser futura','The time cannot be in the future'));
+A.wHora=()=>{ const V=vasos(); const ok=cb(()=>{ const [H,M]=String(MV.whT||'').split(':').map(Number), ml=aguaDe(+MV.whM); if (isNaN(H)) return toast(tx('Elige una hora','Pick a time'));
+    if (!(ml>=20&&ml<=3000)) return toast(tx(`Entre ${aguaTxt(20)} y ${aguaTxt(3000)}`,`Between ${aguaTxt(20)} and ${aguaTxt(3000)}`)); const d=new Date(); d.setHours(H,M||0,0,0); if (d.getTime()>Date.now()) return toast(tx('La hora no puede ser futura','The time cannot be in the future'));
     wAdd(ml,d.getTime()); });
   openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Añadir agua de antes','Add earlier water')}</h3>
-    <div class="chips" style="margin-bottom:12px">${V.map(v=>`<button class="chip" data-a="whPick" data-v="${v.ml}">${esc(v.n)} · ${v.ml} ml</button>`).join('')}</div>
-    <div class="row" style="gap:10px"><div class="field grow"><label>${tx('Cantidad (ml)','Amount (ml)')}</label><input id="whM" class="inp" type="number" inputmode="numeric" value="${V[0].ml}"></div><div class="field grow"><label>${tx('Hora','Time')}</label><input id="whT" class="inp" type="time" value="${hhmm(Date.now()-3600000)}"></div></div>
+    <div class="chips" style="margin-bottom:12px">${V.map(v=>`<button class="chip" data-a="whPick" data-v="${aguaN(v.ml)}">${esc(v.n)} · ${aguaTxt(v.ml)}</button>`).join('')}</div>
+    <div class="row" style="gap:10px"><div class="field grow"><label>${tx('Cantidad','Amount')} (${uA()})</label><input id="whM" class="inp" type="number" inputmode="numeric" value="${aguaN(V[0].ml)}"></div><div class="field grow"><label>${tx('Hora','Time')}</label><input id="whT" class="inp" type="time" value="${hhmm(Date.now()-3600000)}"></div></div>
     <button class="btn pri big" data-a="cbm" data-v="${ok}">${tx('Añadir','Add')}</button></div>`); };
 A.whPick=v=>{ const el=document.getElementById('whM'); if (el) el.value=v; };
 function wAdd(ml,t,nom){ const n=nut(), k=dayKey(t); n.waterLog=n.waterLog||{}; (n.waterLog[k]=n.waterLog[k]||[]).push({t,ml,...(nom?{n:nom}:{})}); n.waterLog[k].sort((a,b)=>a.t-b.t);
   Object.keys(n.waterLog).forEach(x=>{ if (x<dayKey(Date.now()-60*DAY)) delete n.waterLog[x]; });
   const b0=waterToday(k); n.water[k]=(n.water[k]||0)+ml; if (k===dayKey()) wGuardaMeta(); save(); render.keep=true; render(); if (k===dayKey() && waterToday(k)>=waterGoal() && b0<waterGoal()) toast(tx('💧 ¡Meta de agua cumplida!','💧 Water goal reached!')); }
 A.wVaso=i=>{ const v=vasos()[+i]; if (v) A.water(v.ml,v.n); };
-A.wVasos=()=>{ const V=vasos().map(v=>Object.assign({},v)); const fila=(v,i)=>`<div class="row" style="gap:8px;margin-bottom:8px"><input id="wvN${i}" class="inp grow" maxlength="18" value="${esc(v.n)}" placeholder="${tx('Nombre','Name')}"><input id="wvM${i}" class="inp" style="width:96px" type="number" inputmode="numeric" value="${v.ml}"><span class="xs mut">ml</span></div>`;
-  const ok=cb(()=>{ const out=[]; for (let i=0;i<6;i++){ const nm=(MV['wvN'+i]||'').trim(), ml=Math.round(+MV['wvM'+i]); if (nm&&ml>=20&&ml<=3000) out.push({n:nm.slice(0,18),ml}); }
+A.wVasos=()=>{ const V=vasos().map(v=>Object.assign({},v)); const fila=(v,i)=>`<div class="row" style="gap:8px;margin-bottom:8px"><input id="wvN${i}" class="inp grow" maxlength="18" value="${esc(v.n)}" placeholder="${tx('Nombre','Name')}"><input id="wvM${i}" class="inp" style="width:96px" type="number" inputmode="numeric" value="${v.ml===''?'':aguaN(v.ml)}"><span class="xs mut">${uA()}</span></div>`;
+  const ok=cb(()=>{ const out=[]; for (let i=0;i<6;i++){ const nm=(MV['wvN'+i]||'').trim(), ml=aguaDe(+MV['wvM'+i]); if (nm&&ml>=20&&ml<=3000) out.push({n:nm.slice(0,18),ml}); }
     if (!out.length) return toast(tx('Deja al menos un recipiente','Keep at least one container')); nut().vasos=out.slice(0,4); save(); render.keep=true; render(); toast(tx('Recipientes guardados','Containers saved')); });
   while (V.length<4) V.push({n:'',ml:''});
   openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Tus recipientes','Your containers')}</h3><p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">${tx('Tu taza, tu termo, tu botella del gimnasio… Hasta 4, cada uno con un toque. Deja vacío el nombre para quitar uno.','Your mug, your flask, your gym bottle… Up to 4, one tap each. Leave the name empty to remove one.')}</p>
@@ -9887,13 +9963,13 @@ function wRachas(){ let act=0, mej=0, c=0; const hoy=dayKey(), dias=[...Array(12
   for (let i=0;i<120;i++){ const k=dayKey(Date.now()-i*DAY); if (wDiaMl(k)>=wGoalDia(k)) act++; else if (k!==hoy) break; } return {act,mej}; }
 A.aguaStats=()=>openLayer('aguaStats',{y:new Date().getFullYear(),m:new Date().getMonth()});
 SCREENS.aguaStats=p=>{ const D=n=>[...Array(n).keys()].map(i=>dayKey(Date.now()-(i+1)*DAY)), med=L=>{ const v=L.map(wDiaMl).filter(x=>x>0); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-  const d30=D(30), ok30=d30.filter(k=>wDiaMl(k)>0&&wDiaMl(k)>=wGoalDia(k)).length, R=wRachas(), L1=v=>v?(Math.round(v/100)/10).toLocaleString(LOC())+' L':'—';
+  const d30=D(30), ok30=d30.filter(k=>wDiaMl(k)>0&&wDiaMl(k)>=wGoalDia(k)).length, R=wRachas(), L1=v=>v?aguaLTxt(v):'—';
   const sem=[...Array(7).keys()].reverse().map(i=>waterToday(dayKey(Date.now()-i*DAY)));
-  let b=`<div class="card" style="margin-bottom:10px"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:4px">${tx('ÚLTIMOS 7 DÍAS (L)','LAST 7 DAYS (L)')}</div>${barChart(sem.map(v=>Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?tx('Hoy','Today'):DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>
+  let b=`<div class="card" style="margin-bottom:10px"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:4px">${tx('ÚLTIMOS 7 DÍAS','LAST 7 DAYS')} (${uA()==='oz'?'oz':'L'})</div>${barChart(sem.map(v=>uA()==='oz'?aguaN(v):Math.round(v/100)/10),[6,5,4,3,2,1,0].map(i=>i===0?tx('Hoy','Today'):DAYS_SHORT[new Date(Date.now()-i*DAY).getDay()]),{fmt:v=>v?v.toLocaleString(LOC()):''})}</div>
   <div class="stats"><div class="stat"><div class="v">${L1(med(D(7)))}</div><div class="l">${tx('Media 7 días','7-day average')}</div></div><div class="stat"><div class="v">${L1(med(d30))}</div><div class="l">${tx('Media 30 días','30-day average')}</div></div><div class="stat"><div class="v">${ok30}</div><div class="l">${tx('Metas en 30 días','Goals in 30 days')}</div></div></div>
   <div class="stats" style="margin-top:8px"><div class="stat"><div class="v">${R.act}</div><div class="l">${tx('Racha actual (días)','Current streak (days)')}</div></div><div class="stat"><div class="v">${R.mej}</div><div class="l">${tx('Mejor racha','Best streak')}</div></div></div>`;
   const first=new Date(p.y,p.m,1), st=(first.getDay()+6)%7, days=new Date(p.y,p.m+1,0).getDate(), hoy=dayKey();
-  let cal=(EN_LANG()?['M','T','W','T','F','S','S']:['L','M','X','J','V','S','D']).map(d=>`<div class="dh">${d}</div>`).join(''); for (let i=0;i<st;i++) cal+='<div></div>';
+  let cal=IDIOMAS[LANG()].lun.map(d=>`<div class="dh">${d}</div>`).join(''); for (let i=0;i<st;i++) cal+='<div></div>';
   for (let d=1;d<=days;d++){ const t=new Date(p.y,p.m,d).getTime(), k=dayKey(t); const ml=t<=Date.now()?wDiaMl(k):0, okd=ml>0&&ml>=wGoalDia(k);
     cal+=`<div class="d ${okd?'on':''} ${k===hoy?'today':''}" style="${okd?'background:var(--blue);color:#fff;font-weight:800':ml>0?'background:rgba(74,168,255,.32)':''}">${d}</div>`; }
   const ahora=new Date(), esteMes=p.y===ahora.getFullYear()&&p.m===ahora.getMonth();
@@ -9929,7 +10005,7 @@ SCREENS.photoCmp = p => {
   const col=(m,lbl)=>`<div class="grow" style="min-width:0"><div class="xs mut b" style="margin-bottom:6px">${lbl} · ${fmtDate(m.date)}</div><img src="${m.foto}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px" alt=""><div class="sm" style="margin-top:6px">${m.peso?`${fmtNum(m.peso)} kg`:''}${m.cintura?` · cintura ${fmtNum(m.cintura)} cm`:''}</div></div>`;
   const dd=Math.round((B_.date-A_.date)/DAY), dw=(B_.peso&&A_.peso)?B_.peso-A_.peso:null;
   return lhdr('Comparar fotos')+`<div class="lbody"><div class="row" style="gap:10px;align-items:flex-start">${col(A_,'Antes')}${col(B_,'Después')}</div>
-  <div class="banner ok" style="margin-top:14px"><span class="ic">${I('calendar',20)}</span><div class="grow sm">${Math.abs(dd)} días entre fotos${dw!=null?` · ${dw>0?'+':''}${fmtNum(dw)} kg`:''}</div></div>
+  <div class="banner ok" style="margin-top:14px"><span class="ic">${I('calendar',20)}</span><div class="grow sm">${Math.abs(dd)} días entre fotos${dw!=null?` · ${dw>0?'+':''}${pesoTxt(dw)}`:''}</div></div>
   <div class="seg" style="margin:6px 0 10px"><button class="${p.pick==='a'?'on':''}" data-a="pcPick" data-v="a">Cambiar "antes"</button><button class="${p.pick==='b'?'on':''}" data-a="pcPick" data-v="b">Cambiar "después"</button></div>
   <div class="photos">${ph.map(m=>`<button data-a="pcSet" data-v="${m.id}" style="position:relative"><img src="${m.foto}" alt="" style="${(p.pick==='a'?A_:B_).id===m.id?'outline:3px solid var(--ac);outline-offset:-3px':''}"><div class="xs mut" style="text-align:center;margin-top:4px">${fmtDate(m.date)}</div></button>`).join('')}</div></div>`;
 };
@@ -10261,7 +10337,7 @@ const CQ=[
   const c=calcNutrition(), w=cqPeso(); if (!c||!w) return cqPerfil();
   const T=dayTotals(dayKey()), pi=protIdeas(dayKey());
   return {corta:tx(`Para ti, unos ${c.prot} g al día (${fmtNum(Math.round(c.prot/w*10)/10)} g por kg).`,`For you, about ${c.prot} g a day (${fmtNum(Math.round(c.prot/w*10)/10)} g per kg).`),
-    caso:[tx(`Peso: ${fmtNum(w)} kg · objetivo: ${NGOALS[cqGoalNut()]}.`,`Weight: ${fmtNum(w)} kg · goal: ${cqGoalNut()}.`), tx(`Hoy llevas ${fmtNum(T.p)} g.`,`Today you have ${fmtNum(T.p)} g.`)],
+    caso:[tx(`Peso: ${pesoTxt(w)} · objetivo: ${NGOALS[cqGoalNut()]}.`,`Weight: ${pesoTxt(w)} · goal: ${cqGoalNut()}.`), tx(`Hoy llevas ${fmtNum(T.p)} g.`,`Today you have ${fmtNum(T.p)} g.`)],
     exp:[tx('Al bajar grasa se necesita más proteína para no perder músculo; al ganar músculo, un poco menos; para mantenerte, menos aún. Repartirla en 3 o 4 comidas de 25–40 g funciona mejor que todo de golpe.','When losing fat you need more protein to keep muscle; when building muscle, a bit less; to maintain, less still. Splitting it into 3 or 4 meals of 25–40 g works better than all at once.')],
     ej:[tx('Ejemplo de día: 3 huevos (19 g) · 150 g de pechuga de pollo (46 g) · yogur griego (17 g) · 150 g de lentejas cocidas (14 g) · 120 g de atún (30 g).','Example day: 3 eggs (19 g) · 150 g chicken breast (46 g) · Greek yogurt (17 g) · 150 g cooked lentils (14 g) · 120 g tuna (30 g).')],
     hacer:pi?[tx(`Te faltan ${pi.falta} g hoy: prueba ${pi.ids.map(id=>alimGet(id).n).join(', ')}.`,`You are ${pi.falta} g short today: try ${pi.ids.map(id=>alimGet(id).n).join(', ')}.`)]:[tx('Registra tus comidas para ver cuánto llevas cada día.','Log your meals to see how much you have each day.')],
@@ -10287,7 +10363,7 @@ const CQ=[
 {id:'despues',s:'nut',q:['¿Qué como después de entrenar?','What should I eat after training?'],alias:'despues postentreno recuperar comida posterior',kb:'nut.proteina',f:()=>{
   const c=calcNutrition(), w=cqPeso(), por=w?Math.round(Math.min(40,Math.max(20,w*0.3))):25;
   return {corta:tx(`Una comida con unos ${por} g de proteína en las 2–3 horas siguientes, más hidratos si entrenaste fuerte.`,`A meal with about ${por} g of protein within the next 2–3 hours, plus carbs if you trained hard.`),
-    caso:[w?tx(`Con tu peso (${fmtNum(w)} kg), unos ${por} g de proteína por comida.`,`With your weight (${fmtNum(w)} kg), about ${por} g of protein per meal.`):tx('Completa tu peso en el perfil para personalizarlo.','Add your weight to your profile to personalize it.')],
+    caso:[w?tx(`Con tu peso (${pesoTxt(w)}), unos ${por} g de proteína por comida.`,`With your weight (${pesoTxt(w)}), about ${por} g of protein per meal.`):tx('Completa tu peso en el perfil para personalizarlo.','Add your weight to your profile to personalize it.')],
     exp:[tx('No hay una «ventana» de 30 minutos que se cierre: lo que más cuenta es la proteína total del día. Aun así, una comida con proteína después del entreno ayuda a recuperarte y a llegar a tu meta.','There is no 30-minute «window» that closes: total daily protein matters most. Still, a meal with protein after training helps you recover and reach your target.')],
     ej:[tx('Arroz con pollo y ensalada · tortilla de 3 huevos con pan · yogur griego con fruta y avena · batido de leche con plátano.','Rice with chicken and salad · 3-egg omelette with bread · Greek yogurt with fruit and oats · milk shake with banana.')], hacer:[tx('Si entrenas de noche, la cena hace de comida de después.','If you train at night, dinner is your post-workout meal.')]};
 }},
@@ -10295,7 +10371,7 @@ const CQ=[
 {id:'noBajo',s:'peso',q:['¿Por qué no bajo de peso?','Why am I not losing weight?'],alias:'no bajo peso adelgazar estancado bascula',kb:'peso.tendencia',f:()=>{
   const T=pesoTendencia(), c=calcNutrition(), dias=[...Array(14).keys()].map(i=>dayTotals(dayKey(Date.now()-(i+1)*DAY)).k).filter(k=>k>500), media=dias.length?Math.round(dias.reduce((a,b)=>a+b,0)/dias.length):null;
   const caso=[];
-  if (T&&T.rate!=null) caso.push(tx(`Tu tendencia: ${fmtNum(T.now)} kg, ${T.rate>0?'+':''}${fmtNum(T.rate)} kg por semana.`,`Your trend: ${fmtNum(T.now)} kg, ${T.rate>0?'+':''}${fmtNum(T.rate)} kg per week.`)); else caso.push(tx('Hacen falta 2 semanas de medidas de peso para ver tu tendencia.','You need 2 weeks of weight measurements to see your trend.'));
+  if (T&&T.rate!=null) caso.push(tx(`Tu tendencia: ${pesoTxt(T.now)}, ${T.rate>0?'+':''}${pesoTxt(T.rate)} por semana.`,`Your trend: ${pesoTxt(T.now)}, ${T.rate>0?'+':''}${pesoTxt(T.rate)} per week.`)); else caso.push(tx('Hacen falta 2 semanas de medidas de peso para ver tu tendencia.','You need 2 weeks of weight measurements to see your trend.'));
   if (media&&c) caso.push(tx(`Comes de media ${media} kcal (${dias.length} días con diario); tu objetivo es ${c.kcal}.`,`You eat on average ${media} kcal (${dias.length} logged days); your target is ${c.kcal}.`));
   const comeMas=media&&c&&media>c.kcal*1.05;
   return {corta:T&&T.rate!=null&&T.rate<-0.1?tx('En realidad sí estás bajando: la tendencia baja aunque la báscula suba algunos días.','You are actually losing: the trend goes down even if the scale rises some days.'):comeMas?tx('Según tu diario, comes algo más que tu objetivo. Ajustar eso suele bastar.','According to your diary, you eat a bit more than your target. Adjusting that is usually enough.'):tx('Puede ser agua, sal o comida del día. Mira la tendencia de 2 semanas, no el peso de un día.','It may be water, salt or the day\'s food. Look at the 2-week trend, not one day\'s weight.'), caso,
@@ -10305,10 +10381,10 @@ const CQ=[
 }},
 {id:'ritmo',s:'peso',q:['¿A qué ritmo es sano bajar o subir de peso?','What is a healthy pace to lose or gain weight?'],alias:'ritmo kilos por semana rapido sano',kb:'nut.deficit',f:()=>{
   const w=cqPeso(), K=kb('nut.deficit').ritmo; if (!w) return cqPerfil();
-  return {corta:tx(`Para bajar, del 0,5 al 1 % de tu peso por semana: para ti, entre ${fmtNum(Math.round(w*K.lento*10)/10)} y ${fmtNum(Math.round(w*K.rapido*10)/10)} kg. Para ganar músculo, 0,25–0,5 % al mes es suficiente.`,`To lose, 0.5 to 1 % of your weight per week: for you, ${fmtNum(Math.round(w*K.lento*10)/10)} to ${fmtNum(Math.round(w*K.rapido*10)/10)} kg. To build muscle, 0.25–0.5 % a month is enough.`),
-    caso:[tx(`Tu peso: ${fmtNum(w)} kg · objetivo: ${NGOALS[cqGoalNut()]}.`,`Your weight: ${fmtNum(w)} kg · goal: ${cqGoalNut()}.`)],
+  return {corta:tx(`Para bajar, del 0,5 al 1 % de tu peso por semana: para ti, entre ${fmtNum(pesoN(w*K.lento))} y ${pesoTxt(w*K.rapido)}. Para ganar músculo, 0,25–0,5 % al mes es suficiente.`,`To lose, 0.5 to 1 % of your weight per week: for you, ${fmtNum(pesoN(w*K.lento))} to ${pesoTxt(w*K.rapido)}. To build muscle, 0.25–0.5 % a month is enough.`),
+    caso:[tx(`Tu peso: ${pesoTxt(w)} · objetivo: ${NGOALS[cqGoalNut()]}.`,`Your weight: ${pesoTxt(w)} · goal: ${cqGoalNut()}.`)],
     exp:[tx('Ir más rápido suele costar músculo, energía y ganas de entrenar, y se recupera antes lo perdido. Un ritmo moderado es más fácil de mantener.','Going faster usually costs muscle, energy and motivation, and the weight comes back sooner. A moderate pace is easier to keep up.')],
-    ej:[tx(`Con ${fmtNum(w)} kg y un ritmo medio: ${fmtNum(Math.round(w*K.normal*10)/10)} kg por semana, unos ${fmtNum(Math.round(w*K.normal*4*10)/10)} kg al mes.`,`At ${fmtNum(w)} kg and a medium pace: ${fmtNum(Math.round(w*K.normal*10)/10)} kg per week, about ${fmtNum(Math.round(w*K.normal*4*10)/10)} kg a month.`)],
+    ej:[tx(`Con ${pesoTxt(w)} y un ritmo medio: ${pesoTxt(w*K.normal)} por semana, unos ${pesoTxt(w*K.normal*4)} al mes.`,`At ${pesoTxt(w)} and a medium pace: ${pesoTxt(w*K.normal)} per week, about ${pesoTxt(w*K.normal*4)} a month.`)],
     hacer:[tx('Elige el ritmo en Nutrición › Comida › Tu objetivo diario.','Choose the pace in Nutrition › Food › Your daily target.')]};
 }},
 {id:'recomp',s:'peso',q:['¿Puedo ganar músculo y perder grasa a la vez?','Can I build muscle and lose fat at the same time?'],alias:'recomposicion ganar musculo perder grasa a la vez',kb:'nut.proteina',f:()=>{
@@ -10357,8 +10433,8 @@ const CQ=[
 /* ===== Agua ===== */
 {id:'cuantaAgua',s:'agua',q:['¿Cuánta agua necesito al día?','How much water do I need a day?'],alias:'agua litros cuanta beber hidratacion',kb:'agua',f:()=>{
   const g=waterGoal(), v=waterToday();
-  return {corta:tx(`Para ti, unos ${fmtNum(Math.round(g/100)/10)} L al día, contando todas las bebidas.`,`For you, about ${fmtNum(Math.round(g/100)/10)} L a day, counting all drinks.`),
-    caso:[tx(`Hoy llevas ${fmtNum(Math.round(v/100)/10)} L.`,`Today you have ${fmtNum(Math.round(v/100)/10)} L.`)],
+  return {corta:tx(`Para ti, unos ${aguaLTxt(g)} al día, contando todas las bebidas.`,`For you, about ${aguaLTxt(g)} a day, counting all drinks.`),
+    caso:[tx(`Hoy llevas ${aguaLTxt(v)}.`,`Today you have ${aguaLTxt(v)}.`)],
     exp:[tx('La meta sale de tu peso y la referencia de la EFSA, y sube los días que entrenas. La comida también aporta agua (fruta, verdura, sopas). Un buen indicador: orina clara y poca sed.','The goal comes from your weight and the EFSA reference, and goes up on training days. Food also provides water (fruit, vegetables, soups). A good sign: pale urine and little thirst.')],
     ej:[tx('Un vaso al levantarte, uno con cada comida, una botella en el entreno y otra repartida en la tarde.','A glass on waking, one with each meal, a bottle during the workout and another spread over the afternoon.')], hacer:[tx('Activa los recordatorios de agua en Ajustes › Avisos.','Turn on water reminders in Settings › Reminders.')], acciones:[['irAgua','',tx('Abrir Agua','Open Water')]]};
 }},
@@ -10401,7 +10477,7 @@ const CQ=[
   const K=kb('sup.creatina'), w=cqPeso(), menor=(S.profile||{}).age&&S.profile.age<kb('sup.prudencia').edad;
   if (menor) return {corta:tx('Por ser menor de 18 años, no se recomienda tomar suplementos sin consultarlo con un médico.','As you are under 18, supplements are not recommended without checking with a doctor.'),caso:[],exp:[],ej:[],hacer:[tx('Consúltalo con un profesional.','Check with a professional.')],kb:'sup.prudencia'};
   return {corta:tx(`Es el suplemento con más evidencia para la fuerza. Dosis: ${K.mant[0]}–${K.mant[1]} g al día, todos los días.`,`It is the supplement with the most evidence for strength. Dose: ${K.mant[0]}–${K.mant[1]} g a day, every day.`),
-    caso:[w?tx(`Con ${fmtNum(w)} kg, una carga opcional sería de unos ${Math.round(w*K.carga)} g al día durante ${K.cargaDias[0]}–${K.cargaDias[1]} días.`,`At ${fmtNum(w)} kg, an optional loading phase would be about ${Math.round(w*K.carga)} g a day for ${K.cargaDias[0]}–${K.cargaDias[1]} days.`):''].filter(Boolean),
+    caso:[w?tx(`Con ${pesoTxt(w)}, una carga opcional sería de unos ${Math.round(w*K.carga)} g al día durante ${K.cargaDias[0]}–${K.cargaDias[1]} días.`,`At ${pesoTxt(w)}, an optional loading phase would be about ${Math.round(w*K.carga)} g a day for ${K.cargaDias[0]}–${K.cargaDias[1]} days.`):''].filter(Boolean),
     exp:[tx('La creatina monohidrato ayuda a hacer alguna repetición más y a ganar algo más de fuerza y músculo con el entreno. Da igual la hora. Puede subir 1–2 kg el peso por agua dentro del músculo. No hace falta «descansar» de ella.','Creatine monohydrate helps you do a few more reps and gain a bit more strength and muscle with training. Timing does not matter. It can add 1–2 kg of water weight inside the muscle. There is no need to «cycle» it.')],
     ej:[tx('3–5 g mezclados con agua, zumo o el batido, a la hora que te sea fácil.','3–5 g mixed with water, juice or your shake, whenever is easiest.')], hacer:[tx('Si la tomas, busca «creatina monohidrato» sin mezclas.','If you take it, look for plain «creatine monohydrate».')], cuidado:tx('Si tienes problemas de riñón o tomas medicación, consúltalo antes.','If you have kidney problems or take medication, check first.')};
 }},
@@ -10732,7 +10808,7 @@ function v3Novedades(){ if (!premOK()) return []; const L=[], wk=weekKey(Date.no
   const md=mejoresDias(); if (md) L.push({k:`dias-${md.best.d}-${wk}`,t:tx(`Rindes mejor los ${DIAS_N(md.best.d)}`,`You perform best on ${DIAS_N(md.best.d)}`),d:tx(`Un ${md.dif} % más que los ${DIAS_N(md.peor.d)}, con ${md.n} sesiones. Deja para ese día lo más exigente.`,`${md.dif} % more than on ${DIAS_N(md.peor.d)}, from ${md.n} sessions. Save your hardest session for that day.`),a:'kbOpen',v:'aprende.series'});
   const ar=aguaRendimiento(); if (ar) L.push({k:'aguar-'+wk,t:tx('El agua se nota en tus entrenos','Water shows in your workouts'),d:tx(`Los días que bebiste poca agua rendiste un ${ar.dif} % menos (${ar.poca} entrenos frente a ${ar.bien}).`,`On days you drank little water you performed ${ar.dif} % worse (${ar.poca} workouts against ${ar.bien}).`),a:'kbOpen',v:'agua.rendimiento'});
   const ids=[...new Set(S.sessions.slice(-6).flatMap(s=>s.items.map(it=>it.exId)))]; for (const id of ids){ const o=estancadoCon(id); if (o){ L.push({k:`est-${id}-${wk}`,t:tx(`Por qué ${o.ex.n} no sube`,`Why ${o.ex.n} is not going up`),d:comidaProgresoTxt(o),a:'kbOpen',v:'comida.progreso'}); break; } }
-  const pp=pesoPrediccion(); if (pp) L.push({k:`pred-${pp.desde}-${pp.hasta}`,t:tx(`Tu meta de ${fmtNum(pp.goal)} kg`,`Your ${pp.goal} kg goal`),d:pp.mismo?tx(`A este ritmo llegas en ${pp.desde}.`,`At this pace you get there in ${pp.desde}.`):tx(`A este ritmo llegas entre ${pp.desde} y ${pp.hasta}.`,`At this pace you get there between ${pp.desde} and ${pp.hasta}.`),a:'kbOpen',v:'prediccion.margen'});
+  const pp=pesoPrediccion(); if (pp) L.push({k:`pred-${pp.desde}-${pp.hasta}`,t:tx(`Tu meta de ${pesoTxt(pp.goal)}`,`Your ${pesoTxt(pp.goal)} goal`),d:pp.mismo?tx(`A este ritmo llegas en ${pp.desde}.`,`At this pace you get there in ${pp.desde}.`):tx(`A este ritmo llegas entre ${pp.desde} y ${pp.hasta}.`,`At this pace you get there between ${pp.desde} and ${pp.hasta}.`),a:'kbOpen',v:'prediccion.margen'});
   return L; }
 A.pandaAplicar=k=>{ const x=v3Propuestas().find(p=>p.k===k); const P=PANDA(); P.no[k]=Date.now(); P.visto[k]=Date.now(); if (!x){ save(); bubSync(); guiaRender(); return; }
   try{ x.fn(); }catch(e){} S.applied=(S.applied||0)+1; save(); closeModal(); render.keep=true; render(); bubSync(); toast(x.ok); };
@@ -10754,7 +10830,7 @@ function pandaItems(){ const P=PANDA(), hoy=new Date().toDateString(), dk=dayKey
   v3Novedades().forEach(x=>out.nov.push(x));
   if (S.dismissed&&S.dismissed['tip-'+hoy] && S.settings.lang!=='en') out.nov.push({k:'tip-'+hoy,t:tx('Consejo del día','Tip of the day'),d:tx('Lo cerraste en Mis rutinas: aquí lo tienes hasta mañana.','You closed it in My routines: here it is until tomorrow.'),a:'tipVer'});
   try{ avisosLista().forEach(html=>{ out.nov.push({k:'av-'+pHash(html.replace(/<[^>]+>/g,'')),html}); }); }catch(e){}
-  try{ if (waterToday()>=waterGoal()) out.logro.push({k:'agua-'+dk,t:tx('💧 Meta de agua cumplida','💧 Water goal reached'),d:tx(`${(Math.round(waterToday()/100)/10).toLocaleString(LOC())} L hoy.`,`${(Math.round(waterToday()/100)/10).toLocaleString(LOC())} L today.`)}); }catch(e){}
+  try{ if (waterToday()>=waterGoal()) out.logro.push({k:'agua-'+dk,t:tx('💧 Meta de agua cumplida','💧 Water goal reached'),d:tx(`${aguaLTxt(waterToday())} hoy.`,`${aguaLTxt(waterToday())} today.`)}); }catch(e){}
   try{ const f=nut().fast, x=f.history[f.history.length-1]; if (x&&x.ok&&x.goalH&&Date.now()-x.end<DAY) out.logro.push({k:'ay-'+x.end,t:tx('🌙 Ayuno completado','🌙 Fast complete'),d:tx(`${fmtHMl((x.end-x.start)/3600000)} de ${x.goalH} h.`,`${Math.round((x.end-x.start)/360000)/10} h of ${x.goalH} h.`)}); }catch(e){}
   try{ const s=S.sessions[S.sessions.length-1]; const n=s&&Date.now()-s.end<DAY?s.items.reduce((a,it)=>a+it.sets.filter(x=>x.pr).length,0):0; if (n) out.logro.push({k:'pr-'+s.id,t:tx('🏆 Récord nuevo','🏆 New record'),d:tx(`${plural(n,'récord','récords')} en tu último entreno.`,`${n} ${n===1?'record':'records'} in your last workout.`)}); }catch(e){}
   return out; }
@@ -10956,7 +11032,8 @@ A.importCode=()=>promptBox({title:'Importar con código',text:'Pega el código q
 
 /* ============ Etapa 5 (0.8.4): suplementos, menús de ejemplo y modo viaje ============ */
 function nutSalud(){ const n=nut(); n.salud=Object.assign({embarazo:false,presion:false,rinon:false,corazon:false,medicacion:false},n.salud||{}); return n.salud; }
-const tx=(es,en)=>EN_LANG()?en:es;
+// tx(español, inglés, {pt:'…', de:'…'}): el tercer argumento es opcional; si un idioma no está, se usa el español y lo traduce su tabla
+const tx=(es,en,o)=>{ const l=LANG(); return l==='es'?es:l==='en'?en:(o&&o[l]!=null?o[l]:es); };
 function supCardsHtml(){
   return `<div class="sec">${tx('Más para tu alimentación','More for your diet')}</div>
   <div class="card row tap" data-a="openSup" style="gap:12px"><span style="color:var(--ac)">${I('pill',24)}</span><div class="grow"><div class="b">${tx('Suplementos con evidencia','Evidence-based supplements')}</div><div class="sm mut" style="line-height:1.4">${tx('Creatina, cafeína, beta-alanina y proteína: cuánto, para qué y para quién no.','Creatine, caffeine, beta-alanine and protein: how much, what for and who should skip them.')}</div></div>${I('right',18)}</div>
@@ -11163,9 +11240,10 @@ SCREENS.ciencia=p=>{
 /* ---------- Créditos e historial de cambios ---------- */
 const APP_VERSION='1.9';
 // Arreglos sobre una versión: 1.1.01, 1.1.02… (los avisos de GitHub siguen comparando por APP_VERSION y el número de compilación)
-const APP_PARCHE='01';
+const APP_PARCHE='2';
 const verTxt=()=>APP_VERSION+(APP_PARCHE?'.'+APP_PARCHE:'');
 const CHANGELOG=[
+ {v:'1.9.2',t:'Idiomas y unidades',items:['Unidades de tu país: kilos o libras, centímetros o pies y pulgadas, litros u onzas, en Ajustes › Pantalla e idioma', 'Contacta al creador: envía tus sugerencias desde Ajustes › Acerca de', 'La app queda preparada para nuevos idiomas', 'Política de privacidad ampliada con tus derechos según la ley europea de datos']},
  {v:'1.9.01',t:'Arreglos de Premium',items:['Los precios de Premium salen siempre: antes, a veces no cargaban','La prueba gratis de 3 días se muestra y se aplica al suscribirte, si Google Play te la ofrece']},
  {v:'1.9',t:'Logros sin fin',items:['Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo', 'Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez', 'Reto estrella del mes: cada mes uno distinto, adaptado a ti', 'Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla', 'Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan', 'Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro', 'Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso']},
  {v:'1.8.2',t:'Te cuida mejor',items:['PandarIA ya no quita los ejercicios que acaba de cambiar: tus rutinas no se encogen solas', 'Con Premium progresas más rápido: sube aunque la última serie se quede a una repetición, y una serie corta ya no te baja el peso', 'Aviso claro si tu peso es bajo o comes menos de lo que gastas en reposo, sea cual sea tu objetivo', 'Al marcar una lesión, PandarIA ofrece cambiar los ejercicios de tus rutinas que la cargan', 'La racha de semanas, las gráficas y el informe semanal ya no fallan con el cambio de hora', 'Si olvidas parar un ayuno, a las 48 h te pregunta si sigues y te deja corregir la hora de fin', 'Si quieres mantener o ganar y tu peso se aleja de tu objetivo, te lo dice', 'Después de unas vacaciones ya no propone quitar días de tu plan', 'Versión gratis: te avisa cuando hiciste todas las repeticiones para que pruebes a subir el peso', 'Cambiar tu objetivo de calorías ahora se puede deshacer']},
@@ -11212,7 +11290,7 @@ function creditsCard(){
    Para quitarlo cuando la app esté lista: AVISOS_DEV=false (o borrar este bloque y la llamada a updCard() en Mis rutinas).
    Cada compilación de GitHub crea una Release v0.7.N con las notas de NOTAS_VERSION; la app las lee y avisa si hay una más nueva. */
 const AVISOS_DEV=true;
-const NOTAS_VERSION=["1.9.01 · Arreglos de Premium: precios y prueba gratis", "1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla", "Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan", "Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro", "Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso"];
+const NOTAS_VERSION=["1.9.2 · Idiomas y unidades", "Unidades de tu país: kilos o libras, centímetros o pies y pulgadas, litros u onzas, en Ajustes › Pantalla e idioma", "Contacta al creador: envía tus sugerencias desde Ajustes › Acerca de", "La app queda preparada para nuevos idiomas", "Política de privacidad ampliada con tus derechos según la ley europea de datos", "1.9.01 · Arreglos de Premium: precios y prueba gratis", "1.9 · Logros sin fin", "Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo", "Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez", "Reto estrella del mes: cada mes uno distinto, adaptado a ti", "Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla", "Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan", "Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro", "Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso"];
 const updBuild=()=>typeof window.PF_BUILD==='number'?window.PF_BUILD:null;
 const updVer=n=>verTxt()+'.'+n;
 /*@GITHUB-INICIO*/ // la versión de Google Play borra este bloque entero (scripts/version-play.mjs)
@@ -11580,7 +11658,7 @@ function viewAjustes(){
   const tg=(k,on,ic,lbl,desc)=>{ const lk=PREM_SET.includes(k)&&!premOK(); return `<button class="srow" data-a="toggleSet" data-v="${k}"><span class="si">${I(ic,20)}</span><span class="grow"><div class="b">${lbl}${lk?' <span>🔒</span>':''}</div>${desc?`<div class="xs mut">${lk&&!/^Premium/.test(desc)?'<span>Premium · </span>':''}${desc}</div>`:''}</span><span class="toggle ${on&&!lk?'on':''}"></span></button>`; };
   const nav=(act,ic,lbl,val,v)=>`<button class="srow" data-a="${act}" ${v?`data-v="${v}"`:''}><span class="si">${I(ic,20)}</span><span class="grow b">${lbl}</span><span class="mut sm">${val||''}</span>${I('right',18)}</button>`;
   const arch=S.routines.filter(r=>r.archived).length, nAv=Object.keys(st.avoid||{}).length;
-  const prof=[pr.age?pr.age+' años':'',pr.weight?pr.weight+' kg':''].filter(Boolean).join(' · ')||'Completar';
+  const prof=[pr.age?pr.age+' años':'',pr.weight?pesoTxt(pr.weight):''].filter(Boolean).join(' · ')||'Completar';
   return `<div class="hdr"><h1>Ajustes</h1></div>${(()=>{ try{ const v=updPending(); return v?updCardNew(v):''; }catch(e){ return ''; } })()}
   <div class="card row" data-a="openProfile" style="cursor:pointer;gap:14px"><span style="width:52px;height:52px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:900;font-size:20px;flex:0 0 auto">${pr.name?esc(pr.name[0].toUpperCase()):I('user',24)}</span><div class="grow"><div class="b">${esc(pr.name||'Mi perfil')}</div><div class="sm mut">${prof}${(pr.injuries||[]).length?` · ${plural(pr.injuries.length,'zona sensible','zonas sensibles')}`:''}</div></div>${I('right',18)}</div>
   <div class="sec">Entrenamiento</div><div class="card" style="padding:0 12px">
@@ -11592,8 +11670,6 @@ function viewAjustes(){
     ${tg('restSmart',st.restSmart!==false,'spark','PandarIA ajusta los descansos','Premium · menos descanso en calentamientos y más si una serie cuesta')}
     ${nav('setPlate','calc','Disco más pequeño',`${st.minPlate} kg`)}
     ${typeof ANIM_FEEDBACK!=='undefined'&&ANIM_FEEDBACK?nav('openRev','search','Revisión de animaciones',`${Object.keys(S.animRev||{}).length}`):''}
-    <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('weight',20)}</span><span class="b grow">Unidades</span></div>
-      <div class="seg">${['kg','lb'].map(u=>`<button class="${st.unit===u?'on':''}" data-a="setUnit" data-v="${u}">${u==='kg'?'Kilogramos (kg)':'Libras (lb)'}</button>`).join('')}</div></div>
     ${tg('rir',st.rir,'target','Esfuerzo por serie (RIR)','En todas las rutinas: anota cuántas repeticiones te quedaban')}
     ${nav('openAvoid','eyeoff','Ejercicios evitados',nAv||'')}
     ${nav('openArchived','archive','Archivadas',arch||'')}
@@ -11630,8 +11706,14 @@ function viewAjustes(){
     <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('info',20)}</span><span class="b grow">Tamaño del texto</span></div>
       <div class="seg">${[['n','Normal'],['g','Grande'],['mg','Muy grande']].map(([k,n])=>`<button class="${textoNivel()===k?'on':''}" data-a="setTexto" data-v="${k}">${n}</button>`).join('')}</div></div>
     ${tg('contrast',st.contrast,'eyeoff','Alto contraste')}
-    <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('compass',20)}</span><span class="b grow">Idioma</span></div>
-      <div class="seg"><button class="${st.lang!=='en'?'on':''}" data-a="setLang" data-v="es">Español</button><button class="${st.lang==='en'?'on':''}" data-a="setLang" data-v="en">English</button></div></div>
+    <div class="srow" style="display:block"><div class="row" style="margin-bottom:10px"><span class="si">${I('compass',20)}</span><span class="b grow">${tx('Idioma y unidades','Language and units')}</span></div>
+      <div class="seg">${Object.entries(IDIOMAS).map(([k,L])=>`<button class="${LANG()===k?'on':''}" data-a="setLang" data-v="${k}" lang="${k}" translate="no">${L.n}${L.beta?' · beta':''}</button>`).join('')}</div>
+      ${IDIOMAS[LANG()].beta?`<div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('Traducción en beta: si algo suena raro, cuéntaselo al creador.','Beta translation: if something sounds odd, tell the creator.')} <button class="link xs" data-a="contacto" data-v="idioma">${tx('Contactar','Contact')}</button></div>`:''}
+      ${[['unit',tx('Peso','Weight'),[['kg',tx('Kilos (kg)','Kilograms (kg)')],['lb',tx('Libras (lb)','Pounds (lb)')]]],
+         ['uLong',tx('Altura y medidas','Height and measurements'),[['cm',tx('Centímetros','Centimetres')],['in',tx('Pies y pulgadas','Feet and inches')]]],
+         ['uAgua',tx('Agua','Water'),[['ml',tx('Litros y ml','Litres and ml')],['oz',tx('Onzas (oz)','Ounces (oz)')]]]]
+        .map(([k,n,ops])=>`<div class="xs mut b" style="margin:12px 2px 6px">${n}</div><div class="seg">${ops.map(([v,l])=>`<button class="${(k==='unit'?uP():k==='uLong'?uL():uA())===v?'on':''}" data-a="setUnidad" data-v="${k}|${v}">${l}</button>`).join('')}</div>`).join('')}
+      <div class="xs mut" style="margin-top:8px;line-height:1.4">${tx('Tus datos se guardan igual: cambiar de unidad no altera nada.','Your data is stored the same way: changing units changes nothing.')}</div></div>
   </div>
   <div class="sec">Recordatorios</div><div class="card">
     <div class="sm mut" style="margin-bottom:10px">Días en que quieres entrenar. Te avisamos al abrir la app${'Notification' in window?' y con notificaciones':''}.</div>
@@ -11667,11 +11749,11 @@ const AJ_GRUPOS=[
    parts:[{keys:[],rest:['Nutrición y ayuno']}]},
   {id:'avisos',ic:'bell',t:'Avisos y sonido',en:'Reminders and sound',d:'Notificaciones, sonido, vibración y voz',den:'Notifications, sound, vibration and voice',
    parts:[{keys:['nfMenu'],rest:['Notificaciones','Recordatorios'],whole:true},{sec:'Durante el entreno',keys:['toggleSet:sound','toggleSet:vibrate','toggleSet:voice','toggleSet:uiSound']}]},
-  {id:'pantalla',ic:'moon',t:'Pantalla e idioma',en:'Display and language',d:'Idioma, tema, tamaño del texto y animaciones',den:'Language, theme, text size and animations',
+  {id:'pantalla',ic:'moon',t:'Pantalla e idioma',en:'Display and language',d:'Idioma, unidades, tema, tamaño del texto y animaciones',den:'Language, units, theme, text size and animations',
    parts:[{keys:['setLang','setUi','setThemeMode','setTexto','toggleSet:contrast','toggleSet:anim']},{sec:'Durante el entreno',keys:['toggleSet:bigRest','toggleSet:awake'],rest:['Apariencia y accesibilidad','Durante el entreno']}]},
   {id:'salud',ic:'heart',t:'Salud',en:'Health',d:'Health Connect',den:'Health Connect',parts:[{keys:[],rest:['Salud'],whole:true}]},
   {id:'acerca',ic:'info',t:'Acerca de',en:'About',d:'Ciencia, historial de cambios, créditos y versión',den:'Science, change history, credits and version',
-   parts:[{sec:'Acerca de',whole:true,noHead:true},{html:()=>typeof A.hcPrivacy==='function'?`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" data-a="hcPrivacy"><span class="si">${I('lock',20)}</span><span class="grow b">${tx('Política de privacidad','Privacy policy')}</span><span class="mut" style="font-size:22px;line-height:1">›</span></button></div>`:''},{sec:'Créditos',whole:true},{otros:true}]}
+   parts:[{sec:'Acerca de',whole:true,noHead:true},{html:()=>`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" style="width:100%" data-a="contacto"><span class="si">${I('edit',20)}</span><span class="grow"><span class="b">${tx('Contacta al creador','Contact the creator')}</span><br><span class="xs mut">${tx('Sugerencias, ideas o algo que no funciona · 1 al día','Suggestions, ideas or something not working · 1 a day')}</span></span>${I('right',18)}</button></div>`},{html:()=>typeof A.hcPrivacy==='function'?`<div class="card" style="padding:0 12px;margin-top:12px"><button class="srow" data-a="hcPrivacy"><span class="si">${I('lock',20)}</span><span class="grow b">${tx('Política de privacidad','Privacy policy')}</span><span class="mut" style="font-size:22px;line-height:1">›</span></button></div>`:''},{sec:'Créditos',whole:true},{otros:true}]}
 ];
 const AJ_OUT=new Set(['openRev']); // filas que ya no se muestran
 // Reparte el HTML de Ajustes en piezas: cabecera de arriba, secciones con sus filas y lo que queda al final
@@ -13668,7 +13750,7 @@ const KB_LOG_EN={'1.7':'PandarIA brings it together and learns: a 0 to 100 state
  '1.2':'Supplements (creatine, caffeine, beta-alanine and protein powder) with their dose, their evidence and who should skip them; diet quality (fibre, sodium and protein per meal); sample menus; drinks and caffeine in the day’s water; more water for long workouts; fasting linked to the diary and travel mode without equipment.'};
 const EN_08_RX=[
   [/^Te quedan ([\d.,]+) kcal de ([\d.,]+) kcal$/,'$1 kcal left of $2 kcal'],[/^([\d.,]+) kcal por encima de tu objetivo de ([\d.,]+) kcal$/,'$1 kcal over your goal of $2 kcal'],
-  [/^Alrededor de ([\d.,]+) kg por semana \(([\d.,]+) % de tu peso\)\.(.*)$/,(m,a,b,c)=>`About ${a} kg per week (${b} % of your weight).${c?' PandarIA applied its safety limit: it never removes more than 25 % of your expenditure or goes below your resting metabolism.':''}`],
+  [/^Alrededor de ([\d.,]+) (kg|lb) por semana \(([\d.,]+) % de tu peso\)\.(.*)$/,(m,a,u,b,c)=>`About ${a} ${u} per week (${b} % of your weight).${c?' PandarIA applied its safety limit: it never removes more than 25 % of your expenditure or goes below your resting metabolism.':''}`],
   [/^(\d+) % más de calorías que tu mantenimiento\.$/,'$1 % more calories than your maintenance.'],
   [/^Objetivo que se ajusta solo: Faltan días de diario: (\d+) de (\d+)\.$/,'Self-adjusting target: diary days missing: $1 of $2.'],
   [/^Objetivo que se ajusta solo: Faltan pesajes: necesito al menos dos separados (\d+) días\.$/,'Self-adjusting target: missing weigh-ins: I need at least two, $1 days apart.'],
@@ -15344,6 +15426,12 @@ const EN_09_RX = [
 const EN_EXTRA = `Solo esta serie|This set only
 Datos del reloj en tus entrenos|Watch data in your workouts
 Arreglos de Premium|Premium fixes
+Idiomas y unidades|Languages and units
+1.9.2 · Idiomas y unidades|1.9.2 · Languages and units
+Unidades de tu país: kilos o libras, centímetros o pies y pulgadas, litros u onzas, en Ajustes › Pantalla e idioma|Your country's units: kilograms or pounds, centimetres or feet and inches, litres or ounces, in Settings › Display and language
+Contacta al creador: envía tus sugerencias desde Ajustes › Acerca de|Contact the creator: send your suggestions from Settings › About
+La app queda preparada para nuevos idiomas|The app is now ready for new languages
+Política de privacidad ampliada con tus derechos según la ley europea de datos|Privacy policy expanded with your rights under European data law
 1.9.01 · Arreglos de Premium: precios y prueba gratis|1.9.01 · Premium fixes: prices and free trial
 Los precios de Premium salen siempre: antes, a veces no cargaban|Premium prices always show: before, they sometimes did not load
 La prueba gratis de 3 días se muestra y se aplica al suscribirte, si Google Play te la ofrece|The 3-day free trial is shown and applied when you subscribe, if Google Play offers it to you
@@ -15508,12 +15596,16 @@ const EN_RX = [
   [/^Rutina de /,'Routine: '],[/^Próxima: /,'Next: '],[/^Última: hoy$/,'Last: today'],[/^· Hoy$/,'· Today'],[/^· Nunca$/,'· Never'],[/^Hoy$/,'Today'],[/(\d+) semanas de racha/,'$1-week streak'],[/ejercicios más/,'more exercises'],[/Buscar entre (\d+) ejercicios/,'Search $1 exercises'],[/Buscar por nombre o músculo/,'Search by name or muscle'],[/(\d+) rutinas$/,'$1 routines']
 ];
 EN_RX.unshift(...EN_08_RX); EN_RX.unshift(...EN_09_RX);
-function trText(t){
+/* 1.9.2 · Tablas de traducción por idioma. Cada una sabe prepararse (build) y traducir un texto en español (tr).
+   El inglés usa las tablas de siempre (EN_MAP, EN_RX…). */
+const TR={ en:{build:()=>buildEN(), tr:t=>trEN(t)} };
+function trText(t){ const T=TR[LANG()]; return T ? T.tr(t) : null; }
+function trEN(t){
   const s=t.trim(); if (!s) return null;
   if (EN_MAP.has(s)) return t.replace(s,EN_MAP.get(s));
   let out=s, ch=false;
   // «Pecho · Mancuernas + Banco», «Próximo entreno: mañana · Full body A»: se traduce cada parte por separado
-  const seg=s.split(/ (·|\+) /); if (seg.length>2 && seg.length<40){ let any=false; const o=seg.map((p,k)=>{ if(k%2) return p; const r=p&&trText(p); if(r!=null){ any=true; return r; } return p; }); if(any) return t.replace(s,o.join(' ')); }
+  const seg=s.split(/ (·|\+) /); if (seg.length>2 && seg.length<40){ let any=false; const o=seg.map((p,k)=>{ if(k%2) return p; const r=p&&trEN(p); if(r!=null){ any=true; return r; } return p; }); if(any) return t.replace(s,o.join(' ')); }
   for (const [rx,rp] of EN_RX){ const n=out.replace(rx,rp); if(n!==out){ out=n; ch=true; } }
   if (EN_PHR_RX && s.length<400){ const m=new Map(EN_PHR); const n=out.replace(EN_PHR_RX,x=>m.get(x)||x); if(n!==out){ out=n; ch=true; } }
   if (ch && EN_MAP.has(out)) out=EN_MAP.get(out);
@@ -15522,18 +15614,20 @@ function trText(t){
 let langObs=null;
 function trTree(root){
   const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null); const nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
-  nodes.forEach(n=>{ if (n.parentNode && /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)) return; const r=trText(n.nodeValue); if (r!=null && r!==n.nodeValue) n.nodeValue=r; });
+  // 1.9.2: lo marcado con translate="no" (por ejemplo, el nombre de cada idioma) no se traduce nunca
+  nodes.forEach(n=>{ if (n.parentNode && /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)) return; if (n.parentNode && n.parentNode.closest && n.parentNode.closest('[translate="no"]')) return; const r=trText(n.nodeValue); if (r!=null && r!==n.nodeValue) n.nodeValue=r; });
   // 1.9: también lo que leen los lectores de pantalla (aria-label) y los avisos al mantener pulsado (title), incluido el propio elemento
   if (root.querySelectorAll){ const els=[...root.querySelectorAll('[placeholder],[aria-label],[title]')]; if (root.nodeType===1 && root.matches && root.matches('[placeholder],[aria-label],[title]')) els.push(root);
     els.forEach(el=>{ for (const at of ['placeholder','aria-label','title']){ const v=el.getAttribute(at); if (!v) continue; const r=trText(v); if (r && r!==v) el.setAttribute(at,r); } }); }
 }
 const DS_ES=['D','L','M','X','J','V','S'], DS_EN=['S','M','T','W','T','F','S'];
 function applyLang(){
-  document.documentElement.lang = S.settings.lang==='en'?'en':'es';
-  const ds=S.settings.lang==='en'?DS_EN:DS_ES; DS_ES.forEach((_,k)=>DAYS_SHORT[k]=ds[k]);
-  if (S.settings.lang==='en'){
-    buildEN(); trTree(document.body);
-    if (!langObs){ langObs=new MutationObserver(ms=>{ langObs.disconnect(); ms.forEach(m=>{ m.addedNodes.forEach(n=>{ if(n.nodeType===3){ const r=trText(n.nodeValue); if(r!=null) n.nodeValue=r; } else if(n.nodeType===1) trTree(n); }); if(m.type==='characterData'){ const r=trText(m.target.nodeValue); if(r!=null) m.target.nodeValue=r; } }); langObs.observe(document.body,{childList:true,subtree:true,characterData:false}); });
+  const L=LANG(), T=TR[L];
+  document.documentElement.lang = L;
+  const ds=IDIOMAS[L].ds; DS_ES.forEach((_,k)=>DAYS_SHORT[k]=ds[k]);
+  if (T){
+    T.build(); trTree(document.body);
+    if (!langObs){ langObs=new MutationObserver(ms=>{ langObs.disconnect(); ms.forEach(m=>{ m.addedNodes.forEach(n=>{ if(n.nodeType===3){ if (n.parentNode&&n.parentNode.closest&&n.parentNode.closest('[translate="no"]')) return; const r=trText(n.nodeValue); if(r!=null) n.nodeValue=r; } else if(n.nodeType===1) trTree(n); }); if(m.type==='characterData'){ const r=trText(m.target.nodeValue); if(r!=null) m.target.nodeValue=r; } }); langObs.observe(document.body,{childList:true,subtree:true,characterData:false}); });
       langObs.observe(document.body,{childList:true,subtree:true}); }
   } else if (langObs){ langObs.disconnect(); langObs=null; }
 }

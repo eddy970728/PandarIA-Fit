@@ -22,7 +22,7 @@ for (const [ver, { t }] of Object.entries(porVer)) {
   const html = execSync(`git show ${t}:www/index.html`, { cwd: DIR, maxBuffer: 64 << 20 }).toString();
   const vc = new VirtualConsole(); const err = []; vc.on('jsdomError', e => err.push(String(e.message || e).slice(0, 200)));
   const dom = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true, url: 'https://localhost/', virtualConsole: vc,
-    beforeParse(w) { const RD = w.Date; class FD extends RD { constructor(...a) { if (a.length === 0) super(NOW); else super(...a); } static now() { return NOW; } } w.Date = FD;
+    beforeParse(w) { w.PF_REGION = 'ES'; const RD = w.Date; class FD extends RD { constructor(...a) { if (a.length === 0) super(NOW); else super(...a); } static now() { return NOW; } } w.Date = FD;
       w.HTMLCanvasElement.prototype.getContext = () => null; w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
       w.matchMedia = w.matchMedia || (() => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} }));
       w.localStorage.setItem('pandaria-fit-v1', COPIA07); } });

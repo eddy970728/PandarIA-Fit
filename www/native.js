@@ -285,7 +285,10 @@
     return n;
   }
   const fmtEvery = m => m < 60 ? `${m} min` : m % 60 ? `${Math.floor(m/60)} h ${m%60} min` : `${m/60} h`;
-  const litros = ml => (ml/1000).toLocaleString(window.LOC?LOC():'es', {maximumFractionDigits: 2});
+  // 1.9.2: el agua en litros u onzas según las unidades de la app
+  const aguaOz = () => typeof uA === 'function' && uA() === 'oz';
+  const litros = ml => aguaOz() ? Math.round(ml/29.5735).toLocaleString(window.LOC?LOC():'es') : (ml/1000).toLocaleString(window.LOC?LOC():'es', {maximumFractionDigits: 2});
+  const uW = () => aguaOz() ? ' oz' : ' L';
   const WATER_MSG_ES = ['¡Hora de hidratarse! 💧', 'Tu cuerpo te pide un vaso de agua', 'Un sorbo más cerca de tu meta', 'Pausa de agua: tus músculos lo agradecen', '¿Un vasito? El panda también tiene sed 🐼', 'Hidratarte mejora tu energía y tu rendimiento'];
   const WATER_MSG_EN = ['Time to hydrate! 💧', 'Your body is asking for a glass of water', 'One sip closer to your goal', 'Water break: your muscles will thank you', 'A quick glass? The panda is thirsty too 🐼', 'Staying hydrated boosts your energy and performance'];
 
@@ -301,7 +304,7 @@
       }
       await LN.registerActionTypes({types:[
         {id:'EMPEZAR', actions:[{id:'start', title:tx('Empezar','Start')}]},
-        {id:'AGUA', actions:[{id:'w250', title:'+250 ml'}, {id:'w500', title:'+500 ml'}]},
+        {id:'AGUA', actions:[{id:'w250', title:'+' + (aguaOz() ? '8 oz' : '250 ml')}, {id:'w500', title:'+' + (aguaOz() ? '17 oz' : '500 ml')}]},
         {id:'AYUNO', actions:[{id:'faststart', title:tx('Empezar ayuno','Start fast')}]},
         {id:'AYUNO_FIN', actions:[{id:'fastend', title:tx('Terminar ayuno','End fast')}]}
       ]});
@@ -370,12 +373,12 @@
           if (t <= now + 60000) continue;
           if (n.waterSmart && d === 0 && last && t - last < 60 * 60000) continue;
           let title, body;
-          if (done){ title = tx('¿Un extra? 💧', 'One more? 💧'); body = tx(`Ya cumpliste tu meta de hoy (${litros(drank)} L). Un vaso más si tienes sed.`, `You already reached today's goal (${litros(drank)} L). Have another glass if you're thirsty.`); }
+          if (done){ title = tx('¿Un extra? 💧', 'One more? 💧'); body = tx(`Ya cumpliste tu meta de hoy (${litros(drank)}${uW()}). Un vaso más si tienes sed.`, `You already reached today's goal (${litros(drank)}${uW()}). Have another glass if you're thirsty.`); }
           else if (i === 0 && !(d === 0 && drank > 0)){ title = EN_LANG() ? `${userName() ? 'Good morning, ' + userName().replace(/, $/, '') + '!' : 'Good morning!'} 💧` : `${userName() ? cap(userName()) + '¡buenos días!' : '¡Buenos días!'} 💧`; body = tx('Empieza el día con un vaso de agua.', 'Start the day with a glass of water.'); }
           else {
             { const WM = EN_LANG() ? WATER_MSG_EN : WATER_MSG_ES; title = WM[(i + d) % WM.length]; }
             const expected = goal * Math.min(1, (t - st) / Math.max(1, en - st));
-            body = d === 0 ? (drank < expected - 250 ? tx(`Vas un poco atrasado: llevas ${litros(drank)} de ${litros(goal)} L.`, `You're a little behind: ${litros(drank)} of ${litros(goal)} L so far.`) : tx(`Vas bien: llevas ${litros(drank)} de ${litros(goal)} L.`, `You're on track: ${litros(drank)} of ${litros(goal)} L so far.`)) : tx(`Tu meta de hoy: ${litros(goal)} L.`, `Today's goal: ${litros(goal)} L.`);
+            body = d === 0 ? (drank < expected - 250 ? tx(`Vas un poco atrasado: llevas ${litros(drank)} de ${litros(goal)}${uW()}.`, `You're a little behind: ${litros(drank)} of ${litros(goal)}${uW()} so far.`) : tx(`Vas bien: llevas ${litros(drank)} de ${litros(goal)}${uW()}.`, `You're on track: ${litros(drank)} of ${litros(goal)}${uW()} so far.`)) : tx(`Tu meta de hoy: ${litros(goal)}${uW()}.`, `Today's goal: ${litros(goal)}${uW()}.`);
           }
           push(mk(ID.water + k++, title, body, new Date(t), 'agua', {go:'water'}, 'AGUA'), 'skip');
         }
@@ -727,10 +730,10 @@
     let kcal = {locked: true};
     try{ if (prem && typeof calcNutrition === 'function' && typeof dayTotals === 'function'){ const N = calcNutrition(), T = dayTotals(dayKey());
       if (N && N.kcal) kcal = {day: dayKey(), k: Math.round(T.k), kGoal: Math.round(N.kcal), p: Math.round(T.p), pGoal: Math.round(N.prot), c: Math.round(T.c), cGoal: Math.round(N.carbs), g: Math.round(T.g), gGoal: Math.round(N.fat)}; } }catch(e){}
-    const L = {dec: EN_LANG() ? '.' : ',', lockSub: tx('Toca para ver PandarIA Fit Premium', 'Tap to see PandarIA Fit Premium'), tTitle: tx('Hoy toca', 'Up today'), tStart: tx('Empezar', 'Start'),
+    const L = {dec: (1.5).toLocaleString(window.LOC ? LOC() : 'es').charAt(1) === '.' ? '.' : ',', lockSub: tx('Toca para ver PandarIA Fit Premium', 'Tap to see PandarIA Fit Premium'), tTitle: tx('Hoy toca', 'Up today'), tStart: tx('Empezar', 'Start'),
       fActive: tx('AYUNANDO', 'FASTING'), fIdle: tx('AYUNO', 'FAST'), fNone: tx('Sin ayuno en curso', 'No fast running'), fPlan: tx('Plan {x}', '{x} plan'), fGoal: tx('meta {x} h', 'goal {x} h'),
       fStart: tx('Empezar', 'Start'), fEnd: tx('Terminar', 'End'), fFrom: tx('Desde {x}', 'From {x}'),
-      wDone: tx('¡Meta cumplida! 💧', 'Goal reached! 💧'), wLeft: tx('Faltan {x} L', '{x} L to go'),
+      wDone: tx('¡Meta cumplida! 💧', 'Goal reached! 💧'), wLeft: tx('Faltan {x}' + uW(), '{x}' + uW() + ' to go'), wDiv: aguaOz() ? '29.5735' : '1000', wU: aguaOz() ? 'oz' : 'L',
       sWeek: tx('semana', 'week'), sWeeks: tx('semanas', 'weeks'), sThis: tx('Esta semana {x} de {y}', 'This week {x} of {y}'), sLock: tx('Racha · Premium', 'Streak · Premium'),
       cTitle: tx('¿Cómo llegas hoy?', 'How are you today?'), cSub: tx('Un toque en cada fila', 'One tap per row'), cDone: tx('Listo: PandarIA lo tendrá en cuenta hoy', 'Done: PandarIA will use it today'),
       cl0: tx('Sueño', 'Sleep'), cl1: tx('Energía', 'Energy'), cl2: tx('Agujetas', 'Soreness'),
