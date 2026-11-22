@@ -46,10 +46,14 @@ w.fetch = async (url, opt = {}) => {
 // ---------- la app con Mi PandarIA ----------
 ev(`S.settings.onboarded=true; S.profile=Object.assign(S.profile||{},{name:'Eddy',weight:80,height:178,age:29,sex:'h'}); save(true);`);
 const antes = ev(`JSON.stringify(Object.keys(S).sort())`);
+// como en la APK: Mi PandarIA se carga mientras la página aún carga, y Ajustes se monta después (DOMContentLoaded)
+ev(`viewAjustes=AJ_BASE; AJ_BASE=null; Object.defineProperty(document,'readyState',{get:()=>'loading',configurable:true})`);
 ev(fs.readFileSync(new URL('../lab/mipandaria.js', import.meta.url), 'utf8'));
+ev(`delete document.readyState; document.dispatchEvent(new Event('DOMContentLoaded'))`);
 await tic();
 comprobar('la pestaña Mi PandarIA aparece entre Nutrición y Historial', ev(`[...document.querySelectorAll('#nav button')].map(b=>b.dataset.v).join(',')`) === 'rutinas,nutricion,mipandaria,historial,ajustes', ev(`[...document.querySelectorAll('#nav button')].map(b=>b.dataset.v).join(',')`));
 ev(`A.tab('mipandaria')`); await tic();
+comprobar('Mi PandarIA tiene su propia pantalla (no sale dentro de Ajustes)', !/Entrenamiento|Acerca de/.test(ev(`document.querySelector('#view').textContent`)) && /<h1>Mi PandarIA<\/h1>/.test(ev(`document.querySelector('#view').innerHTML`)), ev(`document.querySelector('#view').textContent.slice(0,200)`));
 comprobar('sin sesión: pantalla de bienvenida con «Entrar con Google» y qué se sube', /Entrar con Google/.test(ev(`document.querySelector('#view').textContent`)) && /mote aleatorio/.test(ev(`document.querySelector('#view').textContent`)));
 
 ev(`window.MP_TEST_ID_TOKEN=()=>window.__idt`); ev(`window.__idt='idt:u1:eddy@gmail.com'`);

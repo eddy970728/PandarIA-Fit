@@ -59,6 +59,9 @@ jobs:
           cp lab/mipandaria.js www/mipandaria.js
           sed -i 's#<script src="premium.js"></script></body>#<script src="premium.js"></script><script src="mipandaria.js"></script></body>#' www/index.html
           grep -q '<script src="mipandaria.js"></script></body>' www/index.html || { echo "ERROR: Mi PandarIA no quedó conectado"; exit 1; }
+          # la política de seguridad de la página solo deja conectar con Google y GitHub: se añade el servidor de Mi PandarIA
+          sed -i 's#connect-src '"'"'self'"'"' https://www.googleapis.com#connect-src '"'"'self'"'"' https://vjvhpumsfsktkavtxigk.supabase.co https://www.googleapis.com#' www/index.html
+          grep -q "connect-src 'self' https://vjvhpumsfsktkavtxigk.supabase.co" www/index.html || { echo "ERROR: el servidor de Mi PandarIA no quedó permitido"; exit 1; }
           echo "MPLAB=-mipandaria" >> $GITHUB_ENV
 
       - name: Control (fuera de la rama de Mi PandarIA, la app no puede llevarlo)

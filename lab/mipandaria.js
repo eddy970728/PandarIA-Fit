@@ -311,7 +311,7 @@
   };
 
   /* ---------- Acciones ---------- */
-  const conEspera = async (fn, ok) => { try { toast(tx('Conectando…', 'Connecting…')); await fn(); if (ok) toast(ok); } catch (e) { toast(tx('No se pudo: ', 'Could not: ') + (e.message || e)); } render.keep = true; render(); if (LAYERS.length) refreshTop(); };
+  const conEspera = async (fn, ok) => { try { toast(tx('Conectando…', 'Connecting…')); await fn(); if (ok) toast(ok); } catch (e) { toast(tx('No se pudo: ', 'Could not: ') + (e.message || e)); } render.keep = true; render(); if (LAYERS.length) { try { refreshTop(); } catch (e) {} } };
   A.mpEntrar = () => conEspera(() => entrar(false).then(cargarLiga), tx('¡Dentro de Mi PandarIA!', 'You are in Mi PandarIA!'));
   A.mpOtra = () => { closeLayer(); conEspera(() => entrar(true).then(cargarLiga), tx('Cuenta cambiada', 'Account switched')); };
   A.mpUsar = id => { if (!M.cuentas[id]) return; M.activa = id; M.cache = {}; guardar(); closeLayer(); conEspera(() => sincronizar(true).then(cargarLiga), tx('Cuenta cambiada', 'Account switched')); };
@@ -321,9 +321,9 @@
     ok: () => conEspera(async () => { await rpc('mp_salir'); const id = M.activa; delete M.cuentas[id]; delete M.dias[id]; delete M.enviado[id]; delete M.retos[id]; M.activa = Object.keys(M.cuentas)[0] || null; M.cache = {}; guardar(); closeLayer(); }, tx('Datos borrados', 'Data deleted'))});
   A.mpNombre = () => { const j = (cuenta() || {}).jugador || {}; openModal(`<div class="modal"><h3>${tx('Nombre para tus amigos', 'Name for your friends')}</h3><input id="mpNom" maxlength="40" value="${esc(j.display_name || '')}"><div class="row" style="gap:8px;margin-top:14px"><button class="btn grow" data-a="closeModal">${tx('Cancelar', 'Cancel')}</button><button class="btn pri grow" data-a="mpNombreOk">${tx('Guardar', 'Save')}</button></div></div>`, {center: true}); };
   A.mpNombreOk = () => { const v = (document.getElementById('mpNom') || {}).value || ''; closeModal(); conEspera(async () => { cuenta().jugador = await rpc('mp_entrar', {p_nombre: v.trim()}); guardar(); }, tx('Nombre guardado', 'Name saved')); };
-  A.mpLiga = () => { openLayer('mpLiga', {}); cargarLiga().then(() => refreshTop()); };
-  A.mpAmigos = () => { openLayer('mpAmigos', {}); cargarLiga().then(() => refreshTop()); };
-  A.mpTrofeos = () => { openLayer('mpTrofeos', {}); cargarLiga().then(() => refreshTop()); };
+  A.mpLiga = () => { openLayer('mpLiga', {}); cargarLiga().then(() => { try { refreshTop(); } catch (e) {} }); };
+  A.mpAmigos = () => { openLayer('mpAmigos', {}); cargarLiga().then(() => { try { refreshTop(); } catch (e) {} }); };
+  A.mpTrofeos = () => { openLayer('mpTrofeos', {}); cargarLiga().then(() => { try { refreshTop(); } catch (e) {} }); };
   A.mpComo = () => openLayer('mpComo', {});
   A.mpDia = k => openLayer('mpDia', {k});
   A.mpCopiar = () => { const c = ((cuenta() || {}).jugador || {}).friend_code || ''; try { navigator.clipboard.writeText(c).then(() => toast(tx('Código copiado', 'Code copied')), () => toast(c)); } catch (e) { toast(c); } };
@@ -358,8 +358,13 @@
     const hist = nav.querySelector('[data-v="historial"]'); nav.insertBefore(b, hist || null);
     if (TAB === 'mipandaria') nav.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
   };
-  const _va = viewAjustes;
-  viewAjustes = function () { if (TAB === 'mipandaria') { setTimeout(() => { if (cuenta()) sincPronto(); }, 0); return viewMP(); } return _va.apply(this, arguments); };
+  // Se instala después de que Ajustes monte su pantalla (al cargar la página); si no, Mi PandarIA salía dentro de Ajustes
+  function instalarVista() {
+    const _va = viewAjustes;
+    viewAjustes = function () { if (TAB === 'mipandaria') { setTimeout(() => { if (cuenta()) sincPronto(); }, 0); return viewMP(); } return _va.apply(this, arguments); };
+    if (TAB === 'mipandaria') { try { render(); } catch (e) {} }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(instalarVista, 0)); else instalarVista();
   const _save = save;
   save = function () { const r = _save.apply(this, arguments); try { if (cuenta() && asignar()) sincPronto(); } catch (e) {} return r; };
   document.addEventListener('visibilitychange', () => { if (!document.hidden && cuenta()) sincPronto(); });
