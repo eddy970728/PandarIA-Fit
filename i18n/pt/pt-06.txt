@@ -1,0 +1,150 @@
+Pera
+Pêssego
+Damasco
+Ameixa
+Cereja
+Kiwi
+Abacaxi
+Manga
+Mamão
+Melancia
+Melão
+Melão verde
+Mirtilos
+Framboesa
+Amora
+Goiaba
+Maracujá
+Figo
+Figo seco
+Tâmara
+Uva-passa
+Ameixa-preta
+Romã
+Caqui
+Nectarina
+Tangerina em calda
+Pêssego em calda
+Abacaxi em calda
+Salada de frutas em lata
+Banana-da-terra
+Banana-da-terra cozida
+Banana-da-terra madura frita
+Tostones (banana-da-terra frita)
+Mamey
+Cherimólia
+Graviola
+Lichia
+Figo-da-índia
+Carambola
+Toranja em gomos
+Marmelo
+Cranberry
+Azeitonas verdes
+Azeitonas pretas
+Abacate
+Tamarindo
+Acerola
+Fruta-pão
+Sapoti
+Nêspera
+Morangos congelados
+Jaca
+Cranberries desidratadas
+Manjericão
+Mingau de aveia com água
+Flocos de milho
+Granola
+Cereal de farelo
+Aveia instantânea
+Leite integral
+Leite semidesnatado
+Leite desnatado
+Leite em pó integral
+Leite em pó desnatado
+Leite condensado
+Leite evaporado
+Leite achocolatado
+Leite de cabra
+Iogurte natural integral
+Iogurte natural desnatado
+Iogurte grego natural
+Iogurte grego desnatado
+Iogurte com frutas
+Iogurte grego com frutas
+Kefir
+Queijo minas frescal
+Queijo muçarela
+Queijo muçarela light
+Queijo cheddar
+Queijo parmesão
+Queijo prato
+Queijo para sanduíche
+Cream cheese
+Ricota
+Ricota light
+Queijo cottage
+Queijo de cabra
+Queijo feta
+Queijo gorgonzola
+Queijo cotija
+Queijo Oaxaca
+Queijo provolone
+Queijo emmental
+Creme de leite
+Creme azedo
+Chantilly
+Manteiga
+Manteiga sem sal
+Doce de leite
+Leite 1 %
+Queijo romano
+Queijo Monterey Jack
+Iogurte de baunilha
+Creme de leite leve
+Ovo
+Ovo cozido
+Ovo frito
+Ovo mexido
+Ovo pochê
+Omelete
+Clara de ovo
+Gema de ovo
+Ovo de codorna
+Claras pasteurizadas
+Presunto
+Presunto magro
+Salsicha
+Salsicha de frango
+Linguiça
+Morcela
+Mortadela
+Salame
+Pepperoni
+Peito de frango cru
+Peito de frango grelhado
+Peito de frango cozido
+Sobrecoxa de frango
+Sobrecoxa de frango com pele
+Coxa de frango
+Asas de frango
+Frango inteiro assado
+Frango frito
+Frango desfiado
+Peito de peru
+Peito de peru fatiado
+Carne moída de peru
+Fígado de frango
+Pato
+Carne moída de frango
+Peito de frango com pele
+Azeite de oliva
+Óleo de girassol
+Óleo de canola
+Óleo de soja
+Óleo de coco
+Margarina
+Banha de porco
+Maionese
+Maionese light
+Suco de laranja natural

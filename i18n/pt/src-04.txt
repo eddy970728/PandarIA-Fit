@@ -1,0 +1,150 @@
+Tahini
+Castañas
+Mantequilla de almendras
+Semillas de lino
+Carne seca salada
+Hígado de vaca
+Hígado de vaca cocido
+Lengua de vaca
+Pecho de vaca
+Peceto
+T-bone
+Asado de tira
+Cerveza
+Cerveza light
+Ron
+Proteína de suero aislada
+Batido sustituto de comida
+Proteína de suero en polvo
+Proteína de soja en polvo
+Bebida de almendras
+Vino tinto
+Vino blanco
+Soda
+Refresco de lima limón
+Refresco cola
+Refresco de naranja
+Bebida energética
+Agua tónica
+Bebida de coco
+Bebida de café con leche
+Cacao en polvo azucarado
+Café negro
+Espresso
+Café instantáneo
+Vino rosado
+Té verde
+Limonada
+Cerveza sin alcohol
+Té
+Refresco cola sin azúcar
+Infusión de hierbas
+Horchata
+Bebida de arroz
+Anchoas
+Merluza
+Merluza al horno
+Bacalao salado
+Corvina
+Pescado empanizado
+Lenguado
+Pescado blanco
+Mero
+Caballa
+Lisa
+Sierra
+Salmón ahumado
+Sardinas en aceite
+Sardinas en tomate
+Lubina
+Pejerrey
+Pargo
+Palitos de cangrejo
+Pez espada
+Atún en aceite
+Atún en agua
+Atún blanco en agua
+Atún fresco
+Cangrejo
+Langosta
+Almejas
+Mejillones
+Calamar
+Calamares fritos
+Salmón en lata
+Dorado
+Pulpo
+Bagre
+Salmón
+Salmón a la plancha
+Trucha
+Tilapia
+Tilapia cocida
+Abadejo
+Camarones
+Camarones cocidos
+Porotos negros cocidos
+Porotos colorados cocidos
+Porotos pintos cocidos
+Porotos blancos cocidos
+Habas cocidas
+Garbanzos cocidos
+Garbanzos en lata
+Lentejas secas
+Lentejas cocidas
+Porotos mung cocidos
+Arvejas partidas cocidas
+Maní
+Maní salado
+Maní tostado
+Frijoles refritos
+Soja cocida
+Tempeh
+Salsa de soja
+Tofu suave
+Bebida de soja
+Harina de garbanzo
+Hummus
+Porotos en lata
+Mantequilla de maní
+Tofu firme
+Cordero
+Chivito
+Conejo
+Bagel
+Pan de maíz
+Baguette
+Pan árabe
+Pan pita integral
+Pan de centeno
+Pan blanco
+Tostadas de pan
+Pan integral
+Pan rallado
+Torta de chocolate
+Budín
+Bizcochuelo
+Torta de queso
+Brownie
+Bizcochos
+Galletitas con chips de chocolate
+Galletitas rellenas
+Galletitas dulces
+Galletas de queso
+Galletas de agua
+Galletas integrales
+Medialuna
+Rosquilla
+Muffin
+Panqueques
+Pastel de manzana
+Masa de tarta
+Bollo
+Pan dulce
+Tostada de maíz
+Tortilla de maíz
+Tortilla de trigo
+Waffles
+Polvo de hornear
+Bicarbonato de sodio
+Levadura de cerveza

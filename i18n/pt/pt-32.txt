@@ -1,0 +1,43 @@
+Com 5 treinos ele aprende seu horário habitual
+O PandarIA aprende a que horas você costuma treinar
+Trabalho.
+✓ Feita
+Série
+a próxima série
+Feito por hoje! 💪
+Próxima:
+Descanse e recupere
+exercício
+exercícios
+SUAS ROTINAS
+Toque para começar
+Crie sua primeira rotina
+Toque para abrir o app
+Toque para ver o PandarIA Fit Premium
+Hoje tem
+JEJUM
+Sem jejum em andamento
+Plano {x}
+meta {x} h
+Desde {x}
+Meta cumprida! 💧
+semana
+semanas
+Esta semana {x} de {y}
+Sequência · Premium
+Um toque em cada linha
+Pronto: o PandarIA vai levar em conta hoje
+Dor muscular
+CALORIAS DE HOJE
+{x} kcal restantes
+{x} kcal a mais
+Restam P {p} g · C {c} g · G {g} g
+Jejum começado pelo widget
+Jejum terminado pelo widget
+Sono ontem à noite
+Novo: o PandarIA pode levar em conta seu sono e a variabilidade da frequência cardíaca para sua recuperação.
+Dar permissão
+Hoje, média de 7 dias e nos seus treinos
+Em repouso e durante seus treinos
+Horas da última noite
+Mais um sinal de recuperação

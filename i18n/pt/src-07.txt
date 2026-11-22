@@ -1,0 +1,150 @@
+Jugo de naranja envasado
+Jugo de manzana
+Jugo de uva
+Jugo de ananá
+Néctar de durazno
+Néctar de guayaba
+Chocolate caliente
+Jugo de limón
+Jugo de pomelo
+Jugo de granada
+Cajeta de guayaba
+Sopa de pollo con fideos
+Sopa de verduras
+Caldo de pollo
+Caldo de carne
+Sopa de tomate
+Crema de champiñones
+Sopa de lentejas
+Sopa de arvejas
+Sal
+Mostaza
+Salsa de tomate para pasta
+Salsa picante
+Salsa mexicana
+Salsa barbacoa
+Aderezo ranch
+Vinagreta
+Vinagre
+Vinagre balsámico
+Salsa blanca
+Pesto
+Caldo en cubo
+Salsa de queso
+Salsa teriyaki
+Pimienta
+Orégano
+Comino
+Canela
+Pimentón
+Cúrcuma
+Ají molido
+Ajo en polvo
+Cebolla en polvo
+Hojas de laurel
+Tomillo seco
+Romero seco
+Nuez moscada
+Clavo de olor
+Curry en polvo
+Pimienta de cayena
+Anís en grano
+Salsa inglesa
+Salsa de ostras
+Vinagre de manzana
+Alcaparras
+Aceite de sésamo
+Ghee
+Manteca vegetal
+Arándanos secos
+Pitahaya
+Suero de leche
+Hierbabuena
+Milanesa de carne frita
+Milanesa de pollo frita
+Milanesa al horno
+Milanesa napolitana
+Chivito uruguayo
+Choripán
+Chimichurri
+Salsa criolla
+Tortilla de papas
+Pastel de papa
+Lentejas guisadas con chorizo
+Ñoquis con tuco
+Tarta de jamón y queso
+Tarta de verdura
+Empanada de jamón y queso
+Empanada de pollo
+Alfajor de maicena
+Torta frita
+Polenta con tuco
+Provoleta
+Ensalada mixta
+Ropa vieja
+Picadillo a la habanera
+Fricasé de pollo
+Sándwich cubano
+Croquetas de jamón
+Chilaquiles rojos
+Guacamole
+Tacos al pastor
+Huevos rancheros
+Tinga de pollo
+Paella mixta
+Gazpacho
+Fabada
+Pisto
+Patatas bravas
+Churros
+Puré de papas con manteca
+Arroz blanco con huevo frito
+Bife a la plancha con ensalada
+Para ganar fuerza conviene trabajar con cargas pesadas (hasta 6 repeticiones) y descansar al menos 3 minutos entre series de los ejercicios principales. Desde la 1.8 sigue la postura del ACSM de 2026 (137 revisiones, más de 30.000 personas). Para fuerza recomienda cargas de al menos el 80 % de tu máximo, 2 o más días por semana.
+Para ganar músculo se recomiendan sobre todo series de 6 a 12 repeticiones, con descansos de 1 a 2 minutos. Desde la 1.8 sigue la postura del ACSM de 2026 (137 revisiones, más de 30.000 personas). Para músculo, 10 series o más por músculo a la semana; no hace falta llegar al fallo.
+Para resistencia muscular se usan cargas ligeras con muchas repeticiones (15 o más) y descansos cortos.
+Para bajar grasa PandarIA usa series algo más largas y descansos cortos, que mantienen el pulso alto. Lo que más cuenta para perder grasa es la alimentación.
+Para la salud en general bastan cargas moderadas de 8 a 15 repeticiones, trabajando todos los grupos musculares 2 días o más por semana. Según el ACSM (2026), incluso una dosis mínima, con pocas series 2 días por semana, mejora la fuerza y la salud.
+En las rutinas de movilidad PandarIA usa pocas series y descansos mínimos: la prioridad es moverse con control.
+En los ejercicios multiarticulares con peso (sentadilla, press, remo, peso muerto), descansar 2 minutos o más rinde más fuerza y músculo que descansar 1 minuto, porque permite mantener las repeticiones.
+Cuando PandarIA propone cambiar un ejercicio, busca uno que trabaje lo mismo con una dificultad parecida: evita pasar de un ejercicio con peso a uno mucho más fácil y cuenta como tuyo el equipo del ejercicio que ya haces.
+Cuando completas todas las series en el tope de repeticiones (con 3 series o más, la última puede quedarse a una repetición), se sube la carga entre un 2 y un 10 %. PandarIA sube un 5 % en piernas y un 2,5 % en el resto, como mínimo un disco. La sobrecarga progresiva es lo que más influye en lo que ganas (ACSM 2026).
+Primero se suman repeticiones con el mismo peso hasta llegar al tope del rango, y solo entonces se sube el peso.
+Si anotas cuántas repeticiones te sobraban (RIR) y en la última sesión te sobraron 5 o más de media (en 2 series o más), sumar de a una repetición tardaría semanas. PandarIA calcula tu fuerza con lo que hiciste más lo que te sobró y propone el peso para tus repeticiones dejando unas 2 en reserva, subiendo como mucho un 20 % de una vez. La escala de repeticiones en reserva está validada (Zourdos y col., 2016).
+Si dos sesiones seguidas no llegas al mínimo de repeticiones en la primera serie o en la mitad de las series o más, PandarIA baja el peso un 10 % para consolidar la técnica y volver a subir. Que la última serie se quede corta es normal y no cuenta.
+El pulso máximo se estima con 208 − 0,7 × edad (Tanaka y col., 2001), más preciso que 220 − edad. Según el ACSM, el ejercicio moderado va del 64 al 76 % del pulso máximo y el intenso del 77 al 95 %. En el cardio, PandarIA calcula las calorías con tu pulso medio, tu peso, tu edad y tu sexo (ecuación de Keytel y col., 2005); en las pesas el pulso sube más que el gasto real, así que allí se sigue usando el Compendio. Los datos llegan de tu reloj a través de Health Connect o Salud y pueden tardar unos minutos.
+Además de los logros fijos, hay hitos para todo lo que usas (entrenos, mejor racha, récords, toneladas, días con la meta de agua, ayunos de tu plan, días con diario y check-ins) con escalones de 10, 25, 50, 100, 250, 500 y 1.000, y después uno cada 500, así que nunca se acaban. Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez. El reto estrella del mes cambia cada mes y pide un 10 % más que tu mes anterior, con un tope. Nunca hay premios por bajar de peso, comer menos, ayunar más de lo planeado ni entrenar más de lo planeado; con peso bajo los hitos de ayuno se pausan, y las sesiones suaves cuentan igual.
+Con pesos ligeros, el siguiente disco o mancuerna puede ser un 20 o 25 % más. Si el salto supera el 10 %, PandarIA no sube todavía: te pide sumar repeticiones hasta que tu fuerza estimada te permita hacer el peso nuevo dentro del rango, como mucho 6 por encima del rango; entonces sube. Con series cerca del fallo, el músculo crece de forma parecida con pesos altos, medios o bajos (para la fuerza máxima rinden algo más los altos).
+Si marcaste la sesión anterior como muy exigente (9 o 10 de 10), PandarIA mantiene el peso en lugar de subirlo. Desde la 1.8, si además anotaste las repeticiones que te sobraban y de media fueron 3 o más, manda lo que dicen tus series: la progresión sigue. Desde la 1.8.2, si te sobró al menos 1 de media en ese ejercicio, se suma una repetición o, si llegaste al tope, se sube un disco: solo se mantiene si llegaste al fallo.
+Un metaanálisis de 103 estudios encontró que la fuerza máxima casi no cambia en las primeras 4 semanas sin entrenar y que se pierde más rápido después; los mayores de 65 la pierden unas dos veces más. Por eso PandarIA baja el peso un 10 % tras 4 semanas sin hacer un ejercicio, un 20 % tras 8 y un 30 % tras 12; desde los 65 años empieza a las 2 semanas.
+La postura del ACSM de 2026 no encontró que periodizar por fases dé mejores resultados de forma constante que progresar sin fases. PandarIA lo usa sobre todo para incluir una semana de descarga y variar el estímulo: alterna 3 semanas de volumen, 2 de intensidad y 1 de descarga. Puedes desactivarlo.
+El consenso internacional de entrenadores (Bell y col., 2023) define la descarga como un periodo de menos estrés para reducir la fatiga y recuperarse, y sus recomendaciones prácticas proponen una semana más liviana cada 4 a 8 semanas, bajando la carga cerca de un 10 % y recortando series. PandarIA baja el peso un 10 % y quita una serie en los ejercicios con 3 o más. Hay pocos estudios experimentales directos.
+Las series de calentamiento suben de a poco: 50 %, 70 % y 85 % del peso de trabajo, con menos repeticiones cada vez.
+Hacer al menos 10 series por semana para cada grupo muscular da más crecimiento que hacer menos. Repartir esas series en 2 días o más por semana para cada músculo da más resultado que hacerlas todas en uno (Schoenfeld y col., 2016).
+PandarIA avisa si un grupo muscular grande tuvo menos de 2 series en los últimos 7 días, o menos de 4 en la semana del informe.
+PandarIA compara empuje con tirón, cuádriceps con isquios y piernas con tren superior en las últimas 4 semanas, y avisa cuando uno supera claramente al otro.
+Para comparar series con distinto peso y repeticiones, PandarIA estima tu máximo con la fórmula de Epley (peso × (1 + repeticiones ÷ 30)). Estas fórmulas aciertan más con menos de 10 repeticiones (Mayhew y col., 2008): si en una sesión tienes series de 10 o menos, PandarIA usa solo esas; si no, usa las de hasta 12.
+En dominadas, fondos y otros ejercicios de peso corporal puedes activar «Con lastre» y anotar los kg que añades (cinturón con discos, chaleco o mancuerna). El primer lastre se calcula con las repeticiones que ya haces sin él y la parte de tu peso que mueve el ejercicio: casi todo en dominadas y fondos, y alrededor del 64 % en las flexiones (Ebben y col., 2011), con margen de prudencia. Cuando superas en 3 repeticiones o más el rango de tu rutina en dominadas o fondos, PandarIA te propone pasar a la versión con lastre; en el resto, primero una variante más difícil.
+Sin historial, PandarIA estima el peso inicial según tu peso corporal y nivel, y lo baja a propósito para que la primera sesión sea segura. Lo ajusta por sexo, sedentarismo y edad.
+Los adultos deberían dormir 7 horas o más cada noche de forma habitual.
+Si en el check-in marcas que dormiste mal o tienes poca energía, o eliges empezar suave, PandarIA baja un 10 % la carga sugerida ese día. «Hoy toca» te avisa si vienes de una sesión muy exigente o tus músculos aún se recuperan.
+Si un músculo de la rutina ya tuvo 6 series o más en las últimas 48 horas, PandarIA te avisa antes de empezar.
+Los adultos necesitan entre 150 y 300 minutos de actividad moderada por semana (o 75 a 150 de vigorosa) y ejercicios de fuerza 2 días o más. Desde los 65, equilibrio y fuerza 3 días o más.
+Las calorías en reposo se calculan con la ecuación de Mifflin-St Jeor: 10 × peso + 6,25 × altura − 5 × edad, más 5 en hombres o menos 161 en mujeres. Si prefieres no decir tu sexo, PandarIA usa el punto medio.
+Tus calorías en reposo se multiplican por tu nivel de actividad física. Según la FAO y la OMS, una vida sedentaria ronda 1,4–1,69, una activa 1,7–1,99 y una muy activa 2 o más; PandarIA usa 1,4, 1,6 y 1,8 y lo sube un poco según tus entrenos de la última semana. Antes de la 1.8 usaba 1,2 a 1,55, que se quedaba corto.
+Para perder grasa sin perder músculo conviene bajar despacio, entre el 0,5 y el 1 % del peso por semana. PandarIA calcula el déficit para ese ritmo (cada kilo de grasa equivale a unas 7700 kcal, una estimación habitual), nunca quita más del 25 % de tu gasto y nunca baja de tu metabolismo en reposo. Las 7700 kcal por kilo solo valen para las primeras semanas: al adelgazar gastas menos y el ritmo baja (Hall y col., 2011), por eso PandarIA recalcula con tu peso de cada semana. Comer muy por debajo de lo que gastas durante mucho tiempo tiene riesgos para la salud (consenso del COI sobre REDs, 2023).
+Para ganar músculo se recomienda comer entre un 10 y un 20 % por encima de tu mantenimiento y ganar entre un 0,25 y un 0,5 % de tu peso por semana (Iraki, Helms y col., 2019). PandarIA suma un 10 % (normal) o un 15 % (rápido), o un 5 % si eliges ir lento para limitar la grasa.
+Las fórmulas son una estimación. Con al menos 14 días de diario y dos pesajes separados 14 días o más en las últimas 3 semanas, PandarIA compara lo que comiste con cómo cambió tu peso, estima tu gasto real y lo mezcla con la fórmula: a partes iguales al principio, y con un 75 % de tu gasto real cuando tienes las 3 semanas completas y 4 pesajes o más. Desde la 1.8 usa 3 semanas en vez de 2, porque con 2 el ruido del peso pesaba demasiado; y antes la mitad del error de la fórmula no se corregía nunca. Si el dato sale muy raro, no lo usa.
+Si entrenas, 1,4 a 2,0 g de proteína por kg al día cubren lo necesario, y en déficit puede hacer falta más. El beneficio para el músculo se estabiliza alrededor de 1,6 g/kg.
+Para aprovechar la proteína al ganar músculo conviene repartirla en 4 tomas o más de unos 0,4 g por kg (20 a 50 g) cada 3 o 4 horas (Schoenfeld y Aragon, 2018).
+PandarIA reserva 0,8 g de grasa por kg para cubrir lo esencial; el resto de calorías va a carbohidratos. Suele caer dentro del 15 al 30 % de las calorías.
+Un índice de masa corporal por debajo de 18,5 se considera bajo peso. En ese caso PandarIA no propone déficit y muestra tu mantenimiento.
+Con un índice de masa corporal por debajo de 18,5 (bajo peso), sea cual sea tu objetivo, PandarIA no propone déficit ni ayuno: avisa en Nutrición y en el ayuno, deja de celebrar los ayunos y el estado del día lo tiene en cuenta. Por debajo de 17 recomienda hablar con un médico o nutricionista. Si en tus últimos 7 días comes de media menos de lo que tu cuerpo gasta en reposo (con al menos 5 días anotados), también avisa.
+Si tu objetivo es mantener y en las últimas 4 semanas tu peso cambia más de un 0,5 % por semana (o más de un 0,15 % por semana durante 12 semanas, unos 1,5 kg en alguien de 80), o si quieres ganar y tu peso no sube en 4 semanas o sube más de un 0,5 % por semana (lo recomendado es entre 0,25 y 0,5 %), PandarIA te lo dice con lo que comes de media frente a tu objetivo.
+En menores de 18 las necesidades cambian con el crecimiento: PandarIA solo muestra el mantenimiento como orientación y recomienda consultar a un profesional.
+La EFSA considera adecuados 2,0 L de agua total al día en mujeres y 2,5 L en hombres, contando la que llega con la comida (se suele estimar en un 20 %). PandarIA parte de 33 ml por kg, lo mantiene cerca de esa referencia para que no se dispare en personas grandes ni se quede corto en pequeñas, y suma medio litro los días que entrenas. Como el sudor varía mucho (el ACSM habla de 0,4 a 0,8 L por hora), en las sesiones de más de 1 hora suma 250 ml por cada media hora extra, hasta 500 ml más.
+La referencia de la EFSA cuenta el agua de todas las bebidas. PandarIA suma a tu meta el agua de las bebidas que registras en el diario (café, té, leche, zumos, refrescos…), estimada como el peso de la bebida menos sus hidratos, proteínas y grasas. Las bebidas con alcohol no cuentan.
+Cantidades aproximadas de la EFSA: un espresso de 60 ml tiene unos 80 mg, una taza de café de filtro de 200 ml unos 90 mg, una taza de té de 220 ml unos 50 mg, una lata de cola de 355 ml unos 40 mg y una bebida energética de 250 ml unos 80 mg (el café instantáneo se cuenta como el de filtro). Unos 100 mg cerca de la hora de dormir pueden empeorar el sueño de algunas personas.
+Con calor o mucho sudor se pierde bastante más agua: el ACSM habla de 0,4 a 1,8 litros por hora de ejercicio según la persona y el clima. Si marcas un día de calor o de mucho sudor, PandarIA suma medio litro a tu meta de ese día. Bebe también según tu sed.
+PandarIA sugiere empezar por ayunos cortos (12 a 14 h), avisa si un plan es muy exigente para tu actividad y recomienda romper el ayuno pasadas 24 horas. Una revisión de 2021 que juntó todos los metaanálisis de ensayos sobre ayuno intermitente encontró que la mayoría de sus beneficios tienen evidencia de calidad baja o muy baja: Un metaanálisis de 2025 con 99 ensayos (BMJ) confirmó que el ayuno ayuda a bajar de peso más o menos lo mismo que comer un poco menos cada día. PandarIA lo ofrece como una herramienta más para organizar lo que comes, no como algo mágico.
+La creatina monohidrato es el suplemento con más pruebas para ganar fuerza y músculo con el entrenamiento. Basta con 3 a 5 g al día, todos los días, a cualquier hora. La fase de carga (0,3 g por kg al día durante 5 a 7 días) solo hace que el efecto llegue antes. En personas sanas se considera segura; puede subir 1 o 2 kg el peso por el agua que retiene el músculo.

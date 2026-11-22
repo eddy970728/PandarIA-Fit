@@ -1,0 +1,150 @@
+Ex.: Dezembro forte
+O que contamos
+Meta
+1 semana
+2 semanas
+30 dias
+Começa hoje. Contam os dados que você registra no PandarIA Fit.
+Criar e compartilhar
+Desafio PandarIA
+Defina uma meta
+Copiado
+Desafio do PandarIA Fit
+Seu amigo
+Remover este desafio?
+Só é removido do seu celular.
+Não encontrei um código de desafio
+O código não é válido
+Você já tem este desafio
+Desafio adicionado!
+Primeiro adicione o desafio com o código PFR
+Progresso atualizado
+Treinando
+Levantado
+Semanas seguidas (máx.)
+Dias treinados
+Seu exercício estrela
+jejum concluído
+jejuns concluídos
+dia com a meta de água
+dias com a meta de água
+Ainda não há treinos neste período.
+treinos
+treinando
+levantadas
+recordes
+Exercício estrela:
+semanas seguidas
+Feito com o PandarIA Fit
+De manhã
+À tarde
+À noite
+Hoje ainda não há dados: faça o check-in.
+Um número de 0 a 100 que junta seus sinais de cansaço de hoje e diz como encarar a sessão.
+Começa em 100 e cada sinal tira conforme seu peso: o check-in, os músculos de hoje, uma sessão muito exigente, um jejum longo, o cansaço de vários dias e, com Saúde, o sono e a frequência cardíaca. Com 80 ou mais, Pronto; de 60 a 79, Normal; de 40 a 59, Leve; abaixo de 40, Descanse.
+Você dormiu mal (−15) e suas pernas estão com menos da metade da recuperação (−15): 70, Normal.
+Hoje, sessão leve com o botão «Leve».
+Faça sua sessão como está.
+Ver meu estado do dia
+Porque seu normal é só seu: um mesmo número pode ser bom para você e ruim para outra pessoa.
+Você ainda não tem 14 dias de dados em nenhum item.
+O PandarIA usa sua média das últimas 4 semanas, e só com 14 dias de dados ou mais. Assim uma noite de 6 horas conta diferente se você costuma dormir 6 ou 8.
+Se sua frequência em repouso costuma ser 52 e hoje é 60, o PandarIA percebe; um 60 geral não diria nada.
+Registre todo dia o que puder: check-in, água e, se possível, conecte o Saúde.
+Ver minha linha de base
+Vermelho: menos da metade da recuperação. Amarelo: entre 50 e 85 %. Verde: quase pronto. Sem cor: recuperado.
+Agora você não tem nenhum músculo no vermelho.
+Cada sessão dos últimos 4 dias cansa os músculos que trabalhou: com 6 séries são precisas cerca de 48 h, com menos, menos tempo, e uma sessão muito exigente soma 15 %. É uma estimativa: seu corpo manda.
+Se você fez 8 séries de peito ontem às 19:00, hoje no mesmo horário o peito vai estar amarelo.
+Se um músculo está vermelho, treine outros ou faça essa região mais leve.
+Hoje não há ajustes especiais: o peso vem da sua última sessão de cada exercício.
+O PandarIA olha sua última sessão desse exercício e como você chega hoje.
+Se você completou todas as séries no máximo de repetições, sobe o peso; se em duas sessões seguidas não chegou ao mínimo, baixa 10 %; se a sessão anterior foi muito dura, mantém; se voltou de uma pausa, baixa conforme o tempo; e se chega com pouco descanso ou em deload, alivia.
+3 × 12 com 40 kg (faixa 8–12): na próxima vez, 42,5 kg com 8 repetições.
+Toque no «por quê» embaixo do exercício para ver o motivo exato.
+Mude a faixa por 2 ou 3 semanas: se você faz 8–12 repetições, tente 4–6 com um pouco mais de peso (ou o contrário).
+Se você está há mais de 6 semanas puxando forte, faça uma semana de deload (menos peso e menos séries).
+Chegue à sua proteína diária: sem ela o músculo se recupera pior.
+O corpo se adapta ao que você repete. No começo você sobe quase toda semana; depois é preciso variar o estímulo (séries, repetições ou o exercício) e se recuperar bem. Uma estagnação de 3 ou 4 sessões é normal e não significa que você está fazendo errado.
+Ver o exercício
+Todos os seus grupos grandes estão na faixa ou acima.
+Contam as séries de trabalho (não os aquecimentos) que chegam perto da falha, a 1–3 repetições de não conseguir mais. Os músculos que ajudam num exercício contam metade. Mais séries nem sempre é melhor: acima de 20 a recuperação começa a pesar.
+Exemplo para peito com 3 treinos por semana: 2 exercícios × 2 séries em cada sessão = 12 séries semanais.
+Continue assim e veja o mapa muscular dos últimos 7 dias em Meu histórico.
+Ver meu mapa muscular
+Comece com um peso que você consiga mover 12 vezes com boa técnica e ajuste na série seguinte.
+Sem histórico, o PandarIA estima um peso prudente com seu peso corporal e seu nível, e o baixa de propósito para que a primeira sessão seja segura.
+Faça a primeira série, anote o peso e as repetições, e o PandarIA vai ajustar as seguintes.
+Com seu máximo estimado calcula-se qual peso você consegue mover um número de vezes (fórmula de Epley). Escolha o peso com que chegue ao fim da faixa com 1 ou 2 repetições de reserva.
+Se você chega ao máximo da faixa em todas as séries, na próxima vez suba um pouco o peso.
+Você não tem plano semanal.
+Exemplo de 3 dias: segunda, quarta e sexta de corpo inteiro; caminhar 30 minutos nos outros dias.
+Mantenha seu plano e foque em cumpri-lo várias semanas seguidas.
+Crie seu plano semanal: o PandarIA vai dizer todo dia qual rotina tem.
+Sim, seria uma boa ideia: você está há muitas semanas seguidas ou sua recuperação está baixa.
+Ative a periodização por blocos em Ajustes › seu nome › PandarIA Premium: o deload é programado sozinho.
+Continue treinando e ouça os sinais: sono, energia e dor muscular que não passa.
+Melhor uma sessão leve hoje: há vários sinais de cansaço.
+Sim, mas com cuidado: há um sinal de cansaço.
+Sim: não há sinais de cansaço. Vamos lá!
+O PandarIA junta vários sinais: músculos treinados há pouco, uma sessão muito exigente, o check-in, um jejum longo e, com Health Connect, a frequência em repouso, o sono e a variabilidade da frequência. Com dois sinais ou mais propõe baixar a carga.
+Sessão leve: mesmos exercícios com 10 % menos de peso e uma série a menos.
+Comece sua rotina normalmente.
+Use o botão «Leve» em «Hoje tem» ou escolha outra rotina que não trabalhe os mesmos músculos.
+Ver minha recuperação por músculo
+Pode treinar, sim, mas melhor outros músculos ou a mesma região mais leve. A dor muscular não mede se o treino foi bom.
+Pelos seus treinos, seus músculos já estão quase recuperados.
+A dor muscular aparece 24–72 h depois, sobretudo com exercícios novos ou ao descer o peso devagar. Mexer-se leve (caminhar, bike tranquila) costuma aliviar. Se a dor é numa articulação, pontada ou não deixa você se mexer, não é dor muscular.
+Com as pernas doloridas: hoje membros superiores ou 30 minutos caminhando.
+Treine os músculos que estão verdes no mapa de recuperação.
+Se a dor durar mais de uma semana, inchar ou for numa articulação, consulte um profissional.
+Não há dados de sono: conecte o Health Connect (Ajustes › Saúde) se seu relógio ou celular mede o sono.
+Enquanto você dorme os músculos se reparam e o apetite e a energia se regulam. Uma noite ruim não estraga nada, mas várias seguidas se notam no treino e na fome.
+Rotina simples: mesmo horário para deitar, tela longe 30 minutos antes, quarto escuro e fresco, cafeína só até 6 h antes de dormir.
+Se ontem à noite você dormiu menos de 6 h, hoje escolha uma sessão leve.
+Se você dorme mal por muitas semanas, ronca forte ou sente cansaço de dia, consulte um profissional.
+Descansar o suficiente deixa você fazer mais repetições com bom peso, e isso é o que mais conta para ganhar força e músculo. Em exercícios pequenos (bíceps, elevações) basta menos.
+Agachamento 4 × 6: 2–3 minutos. Rosca bíceps 3 × 12: 60–90 segundos.
+Deixe ativado «O PandarIA ajusta os descansos»: alonga o descanso se uma série pesou.
+Ao perder gordura é preciso mais proteína para não perder músculo; ao ganhar músculo, um pouco menos; para manter, menos ainda. Dividir em 3 ou 4 refeições de 25–40 g funciona melhor que tudo de uma vez.
+Exemplo de dia: 3 ovos (19 g) · 150 g de peito de frango (46 g) · iogurte grego (17 g) · 150 g de lentilha cozida (14 g) · 120 g de atum (30 g).
+Registre suas refeições para ver quanto você leva a cada dia.
+Abrir meu diário
+Ainda não há dias completos no seu diário.
+O objetivo já se ajustou com seu diário e seu peso real.
+Com 2 semanas de diário e peso, o objetivo se ajusta sozinho.
+Calcula-se seu gasto em repouso (fórmula de Mifflin-St Jeor) e multiplica-se pela sua atividade e seus treinos. Para perder, tira-se um pouco; para ganhar músculo, soma-se um pouco. É um ponto de partida: seu peso das próximas semanas diz se é preciso ajustar.
+Pese-se 3 ou 4 vezes por semana e registre suas refeições: o PandarIA vai ajustar o objetivo com dados reais.
+Ver meu objetivo
+Café da manhã leve 30–60 min antes: uma banana e um iogurte, ou uma torrada com ovo. Se você treina logo ao acordar, um café ou um copo de leite basta.
+Refeição normal 2–3 h antes (arroz ou macarrão, frango e salada) ou um lanchinho 1 h antes (pão com queijo, fruta).
+Lanche 1–2 h antes: iogurte com aveia, um sanduíche de peru ou fruta com castanhas. Deixe o jantar para depois do treino.
+Agora mesmo você está em jejum: se está há muitas horas, veja a pergunta de Jejum sobre treinar em jejum.
+Você não está em jejum agora.
+Os carboidratos dão energia para treinar forte e a proteína começa a recuperação. Quanto mais perto do treino, mais leve e com menos gordura e fibra, para não pesar no estômago.
+Teste algumas opções e fique com a que cai melhor.
+Complete seu peso no perfil para personalizar.
+Não existe uma «janela» de 30 minutos que se fecha: o que mais conta é a proteína total do dia. Mesmo assim, uma refeição com proteína depois do treino ajuda a se recuperar e a chegar à sua meta.
+Arroz com frango e salada · omelete de 3 ovos com pão · iogurte grego com fruta e aveia · vitamina de leite com banana.
+Se você treina à noite, o jantar vira a refeição de depois.
+São precisas 2 semanas de medidas de peso para ver sua tendência.
+Na verdade você está perdendo, sim: a tendência cai mesmo que a balança suba em alguns dias.
+Pelo seu diário, você come um pouco mais que seu objetivo. Ajustar isso costuma bastar.
+Pode ser água, sal ou a comida do dia. Olhe a tendência de 2 semanas, não o peso de um dia.
+O peso de um dia pode variar 1–2 kg por água, sal, carboidratos ou digestão. O que importa é a tendência de várias semanas. Se em 3 semanas não cai e você registra tudo, baixe umas 150–200 kcal por dia.
+Erros comuns: não contar óleos, molhos, bebidas e beliscadas; fins de semana sem registrar.
+Pese-se no mesmo horário 3 ou 4 vezes por semana e registre tudo durante 2 semanas.
+Ver minha tendência de peso
+Ir mais rápido costuma custar músculo, energia e vontade de treinar, e o perdido volta mais rápido. Um ritmo moderado é mais fácil de manter.
+Escolha o ritmo em Nutrição › Comida › Seu objetivo diário.
+Sim, e principalmente no começo: com força, proteína e um pequeno déficit é bem possível.
+Dá, mas mais devagar quanto mais experiência você tem. Costuma funcionar melhor alternar fases.
+Quem está começando, quem volta de uma pausa ou quem tem mais gordura pode fazer as duas coisas ao mesmo tempo. Com mais experiência, ganhar músculo pede um pequeno superávit e perder gordura, um déficit.
+Receita: treinar força 3–4 dias, proteína alta todo dia, 200–300 kcal abaixo do seu gasto e dormir 7 h.
+Meça a cintura a cada 2 semanas além do peso: se a cintura cai e a força sobe, vai bem.
+Entre 3 e 7 vezes por semana, no mesmo horário e nas mesmas condições. Olhe a tendência, não cada número.
+Com mais medidas a tendência é mais confiável e as mudanças de um dia (água, sal) atrapalham menos. Se pesar todo dia deixa você ansioso, 2 ou 3 vezes por semana também servem.
+Ao acordar, depois de ir ao banheiro e antes de comer ou beber.
+Registre seu peso em Meu histórico › Corpo ou conecte com o Health Connect.
+Registrar meu peso
+Sim, se você se sente bem. Para sessões curtas ou leves não há problema; para treinos longos ou muito intensos rende melhor ter comido.

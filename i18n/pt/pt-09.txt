@@ -1,0 +1,150 @@
+Peso corporal
+Cintura
+Volume semanal (kg)
+Treinos por semana
+Séries por músculo a cada semana
+Progresso por exercício
+Esta semana
+Semana passada
+Minutos
+Volume
+Escolha rotinas criadas pelo nosso algoritmo e adicione às suas rotinas
+Estas rotinas se atualizam automaticamente conforme seu progresso e você pode editá-las como quiser.
+Adicionar às minhas rotinas
+PandarIA ativado
+PandarIA desativado
+Biblioteca de exercícios
+Substituir exercício
+Criar
+Só com meu equipamento
+Recomendados pelo PandarIA
+Como fazer
+Erros comuns
+Seu histórico
+Alternativas
+Não gosto
+Me incomoda
+Peso máximo
+Sessões
+Multiarticular
+Isolado
+Iniciante
+Intermediário
+Avançado
+Meus equipamentos
+Dificuldade
+Plano semanal
+Descanso padrão
+Menor anilha
+Unidades
+Quilogramas (kg)
+Libras (lb)
+Esforço por série (RIR)
+Exercícios evitados
+Arquivadas
+Check-in antes de treinar
+Periodização por blocos
+Relatório semanal
+Dicas do dia
+Nutrição e jejum
+Objetivo nutricional
+Durante o treino
+Som
+Sons do app
+Toques, séries, recordes e conquistas
+Animações
+Confete, transições e efeitos
+Horário de início
+Comecei antes: escolher horário
+Escolha o horário da sua última refeição.
+Data e hora de início
+Salvar horário
+Vibração
+Avisos por voz
+Tela de descanso grande
+Tela sempre ligada
+Aparência e acessibilidade
+Modo escuro
+Texto grande
+Alto contraste
+Idioma
+Lembretes
+Horário do aviso
+Seus dados
+Seus dados ficam salvos neste aparelho e no seu Google Drive.
+Seus dados ficam salvos só neste aparelho.
+Exportar backup
+Importar backup
+Exportar treinos para Excel (CSV)
+Apagar todos os dados
+Sobre
+Meu perfil
+Salvar perfil
+Idade
+Altura (cm)
+Peso (kg)
+Sexo
+Homem
+Mulher
+Prefiro não dizer
+Condição física atual
+Sedentário
+Um pouco ativo
+Muito ativo
+Lesões ou zonas sensíveis
+Joelho
+Lombar
+Ombro
+Punho
+Tornozelo
+Pescoço
+Como você chega hoje?
+Como você dormiu?
+Como está sua energia?
+Dor muscular ou incômodos?
+Mal
+Mais ou menos
+Bem
+Baixa
+Normal
+Alta
+Muitos
+Alguns
+Nada
+HOJE TEM
+HOJE
+Dia de descanso
+Trocar
+Editar plano semanal
+Dias de treino
+Ordem das rotinas
+Fora do plano
+Deixar o PandarIA propor
+Salvar plano
+DICA DO DIA
+DICA NUTRICIONAL DO DIA
+Seu objetivo diário
+Perder gordura
+Manter
+Ganhar músculo
+Ganhar força
+Resistência
+Flexibilidade
+Saúde e bem-estar
+CALORIAS
+Proteína
+Carboidratos
+Gorduras
+Configurar jejum
+JEJUANDO
+META ALCANÇADA
+JANELA DE ALIMENTAÇÃO
+Terminar jejum
+Ajustar início
+Estou passando mal
+Comecei antes
+Últimos jejuns
+Antes de começar
+Continuar
+Complete seu perfil
+Compartilhar treino

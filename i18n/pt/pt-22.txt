@@ -1,0 +1,150 @@
+Base segura: testes automáticos que verificam cada versão antes de publicar; se um cálculo do PandarIA muda sem querer, a versão não sai
+Biblioteca organizada por músculo, com filtro por tipo de equipamento e busca por apelidos (voador, Smith, gravitron…)
+Biblioteca de exercícios com ficha, busca e exercícios próprios
+Biblioteca de evidências 1.2: 16 regras novas com suas fontes (ISSN, EFSA, OMS e ACSM)
+Biblioteca de evidências: os números que o PandarIA usa (séries, descansos, cargas, calorias, proteína, água, segurança) ficam num só lugar, cada um com sua fonte e seu nível de evidência
+Boas-vindas em 4 passos com perfil: idade, sexo, nível e lesões
+Boas-vindas novas: telas curtas com barra de progresso, «Continuar com o Google» ou «Usar sem conta», seu nome, dados sobre você com «Agora não», onde você treina e as permissões opcionais
+Botões +/− para peso e repetições
+Botão «Fixar» para salvar o descanso que você ajustou com +15/−15
+Botão ⟲ na ficha para girar a vista
+Qualidade do dia no diário (Premium): fibra frente aos 25 g da EFSA, sódio frente aos 2 g da OMS e refeições com proteína suficiente, com dicas leves
+Cardio em 3D: 31 exercícios com suas máquinas (esteira normal, inclinada e curva, bicicletas ergométrica, de spinning, reclinada e air bike, elíptico, arc trainer, remo, SkiErg, escada, stepper, VersaClimber, trenó e cordas navais) e os de peso corporal (burpees, saltos, corda, boxe, escalador, passada de urso…). Não resta nenhuma animação em 2D
+Check-in com efeito: se você dormiu mal ou tem pouca energia, a carga sugerida cai 10 %; «Hoje tem» avisa sobre sua recuperação e oferece começar leve
+Compartilhar treinos como imagem e rotinas com código curto
+Verificação automática de posturas: joelhos e cotovelos que não dobram ao contrário e nada atravessa o chão
+Backup no seu Google Drive (opcional): é salvo sozinho ao terminar cada treino e uma vez por dia, numa pasta oculta do seu próprio Drive que ninguém mais vê; o app não pode ver seus outros arquivos
+Corrigidos também o crucifixo com halteres e o crossover
+Corrigido o texto da proteína: a ISSN recomenda 1,4–2,0 g/kg se você treina (antes dizia 1,6–2,2)
+Corrigido: ao estagnar, o PandarIA não propõe mais um exercício muito mais fácil (por exemplo flexão na parede no lugar do supino)
+Corrigidos os movimentos estranhos (hiperextensões, superman, elevação lateral de perna, pendurar, paralelas, fazendeiro…) e novos movimentos próprios para diamante, arqueiro, Arnold, remada cavalinho, sissy, nórdico inverso e muitos mais
+Crie seus alimentos com o rótulo e suas receitas por porções (10 grátis, sem limite no Premium)
+Criar, editar e arquivar rotinas
+Créditos e histórico de mudanças em Ajustes
+Dados impossíveis bloqueados: idade de 12 a 100 anos, altura de 100 a 230 cm, peso de 30 a 300 kg e medidas com seus limites; um erro de digitação não dispara mais suas calorias
+Descanso diferente em cada série: toque e escolha «Só esta série» ou «Todas as séries»
+Diário alimentar em Nutrição: café da manhã, almoço, lanche da tarde, jantar e lanches, com 597 alimentos que funcionam sem internet (dados do USDA, de domínio público) e nomes do Uruguai, Argentina, Cuba, México e Espanha
+Durante os intervalados, botões −10 s e +10 s em cada descanso; a mudança vale para os descansos seguintes e é lembrada na próxima vez
+Exemplos de cardápio (Premium): um dia de refeições com suas calorias, sua proteína, sua alimentação e suas alergias; adicione ao diário com um toque ou peça outro
+Exercícios próprios: você pode escolher uma animação parecida
+O histórico guarda o descanso real de cada série e os códigos de rotina incluem os descansos
+Em Ajustes › Seus dados você pode voltar aos dados de antes da atualização ou apagar essa cópia; ela é apagada sozinha em 60 dias
+Na ficha: pausa, câmera lenta, fase do movimento (desce, sobe, empurra…) e anel de «Segure» nos exercícios estáticos
+Num celular novo, ao entrar na conta, o PandarIA encontra seu backup e o recupera: treinos, rotinas, diário, medidas, fotos e Premium
+Esforço percebido (RIR) por série
+Fotos de progresso lado a lado e exportação para CSV
+Fotos de progresso: no máximo 40. Ao passar de 40 apaga-se a mais antiga, mas a primeira é sempre mantida para comparar; aviso a partir da foto 35
+Health Connect: também salva as calorias das suas refeições e a água (Premium)
+Histórico: calendário, recordes, gráficos, medidas, conquistas e mapa muscular
+Relatório semanal com seus minutos de atividade frente à meta da OMS
+Inglês, texto grande e alto contraste
+As 64 máquinas refeitas com máquinas reais: assento, encosto, alavancas com seu eixo, rolos, pilha de placas, trilhos e plataformas
+As animações corrigidas voltam a aparecer como pendentes em Revisão de animações
+Mãos e pés ficam nas pegadas, nos rolos e nas plataformas durante todo o movimento
+As posturas mantidas (pranchas, alongamentos, yoga) respiram suavemente em vez de ficarem congeladas
+Meta de água recalibrada com a referência da EFSA (não dispara mais em pessoas grandes)
+Metas com data, relatório semanal e gráfico de séries por músculo
+Modo hábitos: registre sem ver calorias nem números; ativa-se sozinho se no jejum você marcou um transtorno alimentar
+Modo intervalado: Tabata, HIIT, EMOM e AMRAP
+Modo intervalado: agora você pode mudar o tempo de descanso entre séries em todos os formatos, também no Tabata
+Modo viagem: em «Hoje tem» ou em Trocar, faça sua rotina sem equipamento (só peso corporal, com elásticos, com TRX ou numa academia de hotel); o PandarIA troca cada exercício por um do mesmo músculo e sua rotina não muda
+Nova tela Ciência do PandarIA em Ajustes › Sobre, com as 37 regras, suas fontes e o histórico da Biblioteca
+Novo teste automático: antes de criar cada versão são tocados uns 780 botões de todas as abas em espanhol e em inglês; se um der erro, a versão não sai
+Nova seção do Explorar: Só máquinas, com 5 rotinas
+Novas seções do Explorar: corrida, boxe, esportes, escritório e gravidez
+Novo motor de animação 3D: o corpo tem profundidade real e cada exercício é visto do ângulo que melhor o explica
+Objetivo que se ajusta sozinho (Premium): com 10 dias de diário e duas pesagens, o PandarIA estima seu gasto real e corrige suas calorias
+Tela de treino e janela de Terminar rotina com intensidade
+Peso corporal em 3D: 128 exercícios novos com seu equipamento (barra fixa, paralelas, argolas e TRX, elásticos, banco, caixa, cadeira, parede e colchonete): flexões e paralelas, barras, core, pernas e glúteo, mobilidade, alongamentos, yoga (com a saudação ao sol encadeada) e pilates
+Peso livre em 3D: 109 exercícios com barra, halteres, kettlebell, barra W, hexagonal, landmine, medicine ball e bola suíça, incluindo os deitados de lado
+Aba Nutrição: calorias, proteína, água e jejum intermitente supervisionado
+Abas Minhas rotinas, Explorar, Meu histórico e Ajustes, em tema escuro
+Plano semanal com "Hoje tem" e check-in antes de treinar
+Polias e Smith em 3D: 54 exercícios com sua torre de polia, cabo, corda ou barra, e a barra guiada que só sobe e desce
+Porções caseiras (xícara, unidade, fatia, colher…) ou gramas, recentes, favoritos, copiar o dia anterior e refeições salvas
+Preferências: vegetariana ou vegana e alergias (leite, ovo, glúten, amendoim, castanhas, soja, peixe, frutos do mar, gergelim); o PandarIA avisa quando algo não combina
+Premium com sua conta: os códigos de desbloqueio de conta (PA-) funcionam em qualquer celular onde você entrar; os de celular (PF-) continuam iguais
+Premium: o PandarIA encurta o descanso dos aquecimentos e soma 30 s se uma série pesou
+Premium: músculos trabalhados destacados na animação
+Quem já tinha o app vê uma única vez um card breve para conectar o Google; se disser «Agora não», fica em Ajustes
+Registrar é grátis; com Premium você compara o dia com seu objetivo de calorias e macros e vê sua semana
+Regras que mudam resultados (Biblioteca 1.1): 2 minutos de descanso nos multiarticulares com peso quando o objetivo é ganhar músculo
+Revisão 3: 160 animações aprovadas e 67 corrigidas. Bancos e colchonetes não atravessam mais o corpo; nos levantamentos terra a barra sobe pela frente das pernas; a barra W tem seu formato; nas roscas de punho só o punho se move; desenvolvimento Arnold, desenvolvimento cubano, clean, halo e levantamento turco com o movimento real e sem pulos; afundo andando alternando as pernas; remada invertida com os calcanhares fixos; roda (rollout) sem sair do chão
+Revisão 4: 218 animações aprovadas. Levantamentos terra refeitos com biomecânica real: os pés não se mexem, primeiro estendem-se os joelhos e depois o quadril, e a barra sobe em linha reta deslizando colada às pernas sem atravessá-las nem dar trancos. Halo com kettlebell: os antebraços passam por cima da cabeça sem tocá-la
+Revisão 5: 322 aprovadas e 33 corrigidas. Colchonetes, bancos e almofadas não atravessam mais o corpo; braços realmente esticados no hundred, serrote, roll up, teaser e saltos; cotovelos certos no face pull e Y-T-W; joelhos que não giram mais nas elevações de pernas nem no dead bug; saudação ao sol com passo para trás em afundo e chaturanga; dragon flag, muscle-up, sissy, Copenhague e mobilidade articular (agora com 8 movimentos) refeitos; halo sem tocar a cabeça
+Revisão 6 de animações: escalador e burpees mais fluidos e em ritmo humano; a corda passa por cima da cabeça e por baixo dos pés; tiro sem cortes; salto do patinador com transições suaves; salto na caixa com impulso, voo, aterrissagem e descida perna por perna; boxe de sombra sem cruzar as pernas; elíptico para a frente; bola com queda, quique e recolhida; escada com degraus visíveis; cordas cuja onda viaja até a ancoragem
+Revisão de animações no Explorar, por seções de equipamento: marque cada uma como correta ou incorreta e envie seus votos
+Rotinas do PandarIA com ordem lógica de exercícios
+Vê-se o equipamento de cada exercício: pesos, bancos, máquinas, polias com seu cabo, elásticos, barras e aparelhos de cardio
+Selo «Em revisão» nas animações que ainda não estão aprovadas
+Séries: números negativos não são aceitos e, se você anota um peso, repetições ou um tempo muito acima do seu histórico (por exemplo 1000 kg em vez de 100), o PandarIA pergunta antes de salvar como recorde
+Se dois celulares têm dados diferentes, nada é sobrescrito: o app mostra as duas cópias e você escolhe
+Se a memória enche, o app libera espaço (primeiro a cópia de antes da atualização, depois as fotos mais antigas) e seus treinos são salvos igual
+Se uma pesagem muda muito em relação à anterior, o app pergunta se está certa antes de salvar
+Sons em séries, recordes, conquistas, água e jejum
+Suplementos com evidência em Nutrição: creatina, cafeína, beta-alanina e proteína em pó, com dose para seu peso, nível de evidência e avisos se você está grávida, tem pressão alta, problemas nos rins ou no coração, ou toma medicação (para menores não dá dose)
+Temporário durante o desenvolvimento: aviso de versão nova em Minhas rotinas com as mudanças e botão para baixar; em Ajustes, número exato da versão e Buscar atualizações
+Texto mais claro para quem tem mais rotinas que o limite grátis
+Toque no porquê de uma sugestão, ou em «Ver fonte» numa dica ou em Nutrição, para ver de onde vem
+Tudo de novo da 0.8 em inglês: diário e nomes dos 597 alimentos, Ciência do PandarIA com suas 53 regras, suplementos, cardápios, Health Connect e jejum
+Seus dados levam número de versão e, antes de atualizá-los, o app guarda uma cópia exata de como estavam
+Versão de teste: botão «Dá para entender?» em cada animação para enviar seus votos ao criador
+Versão grátis: até 3 rotinas ao mesmo tempo contando as arquivadas (para criar outra é preciso excluir alguma); com Premium, ilimitadas
+Etapa 1
+Etapa 2
+Etapa 3
+Etapa 4
+Etapa 5
+Treino concluído! Bom trabalho.
+Já!
+Descanso terminado
+Vai! Máximo de rodadas
+Prepare-se
+Último minuto
+Você terminou! Ótimo trabalho.
+Meta cumprida! Crie uma nova para continuar avançando.
+Preciso de pelo menos 2 registros para projetar seu ritmo.
+Versão nova
+Você tem
+Nova
+Mudanças e correções
+Baixar e instalar
+Mais tarde
+Pular esta versão
+Você tem a última versão.
+Você tem a última versão
+O que há de novo
+Entendi
+Toque para ver o que há de novo
+Sem notas para esta versão
+Não vou avisar sobre esta versão
+Avisos de versão ativados
+Avisos de versão desativados
+Buscando…
+Não foi possível verificar. Confira sua conexão.
+Só funciona no app instalado
+Buscar atualizações
+O arquivo PandarIA-Fit.apk é baixado. Abra e instale por cima: suas rotinas e seu histórico são mantidos. Na primeira vez, o Android pode pedir para permitir "Instalar apps desconhecidos" para seu navegador.
+↓ Desce
+↑ Sobe
+Sobe
+Abre
+Para a frente
+Contrai
+Arqueia
+Desce devagar
+Fecha
+Contrai
+Empurra
+Alonga
+Estende
+Flexiona
+Gato
+Gira
+Gira e empurra
+Bate
+Guarda
+Impulsiona
+Junta
+Arremessa
+Levanta

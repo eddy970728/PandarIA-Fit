@@ -1,0 +1,150 @@
+Fibra, sodio y proteína en cada comida
+Calidad del día: fibra, sodio y proteína por comida · Premium
+Ver más
+Poca fibra hoy: legumbres, pan o arroz integral, fruta con piel o verduras la suben fácil.
+Bastante sodio hoy: mañana prueba con menos fiambres, quesos curados, salsas y comidas preparadas.
+CALIDAD DEL DÍA
+Fibra
+aprox.
+Sodio
+es
+menos de
+Estás en ayuno
+Sigo ayunando
+Escanear código de barras
+de
+Cada casa la hace distinto: si la tuya lleva otras cantidades, créala en Mis recetas.
+El escáner funciona en la app instalada
+Preparando el escáner… (solo la primera vez)
+Falta el permiso de la cámara
+No se pudo abrir el escáner
+Actívalo en Ajustes del iPhone › PandarIA Fit › Cámara.
+Actívalo en Ajustes del teléfono › Aplicaciones › PandarIA Fit › Permisos.
+Mientras tanto, puedes escribir los números que hay bajo el código de barras.
+Detalle
+Escribir el código
+El código tiene entre 8 y 14 números
+Los números que hay debajo de las barras.
+Buscando el producto…
+Sin conexión: escribe los datos de la etiqueta y el código quedará guardado
+No está en Open Food Facts: escribe los datos de la etiqueta una vez y quedará guardado
+Código
+Datos de Open Food Facts (licencia ODbL), escritos por sus usuarios: revísalos con la etiqueta antes de guardar.
+Al guardar, la próxima vez que lo escanees aparecerá solo.
+Plan
+Desde mi última comida
+No hay comidas recientes en tu diario
+Con tu peso actual no recomendamos ayunar: tu cuerpo necesita comer con regularidad.
+Estos días comes menos de lo que tu cuerpo gasta en reposo: ahora no es buen momento para ayunar.
+Llevas más de 72 horas. Un ayuno tan largo no es seguro sin supervisión: rómpelo con una comida suave y, si te encuentras mal, consulta a un profesional.
+Antes de un 23:1, completa al menos 3 ayunos de 16 h o más. Comer una sola vez al día hace difícil llegar a tu proteína.
+Estadísticas e historial
+Plan de ayuno
+Libre
+· el tuyo
+Con tan pocas horas para comer cuesta llegar a tu proteína y a tus calorías, y no conviene entrenar fuerte en ayunas. Si te mareas o te sientes débil, termina el ayuno.
+Elegir igualmente
+Mejor no
+¿Ayunar ahora?
+Durante el embarazo o la lactancia no se recomienda ayunar. Si aun así quieres hacerlo, háblalo antes con tu médico.
+Empezar igualmente
+¿Terminar el ayuno?
+Como es menos de 1 hora, no se guardará en tu historial.
+Seguir ayunando
+Si terminaste antes y olvidaste pararlo, corrige la hora de fin para que no cuente en tus estadísticas.
+Corregir la hora
+Dejarlo así
+Ayuno de menos de 1 hora: no se guarda
+✓ ¡Ayuno completado!
+Ayuno terminado
+¿Sigues ayunando?
+Sí, sigo ayunando
+Ya terminé
+Ayuno reanudado: sigue contando desde su inicio
+Quitar
+Si sientes mareo, debilidad, dolor de cabeza fuerte o malestar, lo recomendable es <b>terminar el ayuno ahora</b> y comer algo con hidratos y proteína. Si los síntomas son intensos o no pasan, busca atención médica.
+a las
+Tiempos aproximados: cada cuerpo es distinto. Información general, no consejo médico.
+Poner un horario fijo
+Elige una hora
+Horario fijo quitado
+Horario fijo
+¿A qué hora sueles terminar tu última comida? Cada día te avisamos a esa hora y puedes empezar el ayuno desde ella con un toque, aunque abras la app más tarde.
+Empiezo a ayunar a las
+Guardar horario
+Quitar el horario fijo
+¿Cómo te sentiste?
+Con varios ayunos anotados, PandarIA te dice qué duración te sienta mejor.
+Anotado
+En tus ayunos de 16 h o más tu energía suele ser más baja que en los cortos. Si te cuesta, un plan de 14:10 puede sentarte mejor.
+En tus ayunos de 16 h o más tu energía suele ser igual o mejor que en los cortos: te sientan bien.
+En los ayunos largos pasas bastante más hambre. Rompe con proteína y fibra para llegar mejor al siguiente.
+En los ayunos largos no pasas más hambre que en los cortos.
+Elige fechas y horas válidas
+El final debe ser después del inicio
+El final no puede ser futuro
+Como máximo 72 horas
+Se cruza con el ayuno que tienes en marcha
+Ayuno añadido
+Ayuno corregido
+Borrar este ayuno
+No se puede deshacer.
+Borrar
+Ayuno borrado
+Añadir un ayuno olvidado
+Corregir ayuno
+Empezó
+Terminó
+Cómo me sentí
+Ayunos (30 días)
+Duración media
+Horas en 30 días
+Metas cumplidas
+Racha actual
+Mejor racha
+Verde fuerte: meta cumplida · verde claro: ayunaste, pero menos que tu meta · cuenta el día en que empezó
+Últimos ayunos (horas)
+Cómo te sientan
+PandarIA ya puede decirte qué duración te sienta mejor (Premium).
+Añadir uno olvidado
+Todavía no terminaste ningún ayuno.
+Tus ayunos
+✓ meta
+Energía
+Vaso
+Botella
+Día de calor o de mucho sudor
+Por qué esta cantidad
+Por qué medio litro
+Añadir con otra hora
+Todavía no registraste agua hoy.
+sin hora (widget o aviso)
+Registro de agua hoy
+Sin registros todavía
+La hora no puede ser futura
+Añadir agua de antes
+💧 ¡Meta de agua cumplida!
+Deja al menos un recipiente
+Recipientes guardados
+Tu taza, tu termo, tu botella del gimnasio… Hasta 4, cada uno con un toque. Deja vacío el nombre para quitar uno.
+ÚLTIMOS 7 DÍAS
+Media 30 días
+Metas en 30 días
+Racha actual (días)
+Azul: meta cumplida · celeste: bebiste, pero menos que la meta
+Últimos 14 días (litros)
+Tu agua
+Retos del mes
+Reto estrella:
+Retos con amigos
+Crea un reto, compártelo por WhatsApp con su código y comparad quién llega antes a la meta. Sin cuentas ni servidores: todo queda en vuestros teléfonos.
+meta
+terminó el
+hasta el
+Tú
+Actualizado
+Invitar
+Mi progreso
+Crear reto
+Pegar código
+Nombre del reto

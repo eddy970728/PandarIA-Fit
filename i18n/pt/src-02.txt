@@ -1,0 +1,150 @@
+Health Connect no está conectado
+Tú eliges qué datos compartir. Puedes desconectarlo cuando quieras.
+Conectar Health Connect
+Tus datos de salud se quedan en tu teléfono: PandarIA Fit no los envía a ningún servidor.
+Política de privacidad
+Conecta PandarIA Fit con Health Connect para leer pasos, peso y pulso de Samsung Health u otras apps, y guardar allí tus entrenos, tu peso, tus comidas y tu agua.
+Pasos hoy
+Media 7 días
+Actualizar ahora
+Leer de Health Connect
+Pasos
+Hoy y media de 7 días
+Peso
+Se añade solo a Mi historial › Cuerpo
+Pulso
+En reposo o la última medida
+Guardar en Health Connect
+Entrenos
+Como calorías activas estimadas por duración e intensidad
+Cuando registras tu peso en Cuerpo
+Las calorías de lo que añades hoy a tu diario
+Agua
+Cada vaso o botella que sumas
+Si quitas algo del diario o del agua, bórralo también en Health Connect: PandarIA solo añade.
+PandarIA
+Usar mis pasos en las recomendaciones
+Ajusta tus calorías diarias según tu actividad
+Permisos en Health Connect
+Desconectar
+Pulso en reposo
+Pulso última medida
+Datos de antes de actualizar
+Una repetición más que la última vez
+Modo viaje: ¿qué tienes a mano?
+Ejemplos de menú
+Agua del día
+Meta de agua
+Objetivo fuerza
+Objetivo músculo
+Objetivo resistencia
+Objetivo bajar grasa
+Objetivo salud
+Objetivo flexibilidad
+Descanso en multiarticulares
+Alternativas de dificultad parecida
+Cuánto subir el peso
+Doble progresión
+Bajar tras dos fallos
+Sesión muy exigente
+Volver tras una pausa
+Bloques de 6 semanas
+Semana de descarga
+Series de calentamiento
+Series semanales para músculo
+Aviso de pocas series
+Equilibrio entre músculos
+Máximo estimado
+Peso inicial prudente
+Horas de sueño
+Días con poco descanso
+Músculo entrenado hace poco
+Actividad semanal
+Metabolismo en reposo
+Factor de actividad
+Ritmo para bajar grasa
+Superávit para ganar músculo
+Objetivo que se ajusta solo
+Proteína diaria
+Proteína por comida
+Grasas mínimas
+IMC bajo
+Menores de edad
+Agua diaria
+Bebidas que cuentan como agua
+Cafeína de las bebidas
+Ayuno con prudencia
+Creatina
+Cafeína antes de entrenar
+Beta-alanina
+Proteína en polvo
+Suplementos con prudencia
+Fibra diaria
+Sodio diario
+Ayuno conectado con el diario
+Agua extra con calor o sudor
+Ayuno y agua completos
+Ayuno: las fases en una línea bajo el anillo, también en la versión web
+Estadísticas del ayuno: calendario del mes, duración media, horas, metas cumplidas y rachas
+Corrige, borra o añade un ayuno que olvidaste
+Horario fijo: aviso diario y empezar desde tu hora con un toque
+Cómo te sentiste al terminar: PandarIA te dice qué duración te sienta mejor (Premium)
+Plan 23:1 (una comida al día) con avisos de prudencia
+Agua: tus recipientes, la lista del día con hora, deshacer y añadir con otra hora
+Día de calor o de mucho sudor: medio litro más en la meta
+Estadísticas del agua: calendario, medias y rachas
+Widgets que funcionan sin abrir la app: agua con tus recipientes y deshacer, empezar y terminar el ayuno
+Widget nuevo de check-in: cómo llegas hoy en tres toques, y la app ya no lo vuelve a preguntar al entrenar
+Widgets nuevos Mi día (entreno, agua, ayuno y calorías) y Calorías que te quedan (Premium)
+Deshacer al borrar una comida, un entreno, una medida, agua o un ayuno
+Terminar el ayuno pregunta antes (también desde el widget y el aviso) y se puede reanudar si fue sin querer
+Limpiar datos de prueba: borra entrenos de segundos y ayunos de minutos para que PandarIA no aprenda de ellos
+Limpiar datos de prueba
+Una sola comida al día. Muy exigente.
+Meta de agua del día
+Modo viaje
+Ejercicios de alto impacto
+Fuerza en menores
+Más descanso desde los 50
+Empezar desde cero
+Series, repeticiones y descanso de las rutinas de fuerza
+Series, repeticiones y descanso de las rutinas de músculo
+Rutinas de resistencia
+Rutinas de bajar grasa
+Rutinas de salud y bienestar
+Rutinas de flexibilidad
+Descanso de los multiarticulares en rutinas de músculo
+Cambios de ejercicio por estancamiento o molestia
+Sugerencia de peso en cada serie
+Sugerencia de repeticiones en cada serie
+Sugerencia de peso al volver
+Rutinas de PandarIA con periodización activada
+Semanas de descarga y aviso de descarga
+Consejo del día
+Músculos rezagados e informe semanal
+Informe de equilibrio
+Récords, progreso y peso inicial
+Peso inicial estimado
+Aviso de recuperación y consejo del día
+Check-in, «Hoy toca» y sugerencias del entreno
+Aviso al abrir una rutina
+Calorías diarias
+Calorías para bajar grasa
+Calorías para ganar músculo
+Calorías diarias (Premium)
+Macros diarios
+Calorías y ayuno
+Cafeína del día en Agua
+Consejos del ayuno
+Suplementos y cafeína del día
+Calidad del día en el diario (Premium)
+Ejemplos de menú (Premium)
+Ayuno intermitente
+«Hoy toca» y Empezar rutina
+Ejercicios que PandarIA no elige
+Repeticiones en menores
+Descansos
+Series por ejercicio
+Adultos sanos
+Adultos y mayores
+Adultos que entrenan

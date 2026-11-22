@@ -1,0 +1,43 @@
+Con 5 entrenos aprende tu hora habitual
+PandarIA aprende a qué hora sueles entrenar
+Trabajo.
+✓ Hecha
+Serie
+la siguiente serie
+¡Hecho por hoy! 💪
+Próxima:
+Descansa y recupera
+ejercicio
+ejercicios
+TUS RUTINAS
+Toca para empezar
+Crea tu primera rutina
+Toca para abrir la app
+Toca para ver PandarIA Fit Premium
+Hoy toca
+AYUNO
+Sin ayuno en curso
+Plan {x}
+meta {x} h
+Desde {x}
+¡Meta cumplida! 💧
+semana
+semanas
+Esta semana {x} de {y}
+Racha · Premium
+Un toque en cada fila
+Listo: PandarIA lo tendrá en cuenta hoy
+Agujetas
+CALORÍAS DE HOY
+{x} kcal restantes
+{x} kcal de más
+Quedan P {p} g · C {c} g · G {g} g
+Ayuno empezado desde el widget
+Ayuno terminado desde el widget
+Sueño anoche
+Nuevo: PandarIA puede tener en cuenta tu sueño y la variabilidad del pulso para tu recuperación.
+Dar permiso
+Hoy, media de 7 días y en tus entrenos
+En reposo y durante tus entrenos
+Horas de la última noche
+Una señal más de recuperación

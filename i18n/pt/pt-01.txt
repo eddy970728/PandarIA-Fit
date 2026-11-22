@@ -1,0 +1,150 @@
+Diário alimentar
+ÚLTIMOS 7 DIAS (KCAL)
+Dados dos alimentos: USDA, base de dados de nutrientes de referência (domínio público). Confira sempre o rótulo dos produtos embalados.
+RITMO PARA PERDER
+RITMO PARA GANHAR
+Lento
+Rápido
+Por quê
+Como funciona
+Desativar o ajuste automático
+Ativar o ajuste automático
+Fórmula de Mifflin-St Jeor
+(fonte)
+Ver fonte
+Mais para sua alimentação
+O jejum ajuda a organizar as refeições, mas o que mais conta é o total de calorias do dia.
+Esta seção dá orientações gerais e não substitui um nutricionista ou médico. Se você tem alguma condição de saúde, consulte antes de mudar sua alimentação.
+Modo hábitos: você registra o que come sem contar calorias.
+Refeições do dia
+Frutas e verduras
+Refeições com proteína
+Você está no modo hábitos: o PandarIA não mostra calorias nem números. Dá para mudar isso nas preferências do diário.
+Tempos aproximados · informação geral, não é conselho médico
+Café da manhã
+Almoço
+Lanche da tarde
+Jantar
+Lanches
+CATEGORIAS
+Frutas
+Verduras e legumes
+Leguminosas
+Cereais e pães
+Laticínios
+Ovos
+Carnes
+Aves
+Peixes e frutos do mar
+Castanhas e sementes
+Óleos e gorduras
+Bebidas
+Doces e sobremesas
+Pratos prontos
+Temperos e molhos
+Suplementos
+Meus alimentos
+Minhas receitas
+‹ Todas as categorias
+Todos
+Recentes
+Favoritos
+Refeições
+Meus
+Toque na estrela de um alimento para tê-lo aqui.
+Você ainda não salvou refeições. No diário, toque em «Salvar refeição» para repetir um café da manhã ou almoço com um toque.
+Adicionar
+Salvar alterações
+Tirar do diário
+Quantidade
+Gramas
+Fonte: USDA, base de dados de nutrientes de referência.
+Copie os dados do rótulo. Se o rótulo dá os valores por porção, escreva quantos gramas tem essa porção.
+Porção
+Gramas dessa porção
+POR PORÇÃO
+Calorias (kcal)
+Proteína (g)
+Carboidratos (g)
+Gorduras (g)
+Fibra (g)
+Açúcares (g)
+Sódio (mg)
+leite
+ovo
+glúten
+amendoim
+castanhas
+soja
+peixe
+frutos do mar
+gergelim
+Tem carne, frango, peixe ou frutos do mar
+Ex.: Barrinha de aveia da minha marca
+1 porção
+Porções que rende
+Adicione os ingredientes com seus gramas.
+Adicionar ingrediente
+Ex.: Feijoada da mamãe
+Preferências de comida
+Alimentação
+Como de tudo
+Vegetariana
+Vegana
+Alergias ou alimentos que evito
+O PandarIA avisa quando um alimento os contém. É uma ajuda, não uma garantia: em produtos embalados confira sempre o rótulo.
+Modo hábitos
+Registre o que você come sem ver calorias nem números.
+Pronto
+Novo alimento
+Nova receita
+Receita
+Salvar alimento
+Salvar receita
+Apagar receita
+Nome
+Copiar ontem
+Copiar o dia anterior
+Salvar refeição
+Preferências
+Hoje
+Ontem
+Complete seu perfil para comparar com seu objetivo.
+🔒 Compare com seu objetivo e veja sua semana · Premium
+Ciência do PandarIA
+Recuperação
+Atividade física
+Treino
+Nutrição
+Segurança
+Evidência sólida
+Evidência moderada
+Evidência limitada
+Evidência contraditória
+Domínio público, com crédito
+Conselho da fonte, com nossas palavras
+Critério próprio do PandarIA
+Como usamos as fontes
+Domínio público:
+é incluído no app, sempre com o crédito.
+Outras fontes:
+só pegamos o conselho, escrito com nossas palavras, e citamos a fonte.
+Critério próprio:
+quando nenhuma fonte dá o número exato, o PandarIA usa um valor prudente e marca assim.
+Fontes citadas
+Histórico da Biblioteca
+O PandarIA dá orientações gerais sobre exercício e alimentação. Não faz diagnósticos nem substitui um profissional de saúde.
+Usado por
+Para quem
+Uso da fonte
+Revisar antes de
+No app desde
+FONTE
+FONTES
+Orientação geral baseada em evidências; não substitui um profissional de saúde.
+Ver toda a Biblioteca
+Organização Mundial da Saúde
+Autoridade Europeia para a Segurança dos Alimentos (EFSA)
+OMS
+OMS, resumido pela World Obesity Federation.
+Configurações do Health Connect

@@ -1,0 +1,150 @@
+Nutrición: suplementos y menús en la cabecera, el candado de Premium en una línea y la gráfica del agua en Estadísticas. Ayuno: el plan en un botón con la explicación de cada uno y un solo consejo
+Por dentro: más rápida con muchos datos, el espacio que usan tus datos en Ajustes, limpieza de avisos viejos y copias de seguridad de todas las versiones probadas
+Sin señales de cansancio
+Prevention, diagnosis and treatment of the overtraining syndrome (consenso conjunto del ECSS y el ACSM)
+Empiezas y terminas cuando quieras.
+Ideal para empezar.
+Paso siguiente, fácil de sostener.
+El más popular.
+Para quien ya tiene experiencia.
+Exigente; no recomendado para empezar.
+5 días normales y 2 días de 500–600 kcal.
+Tu objetivo diario y tu diario comparado con él · Premium
+Estado del día
+Tu línea base
+Cansancio acumulado
+Aprender cómo respondes
+Ayuno y entreno juntos
+Agua y rendimiento
+Comida y progreso
+Tus hábitos
+Predicciones con margen
+Tarjeta de Hoy, estado del día y widget Mi día
+Propuestas del panda y estado del día
+Propuestas y novedades del panda
+Novedades del panda
+Novedades y propuestas del panda
+Propuestas del panda
+Adultos sanos que ayunan
+El panda te avisa
+El panda es tu centro de avisos: parpadea cuando PandarIA te propone un cambio (tú decides: Ver la propuesta o Ahora no), punto naranja con novedades y punto verde con logros
+Los avisos ya no llenan Mis rutinas: se leen dentro del panda (si quitas el panda en Ajustes vuelven a la pantalla)
+iPhone: vuelve atrás deslizando desde el borde izquierdo, como en las apps de Apple
+iPhone: textos de Apple Health corregidos
+Interfaz a tu gusto
+Toda la app más compacta sin achicar los textos: entreno, calendarios y estadísticas
+Ningún texto cortado: los consejos del día se leen enteros
+iPhone: estilo propio, el sonido y la voz ya no se pierden, escáner arreglado y aviso claro si Salud no conecta
+Escribe el código de barras a mano si la cámara no puede leerlo
+Consejo nutricional del día
+Código de barras
+Elige cómo ver la app: Completa (todo a la vista, ordenado) o Minimalista (solo lo esencial). Se cambia en cualquier momento
+Mis rutinas más limpia: consejo del día arriba, Hoy compacto, avisos juntos y rutinas con botón de empezar
+Opcional. No cambia tu sesión, pero PandarIA lo tiene en cuenta para sus sugerencias.
+Burbuja de PandarIA: un botón pequeño con el icono de la app que abre una guía rápida con las preguntas de la pantalla en la que estás (se puede arrastrar o quitar en Ajustes)
+Tu centro de avisos: parpadea si PandarIA te propone algo (nada se aplica sin tu permiso), punto naranja con novedades y verde con logros. Abre la guía de cada pantalla. Se puede arrastrar a cualquier borde
+Pregúntale sobre entreno, comida, sueño o ayuno: responde con tus datos.
+Consulta a PandarIA
+Consulta a PandarIA (Premium, experimental): 34 preguntas en 9 temas que PandarIA responde con tus datos, sin internet, con ejemplos, qué hacer y la regla de la que sale
+Retos del mes que se adaptan a tu plan: entrenos, días con la meta de agua y ayunos
+Retos con amigos: crea un reto, compártelo con un código y comparad vuestro progreso, sin cuentas ni servidores
+Tu mes y Tu año en PandarIA (Premium): resumen con tarjeta para compartir
+Tarjeta del entreno renovada, con el panda y tus récords
+Versión para iPhone y iPad (se instala con AltStore desde el PC)
+Google Play: símbolos del código nativo para analizar cierres y compatibilidad con más teléfonos (la cámara ya no es obligatoria)
+1.4 · Retos y Consulta a PandarIA
+Consulta a PandarIA (experimental)
+Retos del mes y retos con amigos
+Tu mes y Tu año en PandarIA
+Versión para iPhone y iPad
+Más teléfonos compatibles en Google Play
+Retos y Consulta a PandarIA
+Ayuno en su propia pestaña y Nutrición con dos subpestañas: Comida y Agua
+Ajustes › Nutrición y ayuno: el objetivo nutricional se elige ahí mismo y las preferencias de comida están a mano
+Código de barras (Premium): escanea un producto sin dar permiso de cámara; busca sus datos en Open Food Facts y, si no está, lo escribes una vez y queda guardado
+Ideas para completar la proteína del día con alimentos que ya sueles comer (Premium)
+Tendencia de peso suavizada, cuánto cambias por semana y fecha estimada de tu meta (Premium)
+Health Connect: sueño y variabilidad del pulso como señales de recuperación (Premium)
+Recordatorio de entreno a tu hora habitual, los días de tu plan semanal (Premium)
+Notificación del entreno con la serie siguiente y el botón «✓ Hecha»
+Biblioteca de evidencia 1.6: 4 reglas nuevas
+1.3 · Comer, dormir y ayunar
+Pestaña de Ayuno y Nutrición con Comida y Agua
+Código de barras con Open Food Facts
+Tendencia de peso e ideas de proteína
+Sueño y variabilidad del pulso en tu recuperación
+Avisos a tu hora habitual y serie hecha desde la notificación
+Comer, dormir y ayunar
+Tendencia de peso
+Ideas para completar la proteína
+Variabilidad del pulso más baja de lo normal
+Noche corta
+Mi historial › Cuerpo
+Nutrición › Comida
+Comida
+PandarIA v2 · Fuerza estimada (1RM) en cada ejercicio con peso, con su gráfica y aviso de récord de fuerza durante el entreno
+PandarIA v2 · Tu fuerza por músculo: las últimas 4 semanas frente a las 4 anteriores
+PandarIA v2 · Recuperación por músculo: un mapa con el porcentaje de cada músculo y cuándo estará listo
+PandarIA v2 · En las rutinas de PandarIA se pregunta cuántas repeticiones te quedaban en cada serie, para ajustar la próxima sesión
+PandarIA v2 · Aprende de tus cambios: si cambias un ejercicio a mano, lo tiene en cuenta al proponer ejercicios
+Temas: Automático, Claro, Oscuro gris (pantallas LCD) y Negro puro (pantallas OLED)
+Tamaño del texto: Normal, Grande y Muy grande
+Biblioteca de evidencia 1.5: 2 reglas nuevas
+1.2 · PandarIA v2 y temas
+Fuerza estimada (1RM) y tu fuerza por músculo
+Recuperación por músculo en un mapa
+Esfuerzo por serie en las rutinas de PandarIA
+Temas Automático, Claro, Oscuro gris y Negro puro
+Tamaño del texto en tres niveles
+Automático
+Negro
+De noche usa
+Oscuro gris
+Negro puro
+Oscuro gris se ve mejor en pantallas LCD. Negro puro ahorra batería en pantallas OLED (AMOLED).
+Tamaño del texto
+Grande
+Muy grande
+Preguntar el esfuerzo en rutinas de PandarIA
+Premium · tras cada serie: cuántas repeticiones te quedaban. PandarIA ajusta la próxima sesión
+En todas las rutinas: anota cuántas repeticiones te quedaban
+Olvidar mis cambios de ejercicio
+Recuperación por músculo
+Aprender de tus cambios
+Rutinas de PandarIA y alternativas
+PandarIA v2 y temas
+La parte de arriba de la pantalla ya no muestra restos de la imagen de inicio
+Al elegir una foto de progreso ya no se borran las medidas que escribiste y la foto se guarda
+Arreglos
+1.1.01 · Arreglos de la parte de arriba de la pantalla y de las fotos de progreso
+Pantalla de borde a borde en todas las versiones de Android y código optimizado para Google Play
+Las fotos de progreso se guardan aparte: mucho más espacio para tus datos
+Seguridad: la app solo puede conectarse con Google (y con GitHub en la versión de GitHub) y los avisos se muestran siempre como texto
+Premium: la suscripción se vuelve a comprobar con Google Play al menos cada 7 días
+Prueba gratis: la pantalla Premium aclara que los 3 días gratis son para tu primera suscripción
+Los códigos de regalo no se alargan cambiando la fecha del teléfono
+Textos más grandes (mínimo 12 px) y zonas táctiles más amplias en los botones pequeños
+Los estiramientos, la movilidad y el yoga ya no cuentan como récords
+Progreso y agua explican qué falta cuando todavía hay pocos datos
+1.1 · Base sólida para Google Play
+Fotos de progreso guardadas aparte: más espacio para tus datos
+Seguridad reforzada
+Premium: comprobación cada 7 días y prueba gratis más clara
+Textos y botones más fáciles de leer y tocar
+Los estiramientos ya no cuentan como récords
+Lista para Google Play
+Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno verás cuál toca. Con Premium, PandarIA la cambia si los músculos aún no se recuperaron.
+Quitar plan semanal
+¿Quitar el plan semanal?
+Tus rutinas y tu historial se quedan igual; solo dejarás de ver qué toca cada día.
+Quitar plan
+1.9 · Logros sin fin
+Logros sin fin
+Logros que no se acaban: hitos para entrenos, agua, ayunos, diario de comida, check-ins y récords, con niveles que siguen subiendo
+Semana perfecta, mes perfecto y semana hidratada se ganan una y otra vez
+Reto estrella del mes: cada mes uno distinto, adaptado a ti
+Toda la app revisada en español e inglés, también lo que leen los lectores de pantalla
+Cardio ahora: eliges actividad, minutos e intensidad y arrancas; cuenta para tu racha sin sustituir la rutina del plan
+Más fácil de usar con lectores de pantalla, botones más fáciles de tocar y mejor contraste en el modo claro
+Tu reloj en cada entreno: pulso medio y máximo, zona de esfuerzo y pasos, leídos de Health Connect o Salud; en el cardio, calorías según tu pulso
+1.8.2 · Te cuida mejor

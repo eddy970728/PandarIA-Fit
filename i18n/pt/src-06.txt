@@ -1,0 +1,150 @@
+Pera
+Durazno
+Damasco
+Ciruela
+Cereza
+Kiwi
+Ananá
+Mango
+Papaya
+Sandía
+Melón
+Melón verde
+Arándanos
+Frambuesa
+Mora
+Guayaba
+Maracuyá
+Higo
+Higo seco
+Dátil
+Pasas de uva
+Ciruela pasa
+Granada
+Caqui
+Nectarina
+Mandarina en almíbar
+Durazno en almíbar
+Ananá en almíbar
+Macedonia en lata
+Plátano macho
+Plátano macho cocido
+Plátano maduro frito
+Tostones
+Mamey
+Chirimoya
+Guanábana
+Lichi
+Tuna
+Carambola
+Pomelo en gajos
+Membrillo
+Arándano rojo
+Aceitunas verdes
+Aceitunas negras
+Palta
+Tamarindo
+Acerola
+Fruta de pan
+Zapote
+Níspero
+Frutillas congeladas
+Jaca
+Pasas de arándano
+Albahaca
+Avena cocida con agua
+Copos de maíz
+Granola
+Cereal de salvado
+Avena instantánea
+Leche entera
+Leche semidescremada
+Leche descremada
+Leche en polvo entera
+Leche en polvo descremada
+Leche condensada
+Leche evaporada
+Leche chocolatada
+Leche de cabra
+Yogur natural entero
+Yogur natural descremado
+Yogur griego natural
+Yogur griego descremado
+Yogur con frutas
+Yogur griego con frutas
+Kéfir
+Queso fresco
+Queso mozzarella
+Queso mozzarella light
+Queso cheddar
+Queso parmesano
+Queso danbo
+Queso de sándwich
+Queso crema
+Ricota
+Ricota descremada
+Queso cottage
+Queso de cabra
+Queso feta
+Queso azul
+Queso cotija
+Queso Oaxaca
+Queso provolone
+Queso emmental
+Crema de leche
+Crema ácida
+Crema chantilly
+Manteca
+Manteca sin sal
+Dulce de leche
+Leche 1 %
+Queso romano
+Queso Monterey
+Yogur de vainilla
+Crema ligera
+Huevo
+Huevo duro
+Huevo frito
+Huevo revuelto
+Huevo pochado
+Omelette
+Clara de huevo
+Yema de huevo
+Huevo de codorniz
+Claras pasteurizadas
+Jamón cocido
+Jamón cocido magro
+Salchicha
+Salchicha de pollo
+Chorizo
+Morcilla
+Mortadela
+Salame
+Pepperoni
+Pechuga de pollo cruda
+Pechuga de pollo a la plancha
+Pechuga de pollo hervida
+Muslo de pollo
+Muslo de pollo con piel
+Pata de pollo
+Alitas de pollo
+Pollo entero asado
+Pollo frito
+Pollo desmenuzado
+Pechuga de pavo
+Fiambre de pavo
+Carne picada de pavo
+Hígado de pollo
+Pato
+Carne picada de pollo
+Pechuga de pollo con piel
+Aceite de oliva
+Aceite de girasol
+Aceite de canola
+Aceite de soja
+Aceite de coco
+Margarina
+Grasa de cerdo
+Mayonesa
+Mayonesa light
+Jugo de naranja natural

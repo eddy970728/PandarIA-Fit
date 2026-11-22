@@ -1,0 +1,150 @@
+Posso treinar hoje?
+Estou com dor muscular, treino mesmo assim?
+Quanto eu deveria dormir para me recuperar?
+Quanto devo descansar entre as séries?
+Quanta proteína eu preciso por dia?
+Quantas calorias devo comer?
+O que como antes de treinar às {hora}?
+O que como depois de treinar?
+Por que não perco peso?
+Em que ritmo é saudável perder ou ganhar peso?
+Posso ganhar músculo e perder gordura ao mesmo tempo?
+De quanto em quanto tempo me peso?
+Posso treinar em jejum se treino {momento}?
+Qual plano de jejum combina comigo?
+O que quebra o jejum?
+O jejum vai me fazer perder músculo?
+Quanta água eu preciso por dia?
+Quanta água bebo ao treinar?
+O café ou o chimarrão contam como água?
+Incômodo em {zona}: o que faço?
+a região
+Como aqueço direito?
+Como diferencio dor muscular de uma lesão?
+Eu deveria tomar creatina?
+Preciso de proteína em pó?
+A cafeína antes de treinar me ajuda?
+Como o PandarIA decide meus pesos e repetições?
+Como o PandarIA calcula minha recuperação?
+O que inclui o Premium?
+Onde meus dados ficam salvos?
+um exercício
+certo horário
+uma região
+em certo horário
+Só peso corporal
+Peso corporal e elásticos
+Peso corporal e TRX
+Academia de hotel (halteres e banco)
+Fim do descanso, dias de treino, água e fases do jejum. Você escolhe cada aviso.
+Avisos no horário exato
+Para que o fim do descanso e os avisos cheguem bem na hora (Alarmes e lembretes).
+Lê seus passos, peso, sono e frequência cardíaca do seu relógio ou de outros apps, e salva lá seus treinos.
+Faça os dois exercícios do par seguidos, sem descanso entre eles; descanse ao terminar o par.
+Na última série, ao ficar perto da falha, baixe o peso em 20 % e continue sem descanso, duas vezes.
+Rest-pause
+Leve a última série perto da falha, descanse de 15 a 20 segundos e tire mais algumas repetições com o mesmo peso, duas vezes.
+Myo-reps
+Uma série de ativação de 12 a 15 repetições e depois minisséries de 3 a 5 com 3 a 5 respirações de pausa.
+Cada série com mais peso e menos repetições: 12, 10, 8 e 6.
+Cada série é dividida em duas com 15 a 30 segundos de pausa no meio. Mova o peso rápido e limpo.
+Dez séries de dez com cerca de 60 % do seu máximo nos dois primeiros exercícios, com 90 segundos de descanso.
+Primeiro, uma série explosiva com 50 % do seu máximo: todas as repetições que conseguir (mínimo 15), parando 1 a 3 antes da falha. Depois, suas séries normais.
+Caminhar
+Correr
+Bicicleta
+Nadar
+Marcha em casa
+Outro
+Você consegue falar sem esforço
+Moderada
+Você consegue falar, mas não cantar
+Forte
+Você só diz frases curtas
+Minutos treinando
+Dias com a meta de água
+Jejuns concluídos
+Dias com diário alimentar
+Dias com check-in
+Treino e progresso
+Recuperação e sono
+Nutrição e proteína
+Peso e corpo
+Incômodos e segurança
+Como o app funciona
+Google, backup no Drive, assinatura, exportar e importar
+Equipamentos, nível, plano semanal, unidades
+PandarIA Premium
+Seu coach de IA: descansos, esforço, check-in e relatórios
+Objetivo nutricional e jejum
+Avisos e som
+Notificações, som, vibração e voz
+Tela
+Tema, interface, tamanho do texto e animações
+Saúde
+Health Connect
+Idioma do app
+Idioma e unidades de medida
+Ciência, histórico de mudanças, créditos e versão
+A assinatura é comprada no app instalado pelo Google Play.
+Carregando preços…
+No iPhone e no iPad a assinatura vai chegar quando o PandarIA Fit estiver na App Store. Enquanto isso você pode pedir Premium com seu código (abaixo).
+A assinatura não está disponível agora. Confira sua conexão e tente de novo.
+3 dias grátis, depois
+a cada 3 meses
+você economiza
+por mês
+3 dias grátis se for sua primeira assinatura.
+Se cancelar antes que acabem, não é cobrado.
+Renova sozinha até você cancelar no Google Play. Você pode cancelar quando quiser e continua com Premium até o fim do período pago.
+Não pode pagar?
+Premium ativo com sua assinatura do Google Play. Obrigado por apoiar o projeto!
+Não foi possível verificar sua assinatura nos últimos 7 dias. Conecte-se à internet e toque em «Restaurar compras».
+Sua assinatura
+Status
+Ativa no Google Play
+Gerenciar assinatura
+Seja <span style="color:var(--ac)">Premium</span>
+O PandarIA Fit é grátis e sempre vai ser. Você pode treinar, registrar suas refeições e salvar seus dados sem pagar nada.
+Mas se decidir ser Premium, você terá um <b>coach de IA</b> que guia sua saúde e suas metas: uma mistura de personal trainer, orientador nutricional e aquele gymbro que insiste e grita para você fazer mais uma série.
+Grátis frente ao Premium
+GRÁTIS
+Escolha seu plano
+Mande uma mensagem ao desenvolvedor com seu código e o motivo pelo qual você não pode pagar. Vamos analisar seu pedido e dizer se podemos presentear você com um tempo de Premium.
+SEU CÓDIGO DE CONTA
+Escrever ao desenvolvedor
+Sem conta, o presente só funciona neste celular. Com sua conta do Google (Ajustes › seu nome › Minha conta), funciona em qualquer celular.
+Código de presente
+Cole aqui o código que enviaram
+Pedir Premium
+🎉 Premium ativado! Obrigado por apoiar o projeto
+Não foi possível concluir a compra.
+Buscando suas compras…
+Premium restaurado
+Não encontramos uma assinatura ativa nesta conta do Google Play
+Treino em andamento
+Fim do descanso e das séries
+Lembretes de treino
+Quando tem treino e sequência
+Fases, meta e janela de alimentação
+Lembretes para beber água
+PandarIA, relatórios e backups
+Sugestões, relatório semanal e backups
+Escolha uma rotina e bora. Uns minutos já contam.
+Um extra? 💧
+Comece o dia com um copo de água.
+Você já passou da sua meta: continue se estiver se sentindo bem.
+Você está na metade do jejum 💪
+Quebre o jejum com proteína e verduras, ou continue se quiser um esforço extra.
+Bom momento para sua última refeição, com proteína.
+Hora de começar seu jejum ⏱️
+A semana está acabando
+Treine hoje para manter a sequência. Uns minutos já contam.
+Seu relatório semanal está pronto 📊
+Salve seu backup 💾
+Um toque e suas rotinas e seu histórico ficam seguros no Drive.
+Bora para a próxima série
+⏱️ Descanso terminado
+✅ Tempo cumprido
+Série concluída
+No seu horário habitual

@@ -1,0 +1,150 @@
+Cuida melhor de você
+O PandarIA não tira mais os exercícios que acabou de trocar: suas rotinas não encolhem sozinhas
+Com Premium você progride mais rápido: sobe mesmo que a última série fique a uma repetição, e uma série curta não baixa mais seu peso
+Aviso claro se seu peso está baixo ou você come menos do que gasta em repouso, seja qual for seu objetivo
+Ao marcar uma lesão, o PandarIA oferece trocar os exercícios das suas rotinas que a sobrecarregam
+A sequência de semanas, os gráficos e o relatório semanal não falham mais com a mudança de horário
+Se você esquecer de parar um jejum, às 48 h ele pergunta se você continua e deixa corrigir o horário de fim
+Se você quer manter ou ganhar e seu peso se afasta do seu objetivo, ele avisa
+Depois de umas férias, não propõe mais tirar dias do seu plano
+Versão grátis: avisa quando você fez todas as repetições para tentar subir o peso
+Mudar seu objetivo de calorias agora pode ser desfeito
+1.8.1 · Mais organizado
+Mais organizado
+Menu de 4 abas: Rotinas, Nutrição, Histórico e Ajustes
+Explorar exercícios e rotinas e o Modo intervalado agora estão no + de Rotinas, organizado em três grupos
+O jejum volta para Nutrição junto com Comida e Água; se você está jejuando, vê em cima em qualquer seção
+Comida, Água, Jejum e Histórico mais curtos: o importante à vista e o resto em blocos que se abrem
+Corrigida a busca de ingredientes ao criar uma receita, que não mostrava resultados
+A busca de alimentos entende plurais e erros de uma letra
+39 ingredientes novos (especiarias, confeitaria, beiju, nhoque, charque, peixes…) e mais nomes de Cuba, México e Uruguai, como erva-mate
+1.8 · O PandarIA aprende com você
+Estado do dia: o PandarIA aprende como você chega e ajusta suas sugestões
+19 fontes científicas novas: pausas conforme sua idade, deloads e calorias mais precisos
+Lastro em barras, paralelas, flexões e outros exercícios com peso corporal
+10 exercícios novos, entre eles a extensão de tríceps com peso corporal na barra
+Calorias de cada treino e meta de passos conforme sua idade
+Histórico por abas e Nutrição mais organizada
+Mais de 10 falhas corrigidas depois de simular 32 usuários e 3 meses de treino
+Primeiro lastro calculado com suas repetições sem ele
+Lastro em barras, paralelas, flexões e outros exercícios com peso corporal: no menu do exercício toque em «Adicionar lastro» e anote os kg que adiciona. O PandarIA calcula o primeiro lastro com suas repetições e propõe adicioná-lo quando você supera sua faixa (pedido por um tester)
+10 exercícios novos: extensão de tríceps com peso corporal (na barra), paralelas na barra reta, rosca bíceps com peso corporal, pés na barra, parada de mão na parede, abdominal invertido, afundo com salto, búlgaro sem peso, flexões hindus e remada renegada. E a busca entende nomes de outros países: planchas, lagartijas, barras ou paralelas
+Lastro em exercícios com peso corporal
+Peso da primeira série com lastro e proposta de adicionar lastro
+Com lastro você continua treinando na sua faixa de repetições em vez de fazer séries cada vez mais longas.
+Na calistenia se progride com variantes mais difíceis quando você supera a faixa objetivo.
+Com lastro
+Tirar lastro
+Adicionar lastro
+LASTRO
+Plano semanal removido
+Jejum longo ou poucas calorias antes de treinar
+Proteína curta vários dias
+Frequência cardíaca em repouso mais alta que o normal
+Adultos saudáveis com Health Connect
+«Hoje tem» e recuperação
+«Hoje tem», resumo do treino e relatório semanal
+«Hoje tem» e recuperação (com Health Connect)
+1.0.1 · Tudo do PandarIA faz parte do Premium: sem Premium a rotina mostra «PandarIA · Premium» e você vê o que fez da última vez
+1.0.1 · O PandarIA conecta mais dados: um jejum longo ou um dia com poucas calorias, a proteína curta vários dias e a frequência em repouso do Health Connect contam para sua recuperação
+1.0.1 · O relatório semanal soma água, jejuns e proteína
+1.0.1 · A versão do Google Play pede só as 8 permissões do Health Connect que usa
+Biblioteca de evidências 1.4: 3 regras novas
+1.0.1 · Tudo do PandarIA faz parte do Premium
+1.0.1 · O PandarIA conecta jejum, calorias, proteína e frequência em repouso com sua recuperação
+1.0.1 · Só as 8 permissões do Health Connect que o app usa
+PandarIA · Premium 🔒
+Com Premium, o PandarIA sugere pesos e repetições e ajusta sua rotina com seu progresso. Grátis você vê o que fez da última vez.
+Escolha seus dias e a ordem das suas rotinas.
+Em cada dia de treino você verá qual tem. Com Premium, o PandarIA troca se os músculos ainda não se recuperaram.
+(com o que falha). As novas em 3D levam a etiqueta
+. Quando terminar uma seção, envie seus votos.
+. Avisos com som e vibração.
+. Avisos com som, voz e vibração.
+Abra cada exercício, veja a animação e marque como
+Correta
+Incorreta
+✓ Correta
++ Adicionar
+Duração total:
+seus equipamentos
+: só peso corporal
+Vamos usar
+Ideia, design e desenvolvimento:
+Um app da
+PandarIA Fit · criado por Eddy · LunaDoggyBru Studios
+criado por Eddy
+Revisão:
+Revisão de animações
+Sem revisar
+Com erros
+EM REVISÃO
+por seções de equipamento
+Enviar meus votos ao criador
+Premium · menos descanso nos aquecimentos e mais se uma série pesa
+menos descanso nos aquecimentos e mais se uma série pesa
+Primeiro passo
+Complete seu primeiro treino
+Constante
+5 treinos
+Disciplina
+25 treinos
+Imparável
+50 treinos
+Lenda
+100 treinos
+Sequência de 2
+2 semanas seguidas treinando
+Um mês firme
+4 semanas seguidas
+Hábito de aço
+12 semanas seguidas
+Recorde pessoal
+Seu primeiro recorde
+Colecionador
+25 recordes
+10 toneladas
+100 toneladas
+10.000 kg de volume total
+100.000 kg de volume total
+Madrugador
+Treine antes das 8:00
+Coruja
+Treine depois das 22:00
+Eu me conheço
+Registre suas medidas
+Time com o PandarIA
+Aplique 5 sugestões
+Cada treino aproxima você do próximo.
+Abdômen e core
+Atualizar pesos da rotina
+Ajuste automático desativado
+Anote quantas repetições sobraram
+Mire em 500–600 kcal, priorizando proteína e verduras. Evite treinos intensos hoje.
+Jejum livre: comece quando terminar sua última refeição.
+Adicionar aos lanches
+Adicionar a Lanches
+Adicionar ao Café da manhã
+Adicionar ao Almoço
+Adicionar ao Lanche da tarde
+Adicionar ao Jantar
+Barra e paralelas
+Biblioteca de academia
+Apagar este backup
+A cada minuto você começa uma série; descansa o que sobrar do minuto.
+Refeições salvas
+Com aprovação médica
+Consulte seu médico ou obstetriz antes de começar.
+Backup dos seus dados
+Criar exercício
+Crie com base no que você tem planejado ou passe para o celular sua rotina do papel ou das notas.
+Como chamamos você
+Descanso entre blocos
+Descanso entre blocos
+Depois do primeiro trimestre, evite ficar muito tempo de barriga para cima. Pare se sentir dor, sangramento, tontura, falta de ar ou contrações.
+Menor anilha disponível
+Durante o jejum você pode tomar água, café ou chá sem açúcar.
+Dias baixos
+Dias em que você quer treinar. Avisamos ao abrir o app.
+Ex.: Remada com toalha
+Exercícios (alternados)

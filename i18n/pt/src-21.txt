@@ -1,0 +1,150 @@
+Ejercicios del circuito
+Elige el equipo que tienes o quieres usar. El peso corporal y la esterilla siempre están incluidos.
+Elige qué días entrenas y en qué orden van tus rutinas. Cada día de entreno, PandarIA te propone la siguiente y la cambia si los músculos aún no se recuperaron (48 horas).
+Eliminar ejercicio propio
+Empezar ayuno
+Empezar ayuno ahora
+Entreno
+No hay entreno en curso.
+Español
+Hoy es día bajo en calorías
+La franja verde (10 a 20 series) es lo recomendado para ganar músculo. Las series de músculos secundarios cuentan como media.
+La sobrecarga progresiva es la base de las ganancias de fuerza y músculo.
+La técnica primero, el peso después. Una repetición limpia vale más que dos con trampa.
+Las rutinas archivadas no aparecen en Mis rutinas, pero sus entrenos siguen en tu historial. Si eliminas una, su historial desaparece.
+Libera espacio. Se borra sola a los 60 días.
+Los ejercicios que crees aparecen en la biblioteca para usarlos en cualquier rutina.
+Marca lo que corresponda. Tus respuestas solo se usan para decidir si el ayuno es adecuado y no se comparten.
+Mi rutina propia
+Máx. repeticiones
+Músculo principal
+No te gusta
+Para empezar te sugiero 12:12 o 14:10 y subir de a poco cuando te sientas cómodo.
+Para ganar músculo con ventanas cortas, asegúrate de llegar a tus calorías y proteína en la ventana de comida.
+Pega el código de una rutina que te compartieron.
+Remo en mi máquina
+Revisar aptitud para el ayuno
+Semana sólida. La próxima, intenta una repetición más en tus ejercicios principales.
+Soy menor de 18 años
+Sueño, energía y agujetas; se puede saltar
+Tabata clásico: 20 s / 10 s.
+Tabata, HIIT, EMOM o AMRAP con temporizador automático, avisos y registro en tu historial.
+Tantas rondas como puedas en el tiempo elegido.
+Te creamos una rutina inteligente para los músculos que elijas, la cual puedes editar.
+Tengo diabetes con medicación
+Tengo o tuve un trastorno de la conducta alimentaria
+Tengo otra condición médica que requiere control de comidas
+Todavía no registraste este ejercicio.
+Tú eliges trabajo, descanso, rondas y tandas.
+Una caída sostenida suele indicar fatiga: revisa sueño, comida y estrés.
+Usamos nuestro potente algoritmo para diseñar tu rutina perfecta, te ayudaremos a mejorar y la iremos actualizando cuando sea necesario.
+Variar el ejercicio ayuda a romper estancamientos.
+años
+de 16 h
+© 2026 LunaDoggyBru Studios. Todos los derechos reservados.
+¿Qué comida quieres guardar?
+¿Qué quieres entrenar hoy?
+Próximo entreno: mañana
+Próximo entreno: hoy
+Clásico: 20 s de trabajo y 10 s de descanso, 8 rondas por tanda. Puedes ajustar los tiempos.
+Arranque sin pesas
+Base sólida
+Básicos pesados
+Cardio de máquinas
+Cardio y potencia
+Centro de acero
+Centro fuerte y postura
+Circuito con pesas
+Circuitos metabólicos
+Con mancuernas
+Core básico
+Core de acero
+Corre más y mejor
+Cuello y espalda en el trabajo
+Cuerpo completo con bandas
+Cuerpo completo sin pesas
+Full body sin pesas
+Deportes de equipo
+Día de pierna
+Embarazo y posparto
+En casa sin pesas
+Entreno más cómodo
+Equilibrio y movilidad
+Espalda sana y postura
+Exprés total
+Exprés tren inferior
+Exprés tren superior
+Flexibilidad y calma
+Fortalece esos glúteos
+Fuerza para boxeo
+Fuerza para corredores
+Fuerza para la vida real
+Fuerza y equilibrio
+Fuerza y potencia
+Funcional atlético
+Funcional básico
+Fútbol, básquet y más
+Glúteos en el gym
+Glúteo a fondo
+Glúteo fuerte y firme
+Glúteo y pierna con bandas
+Intervalos de carrera
+Kettlebell básico
+Levanta más
+Mayores de 60
+Muévete mejor
+Máquinas para empezar
+Pausa activa de 5 minutos
+Pausas activas en la oficina
+Piernas para empezar
+Pilates básico
+Pilates clásico
+Posparto: reconexión del core
+Potencia y cambio de dirección
+Preparación para correr
+Prevención de lesiones
+Principiante desde cero
+Quema de grasa
+Reto sin pesas
+Running y preparación física
+Rutinas de gimnasio
+Rutinas exprés 15 min
+Semana 1: conoce tu cuerpo
+Semana 3: más confianza
+Sin excusas
+Solo tu cuerpo
+Tu primer mes
+Yoga desafío
+Yoga para empezar
+5 minutos sin cambiarte
+Adiós dolores
+Día anterior
+Girar la vista
+Cámara lenta
+Fin del descanso y siguiente ejercicio
+Sonidos y detalles
+Aviso cada lunes con el resumen de tu semana
+Cuenta regresiva en ejercicios de tiempo
+Ciclos de volumen, intensidad y descarga
+En Mis rutinas
+Versión 0.9
+Primera versión
+Pulido: cero errores, copia en Google Drive, inglés completo y más alimentos (en desarrollo)
+Nutrición completa y PandarIA con evidencia
+Animaciones en 3D: todos los ejercicios
+Animaciones nuevas y descanso por serie
+Progreso, nutrición y comunidad
+Figuras animadas que muestran cada ejercicio
+12 equipos nuevos en Mis equipos: Smith, landmine, barra hexagonal, barra Z, banco GHD, trineo, balón medicinal, fitball, cuerdas de batalla, escaladora, SkiErg y air bike
+176 ejercicios nuevos: 386 en total, casi todos de máquinas, Smith, poleas y accesorios de gimnasio
+52 máquinas aprobadas en la revisión y 12 corregidas: rodillos y almohadillas en su sitio (curl femoral, extensión de cuádriceps, remo en T, prensas, hiperextensión para glúteo)
+95 animaciones aprobadas en la revisión y 23 corregidas (leñadores, pull through, jalones cerrados, extensiones de tríceps, bancos que ya no atraviesan el cuerpo, Smith que no se mueve y sin saltos al subir)
+Agua: las bebidas del diario (café, té, leche, zumos, refrescos) cuentan para tu meta, botón «Otra bebida», cafeína del día frente al límite de la EFSA y más agua en los entrenos de más de 1 hora
+Ajustes › Tus datos: Guardar ahora, Recuperar, Cerrar sesión y Borrar mi copia
+Animaciones rehechas una a una: personaje con cuerpo, más grande y con mejor encuadre
+Animaciones: confeti, transiciones de pestaña y anillos animados
+Arreglo: las notas y la importación con código no se guardaban
+Atajos: calentamientos con menos descanso, más descanso antes de las últimas series e igualar todas
+Ayuno conectado con el diario: empieza desde tu última comida registrada, mira tu ventana de comida del día y, si registras comida mientras ayunas, PandarIA te ofrece terminarlo
+Ayuno: elegir la hora de inicio si empezaste antes
+Bajar grasa a tu ritmo: lento, normal o rápido (0,5 a 1 % del peso por semana), con límite de seguridad; para ganar músculo, +5, +10 o +15 %

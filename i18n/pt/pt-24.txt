@@ -1,0 +1,150 @@
+Todo o equipamento de uma academia
+Você não marcou nenhuma série como concluída. Toque em ✓ em cada série que fizer para salvá-la.
+Nada desta sessão será salvo.
+Descartar treino?
+Ajustes › seu nome › Minha conta: salvar, recuperar, sair da conta e apagar o backup
+Boas-vindas novas, com «Continuar com o Google» ou «Usar sem conta»
+Backup automático no seu Google Drive (opcional e privado)
+Num celular novo você recupera treinos, rotinas, diário, fotos e Premium
+Nunca se sobrescrevem dados sem perguntar
+Premium com sua conta: funciona em qualquer celular
+sua conta do Google
+Etapa 3 · Inglês completo: o app inteiro em inglês, também as 386 dicas de exercício, a técnica passo a passo, o Explorar, o histórico de mudanças, as conquistas e os avisos do celular
+A voz dos treinos, os avisos do celular, a notificação do treino em andamento e os widgets falam no idioma que você escolher
+Em inglês os números e as datas ficam no estilo inglês (1,910 kcal · 80.6 kg · November 12)
+Novo teste automático: em inglês, se sobrar algum texto em espanhol nas telas, a versão não sai
+Correção: mais espaço em cima para a câmera e a barra de status (notch) em todas as telas
+Correção: ao tocar em «Buscar atualizações» a versão nova abre direto, mesmo que antes você tenha escolhido «Mais tarde» ou «Pular esta versão»; o aviso também aparece em Ajustes
+O app inteiro em inglês, também dicas de exercício, técnica, Explorar e conquistas
+A voz, os avisos do celular e os widgets no seu idioma
+Números e datas no estilo inglês
+Mais espaço em cima para o notch em todas as telas
+«Buscar atualizações» abre direto a versão nova
+inglês completo
+PandarIA: progressão ao vivo, rotinas por grupo muscular, Confie no PandarIA, sugestões a cada 3 treinos e renovação a cada 15
+O PandarIA Fit é um projeto pessoal. Se você não pode pagar, me escreva e eu dou de presente. Só vai funcionar neste celular; se você apagar o app, vai ter que pedir de novo. Se entrar com o Google em Ajustes › seu nome › Minha conta, vai funcionar em qualquer celular com sua conta.
+O PandarIA baseia suas recomendações em diretrizes do American College of Sports Medicine (ACSM) e da National Strength and Conditioning Association (NSCA) para força, da Organização Mundial da Saúde (OMS) para atividade física e da International Society of Sports Nutrition (ISSN) para nutrição. Não substitui um profissional de saúde.
+PandarIA e relatórios
+O PandarIA vai evitar este exercício ao criar rotinas.
+O PandarIA vai evitar os exercícios que sobrecarregam essas zonas. Se você tem dor, consulte um profissional de saúde.
+O PandarIA não vai usar estes exercícios ao criar rotinas. Marque-os na ficha de cada exercício.
+O PandarIA sugere em cinza
+O PandarIA usa estes dados para escolher exercícios, estimar pesos iniciais, ajustar descansos e calcular sua nutrição. Tudo é opcional e fica no seu celular.
+PandarIA: incrementos e peso inicial conforme o tipo de equipamento, e lesões do perfil atualizadas com os exercícios novos
+PandarIA: periodização por blocos e semanas de deload
+PandarIA: prioriza máquinas e Smith para iniciantes e mais peso livre para avançados
+PandarIA: se um exercício incomoda, oferece primeiro a versão na máquina
+PandarIA: sugere passar da versão guiada para o peso livre quando você já progride
+Polimento: zero erros, backup no Google Drive, inglês completo e receitas típicas
+Etapa 4 · Ajustes organizados: a tela principal fica curta, com seu perfil, Premium e 8 grupos (Sua conta e seus dados, Treino, PandarIA, Nutrição e jejum, Avisos e som, Tela e idioma, Saúde e Sobre) que abrem sua própria tela
+«Apagar todos os dados» fica à parte, no fim de Sua conta e seus dados
+A política de privacidade pode ser aberta em Ajustes › Sobre
+40 receitas típicas do Uruguai, Argentina, Cuba, México e Espanha no diário (milanesas, chivito, choripán, tortilha de batata, pascualina, ropa vieja, picadinho, chilaquiles, tacos al pastor, paella, gaspacho, fabada e mais), calculadas com ingredientes do USDA e com seus alérgenos; a ficha mostra o que leva cada uma
+Novo nome do estúdio: LunaDoggyBru Studios
+A revisão de animações é desligada na versão final (os votos já enviados ficam salvos)
+Correção: algumas metas salvas num formato antigo mostravam «Invalid Date» e a barra de progresso vazia
+0.9 · Versão completa: 0.9 fechada
+Ajustes organizados em 8 grupos
+40 receitas típicas do Uruguai, Argentina, Cuba, México e Espanha
+Novo nome: LunaDoggyBru Studios
+Política de privacidade em Ajustes › Sobre
+Revisão de animações desligada na versão final
+Sua conta e seus dados
+Etapa 4 · Ajustes organizados
+Perfil salvo
+Pronto para o Google Play (em desenvolvimento)
+Métodos especiais no editor de rotinas: bi-set, drop-set, rest-pause, myo-reps, pirâmide, séries em cluster, volume alemão (10 × 10) e método Bilbo. Escolher é grátis; com Premium, o PandarIA monta as séries por você
+Cada método explica como se faz, leva a etiqueta «Não comprovado que seja melhor que o treino normal» e sua fonte em Ciência do PandarIA; o método Bilbo e as myo-reps, além disso, «Evidência limitada»
+Segurança: os métodos que chegam perto da falha são para nível intermediário ou avançado e não se aplicam ao agachamento nem ao levantamento terra com barra nem a exercícios que sobrecarreguem uma zona sensível
+Cotovelo e quadril como zonas sensíveis: o PandarIA evita os exercícios que mais as sobrecarregam e, com o cotovelo, sobe o peso de braços uma anilha por vez e adiciona aquecimento
+Premium com assinatura do Google Play: mensal ou trimestral, com 3 dias grátis; «Restaurar compras» e «Gerenciar assinatura»
+Pedir Premium grátis: se você não pode pagar, envie seu código e o motivo; os códigos ficam só como presente
+Biblioteca de evidências 1.3: 12 regras novas
+1.0 · Primeira entrega para o Google Play
+Métodos especiais no editor de rotinas (bi-set, drop-set, rest-pause, myo-reps, pirâmide, cluster, volume alemão e Bilbo)
+Cotovelo e quadril como zonas sensíveis
+Premium com assinatura do Google Play e 3 dias grátis
+Pedir Premium grátis se você não pode pagar
+Métodos especiais
+Nenhum
+Cotovelo
+Quadril
+Minissérie depois da pausa
+Segunda metade da série depois da pausa
+Série Bilbo: todas as repetições que conseguir (mínimo 15), parando 1 a 3 antes da falha
+Você passou de 15 repetições: +2,5 kg
+Não chegou a 15: o ciclo recomeça em 50 %
+Pirâmide: mais peso e menos repetições em cada série
+Você completou esta série da pirâmide: suba o peso
+Mesmo peso: busque as repetições desta série
+Métodos especiais: o que esperar
+Métodos perto da falha: para quem
+Bi-set
+Drop-set
+Pirâmide
+Séries em cluster
+Volume alemão (10 × 10)
+Método Bilbo
+Cotovelo sensível
+Quadril sensível
+Pessoas que já treinam
+Pessoas com incômodo no cotovelo
+Pessoas com incômodo no quadril
+Etiqueta e explicação de cada método especial
+Quais exercícios cada método muda
+Método Bi-set
+Método Drop-set
+Método Rest-pause
+Método Myo-reps
+Método Pirâmide
+Método Séries em cluster
+Método Volume alemão
+Lesões do perfil: cotovelo
+Lesões do perfil: quadril
+Comparison of traditional and advanced resistance training paradigms on muscle hypertrophy in trained individuals (meta-análise)
+O que é o método Bilbo (descrição do criador, sem estudos próprios)
+Effectiveness of different methods of resistance exercises in lateral epicondylosis (revisão sistemática)
+Sugere pesos e repetições e propõe melhorias com seu progresso.
+Não vai sugerir mudanças; você verá o que fez da última vez.
+Tufano, Brown e Haff
+Raman, MacDermid e Grewal
+Sugestões do PandarIA
+Dia
+Ativo
+Premium ativo
+Memória quase cheia: a cópia de antes da atualização foi apagada.
+Não foi possível salvar: a memória do celular está cheia.
+Desfazer
+Desfeito
+Histórico
+Vista minimalista
+Vista completa
+Mudar vista
+Biblioteca
+toque para voltar
+Crie a sua, deixe o PandarIA montar ou escolha uma no Explorar.
+Suas rotinas
+Explorar exercícios e rotinas
+Seu ponto de partida
+O PandarIA resume o que vale a pena priorizar em treino, comida e hábitos.
+Ver meu ponto de partida
+Fechar aviso
+Seus dados ocupam muito espaço
+Exportar backup
+Treinar agora
+Cardio agora
+Você escolhe atividade, minutos e intensidade e começa. Conta para sua sequência.
+Carregando suas fotos, tente daqui a pouco
+Espaço usado
+O app está mais organizado
+Agora são 4 abas. Isto é o que mudou de lugar:
+Agora fica no + de Rotinas, como «Explorar exercícios e rotinas».
+Também no + de Rotinas, em «Treinar agora».
+Volta para Nutrição, junto com Comida e Água. Se você está jejuando, vai ver em cima.
+Blocos que se abrem
+O diário, o objetivo, a água e o histórico mostram o importante; toque num título para ver o resto.
+Como você prefere ver o app?
+Você pode mudar quando quiser com o botão de vista em Minhas rotinas ou em Ajustes.
+Completa
+Tudo à vista, organizado
+Minimalista

@@ -1,0 +1,150 @@
+Exercícios do circuito
+Escolha o equipamento que você tem ou quer usar. O peso corporal e o colchonete estão sempre incluídos.
+Escolha em que dias você treina e em que ordem vão suas rotinas. Em cada dia de treino, o PandarIA propõe a próxima e troca se os músculos ainda não se recuperaram (48 horas).
+Excluir exercício próprio
+Começar jejum
+Começar jejum agora
+Treino
+Não há treino em andamento.
+Español
+Hoje é dia de poucas calorias
+A faixa verde (10 a 20 séries) é o recomendado para ganhar músculo. As séries de músculos secundários contam como metade.
+A sobrecarga progressiva é a base dos ganhos de força e músculo.
+Primeiro a técnica, depois o peso. Uma repetição limpa vale mais que duas roubadas.
+As rotinas arquivadas não aparecem em Minhas rotinas, mas seus treinos continuam no seu histórico. Se você excluir uma, o histórico dela desaparece.
+Libera espaço. É apagado sozinho em 60 dias.
+Os exercícios que você criar aparecem na biblioteca para usar em qualquer rotina.
+Marque o que se aplica. Suas respostas só são usadas para decidir se o jejum é adequado e não são compartilhadas.
+Minha rotina própria
+Máx. repetições
+Músculo principal
+Você não gosta
+Para começar sugiro 12:12 ou 14:10 e ir subindo aos poucos quando se sentir confortável.
+Para ganhar músculo com janelas curtas, garanta chegar às suas calorias e proteína na janela de alimentação.
+Cole o código de uma rotina que compartilharam com você.
+Remada na minha máquina
+Verificar aptidão para o jejum
+Semana sólida. Na próxima, tente uma repetição a mais nos seus exercícios principais.
+Tenho menos de 18 anos
+Sono, energia e dor muscular; dá para pular
+Tabata clássico: 20 s / 10 s.
+Tabata, HIIT, EMOM ou AMRAP com cronômetro automático, avisos e registro no seu histórico.
+Quantas rodadas conseguir no tempo escolhido.
+Criamos uma rotina inteligente para os músculos que você escolher, e você pode editá-la.
+Tenho diabetes com medicação
+Tenho ou tive um transtorno alimentar
+Tenho outra condição médica que exige controle das refeições
+Você ainda não registrou este exercício.
+Você escolhe trabalho, descanso, rodadas e blocos.
+Uma queda constante costuma indicar fadiga: confira sono, comida e estresse.
+Usamos nosso poderoso algoritmo para montar sua rotina perfeita, vamos ajudar você a melhorar e atualizá-la quando for preciso.
+Variar o exercício ajuda a quebrar estagnações.
+anos
+de 16 h
+© 2026 LunaDoggyBru Studios. Todos os direitos reservados.
+Qual refeição você quer salvar?
+O que você quer treinar hoje?
+Próximo treino: amanhã
+Próximo treino: hoje
+Clássico: 20 s de trabalho e 10 s de descanso, 8 rodadas por bloco. Dá para ajustar os tempos.
+Começo sem pesos
+Base sólida
+Básicos pesados
+Cardio nas máquinas
+Cardio e potência
+Core de aço
+Core forte e postura
+Circuito com pesos
+Circuitos metabólicos
+Com halteres
+Core básico
+Core de aço
+Corra mais e melhor
+Pescoço e costas no trabalho
+Corpo inteiro com elásticos
+Corpo inteiro sem pesos
+Full body sem pesos
+Esportes coletivos
+Dia de perna
+Gravidez e pós-parto
+Em casa sem pesos
+Treino mais confortável
+Equilíbrio e mobilidade
+Costas saudáveis e postura
+Expresso total
+Expresso membros inferiores
+Expresso membros superiores
+Flexibilidade e calma
+Fortaleça esses glúteos
+Força para o boxe
+Força para corredores
+Força para a vida real
+Força e equilíbrio
+Força e potência
+Funcional atlético
+Funcional básico
+Futebol, basquete e mais
+Glúteos na academia
+Glúteo a fundo
+Glúteo forte e firme
+Glúteo e perna com elásticos
+Intervalados de corrida
+Kettlebell básico
+Levante mais
+Acima de 60
+Mexa-se melhor
+Máquinas para começar
+Pausa ativa de 5 minutos
+Pausas ativas no escritório
+Pernas para começar
+Pilates básico
+Pilates clássico
+Pós-parto: reconexão do core
+Potência e mudança de direção
+Preparação para correr
+Prevenção de lesões
+Iniciante do zero
+Queima de gordura
+Desafio sem pesos
+Corrida e preparação física
+Rotinas de academia
+Rotinas expressas de 15 min
+Semana 1: conheça seu corpo
+Semana 3: mais confiança
+Sem desculpas
+Só seu corpo
+Seu primeiro mês
+Yoga desafio
+Yoga para começar
+5 minutos sem trocar de roupa
+Adeus dores
+Dia anterior
+Girar a vista
+Câmera lenta
+Fim do descanso e próximo exercício
+Sons e detalhes
+Aviso toda segunda com o resumo da sua semana
+Contagem regressiva nos exercícios por tempo
+Ciclos de volume, intensidade e deload
+Em Minhas rotinas
+Versão 0.9
+Primeira versão
+Polimento: zero erros, backup no Google Drive, inglês completo e mais alimentos (em desenvolvimento)
+Nutrição completa e PandarIA com evidências
+Animações em 3D: todos os exercícios
+Animações novas e descanso por série
+Progresso, nutrição e comunidade
+Figuras animadas que mostram cada exercício
+12 equipamentos novos em Meus equipamentos: Smith, landmine, barra hexagonal, barra W, banco GHD, trenó, medicine ball, bola suíça, cordas navais, escada, SkiErg e air bike
+176 exercícios novos: 386 no total, quase todos de máquinas, Smith, polias e acessórios de academia
+52 máquinas aprovadas na revisão e 12 corrigidas: rolos e almofadas no lugar (flexora, extensora, remada cavalinho, leg press, hiperextensão para glúteo)
+95 animações aprovadas na revisão e 23 corrigidas (lenhadores, pull through, puxadas fechadas, extensões de tríceps, bancos que não atravessam mais o corpo, Smith que não se mexe e sem pulos ao subir)
+Água: as bebidas do diário (café, chá, leite, sucos, refrigerantes) contam para sua meta, botão «Outra bebida», cafeína do dia frente ao limite da EFSA e mais água nos treinos de mais de 1 hora
+Ajustes › Seus dados: Salvar agora, Recuperar, Sair da conta e Apagar meu backup
+Animações refeitas uma a uma: personagem com corpo, maior e com melhor enquadramento
+Animações: confete, transições de aba e anéis animados
+Correção: as notas e a importação com código não eram salvas
+Atalhos: aquecimentos com menos descanso, mais descanso antes das últimas séries e igualar todas
+Jejum conectado ao diário: começa a partir da sua última refeição registrada, mostra sua janela de alimentação do dia e, se você registrar comida enquanto jejua, o PandarIA oferece terminá-lo
+Jejum: escolher o horário de início se você começou antes
+Perder gordura no seu ritmo: lento, normal ou rápido (0,5 a 1 % do peso por semana), com limite de segurança; para ganhar músculo, +5, +10 ou +15 %

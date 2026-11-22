@@ -1,0 +1,150 @@
+Compartir o guardar
+Compartir rutina
+Copiar
+Compartir tarjeta
+Eliminar este entreno
+Detalle del entreno
+Cuéntanos de ti
+¿Dónde vas a entrenar?
+Tu nivel
+Que PandarIA diseñe mi plan
+Explorar rutinas
+Ir a Mis rutinas
+Casa sin equipo
+Casa con mancuernas
+Casa equipada
+Gimnasio completo
+Tiempo disponible
+Objetivo
+Nivel
+Crear rutina
+¿Qué músculos quieres entrenar?
+¿Cuál es tu objetivo principal?
+¿Cuántos días por semana?
+¿Cuál es tu nivel?
+¿Con qué equipo cuentas?
+Diseñar mi plan
+Tu plan está listo
+Generar otra versión
+Tandas
+Cuenta previa
+Trabajo
+Descanso
+Rondas
+Repeticiones por minuto
+Guardar en el historial
+Nombre de la rutina
+Objetivo de la rutina
+Descanso entre series
+Tipo de serie
+Calentamiento
+Al fallo
+Drop set
+Eliminar serie
+Añadir nota
+Añadir nota fija
+Añadir series de calentamiento
+Crear superserie con el siguiente
+Quitar de la superserie
+Calculadora de discos
+Preferencias del ejercicio
+Eliminar ejercicio
+Ver ficha completa
+Temporizador de descanso
+¿Salir sin guardar?
+Salir sin guardar
+Seguir editando
+¿Eliminar rutina?
+Archivar en su lugar
+Eliminar de todos modos
+Aún no tienes rutinas
+Ir a Explorar
+Rutinas
+Nunca
+Pecho
+Hombros
+Bíceps
+Tríceps
+Antebrazos
+Abdomen
+Oblicuos
+Cuádriceps
+Isquiotibiales
+Isquios
+Glúteos
+Gemelos
+Espalda (dorsales)
+Trapecio
+Zona lumbar
+Lumbar
+Aductores
+Abductores
+Cardio
+Movilidad
+Esterilla
+Mancuernas
+Barra y discos
+Banco
+Máquinas de gimnasio
+Poleas
+Kettlebell
+Bandas elásticas
+Barra de dominadas
+Paralelas
+TRX / anillas
+Rueda abdominal
+Comba
+Cajón / escalón
+Cinta de correr
+Bicicleta estática
+Elíptica
+Remo ergómetro
+Máquina Smith
+Restablecer
+Mejoras de testers
+Máquinas
+Smith
+Peso libre
+Todo
+Movilidad y estiramientos
+Solo máquinas
+Guiadas, seguras y fáciles de aprender
+Circuito de máquinas para principiantes
+Pierna en máquinas
+Torso en máquinas
+Glúteo en máquinas
+Full body en Smith
+Créditos
+Historial de cambios
+Actual
+Todos los derechos reservados.
+Landmine
+Barra hexagonal
+Barra Z
+Banco GHD / glúteo-isquio
+Trineo
+Balón medicinal
+Fitball
+Cuerdas de batalla
+Escaladora / stepper
+SkiErg
+Bicicleta de aire
+Media
+Difícil
+Solo esta serie
+Datos del reloj en tus entrenos
+Arreglos de Premium
+Idiomas y unidades
+Ajustes nuevos y tu foto de perfil
+Ajustes nuevos: arriba tu nombre y tu tipo de cuenta; al tocarlo, tu tarjeta con Mi cuenta, Mis datos personales y PandarIA Premium
+Tu tarjeta: tu foto, tu edad, tus entrenos y tu racha
+Foto de perfil: elígela, cámbiala, recórtala o quítala
+Hazte Premium: qué ganas frente a la versión gratis, punto por punto
+En la bienvenida eliges tus unidades justo después de tu nombre
+Día de calor muestra el agua en tus unidades (oz o ml)
+La copia en Google Drive ya no aparece en Acerca de cuando la app está en inglés
+Nueva bienvenida
+1.9.3 · Nueva bienvenida
+Nueva bienvenida: unas preguntas por pasos y tu punto de partida en entreno, comida y hábitos
+Pantalla de permisos en Ajustes › Avisos y sonido: qué usa la app y para qué
+Embarazo o lactancia en tu perfil: sin dietas para bajar ni ayunos
