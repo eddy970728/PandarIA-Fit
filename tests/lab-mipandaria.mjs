@@ -21,8 +21,9 @@ w.fetch = async (url, opt = {}) => {
   const u = new URL(url), h = opt.headers || {}, body = opt.body ? JSON.parse(opt.body) : {};
   const yo = (h.Authorization || '').replace('Bearer at:', '') || null;
   const fn = u.pathname.replace('/rest/v1/rpc/', '');
+  const res = (st, j) => ({ ok: st < 300, status: st, json: async () => j, text: async () => JSON.stringify(j) });
+  if (u.host !== 'vjvhpumsfsktkavtxigk.supabase.co') return res(404, {}); // otras llamadas de la app (avisos de versión): no cuentan
   SV.llamadas.push(fn);
-  const res = (st, j) => ({ ok: st < 300, status: st, text: async () => JSON.stringify(j) });
   if (h.apikey !== 'sb_publishable_sL20nOJlssLKJzzkOzTeDw_rTZFyspt') return res(401, { message: 'sin apikey' });
   if (u.pathname === '/auth/v1/token') {
     if (u.searchParams.get('grant_type') === 'id_token') { const c = JSON.parse(Buffer.from(body.id_token.split('.')[1], 'base64').toString()); const id = 'u-' + c.sub; return res(200, { access_token: 'at:' + id, refresh_token: 'rt:' + id, expires_in: 3600, user: { id, email: c.email } }); }
