@@ -31,3 +31,15 @@ jobs:
         run: supabase db push --password "$SUPABASE_DB_PASSWORD" --include-all
       - name: Ver qué quedó aplicado
         run: supabase migration list --password "$SUPABASE_DB_PASSWORD"
+      - name: Comprobar que sin sesión no se ve ni se escribe nada
+        env:
+          PUB: sb_publishable_sL20nOJlssLKJzzkOzTeDw_rTZFyspt
+        run: |
+          U="https://$SUPABASE_PROJECT_REF.supabase.co"
+          for t in mp_players mp_days mp_entries mp_friends; do
+            R=$(curl -s "$U/rest/v1/$t?select=*" -H "apikey: $PUB"); echo "$t → $R"
+            echo "$R" | grep -q '"user_id"\|"a":' && { echo "ERROR: $t se ve sin sesión"; exit 1; } || true
+          done
+          R=$(curl -s -X POST "$U/rest/v1/rpc/mp_entrar" -H "apikey: $PUB" -H "Content-Type: application/json" -d '{}'); echo "mp_entrar → $R"
+          echo "$R" | grep -q '"mote"' && { echo "ERROR: se pudo entrar sin sesión"; exit 1; } || true
+          echo "Correcto: sin sesión no hay acceso"
