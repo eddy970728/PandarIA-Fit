@@ -1,0 +1,100 @@
+Desafio você no PandarIA Fit! «{0}»: {1} ${trS(T.u[0])} até {3}. Abra o app, vá em Meu histórico › Desafios › Colar código e cole isto:\n{4}
+Estou com {0} de {1} em «{2}». Cole em Meu histórico › Desafios › Colar código:\n{3}
+Seu {0} no PandarIA
+Seu ${trS(mesN(now.getMonth()))}
+Hoje: {0} (${trS(E.word)}), com ${plural(E.n,'fonte de dados','fontes de dados')}.
+Você já tem linha de base em: ${trS(listos.map(o=>o.n.toLowerCase()).join(', '))}.
+No vermelho agora: ${trS(rojo.join(', '))}.
+No amarelo: ${trS(am.join(', '))}.
+Hoje você tem {0} % menos de carga por como chega.
+Semana de deload ativa até {0}: pesos mais leves.
+Ainda há poucos dados de ${trS(ex.n)}: com 3 sessões ou mais o PandarIA consegue ver se você está estagnado.
+Sessões registradas: {0}.
+Sua força estimada em ${trS(ex.n)} não sobe há {1} sessões. É uma estagnação normal e tem solução.
+Na verdade você avança, sim: sua força estimada em ${trS(ex.n)} continua subindo ({1} → {2}).
+Força estimada (1RM): {0} na sua última sessão; sua melhor marca, {1}.
+Séries de ${trS(MUSCLES[m]||m).toLowerCase()} nos últimos 7 dias: {1} (o habitual para ganhar músculo é de {2} a {3}).
+Sono de ontem à noite: {0} h {1}.
+Proteína curta em {0} dos seus últimos {1} dias com diário.
+Suba para {0} séries semanais de ${trS(MUSCLES[m]||m).toLowerCase()}: por exemplo, uma série a mais em cada sessão.
+Plano de 2 semanas para ${trS(ex.n)}: semana 1, 4 × 6 com 5 % mais de peso; semana 2, 3 × 8 com o peso de antes. Depois volte à sua rotina.
+Para ganhar músculo, de {0} a {1} séries por músculo por semana. Para manter, umas 6 bastam.
+Abaixo de {0}: ${trS(bajo.map(m=>MUSCLES[m].toLowerCase()).join(', '))}.
+Adicione 2 ou 3 séries semanais a ${trS(bajo.slice(0,3).map(m=>MUSCLES[m].toLowerCase()).join(', '))}.
+Para começar, uns {0} para {1} repetições, e ajuste na série seguinte.
+Ainda não há séries registradas de ${trS(ex.n)}.
+Para {0}–{1} repetições, entre {2} e {3}.
+Sua força estimada (1RM) em ${trS(ex.n)}: {1}.
+Seu objetivo de treino mais habitual: {0}–{1} repetições.
+Para seu nível, {0} dias de força por semana. O mínimo recomendado para a saúde são {1}.
+Nas últimas 4 semanas você treinou {0} vezes ({1} por semana).
+Seu plano semanal: {0} dias.
+O importante é o total semanal de séries por músculo e conseguir mantê-lo. 3 dias de corpo inteiro funcionam muito bem; com 4 ou 5 dias você pode dividir por regiões. Além disso, a OMS recomenda {0}–{1} minutos de atividade moderada por semana.
+Ainda não: um deload costuma vir a cada {0}–{1} semanas de treino pesado.
+Semanas seguidas treinando: {0}.
+Recuperação agora: ${trS(rs.lvl)}${rs.msgs.length?' ('+trS(rs.msgs.join(', '))+')':''}.
+Uma semana de deload baixa o peso para {0} % e tira algumas séries. Você não perde o que ganhou: o corpo se recupera e você volta com mais força.
+Se você faz 4 × 8 com 80 kg, no deload: 3 × 8 com {0} kg.
+Hoje tem: {0}.
+Músculos ainda abaixo de 50 %: ${trS(cans.join(', '))}.
+Pelos seus treinos, ainda estão se recuperando: ${trS(cans.join(', '))}.
+Ontem à noite você dormiu {0} h {1}${z.avg?` (sua média: ${Math.floor(z.avg/60)} h ${String(z.avg%60).padStart(2,'0')})`:''}.
+Nos seus últimos check-ins, {0} de {1} com pouco descanso.
+{0} horas ou mais toda noite. Abaixo de 6 h sua recuperação e sua força sofrem.
+Para seu objetivo, uns {0} em geral e {1} ou mais em exercícios grandes com peso (agachamento, supino, remada).
+Seu descanso padrão: {0}.
+O PandarIA ajusta os descansos: ${S.settings.restSmart!==false?'sim':'não'}.
+Para você, uns {0} g por dia ({1} g por kg).
+Peso: {0} · objetivo: ${trS(NGOALS[cqGoalNut()])}.
+Hoje você está com {0} g.
+Faltam {0} g hoje: experimente ${trS(pi.ids.map(id=>alimGet(id).n).join(', '))}.
+Seu objetivo: umas {0} kcal por dia para ${trS(NGOALS[cqGoalNut()]).toLowerCase()}.
+Média dos seus últimos {0} dias com diário: {1} kcal.
+Divisão orientativa: café da manhã {0} · almoço {1} · lanche {2} · jantar {3} kcal.
+Para treinar às {0}: algo com carboidratos e um pouco de proteína, 1–3 horas antes.
+Suas calorias do dia: {0} kcal.
+Uma refeição com uns {0} g de proteína nas 2–3 horas seguintes, mais carboidratos se você treinou pesado.
+Com seu peso ({0}), uns {1} g de proteína por refeição.
+Sua tendência: {0}, {1}{2} por semana.
+Você come em média {0} kcal ({1} dias com diário); seu objetivo é {2}.
+Para perder, de 0,5 a 1 % do seu peso por semana: para você, entre {0} e {1}. Para ganhar músculo, 0,25–0,5 % ao mês é suficiente.
+Seu peso: {0} · objetivo: ${trS(NGOALS[cqGoalNut()])}.
+Com {0} e um ritmo médio: {1} por semana, uns {2} por mês.
+Seu nível: ${trS(LEVEL_NAMES[L])}.
+Medidas de peso nas últimas 4 semanas: {0}.
+Você está há {0} h de jejum.
+Os estudos não mostram que treinar em jejum queime mais gordura ao longo do dia. A partir de umas {0} h de jejum, o PandarIA conta como um sinal de menos energia para sua recuperação.
+Para você, ${trS(rec)}. Suba de nível quando ficar confortável por várias semanas.
+Jejuns registrados: {0} ({1} concluídos).
+Seu plano atual: ${trS(f.plan)}.
+Sua proteína diária: {0} g. Numa janela de 8 h, uns {1} g em cada uma de 3 refeições.
+Para você, uns {0} por dia, contando todas as bebidas.
+Hoje você está com {0}.
+Seu limite orientativo de cafeína: {0} mg por dia.
+Troque os exercícios que sobrecarregam a região (${trS(z[0]).toLowerCase()}) por versões que não incomodem, baixe o peso e não treine com dor.
+Zonas sensíveis no seu perfil: ${trS(inj.join(', '))}.
+5 minutos de movimento leve e depois {0} séries de aproximação do primeiro exercício, subindo o peso.
+Se você vai fazer 80 kg: {0}, e depois suas séries de trabalho.
+É o suplemento com mais evidências para a força. Dose: {0}–{1} g por dia, todos os dias.
+Com {0}, uma saturação opcional seria de uns {1} g por dia durante {2}–{3} dias.
+Sua meta: {0} g por dia.
+Proteína curta em {0} dos seus últimos dias com diário.
+Sim, pode ajudar a render um pouco mais. Dose útil: {0}–{1} mg por kg, uns {2} minutos antes.
+Para você: {0}–{1} mg, sem passar de {2} mg de uma vez se você não está acostumado.
+Seu limite diário orientativo: {0} mg.
+Ao subir, o peso aumenta {0}–{1} %. Se você falha duas sessões seguidas, baixa para {2} % para voltar a subir. Também leva em conta quantas repetições sobraram, sua recuperação, as pausas longas e se uma sessão foi muito exigente.
+Backup no Drive ativo com {0}.
+variabilidade {0} % abaixo da sua média
+frequência {0} bpm acima da sua média
+${ms.slice(0,2).map(mN).join(' e ')} com menos da metade da recuperação
+Com ${plural(E.n,'fonte de dados','fontes de dados')} de hoje
+Cada dado frente à sua própria média de {0} dias, não frente a valores gerais.
+faltam ${plural(o.falta,'dia','dias')}
+nos seus últimos {0} dias com diário você comeu em média {1} kcal, abaixo do seu gasto ({2}): com menos energia é mais difícil subir
+sua proteína ficou curta em {0} de {1} dias
+${trS(o.ex.n)} está há {1} sessões sem subir e não é por falta de esforço: ${trS(p.join(', e '))}.
+Nestes dias se repetem vários sinais: ${trS(ca.txt.join(', '))}. Uma semana mais leve agora costuma render mais que forçar.
+Uma série a mais de {0}
+Uma série a menos de {0}
+Nas suas últimas {0} semanas você progrediu {1} % mais por semana com ${o.dir>0?'mais':'menos'} séries de {3}. Agora você faz umas {4} por semana: o PandarIA ${o.dir>0?'adiciona':'tira'} uma série em até 2 exercícios do seu plano, sem sair da faixa recomendada.
+Trocar as {0} pelas {1}

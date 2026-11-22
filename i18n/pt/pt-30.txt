@@ -1,5 +1,5 @@
 Como você mede?
-Escolha suas unidades. Você pode mudá-las quando quiser em Ajustes › Idioma do app.
+Escolha suas unidades. Você pode mudá-las quando quiser em Configurações › Idioma do app.
 Mudam o que seu corpo gasta e como se recupera.
 Estou grávida ou amamentando
 O PandarIA não vai propor dietas para perder peso nem jejuns.
@@ -25,7 +25,7 @@ Analisando seus dados…
 O PandarIA prepara seu ponto de partida com o que você contou.
 O que o PandarIA recomenda para começar.
 Permissões
-Todas são opcionais. Você pode ativar agora ou mais tarde em Ajustes › Avisos e som › Permissões.
+Todas são opcionais. Você pode ativar agora ou mais tarde em Configurações › Avisos e som › Permissões.
 Como você quer começar?
 Com o que você já contou, você terá seu plano semanal completo.
 Mais de 60 rotinas para escolher.
@@ -63,7 +63,7 @@ Treine força para não perder músculo enquanto emagrece: o déficit vem da com
 Força pelo menos 2 dias e uns 150 minutos de atividade moderada por semana.
 Cardio que cresce aos poucos e força 2 dias para proteger suas articulações.
 Atividade moderada, uns 150 minutos por semana com força leve, sempre com o aval do seu médico. Evite esportes de contato e ficar deitada de barriga para cima muitos minutos a partir do segundo trimestre.
-Complete sua idade, altura, peso e sexo em Ajustes › seu nome › Meus dados pessoais e o PandarIA vai calcular suas calorias.
+Complete sua idade, altura, peso e sexo em Configurações › seu nome › Meus dados pessoais e o PandarIA vai calcular suas calorias.
 Anote o que você come por uma semana sem mudar nada: vai ver com clareza onde melhorar.
 Tente dormir de 7 a 9 horas: é quando seu corpo se recupera e cresce.
 Se quiser testar o jejum, comece por um 12:12 confortável e suba só se fizer bem.
@@ -72,7 +72,7 @@ Com Premium:
 seu plano com exercícios, séries e pesos que sobem sozinhos.
 divisão por refeições e calorias que se corrigem com seu peso real.
 Hábito
-É calculado com seu perfil de agora. Você pode mudar seus dados em Ajustes › seu nome › Meus dados pessoais.
+É calculado com seu perfil de agora. Você pode mudar seus dados em Configurações › seu nome › Meus dados pessoais.
 Premium ativo!
 Obrigado por apoiar o PandarIA. Você já tem tudo desbloqueado.
 Plano semanal montado pelo PandarIA
@@ -103,7 +103,7 @@ Treinos, rotinas, diário, medidas, fotos e Premium.
 Ao terminar cada treino e uma vez por dia.
 Privado
 Vai para uma pasta oculta do seu Drive. Ninguém mais vê.
-Sempre disponível em Ajustes › seu nome › Minha conta.
+Sempre disponível em Configurações › seu nome › Minha conta.
 Interface
 Completa: tudo à vista, organizado. Minimalista: só o essencial; o resto abre com um toque. Também dá para mudar com o botão de vista em Minhas rotinas.
 Tradução em beta: se algo soar estranho, conte ao criador.

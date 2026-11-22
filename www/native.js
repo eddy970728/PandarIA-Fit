@@ -113,7 +113,7 @@
   let ttsLang = null, ttsWarned = false;
   const wait = ms => new Promise(r => setTimeout(r, ms));
   async function pickLang(){
-    const want = EN_LANG() ? ['en-US','en-GB','en'] : ['es-US','es-MX','es-419','es-ES','es'];
+    const want = ({en:['en-US','en-GB','en'], pt:['pt-BR','pt']})[LANG()] || ['es-US','es-MX','es-419','es-ES','es'];
     let langs = [];
     for (let i = 0; i < 3 && !langs.length; i++){
       try{ langs = (await TTS.getSupportedLanguages()).languages || []; }catch(e){}
@@ -127,13 +127,13 @@
   }
   function ttsHelp(){
     if (ttsWarned) return; ttsWarned = true;
-    confirmBox(Object.assign(EN_LANG() ? {title:'English voice missing', text:'Your phone does not have an English voice installed to read the cues. Install one in the <b>Text-to-speech</b> settings (Google or Samsung engine) and turn voice cues back on.'} : {title:'Falta la voz en español', text:'Tu teléfono no tiene instalada una voz en español para leer los avisos. Instálala en los ajustes de <b>Texto a voz</b> (motor de Google o de Samsung) y vuelve a activar los avisos por voz.'}, {
+    confirmBox(Object.assign(LANG() === 'pt' ? {title:'Falta a voz em português', text:'Seu celular não tem uma voz em português instalada para ler os avisos. Instale uma nas configurações de <b>Conversão de texto em voz</b> (mecanismo do Google ou da Samsung) e ative de novo os avisos por voz.'} : EN_LANG() ? {title:'English voice missing', text:'Your phone does not have an English voice installed to read the cues. Install one in the <b>Text-to-speech</b> settings (Google or Samsung engine) and turn voice cues back on.'} : {title:'Falta la voz en español', text:'Tu teléfono no tiene instalada una voz en español para leer los avisos. Instálala en los ajustes de <b>Texto a voz</b> (motor de Google o de Samsung) y vuelve a activar los avisos por voz.'}, {
       okText:'Instalar voz', ok:() => safe(() => TTS.openInstall()), noText:'Ahora no'}));
   }
   speak = function(text){
     if (!S.settings.voice || !TTS || !text) return; text = typeof spkTr === 'function' ? spkTr(text) : text;
     (async () => {
-      const k = EN_LANG() ? 'en' : 'es';
+      const k = LANG();
       if (!ttsLang || ttsLang.k !== k) ttsLang = {k, l: await pickLang()};
       if (!ttsLang.l){ ttsLang = null; return ttsHelp(); }
       for (let i = 0; i < 3; i++){
@@ -146,7 +146,7 @@
         }
       }
       // 1.6: si la voz nativa falla tres veces (en iPhone pasa tras una interrupción del audio), se usa la voz del navegador
-      try{ if (window.speechSynthesis){ const u = new SpeechSynthesisUtterance(String(text)); u.lang = ttsLang.l || (EN_LANG() ? 'en-US' : 'es-ES'); speechSynthesis.cancel(); speechSynthesis.speak(u); } }catch(e){}
+      try{ if (window.speechSynthesis){ const u = new SpeechSynthesisUtterance(String(text)); u.lang = ttsLang.l || (LANG() === 'es' ? 'es-ES' : LOC()); speechSynthesis.cancel(); speechSynthesis.speak(u); } }catch(e){}
     })();
   };
 
@@ -258,7 +258,7 @@
   // 1.5: las fases están en index.html (FAST_FASES) para que el anillo y los avisos digan lo mismo
   const FAST_PHASES0 = FAST_FASES.map(x => ({h:x.h, n:x.n[0], t:x.t[0], en:[x.n[1], x.t[1]]}));
   // los textos de las fases salen en el idioma elegido (también en los avisos, que no pasan por la pantalla)
-  const FAST_PHASES = new Proxy(FAST_PHASES0, {get:(a, k) => { const v = a[k]; return v && typeof v === 'object' && v.en && EN_LANG() ? Object.assign({}, v, {n: v.en[0], t: v.en[1]}) : v; }});
+  const FAST_PHASES = new Proxy(FAST_PHASES0, {get:(a, k) => { const v = a[k]; return v && typeof v === 'object' && v.en && EN_LANG() ? Object.assign({}, v, {n: v.en[0], t: v.en[1]}) : v && typeof v === 'object' && v.n && LANG() !== 'es' ? Object.assign({}, v, {n: trS(v.n), t: trS(v.t)}) : v; }});
 
   async function refreshPerm(){
     if (!LN) return;
@@ -277,7 +277,7 @@
   }
   const userName = () => { const nm = (S.profile && S.profile.name || '').trim().split(/\s+/)[0]; return nm ? nm + ', ' : ''; };
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-  const trN = s => { if (!s || !EN_LANG() || typeof trText !== 'function') return s; try{ buildEN(); const r = trText(String(s)); return r == null ? s : r; }catch(e){ return s; } };
+  const trN = s => (!s || LANG() === 'es' || typeof trS !== 'function') ? s : trS(s);
   function mk(id, title, body, when, channel, extra, actionTypeId){
     const n = {id, title, body, largeBody: body, channelId: CHN[channel] || CHN.recordatorios, schedule: {at: when, allowWhileIdle: true}, extra: extra || {},
       smallIcon: 'ic_stat_pandaria', iconColor: '#ff7a1a', isExactNotification: exactOk};
@@ -290,6 +290,7 @@
   const litros = ml => aguaOz() ? Math.round(ml/29.5735).toLocaleString(window.LOC?LOC():'es') : (ml/1000).toLocaleString(window.LOC?LOC():'es', {maximumFractionDigits: 2});
   const uW = () => aguaOz() ? ' oz' : ' L';
   const WATER_MSG_ES = ['¡Hora de hidratarse! 💧', 'Tu cuerpo te pide un vaso de agua', 'Un sorbo más cerca de tu meta', 'Pausa de agua: tus músculos lo agradecen', '¿Un vasito? El panda también tiene sed 🐼', 'Hidratarte mejora tu energía y tu rendimiento'];
+  const WATER_MSG_PT = ['Hora de se hidratar! 💧', 'Seu corpo está pedindo um copo de água', 'Um gole mais perto da sua meta', 'Pausa para a água: seus músculos agradecem', 'Um copinho? O panda também está com sede 🐼', 'Se hidratar melhora sua energia e seu desempenho'];
   const WATER_MSG_EN = ['Time to hydrate! 💧', 'Your body is asking for a glass of water', 'One sip closer to your goal', 'Water break: your muscles will thank you', 'A quick glass? The panda is thirsty too 🐼', 'Staying hydrated boosts your energy and performance'];
 
   async function setupNotif(){
@@ -320,17 +321,17 @@
     askExact: IOS ? null : async () => { try{ await LN.changeExactNotificationSetting(); }catch(e){} await refreshPerm(); rescheduleAll(); } };
   function askNotifModal(){
     NS().asked = true; save();
-    openModal(`<div class="modal"><h3>🔔 Activa las notificaciones</h3><p class="mut" style="line-height:1.5;margin:0 0 18px">PandarIA te avisará cuando termine el descanso, cuándo toca entrenar, cuándo beber agua y las fases de tu ayuno. Eliges cada aviso en Ajustes › Notificaciones.</p>
+    openModal(`<div class="modal"><h3>${tx('🔔 Activa las notificaciones','🔔 Turn on notifications',{pt:'🔔 Ative as notificações'})}</h3><p class="mut" style="line-height:1.5;margin:0 0 18px">${tx('PandarIA te avisará cuando termine el descanso, cuándo toca entrenar, cuándo beber agua y las fases de tu ayuno. Eliges cada aviso en Ajustes › Notificaciones.','PandarIA will let you know when your rest ends, when it is time to train, when to drink water and the phases of your fast. You choose each alert in Settings › Notifications.',{pt:'O PandarIA vai avisar quando o descanso terminar, quando for hora de treinar, de beber água e as fases do seu jejum. Você escolhe cada aviso em Configurações › Notificações.'})}</p>
       <div class="col" style="gap:8px"><button class="btn pri wide" data-a="cbm" data-v="${cb(enableNotifs)}">Activar</button><button class="btn wide" data-a="closeModal">Ahora no</button></div></div>`, {center:true});
   }
   async function enableNotifs(){
     try{ notifOk = (await LN.requestPermissions()).display === 'granted'; }catch(e){}
-    if (!notifOk){ toast(IOS ? 'Sin permiso no podemos avisarte. Actívalo en Ajustes del iPhone › PandarIA Fit › Notificaciones.' : 'Sin permiso no podemos avisarte. Actívalo en Ajustes de Android › Aplicaciones › PandarIA Fit.'); return; }
+    if (!notifOk){ toast(IOS ? tx('Sin permiso no podemos avisarte. Actívalo en Ajustes del iPhone › PandarIA Fit › Notificaciones.','Without permission we cannot notify you. Turn it on in iPhone Settings › PandarIA Fit › Notifications.',{pt:'Sem permissão não conseguimos avisar você. Ative em Ajustes do iPhone › PandarIA Fit › Notificações.'}) : tx('Sin permiso no podemos avisarte. Actívalo en Ajustes de Android › Aplicaciones › PandarIA Fit.','Without permission we cannot notify you. Turn it on in Android Settings › Apps › PandarIA Fit.',{pt:'Sem permissão não conseguimos avisar você. Ative em Configurações do Android › Aplicativos › PandarIA Fit.'})); return; }
     await refreshPerm(); rescheduleAll(); refreshNotifUI();
     if (!exactOk && !IOS) askExact();
   }
   function askExact(){
-    confirmBox({title:'Avisos a la hora exacta', text:'Para que los avisos lleguen justo a tiempo, Android necesita el permiso <b>Alarmas y recordatorios</b>. Se abrirá la pantalla para activarlo; luego vuelve con el botón atrás.',
+    confirmBox({title:tx('Avisos a la hora exacta','Alerts on time',{pt:'Avisos na hora exata'}), text:tx('Para que los avisos lleguen justo a tiempo, Android necesita el permiso <b>Alarmas y recordatorios</b>. Se abrirá la pantalla para activarlo; luego vuelve con el botón atrás.','For alerts to arrive right on time, Android needs the <b>Alarms & reminders</b> permission. The screen to turn it on will open; then come back with the back button.',{pt:'Para os avisos chegarem na hora certa, o Android precisa da permissão <b>Alarmes e lembretes</b>. A tela para ativá-la vai abrir; depois volte com o botão voltar.'}),
       okText:'Abrir ajuste', ok: async () => { try{ await LN.changeExactNotificationSetting(); }catch(e){} await refreshPerm(); rescheduleAll(); refreshNotifUI(); }, noText:'Ahora no'});
   }
   function refreshNotifUI(){ if (LAYERS.length && /^nf/.test(LAYERS[LAYERS.length-1].t)) refreshTop(); else { render.keep = true; render(); } }
@@ -357,8 +358,8 @@
         const t = atTime(now + d * DAYMS, remTime); t.setMinutes(t.getMinutes() - (+n.trainLead || 0));
         if (!remDays.includes(atTime(now + d * DAYMS, remTime).getDay())) continue;
         if (d === 0 && trainedToday().length) continue;
-        const title = EN_LANG() ? (r ? `${userName()}${userName() ? 'time' : 'Time'} for ${r.name}!` : `${userName()}${userName() ? 'time' : 'Time'} to train!`) : r ? `${userName() ? userName() + '¡hoy toca ' : '¡Hoy toca '}${r.name}!` : `${userName() ? userName() + '¡hoy toca entrenar!' : '¡Hoy toca entrenar!'}`;
-        push(mk(ID.train + k++, title, r ? tx(`${routineMinutes(r)} min. Tu rutina te espera: toca Empezar y a darle.`, `${routineMinutes(r)} min. Your routine is waiting: tap Start and go for it.`) : tx('Elige una rutina y dale. Unos minutos ya cuentan.', 'Pick a routine and go. A few minutes still count.'), t, 'recordatorios', {go:'train', rid: r && r.id}, r ? 'EMPEZAR' : null), 'none');
+        const title = LANG() === 'pt' ? (r ? `${userName() ? cap(userName()) + 'hoje é dia de ' : 'Hoje é dia de '}${trS(r.name)}!` : `${userName() ? cap(userName()) + 'hoje é dia de treino!' : 'Hoje é dia de treino!'}`) : EN_LANG() ? (r ? `${userName()}${userName() ? 'time' : 'Time'} for ${r.name}!` : `${userName()}${userName() ? 'time' : 'Time'} to train!`) : r ? `${userName() ? userName() + '¡hoy toca ' : '¡Hoy toca '}${r.name}!` : `${userName() ? userName() + '¡hoy toca entrenar!' : '¡Hoy toca entrenar!'}`;
+        push(mk(ID.train + k++, title, r ? tx(`${routineMinutes(r)} min. Tu rutina te espera: toca Empezar y a darle.`, `${routineMinutes(r)} min. Your routine is waiting: tap Start and go for it.`,{pt:`${routineMinutes(r)} min. Sua rotina espera você: toque em Começar e bora.`}) : tx('Elige una rutina y dale. Unos minutos ya cuentan.', 'Pick a routine and go. A few minutes still count.'), t, 'recordatorios', {go:'train', rid: r && r.id}, r ? 'EMPEZAR' : null), 'none');
       }
     }
     // Agua: repartida en tu horario; tras la meta, menos frecuente; no avisa si bebiste hace poco
@@ -376,12 +377,12 @@
           if (t <= now + 60000) continue;
           if (n.waterSmart && d === 0 && last && t - last < 60 * 60000) continue;
           let title, body;
-          if (done){ title = tx('¿Un extra? 💧', 'One more? 💧'); body = tx(`Ya cumpliste tu meta de hoy (${litros(drank)}${uW()}). Un vaso más si tienes sed.`, `You already reached today's goal (${litros(drank)}${uW()}). Have another glass if you're thirsty.`); }
-          else if (i === 0 && !(d === 0 && drank > 0)){ title = EN_LANG() ? `${userName() ? 'Good morning, ' + userName().replace(/, $/, '') + '!' : 'Good morning!'} 💧` : `${userName() ? cap(userName()) + '¡buenos días!' : '¡Buenos días!'} 💧`; body = tx('Empieza el día con un vaso de agua.', 'Start the day with a glass of water.'); }
+          if (done){ title = tx('¿Un extra? 💧', 'One more? 💧'); body = tx(`Ya cumpliste tu meta de hoy (${litros(drank)}${uW()}). Un vaso más si tienes sed.`, `You already reached today's goal (${litros(drank)}${uW()}). Have another glass if you're thirsty.`,{pt:`Você já cumpriu sua meta de hoje (${litros(drank)}${uW()}). Mais um copo se tiver sede.`}); }
+          else if (i === 0 && !(d === 0 && drank > 0)){ title = LANG() === 'pt' ? `${userName() ? 'Bom dia, ' + userName().replace(/, $/, '') + '!' : 'Bom dia!'} 💧` : EN_LANG() ? `${userName() ? 'Good morning, ' + userName().replace(/, $/, '') + '!' : 'Good morning!'} 💧` : `${userName() ? cap(userName()) + '¡buenos días!' : '¡Buenos días!'} 💧`; body = tx('Empieza el día con un vaso de agua.', 'Start the day with a glass of water.'); }
           else {
-            { const WM = EN_LANG() ? WATER_MSG_EN : WATER_MSG_ES; title = WM[(i + d) % WM.length]; }
+            { const WM = ({en:WATER_MSG_EN, pt:WATER_MSG_PT})[LANG()] || WATER_MSG_ES; title = WM[(i + d) % WM.length]; }
             const expected = goal * Math.min(1, (t - st) / Math.max(1, en - st));
-            body = d === 0 ? (drank < expected - 250 ? tx(`Vas un poco atrasado: llevas ${litros(drank)} de ${litros(goal)}${uW()}.`, `You're a little behind: ${litros(drank)} of ${litros(goal)}${uW()} so far.`) : tx(`Vas bien: llevas ${litros(drank)} de ${litros(goal)}${uW()}.`, `You're on track: ${litros(drank)} of ${litros(goal)}${uW()} so far.`)) : tx(`Tu meta de hoy: ${litros(goal)}${uW()}.`, `Today's goal: ${litros(goal)}${uW()}.`);
+            body = d === 0 ? (drank < expected - 250 ? tx(`Vas un poco atrasado: llevas ${litros(drank)} de ${litros(goal)}${uW()}.`, `You're a little behind: ${litros(drank)} of ${litros(goal)}${uW()} so far.`,{pt:`Você está um pouco atrasado: está com ${litros(drank)} de ${litros(goal)}${uW()}.`}) : tx(`Vas bien: llevas ${litros(drank)} de ${litros(goal)}${uW()}.`, `You're on track: ${litros(drank)} of ${litros(goal)}${uW()} so far.`,{pt:`Vai bem: está com ${litros(drank)} de ${litros(goal)}${uW()}.`})) : tx(`Tu meta de hoy: ${litros(goal)}${uW()}.`, `Today's goal: ${litros(goal)}${uW()}.`,{pt:`Sua meta de hoje: ${litros(goal)}${uW()}.`});
           }
           push(mk(ID.water + k++, title, body, new Date(t), 'agua', {go:'water'}, 'AGUA'), 'skip');
         }
@@ -397,17 +398,17 @@
           const reached = g && p.h > g;
           push(mk(ID.fastPhase + i, `${p.h} h · ${p.n}${reached ? ' 🔥' : ''}`, (reached ? tx('Ya pasaste tu meta: sigue si te sientes bien. ', 'You passed your goal: keep going if you feel well. ') : '') + p.t, new Date(s0 + p.h * 3600000), 'ayuno', {go:'fast'}, reached || p.h >= 24 ? 'AYUNO_FIN' : null), 'skip');
         });
-        if (g && n.fastHalf && g / 2 !== 4 && g / 2 !== 8 && g / 2 !== 12) push(mk(ID.fastHalf, tx('Vas por la mitad del ayuno 💪', 'Halfway through your fast 💪'), tx(`Llevas ${g/2} h. Agua, café o té sin azúcar te ayudan.`, `${g/2} h done. Water, coffee or unsweetened tea help.`), new Date(s0 + g * 1800000), 'ayuno', {go:'fast'}), 'skip');
-        if (g && n.fastGoal) push(mk(ID.fastGoal, tx(`¡${g} h de ayuno cumplidas! 🎉`, `${g} h fast complete! 🎉`), tx('Rompe el ayuno con proteína y verduras, o sigue si quieres un esfuerzo extra.', 'Break your fast with protein and vegetables, or keep going if you want an extra push.'), new Date(s0 + g * 3600000), 'ayuno', {go:'fast'}, 'AYUNO_FIN'), 'move');
+        if (g && n.fastHalf && g / 2 !== 4 && g / 2 !== 8 && g / 2 !== 12) push(mk(ID.fastHalf, tx('Vas por la mitad del ayuno 💪', 'Halfway through your fast 💪'), tx(`Llevas ${g/2} h. Agua, café o té sin azúcar te ayudan.`, `${g/2} h done. Water, coffee or unsweetened tea help.`,{pt:`Você está há ${g/2} h. Água, café ou chá sem açúcar ajudam.`}), new Date(s0 + g * 1800000), 'ayuno', {go:'fast'}), 'skip');
+        if (g && n.fastGoal) push(mk(ID.fastGoal, tx(`¡${g} h de ayuno cumplidas! 🎉`, `${g} h fast complete! 🎉`,{pt:`${g} h de jejum cumpridas! 🎉`}), tx('Rompe el ayuno con proteína y verduras, o sigue si quieres un esfuerzo extra.', 'Break your fast with protein and vegetables, or keep going if you want an extra push.'), new Date(s0 + g * 3600000), 'ayuno', {go:'fast'}, 'AYUNO_FIN'), 'move');
       } else {
         const plan = FAST_PLANS[f.plan], last = f.history[f.history.length - 1];
         if (plan && plan.h && last && n.fastWin){
           const close = last.end + (24 - plan.h) * 3600000, lead = (+n.fastWinLead || 60) * 60000;
-          push(mk(ID.fastWin, tx(`Tu ventana de comida cierra en ${fmtEvery(lead / 60000)}`, `Your eating window closes in ${fmtEvery(lead / 60000)}`), tx('Buen momento para tu última comida, con proteína.', 'Good time for your last meal, with protein.'), new Date(close - lead), 'ayuno', {go:'fast'}), 'move');
-          push(mk(ID.fastStart, tx('Hora de empezar tu ayuno ⏱️', 'Time to start your fast ⏱️'), tx(`Plan ${plan.n}. Toca para empezarlo.`, `${plan.n} plan. Tap to start it.`), new Date(close), 'ayuno', {go:'fast'}, 'AYUNO'), 'move');
+          push(mk(ID.fastWin, tx(`Tu ventana de comida cierra en ${fmtEvery(lead / 60000)}`, `Your eating window closes in ${fmtEvery(lead / 60000)}`,{pt:`Sua janela de alimentação fecha em ${trS(fmtEvery(lead / 60000))}`}), tx('Buen momento para tu última comida, con proteína.', 'Good time for your last meal, with protein.'), new Date(close - lead), 'ayuno', {go:'fast'}), 'move');
+          push(mk(ID.fastStart, tx('Hora de empezar tu ayuno ⏱️', 'Time to start your fast ⏱️'), tx(`Plan ${plan.n}. Toca para empezarlo.`, `${plan.n} plan. Tap to start it.`,{pt:`Plano ${plan.n}. Toque para começar.`}), new Date(close), 'ayuno', {go:'fast'}, 'AYUNO'), 'move');
         }
         if (n.fastDaily) for (let d = 0; d < 2; d++)
-          push(mk(ID.fastDaily + d, tx('Hora de empezar tu ayuno ⏱️', 'Time to start your fast ⏱️'), tx(`Plan ${(plan && plan.n) || 'libre'}. Toca Empezar ayuno.`, `${(plan && plan.n) || 'Free'} plan. Tap Start fast.`), atTime(now + d * DAYMS, n.fastDailyTime), 'ayuno', {go:'fast'}, 'AYUNO'), 'none');
+          push(mk(ID.fastDaily + d, tx('Hora de empezar tu ayuno ⏱️', 'Time to start your fast ⏱️'), tx(`Plan ${(plan && plan.n) || 'libre'}. Toca Empezar ayuno.`, `${(plan && plan.n) || 'Free'} plan. Tap Start fast.`,{pt:`Plano ${(plan && plan.n) || 'livre'}. Toque em Começar jejum.`}), atTime(now + d * DAYMS, n.fastDailyTime), 'ayuno', {go:'fast'}, 'AYUNO'), 'none');
       }
     }
     // Racha en riesgo
@@ -416,14 +417,14 @@
       const wk = weekKey(now), days = new Set(S.sessions.filter(s => weekKey(s.end) === wk).map(s => new Date(s.end).toDateString())).size;
       const target = S.plan && S.plan.days.length ? S.plan.days.length : 1, st = streakWeeks(), falt = target - days;
       if (falt > 0 && weekKey(t.getTime()) === wk)
-        push(mk(ID.streak, days === 0 && st > 0 ? tx(`🔥 Tu racha de ${plural(st,'semana','semanas')} está en riesgo`, `🔥 Your ${plural(st,'week','weeks')} streak is at risk`) : tx('Se acaba la semana', 'The week is ending'),
-          days === 0 ? tx('Entrena hoy para mantener la racha. Unos minutos ya cuentan.', 'Train today to keep your streak. A few minutes still count.') : tx(`Te ${falt === 1 ? 'falta 1 entreno' : 'faltan ' + falt + ' entrenos'} para tu objetivo semanal.`, `${plural(falt,'workout','workouts')} to go for your weekly goal.`), t, 'recordatorios', {go:'train'}), 'move');
+        push(mk(ID.streak, days === 0 && st > 0 ? tx(`🔥 Tu racha de ${plural(st,'semana','semanas')} está en riesgo`, `🔥 Your ${plural(st,'week','weeks')} streak is at risk`,{pt:`🔥 Sua sequência de ${plural(st,'semana','semanas')} está em risco`}) : tx('Se acaba la semana', 'The week is ending'),
+          days === 0 ? tx('Entrena hoy para mantener la racha. Unos minutos ya cuentan.', 'Train today to keep your streak. A few minutes still count.') : tx(`Te ${falt === 1 ? 'falta 1 entreno' : 'faltan ' + falt + ' entrenos'} para tu objetivo semanal.`, `${plural(falt,'workout','workouts')} to go for your weekly goal.`,{pt:`${falt === 1 ? 'Falta 1 treino' : 'Faltam ' + falt + ' treinos'} para seu objetivo semanal.`}), t, 'recordatorios', {go:'train'}), 'move');
     }
     // Informe semanal (Premium)
     if (n.report && premium() && S.settings.report !== false){
       const t = atTime(now, n.reportTime); let add = (+n.reportDay - t.getDay() + 7) % 7; if (add === 0 && t.getTime() <= now) add = 7; t.setDate(t.getDate() + add);
       const r = weekReport(weekKey(now));
-      const body = EN_LANG() ? (r.n ? `Week: ${plural(r.n,'workout','workouts')}${r.pvol ? `, ${r.vol >= r.pvol ? '+' : ''}${Math.round((r.vol - r.pvol) / r.pvol * 100)}% volume` : ''}${r.prs ? `, ${plural(r.prs,'record','records')}` : ''}. Tap to see it.` : 'New week, fresh start. Tap to see your report.')
+      const body = LANG() === 'pt' ? (r.n ? `Semana: ${plural(r.n,'treino','treinos')}${r.pvol ? `, ${r.vol >= r.pvol ? '+' : ''}${Math.round((r.vol - r.pvol) / r.pvol * 100)} % de volume` : ''}${r.prs ? `, ${plural(r.prs,'recorde','recordes')}` : ''}. Toque para ver.` : 'Semana nova, recomeço. Toque para ver seu relatório.') : EN_LANG() ? (r.n ? `Week: ${plural(r.n,'workout','workouts')}${r.pvol ? `, ${r.vol >= r.pvol ? '+' : ''}${Math.round((r.vol - r.pvol) / r.pvol * 100)}% volume` : ''}${r.prs ? `, ${plural(r.prs,'record','records')}` : ''}. Tap to see it.` : 'New week, fresh start. Tap to see your report.')
         : r.n ? `Semana: ${plural(r.n,'entreno','entrenos')}${r.pvol ? `, ${r.vol >= r.pvol ? '+' : ''}${Math.round((r.vol - r.pvol) / r.pvol * 100)} % de volumen` : ''}${r.prs ? `, ${plural(r.prs,'récord','récords')}` : ''}. Toca para verlo.` : 'Nueva semana, nuevo comienzo. Toca para ver tu informe.';
       push(mk(ID.report, tx('Tu informe semanal está listo 📊', 'Your weekly report is ready 📊'), body, t, 'pandaria', {go:'report'}), 'move');
     }
@@ -433,7 +434,7 @@
       if (rs.length){
         const t = atTime(now, n.pandariaTime); if (t.getTime() < now + 2 * 3600000) t.setDate(t.getDate() + 1);
         const tot = rs.reduce((a, r) => a + r.sugg.length, 0);
-        push(mk(ID.pandaria, tx(`PandarIA tiene ${plural(tot,'sugerencia','sugerencias')} para ti`, `PandarIA has ${plural(tot,'suggestion','suggestions')} for you`), `${rs[0].name}: ${trN(rs[0].sugg[0].title)}`, t, 'pandaria', {go:'routine', rid: rs[0].id}), 'move');
+        push(mk(ID.pandaria, tx(`PandarIA tiene ${plural(tot,'sugerencia','sugerencias')} para ti`, `PandarIA has ${plural(tot,'suggestion','suggestions')} for you`,{pt:`O PandarIA tem ${plural(tot,'sugestão','sugestões')} para você`}), `${rs[0].name}: ${trN(rs[0].sugg[0].title)}`, t, 'pandaria', {go:'routine', rid: rs[0].id}), 'move');
       }
     }
     // Copia de seguridad mensual: día 1 a las 10:00
@@ -467,12 +468,12 @@
     if (a.rest && a.rest.end > now + 1500){
       const np = nextPending(); let body = tx('A por la siguiente serie', 'On to the next set');
       if (np){ const ex = getEx(np.it.exId), wn = np.it.sets.slice(0, np.i + 1).filter(x => x.t !== 'c').length;
-        body = np.it.sets[np.i].t === 'c' ? tx(`Calentamiento de ${ex.n}`, `${trN(ex.n)} warm-up`) : tx(`¡A por la serie ${wn} de ${ex.n}!`, `On to set ${wn} of ${trN(ex.n)}!`); }
+        body = np.it.sets[np.i].t === 'c' ? tx(`Calentamiento de ${ex.n}`, `${trN(ex.n)} warm-up`,{pt:`Aquecimento de ${trS(ex.n)}`}) : tx(`¡A por la serie ${wn} de ${ex.n}!`, `On to set ${wn} of ${trN(ex.n)}!`,{pt:`Bora para a série ${wn} de ${trS(ex.n)}!`}); }
       list.push(mk(ID.rest, tx('⏱️ Descanso terminado', '⏱️ Rest over'), body, new Date(a.rest.end), 'entreno', {go:'workout'}));
     }
     if (a.timer && a.timer.end > now + 1500){
       const it = wkItem(a.timer.uid);
-      list.push(mk(ID.timer, tx('✅ Tiempo cumplido', '✅ Time is up'), it ? tx(`${getEx(it.exId).n}: serie completada`, `${trN(getEx(it.exId).n)}: set complete`) : tx('Serie completada', 'Set complete'), new Date(a.timer.end), 'entreno', {go:'workout'}));
+      list.push(mk(ID.timer, tx('✅ Tiempo cumplido', '✅ Time is up'), it ? tx(`${getEx(it.exId).n}: serie completada`, `${trN(getEx(it.exId).n)}: set complete`,{pt:`${trS(getEx(it.exId).n)}: série concluída`}) : tx('Serie completada', 'Set complete'), new Date(a.timer.end), 'entreno', {go:'workout'}));
     }
     if (list.length) safe(() => LN.schedule({notifications: list}));
   }
@@ -520,14 +521,14 @@
   SCREENS.nfMenu = () => {
     const n = NS(), prem = premium(), rem = S.settings.reminders;
     let b = '';
-    if (!notifOk) b += `<div class="banner"><span class="ic">${I('bell',20)}</span><div class="grow sm">Las notificaciones están desactivadas en ${IOS ? 'el iPhone' : 'Android'}.<br><button class="link sm" style="margin-top:8px" data-a="nfEnable">Activarlas</button></div></div>`;
-    else if (!exactOk && !IOS) b += `<div class="banner blue"><span class="ic">${I('timer',20)}</span><div class="grow sm">Permite <b>Alarmas y recordatorios</b> para que los avisos lleguen a su hora exacta.<br><button class="link sm" style="margin-top:8px" data-a="nfExact">Permitir</button></div></div>`;
+    if (!notifOk) b += `<div class="banner"><span class="ic">${I('bell',20)}</span><div class="grow sm">${tx(`Las notificaciones están desactivadas en ${IOS ? 'el iPhone' : 'Android'}.`,`Notifications are turned off on ${IOS ? 'the iPhone' : 'Android'}.`,{pt:`As notificações estão desativadas no ${IOS ? 'iPhone' : 'Android'}.`})}<br><button class="link sm" style="margin-top:8px" data-a="nfEnable">${tx('Activarlas','Turn them on',{pt:'Ativar'})}</button></div></div>`;
+    else if (!exactOk && !IOS) b += `<div class="banner blue"><span class="ic">${I('timer',20)}</span><div class="grow sm">${tx('Permite <b>Alarmas y recordatorios</b> para que los avisos lleguen a su hora exacta.','Allow <b>Alarms & reminders</b> so alerts arrive right on time.',{pt:'Permita <b>Alarmes e lembretes</b> para os avisos chegarem na hora exata.'})}<br><button class="link sm" style="margin-top:8px" data-a="nfExact">${tx('Permitir','Allow')}</button></div></div>`;
     b += `<div class="card" style="padding:0 12px">${nTg('on','Notificaciones','Interruptor general de todos los avisos')}</div>`;
     if (n.on){
       b += `<div class="row" style="gap:8px;margin-bottom:6px"><button class="btn grow sm" data-a="nfNext">${I('list',16)} Próximos avisos</button><button class="btn grow sm" data-a="nfBattery"${IOS ? ' hidden' : ''}>${I('info',16)} Que lleguen siempre</button></div>`;
       b += card('moon','Horas de silencio', null, nTg('quiet','Silenciar por la noche','Agua y fases del ayuno no suenan; el resto se mueve al final. El fin del descanso siempre avisa.') + (n.quiet ? nTime('quietFrom','Desde') + nTime('quietTo','Hasta') : ''));
       b += card('dumbbell','Entreno','train', nTg('train','Recordatorio de entreno', rem.days.length ? `${rem.days.length === 7 ? 'Todos los días' : rem.days.map(d => DS[d]).join(' ')} a las ${rem.time}` : 'Elige los días abajo') +
-        (n.train ? `<button class="srow" data-a="nfRemAuto"><span class="grow"><div class="b">${tx('A tu hora habitual','At your usual time')}${prem ? '' : ' 🔒'}</div><div class="xs mut">${(h => rem.auto && prem ? (h ? tx(`Sueles empezar a las ${h.hora}: aviso a las ${h.aviso}${S.plan ? ', los días de tu plan' : ''}`, `You usually start at ${h.hora}: reminder at ${h.aviso}${S.plan ? ', on your plan days' : ''}`) : tx('Con 5 entrenos aprende tu hora habitual','After 5 workouts it learns your usual time')) : tx('PandarIA aprende a qué hora sueles entrenar','PandarIA learns when you usually train'))(typeof horaHabitual === 'function' ? horaHabitual() : null)}</div></span><span class="toggle ${rem.auto && prem ? 'on' : ''}"></span></button>` : '') +
+        (n.train ? `<button class="srow" data-a="nfRemAuto"><span class="grow"><div class="b">${tx('A tu hora habitual','At your usual time')}${prem ? '' : ' 🔒'}</div><div class="xs mut">${(h => rem.auto && prem ? (h ? tx(`Sueles empezar a las ${h.hora}: aviso a las ${h.aviso}${S.plan ? ', los días de tu plan' : ''}`, `You usually start at ${h.hora}: reminder at ${h.aviso}${S.plan ? ', on your plan days' : ''}`,{pt:`Você costuma começar às ${h.hora}: aviso às ${h.aviso}${S.plan ? ', nos dias do seu plano' : ''}`}) : tx('Con 5 entrenos aprende tu hora habitual','After 5 workouts it learns your usual time')) : tx('PandarIA aprende a qué hora sueles entrenar','PandarIA learns when you usually train'))(typeof horaHabitual === 'function' ? horaHabitual() : null)}</div></span><span class="toggle ${rem.auto && prem ? 'on' : ''}"></span></button>` : '') +
         (n.train ? `<div class="xs mut" style="padding:8px 4px 0">Días de entreno</div><div class="chips" style="padding:6px 0 10px;gap:6px">${[1,2,3,4,5,6,0].map(d => `<button class="chip ${rem.days.includes(d) ? 'on' : ''}" style="width:36px;justify-content:center;padding:0" data-a="nfRemDay" data-v="${d}">${DS[d]}</button>`).join('')}</div>
           <div class="row" style="padding:4px 4px 10px;gap:10px"><span class="grow sm">Hora</span><input type="time" class="inp" style="width:148px;height:42px" value="${rem.time}" data-ch="nfRemTime"></div>
           <div class="xs mut" style="padding:0 4px">Avisar</div>${nChips('trainLead',[0,15,30], v => +v ? `${v} min antes` : 'En punto')}` : '') +
@@ -551,7 +552,7 @@
     const L = (p.list || []).slice().sort((a, b) => a.at - b.at);
     const rows = L.map(x => { const d = new Date(x.at);
       return `<div class="kv" style="align-items:flex-start;gap:12px"><span class="mut" style="white-space:nowrap">${d.toDateString() === new Date().toDateString() ? 'Hoy' : DL[d.getDay()].slice(0,3) + ' ' + d.getDate()} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span><span style="text-align:right"><b>${esc(x.title)}</b><br><span class="xs mut">${esc(x.body || '')}</span></span></div>`; }).join('');
-    return lhdr('Próximos avisos') + `<div class="lbody"><p class="sm mut" style="margin-top:0">${L.length ? `${plural(L.length,'aviso programado','avisos programados')}. Se reprograman solos cuando cambias algo.` : 'No hay avisos programados.'}${exactOk ? '' : ' <b>Sin el permiso de alarmas exactas, Android puede retrasarlos.</b>'}</p>${L.length ? `<div class="card" style="padding:4px 14px">${rows}</div>` : ''}</div>`;
+    return lhdr('Próximos avisos') + `<div class="lbody"><p class="sm mut" style="margin-top:0">${L.length ? tx(`${plural(L.length,'aviso programado','avisos programados')}. Se reprograman solos cuando cambias algo.`,`${plural(L.length,'scheduled alert','scheduled alerts')}. They reschedule themselves when you change something.`,{pt:`${plural(L.length,'aviso agendado','avisos agendados')}. Eles se reagendam sozinhos quando você muda algo.`}) : tx('No hay avisos programados.','No alerts scheduled.',{pt:'Não há avisos agendados.'})}${exactOk ? '' : ' <b>'+tx('Sin el permiso de alarmas exactas, Android puede retrasarlos.','Without the exact alarms permission, Android may delay them.',{pt:'Sem a permissão de alarmes exatos, o Android pode atrasá-los.'})+'</b>'}</p>${L.length ? `<div class="card" style="padding:4px 14px">${rows}</div>` : ''}</div>`;
   };
   const reN = () => { save(); scheduleNotifs(); refreshTop(); };
   A.nfMenu = () => { refreshPerm().then(() => openLayer('nfMenu')); };
@@ -576,6 +577,12 @@
     fast:  ['12 h · Estado de ayuno', 'Así se verán las fases de tu ayuno.', 'ayuno', null],
     all:   ['PandarIA Fit 🐼', '¡Las notificaciones funcionan! Bloquea el teléfono y espera…', 'entreno', null]
   };
+  const TESTS_PT = {
+    train: ['Hoje é dia de treino! 💪', 'É assim que vai aparecer seu lembrete de treino.', 'recordatorios', 'EMPEZAR'],
+    water: ['Hora de se hidratar! 💧', 'É assim que vai aparecer o aviso de água. Teste o botão +250 ml.', 'agua', 'AGUA'],
+    fast:  ['12 h · Estado de jejum', 'É assim que vão aparecer as fases do seu jejum.', 'ayuno', null],
+    all:   ['PandarIA Fit 🐼', 'As notificações estão funcionando! Bloqueie o celular e espere…', 'entreno', null]
+  };
   const TESTS_EN = {
     train: ['Time to train! 💪', 'This is how your workout reminder will look.', 'recordatorios', 'EMPEZAR'],
     water: ['Time to hydrate! 💧', 'This is how the water reminder will look. Try the +250 ml button.', 'agua', 'AGUA'],
@@ -584,18 +591,28 @@
   };
   A.nfTest = async kind => {
     if (!notifOk){ enableNotifs(); return; }
-    const TESTS = EN_LANG() ? TESTS_EN : TESTS_ES, t = TESTS[kind] || TESTS.all;
+    const TESTS = ({en:TESTS_EN, pt:TESTS_PT})[LANG()] || TESTS_ES, t = TESTS[kind] || TESTS.all;
     try{ await LN.schedule({notifications: [mk(9999, t[0], t[1], new Date(Date.now() + 5000), t[2], {go: kind === 'water' ? 'water' : kind === 'fast' ? 'fast' : 'train'}, t[3])]}); toast('Llegará en 5 segundos. Puedes bloquear el teléfono.'); }catch(e){ toast('No se pudo programar'); }
   };
-  A.nfBattery = () => openModal(`<div class="sheet"><div class="grab"></div><h3>Que los avisos lleguen siempre</h3>
-    <p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">Samsung duerme las apps para ahorrar batería y puede retrasar los avisos. Haz esto una sola vez:</p>
-    <div class="card">${[
+  A.nfBattery = () => openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('Que los avisos lleguen siempre','Make sure alerts always arrive',{pt:'Para os avisos chegarem sempre'})}</h3>
+    <p class="sm mut" style="margin:-6px 4px 14px;line-height:1.45">${tx('Samsung duerme las apps para ahorrar batería y puede retrasar los avisos. Haz esto una sola vez:','Samsung puts apps to sleep to save battery and may delay alerts. Do this just once:',{pt:'A Samsung coloca os apps para dormir para economizar bateria e pode atrasar os avisos. Faça isto uma vez só:'})}</p>
+    <div class="card">${(LANG() === 'pt' ? [
+      '<b>Configurações › Aplicativos › PandarIA Fit › Bateria</b> e escolha <b>Sem restrições</b>.',
+      '<b>Configurações › Bateria › Limites de uso em segundo plano › Apps que nunca entram em suspensão</b> e adicione o PandarIA Fit.',
+      'Em <b>Configurações › Aplicativos › PandarIA Fit › Notificações</b>, confira se todas as categorias estão ativadas e com som.',
+      'Na mesma tela do app, em <b>Alarmes e lembretes</b>, deixe a permissão ativada.'
+    ] : EN_LANG() ? [
+      '<b>Settings › Apps › PandarIA Fit › Battery</b> and choose <b>Unrestricted</b>.',
+      '<b>Settings › Battery › Background usage limits › Never sleeping apps</b> and add PandarIA Fit.',
+      'In <b>Settings › Apps › PandarIA Fit › Notifications</b>, check that every category is on and has sound.',
+      'On the same app screen, under <b>Alarms & reminders</b>, keep the permission on.'
+    ] : [
       '<b>Ajustes › Aplicaciones › PandarIA Fit › Batería</b> y elige <b>Sin restricciones</b>.',
       '<b>Ajustes › Batería › Límites de uso en segundo plano › Aplicaciones que nunca se suspenden</b> y añade PandarIA Fit.',
       'En <b>Ajustes › Aplicaciones › PandarIA Fit › Notificaciones</b>, comprueba que todas las categorías estén activadas y con sonido.',
       'En la misma pantalla de la app, en <b>Alarmas y recordatorios</b>, deja el permiso activado.'
-    ].map((t, i) => `<div class="row" style="align-items:flex-start;padding:6px 0"><span class="tag ac" style="min-width:24px;justify-content:center">${i+1}</span><span class="sm" style="line-height:1.45">${t}</span></div>`).join('')}</div>
-    <p class="xs mut" style="line-height:1.4">Los nombres pueden variar un poco según tu versión de One UI.</p>
+    ]).map((t, i) => `<div class="row" style="align-items:flex-start;padding:6px 0"><span class="tag ac" style="min-width:24px;justify-content:center">${i+1}</span><span class="sm" style="line-height:1.45">${t}</span></div>`).join('')}</div>
+    <p class="xs mut" style="line-height:1.4">${tx('Los nombres pueden variar un poco según tu versión de One UI.','Names may vary slightly depending on your One UI version.',{pt:'Os nomes podem variar um pouco conforme sua versão da One UI.'})}</p>
     <button class="btn pri big" data-a="closeModal">Entendido</button></div>`);
 
   // Entrada en Ajustes
@@ -614,10 +631,10 @@
   const nativeTiming = () => svcOn && (!!S.active || intRunning());
   function intPhaseInfo(p, c){
     const ex = p.ex ? getEx(p.ex).n : '';
-    const en = EN_LANG(), exN = en ? trN(ex) : ex, lb = p.label ? (en ? trN(p.label) : p.label) : tx('Descanso', 'Rest');
+    const en = LANG() !== 'es', exN = en ? trN(ex) : ex, lb = p.label ? (en ? trN(p.label) : p.label) : tx('Descanso', 'Rest');
     const label = p.type === 'work' ? (p.amrap ? 'AMRAP' : p.emom ? 'EMOM' : tx('TRABAJO', 'WORK')) + (ex ? ' · ' + exN : '') : p.type === 'rest' ? lb : tx('Prepárate', 'Get ready');
-    const sub = p.round ? (p.emom ? tx(`Minuto ${p.round} de ${p.rounds}`, `Minute ${p.round} of ${p.rounds}`) : tx(`Ronda ${p.round} de ${p.rounds}`, `Round ${p.round} of ${p.rounds}`)) + (p.sets > 1 ? tx(` · Tanda ${p.set} de ${p.sets}`, ` · Block ${p.set} of ${p.sets}`) : '') : trN(INT_FMT[c.fmt].n);
-    const say = p.type === 'work' ? (p.amrap ? tx('¡Adelante! Máximo de rondas', 'Go! As many rounds as you can') : (p.emom ? tx(`Minuto ${p.round}. `, `Minute ${p.round}. `) : tx('Trabajo. ', 'Work. ')) + exN) : p.type === 'rest' ? lb : tx('Prepárate', 'Get ready');
+    const sub = p.round ? (p.emom ? tx(`Minuto ${p.round} de ${p.rounds}`, `Minute ${p.round} of ${p.rounds}`,{pt:`Minuto ${p.round} de ${p.rounds}`}) : tx(`Ronda ${p.round} de ${p.rounds}`, `Round ${p.round} of ${p.rounds}`,{pt:`Rodada ${p.round} de ${p.rounds}`})) + (p.sets > 1 ? tx(` · Tanda ${p.set} de ${p.sets}`, ` · Block ${p.set} of ${p.sets}`,{pt:` · Bloco ${p.set} de ${p.sets}`}) : '') : trN(INT_FMT[c.fmt].n);
+    const say = p.type === 'work' ? (p.amrap ? tx('¡Adelante! Máximo de rondas', 'Go! As many rounds as you can') : (p.emom ? tx(`Minuto ${p.round}. `, `Minute ${p.round}. `,{pt:`Minuto ${p.round}. `}) : tx('Trabajo. ', 'Work. ')) + exN) : p.type === 'rest' ? lb : tx('Prepárate', 'Get ready');
     return {label, sub, dur: p.dur, say};
   }
   function svcState(){
@@ -631,15 +648,15 @@
     Object.assign(base, {mode:'workout', title: a.name, startedAt: a.start});
     // 1.3: la notificación muestra la serie siguiente y un botón para marcarla hecha (solo series con peso o repeticiones)
     if (!a.rest && !a.timer){ const np = nextPending(); if (np){ const ex = getEx(np.it.exId), s1 = np.it.sets[np.i];
-      if (ex.mode !== 't'){ const kg = s1.kg ?? s1.sk, reps = s1.reps ?? s1.sr; base.next = {label: tx('Siguiente','Next'), btn: tx('✓ Hecha','✓ Done'), text: `${EN_LANG() ? trN(ex.n) : ex.n} · ${kg ? fmtNum(toUnit(kg)) + ' ' + S.settings.unit + ' × ' : ''}${reps || '?'}`}; } } }
+      if (ex.mode !== 't'){ const kg = s1.kg ?? s1.sk, reps = s1.reps ?? s1.sr; base.next = {label: tx('Siguiente','Next'), btn: tx('✓ Hecha','✓ Done'), text: `${trN(ex.n)} · ${kg ? fmtNum(toUnit(kg)) + ' ' + S.settings.unit + ' × ' : ''}${reps || '?'}`}; } } }
     if (a.timer){
       const it = wkItem(a.timer.uid), n = it ? trN(getEx(it.exId).n) : tx('Serie', 'Set');
-      base.rest = {kind:'set', end: a.timer.end, total: a.timer.total, title: tx(`Serie por tiempo · ${n}`, `Timed set · ${n}`), text: a.name, doneTitle: tx('✅ Tiempo cumplido', '✅ Time is up'), doneText: n, say: tx('Tiempo', 'Time')};
+      base.rest = {kind:'set', end: a.timer.end, total: a.timer.total, title: tx(`Serie por tiempo · ${n}`, `Timed set · ${n}`,{pt:`Série por tempo · ${trS(n)}`}), text: a.name, doneTitle: tx('✅ Tiempo cumplido', '✅ Time is up'), doneText: n, say: tx('Tiempo', 'Time')};
     } else if (a.rest){
-      const en = EN_LANG(); const np = nextPending(); let next = tx('la siguiente serie', 'the next set'), say = tx('Descanso terminado', 'Rest over');
+      const en = LANG() !== 'es'; const np = nextPending(); let next = tx('la siguiente serie', 'the next set'), say = tx('Descanso terminado', 'Rest over');
       if (np){ const ex = getEx(np.it.exId), wn = np.it.sets.slice(0, np.i + 1).filter(x => x.t !== 'c').length, xn = en ? trN(ex.n) : ex.n;
-        next = np.it.sets[np.i].t === 'c' ? tx(`calentamiento de ${xn}`, `${xn} warm-up`) : tx(`serie ${wn} de ${xn}`, `set ${wn} of ${xn}`); say = tx(`Descanso terminado. Siguiente: ${xn}`, `Rest over. Next: ${xn}`); }
-      base.rest = {kind:'rest', end: a.rest.end, total: a.rest.total, title: tx(`Descanso · ${cap(next)}`, `Rest · ${cap(next)}`), text: a.name, doneTitle: tx('⏱️ Descanso terminado', '⏱️ Rest over'), doneText: tx(`¡A por la ${next}!`, `On to ${next}!`), say};
+        next = np.it.sets[np.i].t === 'c' ? tx(`calentamiento de ${xn}`, `${xn} warm-up`,{pt:`aquecimento de ${trS(xn)}`}) : tx(`serie ${wn} de ${xn}`, `set ${wn} of ${xn}`,{pt:`série ${wn} de ${trS(xn)}`}); say = tx(`Descanso terminado. Siguiente: ${xn}`, `Rest over. Next: ${xn}`,{pt:`Descanso terminado. Próximo: ${trS(xn)}`}); }
+      base.rest = {kind:'rest', end: a.rest.end, total: a.rest.total, title: tx(`Descanso · ${cap(next)}`, `Rest · ${cap(next)}`,{pt:`Descanso · ${trS(cap(next))}`}), text: a.name, doneTitle: tx('⏱️ Descanso terminado', '⏱️ Rest over'), doneText: tx(`¡A por la ${next}!`, `On to ${next}!`,{pt:`Bora: ${trS(next)}!`}), say};
     }
     return base;
   }
@@ -779,7 +796,7 @@
         else if (a.type === 'chk'){ const day = a.day || dayKey(); if (!S.checkinDia || S.checkinDia.day !== day) S.checkinDia = {day, sleep: null, energy: null, sore: null};
           if (['sleep', 'energy', 'sore'].includes(a.k)) S.checkinDia[a.k] = +a.v; }
       }catch(e){} });
-      if (ml > 0) msgs.unshift(tx(`💧 +${ml} ml desde el widget`, `💧 +${ml} ml from the widget`));
+      if (ml > 0) msgs.unshift(tx(`💧 +${ml} ml desde el widget`, `💧 +${ml} ml from the widget`,{pt:`💧 +${ml} ml pelo widget`}));
       if (acts.length){ save(); render.keep = true; render(); if (msgs.length) toast(msgs.join(' · ')); }
   }
   window.pfWidgetData = widgetData; window.pfWidgetApply = widgetApply;
@@ -817,8 +834,8 @@
   A.shareRoutine = id => {
     const r = findR(id); if (!r) return;
     const {code, skipped} = encodeRoutine(r), link = `${PAGES}r.html#${code}`;
-    const text = `Prueba mi rutina «${r.name}» en PandarIA Fit 💪\n${link}\n\nSi no se abre, copia este código en Nueva rutina › Importar con código: ${code}`;
-    openModal(`<div class="modal"><h3>Compartir rutina</h3><p class="sm mut" style="line-height:1.45">Comparte el enlace: abre la app e importa la rutina. También vale el código, en <b>Nueva rutina › Importar con código</b>.</p>
+    const text = tx(`Prueba mi rutina «${r.name}» en PandarIA Fit 💪\n${link}\n\nSi no se abre, copia este código en Nueva rutina › Importar con código: ${code}`,`Try my routine "${r.name}" on PandarIA Fit 💪\n${link}\n\nIf it does not open, paste this code in New routine › Import with code: ${code}`,{pt:`Teste minha rotina «${r.name}» no PandarIA Fit 💪\n${link}\n\nSe não abrir, cole este código em Nova rotina › Importar com código: ${code}`});
+    openModal(`<div class="modal"><h3>${tx('Compartir rutina','Share routine',{pt:'Compartilhar rotina'})}</h3><p class="sm mut" style="line-height:1.45">${tx('Comparte el enlace: abre la app e importa la rutina. También vale el código, en <b>Nueva rutina › Importar con código</b>.','Share the link: it opens the app and imports the routine. The code also works, in <b>New routine › Import with code</b>.',{pt:'Compartilhe o link: ele abre o app e importa a rotina. O código também funciona, em <b>Nova rotina › Importar com código</b>.'})}</p>
       <div class="codebox" style="font-size:17px">${code}</div>${skipped ? `<p class="xs" style="color:var(--gold)">${plural(skipped,'ejercicio propio no se incluye','ejercicios propios no se incluyen')}.</p>` : ''}
       <div class="row" style="gap:8px;margin-top:14px"><button class="btn grow" data-a="cbm" data-v="${cb(() => { try{ navigator.clipboard.writeText(text).then(() => toast('Copiado'), () => fallbackCopy(text)); }catch(e){ fallbackCopy(text); } })}">${I('copy',18)} Copiar</button>
       <button class="btn pri grow" data-a="cbm" data-v="${cb(() => { const Sh = P('Share'); if (Sh) Sh.share({title:'Rutina de PandarIA Fit', text, dialogTitle:'Compartir rutina'}).catch(() => {}); })}">${I('upload',18)} Compartir</button></div></div>`, {center:true});
@@ -843,8 +860,8 @@
       // 1.6: en iPhone se dice el motivo real. Instalada con AltStore y un Apple ID gratuito, Apple no da el permiso de Salud a la app
       const m = String(e && (e.message || e) || '');
       if (IOS) confirmBox({title:'No se pudo conectar con Salud', text:(/entitlement|not authori[sz]ed to use|missing/i.test(m)
-          ? 'Esta instalación no tiene permiso de Apple para usar Salud. Pasa con las apps instaladas con <b>AltStore y un Apple ID gratuito</b>: Apple no permite Salud con esa firma. Funcionará en la versión del App Store.'
-          : 'Revisa en la app <b>Salud</b> › tu foto › <b>Apps</b> › <b>PandarIA Fit</b> que los permisos estén activados.') + '<br><br><span class="xs mut">Detalle: ' + esc(m.slice(0, 160)) + '</span>', okText:'Entendido', ok:() => {}});
+          ? tx('Esta instalación no tiene permiso de Apple para usar Salud. Pasa con las apps instaladas con <b>AltStore y un Apple ID gratuito</b>: Apple no permite Salud con esa firma. Funcionará en la versión del App Store.','This install does not have Apple permission to use Health. It happens with apps installed with <b>AltStore and a free Apple ID</b>: Apple does not allow Health with that signature. It will work in the App Store version.',{pt:'Esta instalação não tem permissão da Apple para usar o Saúde. Isso acontece com apps instalados com <b>AltStore e um Apple ID gratuito</b>: a Apple não permite o Saúde com essa assinatura. Vai funcionar na versão da App Store.'})
+          : tx('Revisa en la app <b>Salud</b> › tu foto › <b>Apps</b> › <b>PandarIA Fit</b> que los permisos estén activados.','Check in the <b>Health</b> app › your photo › <b>Apps</b> › <b>PandarIA Fit</b> that the permissions are on.',{pt:'Confira no app <b>Saúde</b> › sua foto › <b>Apps</b> › <b>PandarIA Fit</b> se as permissões estão ativadas.'})) + '<br><br><span class="xs mut">' + tx('Detalle','Detail',{pt:'Detalhe'}) + ': ' + esc(m.slice(0, 160)) + '</span>', okText:tx('Entendido','Got it',{pt:'Entendi'}), ok:() => {}});
       else toast('No se pudo conectar. Revisa los permisos en Health Connect.');
     }
   }
@@ -1031,7 +1048,7 @@
     let h = _vhN.apply(this, arguments);
     if (HSEG === 'resumen' && HCS().on && HD.steps != null){
       // 1.6: los pasos en una tarjeta baja
-      const card = `<div class="card row" data-a="hcMenu" style="gap:10px;cursor:pointer;padding:10px 14px"><span style="color:var(--bad)">${I('flame',18)}</span><div class="grow sm"><b>${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy</b> <span class="mut">· media ${(HD.steps7 || 0).toLocaleString(window.LOC?LOC():'es')}${HD.hr ? ` · pulso ${HD.hr} lpm` : ''}</span>${typeof pasosMeta === 'function' ? (m => `<div class="xs mut" style="margin-top:2px">${tx(`Tu meta según tu edad: ${m[0].toLocaleString(LOC())}–${m[1].toLocaleString(LOC())} pasos`, `Your goal for your age: ${m[0].toLocaleString(LOC())}–${m[1].toLocaleString(LOC())} steps`)}</div>`)(pasosMeta()) : ''}</div>${I('right',16)}</div>`;
+      const card = `<div class="card row" data-a="hcMenu" style="gap:10px;cursor:pointer;padding:10px 14px"><span style="color:var(--bad)">${I('flame',18)}</span><div class="grow sm"><b>${HD.steps.toLocaleString(window.LOC?LOC():'es')} pasos hoy</b> <span class="mut">· media ${(HD.steps7 || 0).toLocaleString(window.LOC?LOC():'es')}${HD.hr ? ` · pulso ${HD.hr} lpm` : ''}</span>${typeof pasosMeta === 'function' ? (m => `<div class="xs mut" style="margin-top:2px">${tx(`Tu meta según tu edad: ${m[0].toLocaleString(LOC())}–${m[1].toLocaleString(LOC())} pasos`, `Your goal for your age: ${m[0].toLocaleString(LOC())}–${m[1].toLocaleString(LOC())} steps`,{pt:`Sua meta conforme sua idade: ${m[0].toLocaleString(LOC())}–${m[1].toLocaleString(LOC())} passos`})}</div>`)(pasosMeta()) : ''}</div>${I('right',16)}</div>`;
       h = h.replace('<div class="stats">', card + '<div class="stats">');
     }
     return h;

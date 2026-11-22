@@ -15,6 +15,8 @@ const a = h.indexOf(A), b = h.indexOf(B);
 if (a < 0 || b < a || h.indexOf(A, a + 1) >= 0 || h.indexOf(B, b + 1) >= 0) fallo('marcas del bloque de GitHub');
 h = h.slice(0, a) + "const updOn=()=>false; function updPending(){ return null; } function updCard(){ return ''; } function updCardNew(){ return ''; } function updInit(){}" + h.slice(b + B.length);
 h = h.split('\n').filter(l => !l.startsWith('Se descarga el archivo PandarIA-Fit.apk')).join('\n');
+// 1.9.5: y su traducción al portugués (PT_DATA, pares ["español","portugués"])
+h = h.replace(/\["Se descarga el archivo PandarIA-Fit\.apk(?:[^"\\]|\\.)*","(?:[^"\\]|\\.)*"\],?/g, '');
 // La política de seguridad (CSP) de la versión de Play no permite conectar con GitHub.
 if (!h.includes("connect-src 'self' https://www.googleapis.com https://api.github.com;")) fallo('política de seguridad (CSP)');
 h = h.replace("connect-src 'self' https://www.googleapis.com https://api.github.com;", "connect-src 'self' https://www.googleapis.com;");

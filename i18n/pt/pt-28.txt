@@ -23,7 +23,7 @@ Janela 12:00–20:00: almoço com 40 g de proteína, lanche com 25 g e jantar co
 Comece a janela com uma refeição rica em proteína.
 A meta vem do seu peso e da referência da EFSA, e sobe nos dias de treino. A comida também traz água (fruta, verdura, sopas). Um bom indicador: urina clara e pouca sede.
 Um copo ao acordar, um em cada refeição, uma garrafa no treino e outra distribuída à tarde.
-Ative os lembretes de água em Ajustes › Avisos e som.
+Ative os lembretes de água em Configurações › Avisos e som.
 Abrir Água
 Uns goles a cada 15–20 minutos: entre 0,5 e 1 L por hora se você sua muito.
 Nos dias de treino, sua meta de água sobe sozinha.

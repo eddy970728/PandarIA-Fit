@@ -2,7 +2,7 @@ Todo o equipamento de uma academia
 Você não marcou nenhuma série como concluída. Toque em ✓ em cada série que fizer para salvá-la.
 Nada desta sessão será salvo.
 Descartar treino?
-Ajustes › seu nome › Minha conta: salvar, recuperar, sair da conta e apagar o backup
+Configurações › seu nome › Minha conta: salvar, recuperar, sair da conta e apagar o backup
 Boas-vindas novas, com «Continuar com o Google» ou «Usar sem conta»
 Backup automático no seu Google Drive (opcional e privado)
 Num celular novo você recupera treinos, rotinas, diário, fotos e Premium
@@ -14,7 +14,7 @@ A voz dos treinos, os avisos do celular, a notificação do treino em andamento 
 Em inglês os números e as datas ficam no estilo inglês (1,910 kcal · 80.6 kg · November 12)
 Novo teste automático: em inglês, se sobrar algum texto em espanhol nas telas, a versão não sai
 Correção: mais espaço em cima para a câmera e a barra de status (notch) em todas as telas
-Correção: ao tocar em «Buscar atualizações» a versão nova abre direto, mesmo que antes você tenha escolhido «Mais tarde» ou «Pular esta versão»; o aviso também aparece em Ajustes
+Correção: ao tocar em «Buscar atualizações» a versão nova abre direto, mesmo que antes você tenha escolhido «Mais tarde» ou «Pular esta versão»; o aviso também aparece em Configurações
 O app inteiro em inglês, também dicas de exercício, técnica, Explorar e conquistas
 A voz, os avisos do celular e os widgets no seu idioma
 Números e datas no estilo inglês
@@ -22,7 +22,7 @@ Mais espaço em cima para o notch em todas as telas
 «Buscar atualizações» abre direto a versão nova
 inglês completo
 PandarIA: progressão ao vivo, rotinas por grupo muscular, Confie no PandarIA, sugestões a cada 3 treinos e renovação a cada 15
-O PandarIA Fit é um projeto pessoal. Se você não pode pagar, me escreva e eu dou de presente. Só vai funcionar neste celular; se você apagar o app, vai ter que pedir de novo. Se entrar com o Google em Ajustes › seu nome › Minha conta, vai funcionar em qualquer celular com sua conta.
+O PandarIA Fit é um projeto pessoal. Se você não pode pagar, me escreva e eu dou de presente. Só vai funcionar neste celular; se você apagar o app, vai ter que pedir de novo. Se entrar com o Google em Configurações › seu nome › Minha conta, vai funcionar em qualquer celular com sua conta.
 O PandarIA baseia suas recomendações em diretrizes do American College of Sports Medicine (ACSM) e da National Strength and Conditioning Association (NSCA) para força, da Organização Mundial da Saúde (OMS) para atividade física e da International Society of Sports Nutrition (ISSN) para nutrição. Não substitui um profissional de saúde.
 PandarIA e relatórios
 O PandarIA vai evitar este exercício ao criar rotinas.
@@ -36,21 +36,21 @@ PandarIA: prioriza máquinas e Smith para iniciantes e mais peso livre para avan
 PandarIA: se um exercício incomoda, oferece primeiro a versão na máquina
 PandarIA: sugere passar da versão guiada para o peso livre quando você já progride
 Polimento: zero erros, backup no Google Drive, inglês completo e receitas típicas
-Etapa 4 · Ajustes organizados: a tela principal fica curta, com seu perfil, Premium e 8 grupos (Sua conta e seus dados, Treino, PandarIA, Nutrição e jejum, Avisos e som, Tela e idioma, Saúde e Sobre) que abrem sua própria tela
+Etapa 4 · Configurações organizadas: a tela principal fica curta, com seu perfil, Premium e 8 grupos (Sua conta e seus dados, Treino, PandarIA, Nutrição e jejum, Avisos e som, Tela e idioma, Saúde e Sobre) que abrem sua própria tela
 «Apagar todos os dados» fica à parte, no fim de Sua conta e seus dados
-A política de privacidade pode ser aberta em Ajustes › Sobre
+A política de privacidade pode ser aberta em Configurações › Sobre
 40 receitas típicas do Uruguai, Argentina, Cuba, México e Espanha no diário (milanesas, chivito, choripán, tortilha de batata, pascualina, ropa vieja, picadinho, chilaquiles, tacos al pastor, paella, gaspacho, fabada e mais), calculadas com ingredientes do USDA e com seus alérgenos; a ficha mostra o que leva cada uma
 Novo nome do estúdio: LunaDoggyBru Studios
 A revisão de animações é desligada na versão final (os votos já enviados ficam salvos)
 Correção: algumas metas salvas num formato antigo mostravam «Invalid Date» e a barra de progresso vazia
 0.9 · Versão completa: 0.9 fechada
-Ajustes organizados em 8 grupos
+Configurações organizadas em 8 grupos
 40 receitas típicas do Uruguai, Argentina, Cuba, México e Espanha
 Novo nome: LunaDoggyBru Studios
-Política de privacidade em Ajustes › Sobre
+Política de privacidade em Configurações › Sobre
 Revisão de animações desligada na versão final
 Sua conta e seus dados
-Etapa 4 · Ajustes organizados
+Etapa 4 · Configurações organizadas
 Perfil salvo
 Pronto para o Google Play (em desenvolvimento)
 Métodos especiais no editor de rotinas: bi-set, drop-set, rest-pause, myo-reps, pirâmide, séries em cluster, volume alemão (10 × 10) e método Bilbo. Escolher é grátis; com Premium, o PandarIA monta as séries por você
@@ -144,7 +144,7 @@ Volta para Nutrição, junto com Comida e Água. Se você está jejuando, vai ve
 Blocos que se abrem
 O diário, o objetivo, a água e o histórico mostram o importante; toque num título para ver o resto.
 Como você prefere ver o app?
-Você pode mudar quando quiser com o botão de vista em Minhas rotinas ou em Ajustes.
+Você pode mudar quando quiser com o botão de vista em Minhas rotinas ou em Configurações.
 Completa
 Tudo à vista, organizado
 Minimalista

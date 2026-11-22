@@ -1,0 +1,100 @@
+Memória cheia: ${n===1?'a foto mais antiga foi apagada':'as '+n+' fotos mais antigas foram apagadas'} para salvar seus dados.
+{0} programas prontos para casa, academia, calistenia, yoga e mais
+{0} ${L.length===1?'aviso':'avisos'}
+Você já usa {0} % do espaço. Exporte um backup por precaução.
+{0} programas prontos e a biblioteca de exercícios.
+{0} MB de uns 5 MB · as fotos ficam à parte
+Abre em {0} ms · última tela em {1} ms
+O PandarIA ajustou ${plural(res,'exercício','exercícios')} para este método.
+Você está treinando <b>{0}</b>. O que quer fazer?
+Você anotou <b>{0}</b>. É mais do que levantam os recordes mundiais em quase todos os exercícios.
+Você anotou <b>{0}</b> e seu máximo neste exercício é {1}. Tem certeza de que não sobra um número?
+Você anotou <b>{0} repetições</b> numa série.
+Você anotou <b>{0} repetições</b> e seu máximo neste exercício é {1}.
+Você anotou <b>{0}</b>${maxT?` e seu máximo é ${fmtTime(maxT)}`:''}.
+Ajustei suas próximas séries para {0} com o que você fez na primeira
+Você gastou umas {0} kcal neste treino (estimativa com o Compêndio de Atividades 2024).
+Cada lado: {0} {1}
+Faltam {0} {1} para o peso exato
+{0} Marco: {1} ${trS(nuevo.h.n[0])}
+🗓️ Mês perfeito! {0}
+💧 Semana hidratada ×{0}
+✅ Semana perfeita ×{0}
+Bora se mexer! {0} minutos
+Umas <b>{0} kcal</b> estimadas. 
+Você marcou forte, mas sua frequência média foi de {0} % do seu máximo: zona moderada. Se quer que seja intenso, aumente o ritmo até passar de 77 %.
+Você marcou leve, mas sua frequência média foi de {0} % do seu máximo: zona intensa. Para um cardio leve de verdade, baixe o ritmo até conseguir falar sem esforço.
+Zona intensa ({0} % da sua frequência máxima): conta em dobro para seus minutos de exercício da semana.
+Zona moderada ({0} % da sua frequência máxima): a que mais ajuda seu coração com o menor risco.
+Frequência baixa ({0} % do seu máximo): serviu de recuperação ativa.
+Últimos 7 dias: ${trS(top.join(', '))}
+Ver todos ({0})
+desde {0}, em média em ${plural(p.n,'exercício','exercícios')}
+Há {0} ${Math.round(dias)===1?'dia':'dias'} você pesava {2} e agora escreveu <b>{3}</b>. Uma mudança tão grande costuma ser erro de digitação.
+Você chegou a {0} fotos: a de {1} foi apagada. A primeira é mantida.
+Você tem {0} de {1} fotos. Depois a mais antiga será apagada (a primeira é mantida).
+{0} ${total===1?'conquista':'conquistas'} alcançadas
+nível {0}
+Próximo: {0}
+O que faz com ${trS(INJURIES[k].n).toLowerCase()}
+${trS(L[2])} deve estar entre {1} e {2} ${L[3]==='años'?'anos':L[3]}. Confira o número.
+Suas rotinas têm ${plural(nombres.length,'exercício','exercícios')} que sobrecarregam a zona que você marcou: ${trS(nombres.slice(0,4).join(', '))}{2}. Troco por alternativas que não a sobrecarregam?
+${plural(n,'exercício trocado','exercícios trocados')}
+Bloco ${({Volumen:'volume',Intensidad:'intensidade',Descarga:'deload'})[ph.n]||ph.n.toLowerCase()} (${ph.d.replace(/semanas?/,x=>x==='semana'?'semana':'semanas')})
+${avisos===1?'Um detalhe':avisos+' detalhes'} para hoje
+${trS(mn)} trabalhados há menos de 48 h
+frequência em repouso de {0} bpm, {1} acima da sua média
+você dormiu {0} h {1}
+variabilidade da frequência de {0} ms, {1} % abaixo da sua média
+em {0} h
+Sua proteína ficou curta em {0} dos seus últimos {1} dias com diário (média de {2} g de {3} g). Ela ajuda você a se recuperar dos treinos.
+você está há {0} h de jejum
+Água: meta cumprida em {0} de {1} dias
+Jejuns concluídos: {0}
+Proteína: {0} de {1} dias com diário na sua meta
+ Nas suas últimas 2 semanas você comeu em média {0} kcal e seu objetivo é {1}.
+Você está subindo {0} % por semana: mais de 0,5 % costuma ser principalmente gordura.{1} Coma um pouco menos para ganhar músculo com menos gordura.
+Você quer ganhar, mas seu peso não sobe há 4 semanas.{0} Tente comer umas 200 kcal a mais por dia e confira se anota tudo.
+Seu objetivo é manter, mas seu peso ${dv.dir<0?'cai':'sobe'} {1} % por semana.{2} ${dv.dir<0?'Coma um pouco mais':'Coma um pouco menos'} para ficar onde está.
+Seu peso está muito abaixo do saudável (índice de massa corporal {0}).
+Seu índice de massa corporal ({0}) está abaixo de 18,5, o que é considerado baixo peso.
+Nos seus últimos {0} dias com diário você comeu em média {1}, menos do que seu corpo gasta em repouso ({2}).
+ de {0} h
+, + água extra pelo seu treino de {0} min
+Inclui {0} de ${plural(dd.n,'bebida','bebidas')} do seu diário.
+, + {0} ml pelo calor
+Objetivo: ${trS(v)}
+Objetivo: ${trS(NGOALS[v]||v).toLowerCase()}{1}
+Cafeína de hoje: cerca de {0} mg de {1} mg (limite da EFSA ${trS(L.why)}).
+Nesse ritmo você chegaria a {0} por volta de {1}.
+Sua meta é {0} kg. Com a tendência atual ainda não dá para estimar a data.
+Faltam {0} g de proteína hoje. Ideias:
+ de {0}
+Para o músculo ajuda dividir a proteína: uns {0} g em cada refeição principal.
+Refeições com {0} g de proteína ou mais
+Você registrou comida durante seu jejum (está há {0}). Terminamos agora?
+${trS(x.n)} removido
+Receita típica calculada pelo PandarIA com ingredientes do USDA (domínio público), para {0} porções:
+Pelo seu diário, hoje você comeu entre {0} e {1} ({2}).
+Jejum desde {0}, sua última refeição
+{0} seguidos ✓
+o último: {0} h
+Plano {0}: muito exigente
+Você ainda não completou 3 jejuns de 16 h ou mais (está com {0}). O prudente é subir aos poucos: 14:10, depois 16:8.
+Você está com {0}${a.goalH?` de ${a.goalH} h`:''}.
+Você está há {0} em jejum. Se terminou antes e esqueceu de parar, termine e corrija o horário de fim.
+Terminou sem querer? Retomar o jejum das {0}
+Seu horário: jejum das <b>{0}</b> até as <b>{1}</b>.
+Começar a partir das {0}
+Jejum desde as {0}
+Horário salvo: avisamos todo dia às {0}
+Sua energia e sua fome são parecidas em jejuns curtos e longos ({0} anotados): escolha o que for mais confortável.
+Anote como você se sentiu ao terminar cada jejum. Com 3 jejuns curtos e 3 de 16 h ou mais, o PandarIA compara (você está com {0}).
+meta {0} h
+Meta de hoje +{0}
+Some {0} à meta de hoje
+${plural(L.length,'registro','registros')} · o último às {1}
+{0} apagados
+Entre {0} e {1}
+🏅 Desafio do mês cumprido: ${trS(RETO_TIPOS[nuevo.id].n)}!
+{0} ${med===1?'desafio do mês cumprido':'desafios do mês cumpridos'} no total

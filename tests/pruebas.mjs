@@ -281,8 +281,8 @@ if (fs.existsSync(COPIA07)) {
 /* ---------- Recorrido de pantallas: toca los botones de cada pestaña en español y en inglés ---------- */
 // Cada pestaña se abre en un navegador simulado nuevo; en español también se tocan los botones de lo que se abre.
 if (fs.existsSync(COPIA07)) {
-  const PELIGRO = /wipe|del|Del|Remove|import|export|Export|share|Share|Url|Mail|upd(Download|Open)|hcPrivacy|Discard|kbUrl|copy|Copy|photo|Photo|mPhoto|backup|Backup|xjump|mFile/;
-  for (const lang of ['es', 'en']) {
+  const PELIGRO = /setLang|obLang|wipe|del|Del|Remove|import|export|Export|share|Share|Url|Mail|upd(Download|Open)|hcPrivacy|Discard|kbUrl|copy|Copy|photo|Photo|mPhoto|backup|Backup|xjump|mFile/;
+  for (const lang of ['es', 'en', 'pt']) {
     let toques = 0; const fallosR = [], sinTraducir = new Set();
     for (const t of ['rutinas', 'explorar', 'nutricion', 'agua', 'ayuno', 'historial', 'ajustes', 'tarjeta']) { // 1.9.4: tu tarjeta (Mi cuenta, Mis datos personales, PandarIA Premium) // 1.3: Nutrición › Agua y la pestaña Ayuno
       const a = abrir({ 'pandaria-fit-v1': fs.readFileSync(COPIA07, 'utf8') });
@@ -291,8 +291,11 @@ if (fs.existsSync(COPIA07)) {
       w.history.back = () => {}; w.history.go = () => {}; w.open = () => null;
       let ultimo = null; w.addEventListener('error', e => { ultimo = e.message || String(e.error); });
       // en inglés se apunta todo texto que, después de traducir, sigue pareciendo español
+      // 1.9.5: en portugués, lo mismo con palabras que solo existen en español
+      if (lang === 'pt') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
+        if (o.length>1 && !/doi\\.org|www\\.|https?:/.test(o) && (/[ñ¿¡]|ción\\b|ciones\\b/i.test(o.replace(/Español|España|piñón|Piñón|Muñoz|Ibáñez|Peña|Núñez|Jäger|Rosé|choripán|Choripán/g,'')) || /(^|[^\\wÀ-ÿ-])(del|los|las|el|y|con|una|unos|unas|hoy|más|también|tienes|puedes|aquí|entreno|entrenos|rutina|rutinas|ejercicio|ejercicios|serie|series|sin|hay|tus|día|días|semanas de racha|mañana|ayuno|desayuno|almuerzo|cena)([^\\wÀ-ÿ-]|$)/.test(o))) __ES.add(o); return r; };`);
       if (lang === 'en') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
-        if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán|Jesús/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o))) __ES.add(o); return r; };`);
+        if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán|Jesús|pão de queijo|[Aa]çaí/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o.replace(/pão de queijo/g,'')))) __ES.add(o); return r; };`);
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
       // 1.8.1: Explorar es una capa de Rutinas y Ayuno una sección de Nutrición; los bloques desplegables se recorren abiertos
       const reset = () => w.eval(`MODALS.length=0; renderModals(); LAYERS.length=0; S=JSON.parse(__SNAP); S.settings.orden181=1; S.settings.fold=Object.fromEntries([...Object.keys(FOLD_DEF),...MEALS.map(m=>'meal-'+m[0])].map(k=>[k,true]));
@@ -313,12 +316,13 @@ if (fs.existsSync(COPIA07)) {
         }
       }
       await espera(200);
-      if (lang === 'en') w.eval('[...__ES]').forEach(x => sinTraducir.add(`${t}: ${x}`));
+      if (lang !== 'es') w.eval('[...__ES]').forEach(x => sinTraducir.add(`${t}: ${x}`));
       a.cerrar();
     }
-    console.log(`Recorrido en ${lang === 'es' ? 'español' : 'inglés'}: ${toques} botones tocados`);
-    if (lang === 'en') comprobar(`en inglés no queda texto en español (${sinTraducir.size} encontrados)`, !sinTraducir.size, [...sinTraducir].slice(0, 8).join(' | '));
-    comprobar(`recorrido de pantallas en ${lang === 'es' ? 'español' : 'inglés'} sin errores (${toques} botones)`, !fallosR.length && toques > 150, fallosR.slice(0, 5).join(' | ') || `solo ${toques} botones`);
+    const LN = {es:'español', en:'inglés', pt:'portugués'}[lang];
+    console.log(`Recorrido en ${LN}: ${toques} botones tocados`);
+    if (lang !== 'es') { comprobar(`en ${LN} no queda texto en español (${sinTraducir.size} encontrados)`, !sinTraducir.size, [...sinTraducir].slice(0, 8).join(' | ')); if (process.env.PT_LISTA) fs.writeFileSync(`/tmp/sin-traducir-${lang}.txt`, [...sinTraducir].join('\n')); }
+    comprobar(`recorrido de pantallas en ${LN} sin errores (${toques} botones)`, !fallosR.length && toques > 150, fallosR.slice(0, 5).join(' | ') || `solo ${toques} botones`);
   }
 }
 
@@ -369,7 +373,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('alimentos: carnes, aves y pescados marcados como de origen animal', !mal(f => ['carne', 'ave', 'pescado'].includes(f.cat) && !f.fl.includes('A')));
   comprobar('alimentos: lácteos marcados con leche (salvo bebidas vegetales)', !mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')), mal(f => f.cat === 'lacteo' && !/^Bebida de/.test(f.n) && !f.fl.includes('L')));
   const porId = Object.fromEntries(L.map(f => [f.id, f]));
-  comprobar('alimentos: todos vienen del USDA, SR o FNDDS de 8 cifras (las recetas típicas, de ingredientes del USDA)', L.every(f => (f.usda && /^\d{5}$|^\d{8}$/.test(f.id)) || (f.rec && /^R\d{2}$/.test(f.id) && f.ing.length && f.ing.every(([i, g]) => porId[i] && porId[i].usda && g > 0))), mal(f => !f.usda && !f.rec));
+  comprobar('alimentos: todos vienen del USDA, SR o FNDDS de 8 cifras, o de la TACO de Brasil (BR..); las recetas típicas, de esos ingredientes', L.every(f => (f.usda && /^\d{5}$|^\d{8}$/.test(f.id)) || (f.taco && /^BR\d{2}$/.test(f.id)) || (f.rec && /^R\d{2}$/.test(f.id) && f.ing.length && f.ing.every(([i, g]) => porId[i] && (porId[i].usda || porId[i].taco) && g > 0))), mal(f => !f.usda && !f.rec));
   comprobar('recetas típicas: al menos 40, con sus alérgenos sumados de los ingredientes', L.filter(f => f.rec).length >= 40 && L.filter(f => f.rec).every(f => f.ing.every(([i]) => [...porId[i].fl.replace('V', '')].every(x => f.fl.includes(x)))), mal(f => f.rec && !f.ing.every(([i]) => [...porId[i].fl.replace('V', '')].every(x => f.fl.includes(x)))));
   const html = fs.readFileSync(HTML, 'utf8');
   comprobar('alimentos: la app da el crédito al USDA', /USDA, base de datos de nutrientes/.test(html) && /dominio público/.test(html));
@@ -1180,7 +1184,10 @@ if (fs.existsSync(COPIA07)) {
     S.settings.unit='kg'; S.settings.uLong='cm'; S.settings.uAgua='ml'; out.metrico=[pesoTxt(80),altTxt(180),aguaLTxt(2500)];
     // idiomas: registro y tercer argumento de tx
     out.idiomas=Object.keys(IDIOMAS).join(','); S.settings.lang='xx'; out.desconocido=LANG(); S.settings.lang='es';
-    out.tx=[tx('a','b',{pt:'c'}), (S.settings.lang='en', tx('a','b',{pt:'c'}))]; S.settings.lang='es';
+    out.tx=[tx('a','b',{pt:'c'}), (S.settings.lang='en', tx('a','b',{pt:'c'})), (S.settings.lang='pt', tx('a','b',{pt:'c'})), tx('Entreno','Workout')]; S.settings.lang='es';
+    // 1.9.5: portugués de Brasil
+    S.settings.lang='pt'; applyLang(); out.pt=[fmtNum(1234.5), trS('Pecho'), trS('Hace 3 días'), trS('2 cucharadas'), DIAS_N(0), String(calOff(new Date(2026,10,1))), tx('2 x','b',{pt:'2 y'}), ALIM.BR01&&ALIM.BR01.taco?'taco':'', alimSearch('feijão').slice(0,1).map(f=>f.n).join()];
+    window.navigator.__defineGetter__('languages',()=>['pt-BR','pt']); const s0=S.settings.lang; S.settings.lang='es'; idiomaInicial(); out.ptAuto=S.settings.lang; S.settings.lang='es'; applyLang();
     // contacto: correo ordenado y como mucho uno al día
     const c=contactoCorreo(['idioma','nutricion'],'Hola, una idea'); out.asunto=c.asunto; out.cuerpo=/Apartados: Nutrición, Idioma y traducción/.test(c.cuerpo)&&/Hola, una idea/.test(c.cuerpo)&&/Versión: /.test(c.cuerpo)&&c.url.startsWith('mailto:lunadoggybrustudios@gmail.com?subject=');
     delete S.contactoDia; A.contacto('idioma'); out.abre=LAYERS.length&&LAYERS[LAYERS.length-1].t==='contacto'&&pkP().sel.join()==='idioma';
@@ -1196,7 +1203,9 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9.2 unidades: las medidas escritas en lb e in se guardan en kg y cm', r.medida[0] === 74.8 && r.medida[1] === 81.3, JSON.stringify(r.medida));
   comprobar('1.9.2 unidades: las metas usan la unidad de cada tipo', JSON.stringify(r.meta) === '["lb","in",68]', JSON.stringify(r.meta));
   comprobar('1.9.2 unidades: en métrico todo sigue igual', JSON.stringify(r.metrico) === '["80 kg","180 cm","2,5 L"]', JSON.stringify(r.metrico));
-  comprobar('1.9.2 idiomas: registro, idioma desconocido vuelve a español y tx con tercer idioma', r.idiomas === 'es,en' && r.desconocido === 'es' && r.tx.join() === 'a,b', JSON.stringify([r.idiomas, r.desconocido, r.tx]));
+  comprobar('1.9.5 portugués: coma decimal, traducciones, porciones, domingos, calendario desde domingo, tx, comidas TACO y búsqueda en portugués', JSON.stringify(r.pt) === JSON.stringify(['1.234,5','Peito','Há 3 dias','2 colheres de sopa','domingos','0','2 y','taco','Porotos carioca cocidos']), JSON.stringify(r.pt));
+  comprobar('1.9.5 portugués: con el teléfono en portugués, una instalación nueva empieza en portugués', r.ptAuto === 'pt', r.ptAuto);
+  comprobar('1.9.2 idiomas: registro, idioma desconocido vuelve a español y tx con tercer idioma', r.idiomas === 'es,en,pt' && r.desconocido === 'es' && r.tx.join() === 'a,b,c,Treino', JSON.stringify([r.idiomas, r.desconocido, r.tx]));
   comprobar('1.9.2 contacto: asunto filtrable con versión e idioma', /^\[PandarIA Fit [\d.]+ · es\] Sugerencias: Nutrición, Idioma y traducción$/.test(r.asunto) && r.cuerpo, r.asunto);
   comprobar('1.9.2 contacto: abre con el apartado elegido, pide mensaje y limita a 1 al día', r.abre && r.pideMsg && r.enviado && r.limite, JSON.stringify([r.abre, r.pideMsg, r.enviado, r.limite]));
   comprobar('1.9.2 sin errores', !a.errores.length, a.errores.join(' | '));

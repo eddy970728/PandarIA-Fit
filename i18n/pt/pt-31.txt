@@ -113,7 +113,7 @@ Escolha seu plano
 Mande uma mensagem ao desenvolvedor com seu código e o motivo pelo qual você não pode pagar. Vamos analisar seu pedido e dizer se podemos presentear você com um tempo de Premium.
 SEU CÓDIGO DE CONTA
 Escrever ao desenvolvedor
-Sem conta, o presente só funciona neste celular. Com sua conta do Google (Ajustes › seu nome › Minha conta), funciona em qualquer celular.
+Sem conta, o presente só funciona neste celular. Com sua conta do Google (Configurações › seu nome › Minha conta), funciona em qualquer celular.
 Código de presente
 Cole aqui o código que enviaram
 Pedir Premium

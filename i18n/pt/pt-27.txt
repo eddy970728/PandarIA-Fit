@@ -82,7 +82,7 @@ Exemplo de 3 dias: segunda, quarta e sexta de corpo inteiro; caminhar 30 minutos
 Mantenha seu plano e foque em cumpri-lo várias semanas seguidas.
 Crie seu plano semanal: o PandarIA vai dizer todo dia qual rotina tem.
 Sim, seria uma boa ideia: você está há muitas semanas seguidas ou sua recuperação está baixa.
-Ative a periodização por blocos em Ajustes › seu nome › PandarIA Premium: o deload é programado sozinho.
+Ative a periodização por blocos em Configurações › seu nome › PandarIA Premium: o deload é programado sozinho.
 Continue treinando e ouça os sinais: sono, energia e dor muscular que não passa.
 Melhor uma sessão leve hoje: há vários sinais de cansaço.
 Sim, mas com cuidado: há um sinal de cansaço.
@@ -98,7 +98,7 @@ A dor muscular aparece 24–72 h depois, sobretudo com exercícios novos ou ao d
 Com as pernas doloridas: hoje membros superiores ou 30 minutos caminhando.
 Treine os músculos que estão verdes no mapa de recuperação.
 Se a dor durar mais de uma semana, inchar ou for numa articulação, consulte um profissional.
-Não há dados de sono: conecte o Health Connect (Ajustes › Saúde) se seu relógio ou celular mede o sono.
+Não há dados de sono: conecte o Health Connect (Configurações › Saúde) se seu relógio ou celular mede o sono.
 Enquanto você dorme os músculos se reparam e o apetite e a energia se regulam. Uma noite ruim não estraga nada, mas várias seguidas se notam no treino e na fome.
 Rotina simples: mesmo horário para deitar, tela longe 30 minutos antes, quarto escuro e fresco, cafeína só até 6 h antes de dormir.
 Se ontem à noite você dormiu menos de 6 h, hoje escolha uma sessão leve.

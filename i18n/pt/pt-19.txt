@@ -1,5 +1,5 @@
 Nutrição: suplementos e cardápios no topo, o cadeado do Premium numa linha e o gráfico da água em Estatísticas. Jejum: o plano num botão com a explicação de cada um e uma única dica
-Por dentro: mais rápido com muitos dados, o espaço que seus dados usam em Ajustes, limpeza de avisos antigos e backups de todas as versões testadas
+Por dentro: mais rápido com muitos dados, o espaço que seus dados usam em Configurações, limpeza de avisos antigos e backups de todas as versões testadas
 Sem sinais de cansaço
 Prevention, diagnosis and treatment of the overtraining syndrome (consenso conjunto do ECSS e do ACSM)
 Você começa e termina quando quiser.
@@ -28,7 +28,7 @@ Propostas do panda
 Adultos saudáveis que jejuam
 O panda avisa você
 O panda é sua central de avisos: pisca quando o PandarIA propõe uma mudança (você decide: Ver a proposta ou Agora não), ponto laranja com novidades e ponto verde com conquistas
-Os avisos não enchem mais Minhas rotinas: são lidos dentro do panda (se você tirar o panda em Ajustes, voltam para a tela)
+Os avisos não enchem mais Minhas rotinas: são lidos dentro do panda (se você tirar o panda em Configurações, voltam para a tela)
 iPhone: volte deslizando a partir da borda esquerda, como nos apps da Apple
 iPhone: textos do Apple Saúde corrigidos
 Interface do seu jeito
@@ -41,7 +41,7 @@ Código de barras
 Escolha como ver o app: Completo (tudo à vista, organizado) ou Minimalista (só o essencial). Dá para mudar a qualquer momento
 Minhas rotinas mais limpa: dica do dia em cima, Hoje compacto, avisos juntos e rotinas com botão de começar
 Opcional. Não muda sua sessão, mas o PandarIA leva em conta nas sugestões.
-Bolha do PandarIA: um botão pequeno com o ícone do app que abre um guia rápido com as perguntas da tela em que você está (dá para arrastar ou tirar em Ajustes)
+Bolha do PandarIA: um botão pequeno com o ícone do app que abre um guia rápido com as perguntas da tela em que você está (dá para arrastar ou tirar em Configurações)
 Sua central de avisos: pisca se o PandarIA propõe algo (nada é aplicado sem sua permissão), ponto laranja com novidades e verde com conquistas. Abre o guia de cada tela. Dá para arrastar para qualquer borda
 Pergunte sobre treino, comida, sono ou jejum: ele responde com seus dados.
 Pergunte ao PandarIA
@@ -60,7 +60,7 @@ Versão para iPhone e iPad
 Mais celulares compatíveis no Google Play
 Desafios e Pergunte ao PandarIA
 Jejum na sua própria aba e Nutrição com duas subabas: Comida e Água
-Ajustes › Nutrição e jejum: o objetivo nutricional é escolhido ali mesmo e as preferências de comida ficam à mão
+Configurações › Nutrição e jejum: o objetivo nutricional é escolhido ali mesmo e as preferências de comida ficam à mão
 Código de barras (Premium): escaneie um produto sem dar permissão de câmera; ele busca os dados no Open Food Facts e, se não estiver lá, você escreve uma vez e fica salvo
 Ideias para completar a proteína do dia com alimentos que você já costuma comer (Premium)
 Tendência de peso suavizada, quanto você muda por semana e data estimada da sua meta (Premium)

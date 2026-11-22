@@ -20,7 +20,7 @@ Corrigido: ao estagnar, o PandarIA não propõe mais um exercício muito mais f�
 Corrigidos os movimentos estranhos (hiperextensões, superman, elevação lateral de perna, pendurar, paralelas, fazendeiro…) e novos movimentos próprios para diamante, arqueiro, Arnold, remada cavalinho, sissy, nórdico inverso e muitos mais
 Crie seus alimentos com o rótulo e suas receitas por porções (10 grátis, sem limite no Premium)
 Criar, editar e arquivar rotinas
-Créditos e histórico de mudanças em Ajustes
+Créditos e histórico de mudanças em Configurações
 Dados impossíveis bloqueados: idade de 12 a 100 anos, altura de 100 a 230 cm, peso de 30 a 300 kg e medidas com seus limites; um erro de digitação não dispara mais suas calorias
 Descanso diferente em cada série: toque e escolha «Só esta série» ou «Todas as séries»
 Diário alimentar em Nutrição: café da manhã, almoço, lanche da tarde, jantar e lanches, com 597 alimentos que funcionam sem internet (dados do USDA, de domínio público) e nomes do Uruguai, Argentina, Cuba, México e Espanha
@@ -28,7 +28,7 @@ Durante os intervalados, botões −10 s e +10 s em cada descanso; a mudança va
 Exemplos de cardápio (Premium): um dia de refeições com suas calorias, sua proteína, sua alimentação e suas alergias; adicione ao diário com um toque ou peça outro
 Exercícios próprios: você pode escolher uma animação parecida
 O histórico guarda o descanso real de cada série e os códigos de rotina incluem os descansos
-Em Ajustes › Seus dados você pode voltar aos dados de antes da atualização ou apagar essa cópia; ela é apagada sozinha em 60 dias
+Em Configurações › Seus dados você pode voltar aos dados de antes da atualização ou apagar essa cópia; ela é apagada sozinha em 60 dias
 Na ficha: pausa, câmera lenta, fase do movimento (desce, sobe, empurra…) e anel de «Segure» nos exercícios estáticos
 Num celular novo, ao entrar na conta, o PandarIA encontra seu backup e o recupera: treinos, rotinas, diário, medidas, fotos e Premium
 Esforço percebido (RIR) por série
@@ -48,7 +48,7 @@ Modo hábitos: registre sem ver calorias nem números; ativa-se sozinho se no je
 Modo intervalado: Tabata, HIIT, EMOM e AMRAP
 Modo intervalado: agora você pode mudar o tempo de descanso entre séries em todos os formatos, também no Tabata
 Modo viagem: em «Hoje tem» ou em Trocar, faça sua rotina sem equipamento (só peso corporal, com elásticos, com TRX ou numa academia de hotel); o PandarIA troca cada exercício por um do mesmo músculo e sua rotina não muda
-Nova tela Ciência do PandarIA em Ajustes › Sobre, com as 37 regras, suas fontes e o histórico da Biblioteca
+Nova tela Ciência do PandarIA em Configurações › Sobre, com as 37 regras, suas fontes e o histórico da Biblioteca
 Novo teste automático: antes de criar cada versão são tocados uns 780 botões de todas as abas em espanhol e em inglês; se um der erro, a versão não sai
 Nova seção do Explorar: Só máquinas, com 5 rotinas
 Novas seções do Explorar: corrida, boxe, esportes, escritório e gravidez
@@ -58,7 +58,7 @@ Tela de treino e janela de Terminar rotina com intensidade
 Peso corporal em 3D: 128 exercícios novos com seu equipamento (barra fixa, paralelas, argolas e TRX, elásticos, banco, caixa, cadeira, parede e colchonete): flexões e paralelas, barras, core, pernas e glúteo, mobilidade, alongamentos, yoga (com a saudação ao sol encadeada) e pilates
 Peso livre em 3D: 109 exercícios com barra, halteres, kettlebell, barra W, hexagonal, landmine, medicine ball e bola suíça, incluindo os deitados de lado
 Aba Nutrição: calorias, proteína, água e jejum intermitente supervisionado
-Abas Minhas rotinas, Explorar, Meu histórico e Ajustes, em tema escuro
+Abas Minhas rotinas, Explorar, Meu histórico e Configurações, em tema escuro
 Plano semanal com "Hoje tem" e check-in antes de treinar
 Polias e Smith em 3D: 54 exercícios com sua torre de polia, cabo, corda ou barra, e a barra guiada que só sobe e desce
 Porções caseiras (xícara, unidade, fatia, colher…) ou gramas, recentes, favoritos, copiar o dia anterior e refeições salvas
@@ -66,7 +66,7 @@ Preferências: vegetariana ou vegana e alergias (leite, ovo, glúten, amendoim, 
 Premium com sua conta: os códigos de desbloqueio de conta (PA-) funcionam em qualquer celular onde você entrar; os de celular (PF-) continuam iguais
 Premium: o PandarIA encurta o descanso dos aquecimentos e soma 30 s se uma série pesou
 Premium: músculos trabalhados destacados na animação
-Quem já tinha o app vê uma única vez um card breve para conectar o Google; se disser «Agora não», fica em Ajustes
+Quem já tinha o app vê uma única vez um card breve para conectar o Google; se disser «Agora não», fica em Configurações
 Registrar é grátis; com Premium você compara o dia com seu objetivo de calorias e macros e vê sua semana
 Regras que mudam resultados (Biblioteca 1.1): 2 minutos de descanso nos multiarticulares com peso quando o objetivo é ganhar músculo
 Revisão 3: 160 animações aprovadas e 67 corrigidas. Bancos e colchonetes não atravessam mais o corpo; nos levantamentos terra a barra sobe pela frente das pernas; a barra W tem seu formato; nas roscas de punho só o punho se move; desenvolvimento Arnold, desenvolvimento cubano, clean, halo e levantamento turco com o movimento real e sem pulos; afundo andando alternando as pernas; remada invertida com os calcanhares fixos; roda (rollout) sem sair do chão
@@ -83,7 +83,7 @@ Se a memória enche, o app libera espaço (primeiro a cópia de antes da atualiz
 Se uma pesagem muda muito em relação à anterior, o app pergunta se está certa antes de salvar
 Sons em séries, recordes, conquistas, água e jejum
 Suplementos com evidência em Nutrição: creatina, cafeína, beta-alanina e proteína em pó, com dose para seu peso, nível de evidência e avisos se você está grávida, tem pressão alta, problemas nos rins ou no coração, ou toma medicação (para menores não dá dose)
-Temporário durante o desenvolvimento: aviso de versão nova em Minhas rotinas com as mudanças e botão para baixar; em Ajustes, número exato da versão e Buscar atualizações
+Temporário durante o desenvolvimento: aviso de versão nova em Minhas rotinas com as mudanças e botão para baixar; em Configurações, número exato da versão e Buscar atualizações
 Texto mais claro para quem tem mais rotinas que o limite grátis
 Toque no porquê de uma sugestão, ou em «Ver fonte» numa dica ou em Nutrição, para ver de onde vem
 Tudo de novo da 0.8 em inglês: diário e nomes dos 597 alimentos, Ciência do PandarIA com suas 53 regras, suplementos, cardápios, Health Connect e jejum

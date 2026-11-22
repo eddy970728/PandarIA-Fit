@@ -1,7 +1,7 @@
 Calculadora de anilhas e saltos de peso em libras se você usa libras
 1.9.2 · Idiomas e unidades
-Unidades do seu país: quilos ou libras, centímetros ou pés e polegadas, litros ou onças, em Ajustes › Tela e idioma
-Fale com o criador: envie suas sugestões em Ajustes › Sobre
+Unidades do seu país: quilos ou libras, centímetros ou pés e polegadas, litros ou onças, em Configurações › Tela e idioma
+Fale com o criador: envie suas sugestões em Configurações › Sobre
 O app fica preparado para novos idiomas
 Política de privacidade ampliada com seus direitos segundo a lei europeia de dados
 1.9.01 · Correções do Premium: preços e teste grátis
@@ -66,7 +66,7 @@ Os exemplos de cardápio feitos com suas calorias e suas preferências fazem par
 Escanear códigos de barras faz parte do Premium.
 A análise completa de Pergunte ao PandarIA (seu caso, explicação, exemplos e o que fazer) faz parte do Premium.
 Na versão grátis você pode criar até 5 exercícios próprios.
-Na versão grátis você pode ter até 3 rotinas, contando as arquivadas. Para criar outra, exclua alguma (em Minhas rotinas ou em Ajustes › Treino › Arquivadas) ou seja Premium.
+Na versão grátis você pode ter até 3 rotinas, contando as arquivadas. Para criar outra, exclua alguma (em Minhas rotinas ou em Configurações › Treino › Arquivadas) ou seja Premium.
 Ver os músculos que trabalham em cada animação faz parte do Premium.
 Este aviso faz parte do Premium.
 Premium recuperado com sua conta

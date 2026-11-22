@@ -11,7 +11,7 @@ Versão grátis: avisa quando você fez todas as repetições para tentar subir 
 Mudar seu objetivo de calorias agora pode ser desfeito
 1.8.1 · Mais organizado
 Mais organizado
-Menu de 4 abas: Rotinas, Nutrição, Histórico e Ajustes
+Menu de 4 abas: Rotinas, Nutrição, Histórico e Configurações
 Explorar exercícios e rotinas e o Modo intervalado agora estão no + de Rotinas, organizado em três grupos
 O jejum volta para Nutrição junto com Comida e Água; se você está jejuando, vê em cima em qualquer seção
 Comida, Água, Jejum e Histórico mais curtos: o importante à vista e o resto em blocos que se abrem

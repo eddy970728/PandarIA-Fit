@@ -1,0 +1,86 @@
+Tirar as {0} do seu plano
+Você pulou {0} das últimas {1} {2} e treinou {3} {4} fora do plano.
+Você pulou {0} das últimas {1} {2}. Um plano que você cumpre rende mais que um mais longo.
+Mudar seu aviso de treino para as {0}
+Você costuma treinar por volta das {0} e seu aviso está às {1}. Assim ele avisa meia hora antes.
+Tirar ${trS(sa.ex.n)} de «{1}»
+Você pulou em {0} das suas últimas {1} sessões desta rotina. Se preferir outro, troque na rotina.
+Em {0} dias você comeu em média {1} kcal e seu peso mudou {2} kg por semana: seu gasto real fica em torno de {3} kcal e não {4}.
+Você costuma treinar às {0}, em jejum. Com sua janela (abre por volta das {1}), treine entre {2} e {3}: com comida antes e uma refeição depois.
+Você rende melhor às {0}
+{0} % a mais que às {1}, com {2} sessões. Deixe para esse dia o mais exigente.
+Nos dias em que você bebeu pouca água rendeu {0} % menos ({1} treinos frente a {2}).
+Por que ${trS(o.ex.n)} não sobe
+Sua meta de {0}
+Nesse ritmo você chega em ${trS(pp.desde)}.
+Nesse ritmo você chega entre ${trS(pp.desde)} e ${trS(pp.hasta)}.
+O PandarIA propõe mudanças em «{0}»
+${plural(r.sugg.length,'proposta','propostas')}: revise e aplique só as que quiser.
+{0} hoje.
+{0} de {1} h.
+${plural(n,'recorde','recordes')} no seu último treino.
+Apagar {0}
+{0} apagados
+Ajuda a ganhar força e músculo se você treina com pesos ou faz esforços curtos e intensos. <b>{0} a {1} g por dia</b>, todos os dias, na hora que quiser (com comida é mais confortável). A saturação${w?` (uns ${Math.round(w*C.carga)} g por dia para você, em 4 doses)`:''} durante {3}–{4} dias é opcional: só adianta o efeito. É normal subir 1 ou 2 kg de peso pela água do músculo.
+Melhora o desempenho em quase todos os esportes. Dose útil: <b>{0} a {1} mg por kg</b>${w?` (uns ${fMin}–${fMax} mg para você)`:''}, uns {3} minutos antes. Comece pelo baixo: mais não rende mais. Conte o café, o chá e os refrigerantes do dia: ${sl.embarazo?`na gravidez e amamentação o limite da EFSA é <b>${F.embarazo} mg por dia</b>`:`a EFSA considera seguros até <b>${F.maxDia} mg por dia</b> e ${F.maxToma} mg de uma vez`}. Evite nas 6 horas antes de dormir.
+Na gravidez e amamentação não use cafeína para treinar; não passe de {0} mg por dia no total.
+Útil em esforços intensos de 1 a 4 minutos (séries longas, intervalados, esportes coletivos). <b>{0} a {1} g por dia</b> divididos em doses de {2} g ou menos, durante pelo menos {3} a {4} semanas: o efeito vem por acúmulo. O formigamento na pele é inofensivo.
+É comida em formato prático. Use só se com suas refeições você não chega à sua proteína${c?` (<b>${c.prot} g por dia</b> para seu objetivo)`:''}. Dá o mesmo resultado que a proteína dos alimentos. Você encontra no diário como «Proteína de soro em pó (whey)» ou «de soja».
+${trS((MEALS.find(x=>x[0]===m)||[,''])[1])} adicionado ao seu diário
+ para suas {0} e {1} g de proteína
+, sem ${trS(evi)}
+${plural(r.entrenos,'treino','treinos')}, ${plural(r.rutinas,'rotina','rotinas')}${r.dias?`, ${plural(r.dias,'dia','dias')} de diário`:''}${r.fotos?`, ${plural(r.fotos,'foto','fotos')}`:''}
+há {0} min
+há {0} h
+em {0}
+✓ Dados recuperados: ${trS(resumenTxt(cloudResumen()))}
+Backup de {0} ({1})${info.modelo?' de '+esc(info.modelo):''}: ${trS(resumenTxt(info.r))}.<br><br>Vai substituir o que há agora neste celular (${trS(resumenTxt(cloudResumen()))}).
+De {0}{1}: ${trS(resumenTxt(k.r))}. Substitui o deste celular.
+${trS(resumenTxt(loc))}. Substitui o backup do Drive.
+Conectado como {0}
+Sua idade e seu sexo{0}
+Seu ponto de partida{0}
+Tudo pronto{0}!
+Umas {0}
+São afastados os exercícios que sobrecarregam: ${inj.map(k=>trS(injN(k))).join(', ')}
+{0} anos
+{0} dias de corpo inteiro
+{0} dias: empurrar, puxar e pernas
+, sem exercícios que sobrecarreguem ${d.inj.map(k=>trS(injN(k))).join(' nem ')}
+O seu: <b>${trS(d.split)}</b>, com sessões de uns {1} minutos${trS(injTxt)}. ${trS(foco)}
+Para manter, umas <b>{0}</b> por dia; na gravidez e na amamentação as necessidades sobem, então não é momento de dietas para perder peso. Seu médico ou nutricionista vai dizer quanto a mais.
+Seu peso está abaixo do saudável: o PandarIA vai mostrar como manter (umas <b>{0}</b> por dia), nunca como perder. Recomendamos falar com um profissional.
+Para manter, umas <b>{0}</b> por dia. ${c.goal==='bajar'?`Para perder gordura com um déficit leve, umas <b>${fmtK(c.kcal)}</b>`:c.goal==='ganar'?`Para ganhar músculo com um superávit pequeno, umas <b>${fmtK(c.kcal)}</b>`:'Seu objetivo é manter'} e uns <b>{2} g de proteína</b> por dia.
+Comece pela água: sua meta é cerca de <b>{0}</b> por dia, contando todas as bebidas.
+Você economiza {0} %
+3 dias grátis e depois {0} ${plan==='mensual'?'por mês':'a cada 3 meses'}. Cancele quando quiser no Google Play; se cancelar nos 3 dias, não paga nada.
+Seu ponto de partida está pronto. Isto é o que muda para ${({grasa:'perder gordura',musculo:'ganhar músculo',fuerza:'ganhar força',salud:'sua saúde',resistencia:'sua resistência'})[obj]}.
+{0} min. Sua rotina espera você: toque em Começar e bora.
+Você já cumpriu sua meta de hoje ({0}{1}). Mais um copo se tiver sede.
+Você está um pouco atrasado: está com {0} de {1}{2}.
+Vai bem: está com {0} de {1}{2}.
+Sua meta de hoje: {0}{1}.
+Você está há {0} h. Água, café ou chá sem açúcar ajudam.
+{0} h de jejum cumpridas! 🎉
+Sua janela de alimentação fecha em ${trS(fmtEvery(lead / 60000))}
+Plano {0}. Toque para começar.
+Plano ${(plan && plan.n) || 'livre'}. Toque em Começar jejum.
+🔥 Sua sequência de ${plural(st,'semana','semanas')} está em risco
+${falt === 1 ? 'Falta 1 treino' : 'Faltam ' + falt + ' treinos'} para seu objetivo semanal.
+O PandarIA tem ${plural(tot,'sugestão','sugestões')} para você
+Aquecimento de ${trS(ex.n)}
+Bora para a série {0} de ${trS(ex.n)}!
+${trS(getEx(it.exId).n)}: série concluída
+Você costuma começar às {0}: aviso às {1}${S.plan ? ', nos dias do seu plano' : ''}
+Minuto {0} de {1}
+Rodada {0} de {1}
+ · Bloco {0} de {1}
+Minuto {0}. 
+Série por tempo · ${trS(n)}
+aquecimento de ${trS(xn)}
+série {0} de ${trS(xn)}
+Descanso terminado. Próximo: ${trS(xn)}
+Descanso · ${trS(cap(next))}
+Bora para a ${trS(next)}!
+💧 +{0} ml pelo widget
+Sua meta conforme sua idade: {0}–{1} passos

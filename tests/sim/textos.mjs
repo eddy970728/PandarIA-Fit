@@ -6,7 +6,7 @@ import { abrirApp } from './app.mjs';
 import fs from 'node:fs';
 
 const D = 864e5, T0 = new Date(2026, 10, 18, 9, 0).getTime();
-const BLOQ = /^(wipeData|cloud|exportData|exportFile|exportCSV|exportCopy|importData|importCode|updDownload|kbUrl|obGoogle|ciGoogle|alScan|mPhoto|retoCompartir|shareSession|shareRoutine|copyCode|periodoCompartir|fbCopy|animFbSend|chatAbrir|supSalud|retoPegar|obHc|obNotif|setLang|lpBorrar|delCustom|animCam|premigOpen|pfGo|cqPay|dPay|dQPay|pfBuy|pfRestore|pfRegalo|tab|nav|back|closeLayer|lback)$/;
+const BLOQ = /^(wipeData|cloud|exportData|exportFile|exportCSV|exportCopy|importData|importCode|updDownload|kbUrl|obGoogle|ciGoogle|alScan|mPhoto|retoCompartir|shareSession|shareRoutine|copyCode|periodoCompartir|fbCopy|animFbSend|chatAbrir|supSalud|retoPegar|obHc|obNotif|setLang|obLang|lpBorrar|delCustom|animCam|premigOpen|pfGo|cqPay|dPay|dQPay|pfBuy|pfRestore|pfRegalo|tab|nav|back|closeLayer|lback)$/;
 const espera = () => new Promise(r => setTimeout(r, 8));
 
 async function datos(a, lang) {

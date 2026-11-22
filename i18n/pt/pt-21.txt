@@ -140,7 +140,7 @@ Figuras animadas que mostram cada exercício
 52 máquinas aprovadas na revisão e 12 corrigidas: rolos e almofadas no lugar (flexora, extensora, remada cavalinho, leg press, hiperextensão para glúteo)
 95 animações aprovadas na revisão e 23 corrigidas (lenhadores, pull through, puxadas fechadas, extensões de tríceps, bancos que não atravessam mais o corpo, Smith que não se mexe e sem pulos ao subir)
 Água: as bebidas do diário (café, chá, leite, sucos, refrigerantes) contam para sua meta, botão «Outra bebida», cafeína do dia frente ao limite da EFSA e mais água nos treinos de mais de 1 hora
-Ajustes › Seus dados: Salvar agora, Recuperar, Sair da conta e Apagar meu backup
+Configurações › Seus dados: Salvar agora, Recuperar, Sair da conta e Apagar meu backup
 Animações refeitas uma a uma: personagem com corpo, maior e com melhor enquadramento
 Animações: confete, transições de aba e anéis animados
 Correção: as notas e a importação com código não eram salvas

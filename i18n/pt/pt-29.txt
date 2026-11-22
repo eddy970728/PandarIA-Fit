@@ -67,11 +67,11 @@ O Google recusou a configuração do app (impressão digital ou ID de cliente). 
 Sem a permissão do Drive não dá para salvar o backup. Tente de novo e marque a caixa do Google Drive.
 Não há nenhuma conta do Google neste celular. Adicione em Configurações do Android › Contas.
 Sem conexão com a internet. Vamos tentar mais tarde.
-Sua sessão do Google expirou. Entre de novo em Ajustes › seu nome › Minha conta.
+Sua sessão do Google expirou. Entre de novo em Configurações › seu nome › Minha conta.
 O Google Drive não deixou salvar o backup (espaço cheio?).
 Não foi possível conectar ao Google Drive. Tente de novo.
 Salvando no Google Drive…
-Há um backup mais novo de outro celular no seu Drive. Confira Ajustes › seu nome › Minha conta.
+Há um backup mais novo de outro celular no seu Drive. Confira Configurações › seu nome › Minha conta.
 ✓ Backup salvo no seu Google Drive
 Baixando seu backup…
 O backup do Drive está danificado ou não é do PandarIA Fit.
@@ -118,7 +118,7 @@ Diário alimentar, água e jejum supervisionado.
 Todo o seu progresso
 Recordes, gráficos, metas, relatórios e fotos.
 Como você quer usar o PandarIA?
-Você pode mudar quando quiser em Ajustes › seu nome › Minha conta.
+Você pode mudar quando quiser em Configurações › seu nome › Minha conta.
 RECOMENDADO
 Backup automático no seu Google Drive: se trocar de celular, você recupera tudo.
 Usar sem conta
@@ -130,7 +130,7 @@ Encontramos um backup seu no Google Drive.
 Backup de
 Recuperar meus dados
 Começar do zero neste celular
-Se você começar do zero, seu backup do Drive não é mexido até você decidir em Ajustes › seu nome › Minha conta quais dados usar.
+Se você começar do zero, seu backup do Drive não é mexido até você decidir em Configurações › seu nome › Minha conta quais dados usar.
 Assim trabalha o PandarIA
 Antes das perguntas, três coisas que vale a pena saber.
 Aprende com você

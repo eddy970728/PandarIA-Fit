@@ -1,6 +1,6 @@
 Diario de comidas
 ÚLTIMOS 7 DÍAS (KCAL)
-Datos de alimentos: USDA, base de datos de nutrientes de referencia (dominio público). Revisa siempre la etiqueta de los productos envasados.
+Datos de alimentos: USDA, base de datos de nutrientes de referencia (dominio público), y TACO (NEPA–UNICAMP) para las comidas de Brasil. Revisa siempre la etiqueta de los productos envasados.
 RITMO PARA BAJAR
 RITMO PARA GANAR
 Lento

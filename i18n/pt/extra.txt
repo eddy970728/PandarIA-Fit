@@ -1,0 +1,228 @@
+# 1.9.5 · Textos nuevos de esta versión (español|portugués). construir.mjs los añade a PT_DATA.
+Pan de queso brasileño|Pão de queijo
+Porotos carioca cocidos|Feijão carioca cozido
+Pulpa de açaí|Polpa de açaí
+Açaí con guaraná|Açaí com xarope de guaraná
+Tapioca con manteca|Tapioca com manteiga
+Cuscuz de maíz|Cuscuz de milho
+Mandioca hervida|Mandioca cozida (aipim, macaxeira)
+Arroz con porotos carioca|Arroz com feijão
+Fuente: TACO, Tabela Brasileira de Composição de Alimentos (NEPA–UNICAMP).|Fonte: TACO, Tabela Brasileira de Composição de Alimentos (NEPA–UNICAMP).
+Los ingredientes de Brasil vienen de la TACO (NEPA–UNICAMP).|Os ingredientes brasileiros vêm da TACO (NEPA–UNICAMP).
+1 cucharón|1 concha
+1 tazón|1 tigela
+1 paquete|1 pacote
+1 unidad grande|1 unidade grande
+Português (Brasil)|Português (Brasil)
+Logros y retos|Conquistas e desafios
+Idioma y traducción|Idioma e tradução
+La app en portugués de Brasil|O app em português do Brasil
+La app en portugués de Brasil (beta): elígelo en Ajustes › Idioma de la app; si algo suena raro, cuéntaselo al creador desde ahí mismo|O app em português do Brasil (beta): escolha em Configurações › Idioma do app; se algo soar estranho, conte ao criador ali mesmo
+Ajustes › Idioma de la app, debajo de Salud: el idioma y las unidades de medida; Pantalla queda para el tema, el texto y las animaciones|Configurações › Idioma do app, abaixo de Saúde: o idioma e as unidades de medida; Tela fica com o tema, o texto e as animações
+Comidas de Brasil con datos de la TACO (UNICAMP): pan de queso, arroz con porotos carioca, tapioca, açaí, cuscuz de maíz y mandioca hervida|Comidas do Brasil com dados da TACO (UNICAMP): pão de queijo, arroz com feijão carioca, tapioca, açaí, cuscuz de milho e mandioca cozida
+En portugués los calendarios del mes empiezan en domingo y los números llevan coma decimal|Em português os calendários do mês começam no domingo e os números usam vírgula decimal
+Los avisos por voz y las notificaciones hablan en portugués cuando eliges ese idioma|Os avisos por voz e as notificações falam português quando você escolhe esse idioma
+El calendario del historial muestra las iniciales de los días en tu idioma|O calendário do histórico mostra as iniciais dos dias no seu idioma
+# textos de estados vacíos y pantallas poco vistas (también faltaban en inglés)
+¡Qué bueno verte de vuelta!|Que bom te ver de volta!
+Esta rutina ya no existe.|Esta rotina não existe mais.
+Semana de descarga: hoy los pesos sugeridos son más livianos.|Semana de deload: hoje os pesos sugeridos são mais leves.
+Esta rutina no tiene ejercicios.|Esta rotina não tem exercícios.
+¿Prefieres archivarla?|Prefere arquivá-la?
+sin descanso hasta el siguiente ↓|sem descanso até o próximo ↓
+No hay ejercicios con esos filtros.|Não há exercícios com esses filtros.
+Crear ejercicio propio|Criar exercício próprio
+Nada en este filtro.|Nada neste filtro.
+¿Qué está mal?|O que está errado?
+Marcar incorrecta|Marcar como incorreta
+Tus votos de animaciones|Seus votos de animações
+Correo: lunadoggybrustudios@gmail.com|E-mail: lunadoggybrustudios@gmail.com
+Enviar|Enviar
+Zonas a priorizar|Regiões para priorizar
+PandarIA solo usará ejercicios que puedas hacer.|O PandarIA só vai usar exercícios que você consegue fazer.
+Tendré en cuenta tu objetivo, nivel, días, tiempo, equipo, ejercicios que evitas y tu historial para el peso inicial.|Vou levar em conta seu objetivo, nível, dias, tempo, equipamento, os exercícios que você evita e seu histórico para o peso inicial.
+calentamiento|aquecimento
+vuelta a la calma|volta à calma
+Tu compañero de entrenamiento. Crea rutinas, registra cada serie y deja que PandarIA te ayude a progresar.|Seu parceiro de treino. Crie rotinas, registre cada série e deixe o PandarIA ajudar você a progredir.
+Puedes cambiar todo esto luego en Ajustes.|Você pode mudar tudo isso depois em Configurações.
+No tienes rutinas archivadas.|Você não tem rotinas arquivadas.
+· esta serie|· esta série
+Calent.|Aquec.
+→ alterna con el siguiente ejercicio|→ alterne com o próximo exercício
+Sesión no encontrada|Sessão não encontrada
+Discos para cada lado de la barra.|Anilhas para cada lado da barra.
+Calcular|Calcular
+Sin ejercicios: solo el temporizador. Añade ejercicios para que la app te diga qué hacer en cada ronda.|Sem exercícios: só o cronômetro. Adicione exercícios para o app dizer o que fazer em cada rodada.
+Sin sesión activa|Nenhuma sessão ativa
+Entrena para ver qué músculos trabajaste.|Treine para ver quais músculos você trabalhou.
+Aún no hay entrenamientos.|Ainda não há treinos.
+Completa una rutina y aparecerá aquí.|Conclua uma rotina e ela vai aparecer aqui.
+No encontrado|Não encontrado
+Tus récords aparecerán aquí cuando completes entrenos.|Seus recordes vão aparecer aqui quando você concluir treinos.
+Entrena para ver tus gráficas de progreso.|Treine para ver seus gráficos de progresso.
+Necesitas al menos 2 sesiones de este ejercicio.|Você precisa de pelo menos 2 sessões deste exercício.
+Registra tu peso y medidas para ver tu evolución. También puedes guardar fotos de progreso.|Registre seu peso e suas medidas para ver sua evolução. Você também pode salvar fotos de progresso.
+Quitar foto|Remover foto
+Consejo: mídete siempre a la misma hora, en ayunas y en las mismas condiciones.|Dica: meça-se sempre no mesmo horário, em jejum e nas mesmas condições.
+Añade rutinas al plan.|Adicione rotinas ao plano.
+Ponte una meta con fecha: un peso en un ejercicio, tu peso corporal o tu cintura. PandarIA te dirá si vas a tiempo.|Defina uma meta com data: um peso num exercício, seu peso corporal ou sua cintura. O PandarIA vai dizer se você está no prazo.
+Cada semana tendrás aquí un informe con tus entrenos, volumen, récords y la sugerencia principal de PandarIA.|Toda semana você vai ter aqui um relatório com seus treinos, volume, recordes e a principal sugestão do PandarIA.
+Necesito edad, sexo, altura y peso para calcular tus calorías y proteína.|Preciso da sua idade, sexo, altura e peso para calcular suas calorias e proteína.
+Contiene|Contém
+Ingredientes|Ingredientes
+Gramos en la receta|Gramas na receita
+El ayuno intermitente no se recomienda en menores de 18 años. Te sugerimos comidas regulares y equilibradas.|O jejum intermitente não é recomendado para menores de 18 anos. Sugerimos refeições regulares e equilibradas.
+Por lo que nos indicaste, el ayuno intermitente no es recomendable sin supervisión profesional. Habla con tu médico o nutricionista antes de hacerlo.|Pelo que você nos contou, o jejum intermitente não é recomendável sem supervisão profissional. Fale com seu médico ou nutricionista antes de fazer.
+Revisar mis respuestas|Revisar minhas respostas
+Ayuno supervisado por PandarIA|Jejum supervisionado pelo PandarIA
+Planes 12:12, 14:10, 16:8, 18:6, 20:4, 5:2 o libre, con temporizador, historial y consejos según tus entrenos.|Planos 12:12, 14:10, 16:8, 18:6, 20:4, 5:2 ou livre, com cronômetro, histórico e dicas conforme seus treinos.
+Cambiar "antes"|Trocar "antes"
+Cambiar "después"|Trocar "depois"
+Si no se abre el menú de compartir, mantén pulsada la imagen para guardarla.|Se o menu de compartilhar não abrir, mantenha a imagem pressionada para salvá-la.
+Envía este código. Quien lo pegue en|Envie este código. Quem colar em
+Nueva rutina → Importar con código|Nova rotina → Importar com código
+tendrá la misma rutina, con pesos adaptados por su PandarIA.|vai ter a mesma rotina, com pesos adaptados pelo próprio PandarIA.
+Avisar de versiones nuevas:|Avisar sobre versões novas:
+Equipos, nivel, plan semanal y descansos|Equipamentos, nível, plano semanal e descansos
+# avisos (toast) y ventanas de confirmación que faltaban también en inglés
+Rutina renovada lista|Rotina renovada pronta
+🔔 ¡Hoy toca entrenar!|🔔 Hoje é dia de treino!
+Descargar archivo|Baixar arquivo
+Copiar al portapapeles|Copiar para a área de transferência
+Copia copiada al portapapeles|Backup copiado para a área de transferência
+No se pudo copiar|Não foi possível copiar
+Copia de seguridad descargada|Backup baixado
+Elegir archivo|Escolher arquivo
+Pegar texto de la copia|Colar o texto do backup
+Pegar copia|Colar backup
+¿Importar copia?|Importar backup?
+Datos importados|Dados importados
+El texto no es una copia válida|O texto não é um backup válido
+¿Borrar todo?|Apagar tudo?
+Se eliminarán rutinas, historial, medidas y ajustes. Esto no se puede deshacer. Te recomendamos exportar una copia antes.|Rotinas, histórico, medidas e configurações serão apagados. Isso não pode ser desfeito. Recomendamos exportar um backup antes.
+Borrar todo|Apagar tudo
+Datos borrados|Dados apagados
+Rutina duplicada|Rotina duplicada
+Rutina archivada. Su historial se mantiene.|Rotina arquivada. O histórico dela é mantido.
+Rutina eliminada|Rotina excluída
+Los cambios que hiciste en esta rutina se perderán.|As mudanças que você fez nesta rotina serão perdidas.
+Solo para ejercicios con peso|Só para exercícios com peso
+Añade otro ejercicio debajo primero|Adicione outro exercício abaixo primeiro
+Nota fija|Nota fixa
+Aparecerá siempre en este ejercicio.|Vai aparecer sempre neste exercício.
+Ver ficha del ejercicio|Ver ficha do exercício
+Rutina creada|Rotina criada
+Rutina guardada|Rotina salva
+Escribe un nombre|Digite um nome
+Ejercicio creado|Exercício criado
+Gracias: la revisaremos. Puedes enviar tus votos desde Ajustes|Obrigado: vamos revisar. Você pode enviar seus votos em Configurações
+Animación elegida|Animação escolhida
+PandarIA Fit · animaciones|PandarIA Fit · animações
+¿Eliminar ejercicio?|Excluir exercício?
+Se quitará de la biblioteca. Las rutinas que lo usen lo mostrarán como eliminado.|Ele será removido da biblioteca. As rotinas que o usam vão mostrá-lo como excluído.
+No encontré ejercicios con tu equipo. Revisa Mis equipos.|Não encontrei exercícios com seu equipamento. Confira Meus equipamentos.
+Rutina creada por PandarIA. Revísala y guarda.|Rotina criada pelo PandarIA. Revise e salve.
+Nueva versión generada|Nova versão gerada
+¡Plan añadido! PandarIA armó tu semana|Plano adicionado! O PandarIA montou sua semana
+¡Listo! Crea tu primera rutina|Pronto! Crie sua primeira rotina
+Rutina restaurada|Rotina restaurada
+¿Eliminar definitivamente?|Excluir de vez?
+La rutina y todos sus entrenos desaparecerán del historial.|A rotina e todos os treinos dela vão sumir do histórico.
+Añade ejercicios a la rutina primero|Adicione exercícios à rotina primeiro
+Escribe las repeticiones|Digite as repetições
+Escribe los segundos|Digite os segundos
+PandarIA: +30 s de descanso, esa serie costó|PandarIA: +30 s de descanso, essa série foi puxada
+¡Completaste todas las series! Toca Terminar rutina.|Você concluiu todas as séries! Toque em Terminar rotina.
+Nota de hoy|Nota de hoje
+Se guardará en la rutina y aparecerá siempre.|Vai ser salva na rotina e aparecer sempre.
+Añade otro ejercicio debajo|Adicione outro exercício abaixo
+No me gusta este ejercicio|Não gosto deste exercício
+PandarIA lo evitará en nuevas rutinas|O PandarIA vai evitá-lo em rotinas novas
+Me molesta (dolor o incomodidad)|Me incomoda (dor ou desconforto)
+PandarIA te propondrá un cambio al terminar|O PandarIA vai propor uma troca ao terminar
+Ver ficha y técnica|Ver ficha e técnica
+Entreno descartado|Treino descartado
+⏱️ ¡Descanso terminado!|⏱️ Descanso terminado!
+Puedes guardar lo que hiciste hasta ahora o descartarlo.|Você pode salvar o que fez até agora ou descartar.
+Guardar y terminar|Salvar e terminar
+Intervalos descartados|Intervalos descartados
+No se registró ningún intervalo|Nenhum intervalo foi registrado
+¿Eliminar entreno?|Excluir treino?
+Se quitará del historial y de tus estadísticas.|Ele será removido do histórico e das suas estatísticas.
+¿Eliminar registro?|Excluir registro?
+Escribe al menos una medida|Digite pelo menos uma medida
+Medidas guardadas|Medidas salvas
+Añadida a Mis rutinas|Adicionada a Minhas rotinas
+Más repeticiones para construir base.|Mais repetições para construir base.
+Más peso y menos repeticiones.|Mais peso e menos repetições.
+Más liviano para recuperarte.|Mais leve para você se recuperar.
+Plan propuesto por PandarIA|Plano proposto pelo PandarIA
+Elige al menos un día y una rutina|Escolha pelo menos um dia e uma rotina
+Plan semanal guardado|Plano semanal salvo
+Revisa el objetivo y la fecha|Confira o objetivo e a data
+Meta creada|Meta criada
+¿Eliminar meta?|Excluir meta?
+Disponible con PandarIA Fit Premium|Disponível com o PandarIA Fit Premium
+No hay nada registrado el día anterior|Não há nada registrado no dia anterior
+Nombre de la comida|Nome da refeição
+Comida guardada: la encontrarás al añadir|Refeição salva: você vai encontrá-la ao adicionar
+¿Borrar esta comida guardada?|Apagar esta refeição salva?
+Tu diario no cambia.|Seu diário não muda.
+Indica una cantidad|Informe uma quantidade
+Ponle un nombre|Dê um nome
+Indica los gramos de la porción|Informe os gramas da porção
+Indica las calorías|Informe as calorias
+Alimento creado|Alimento criado
+Indica los gramos|Informe os gramas
+Añade al menos un ingrediente|Adicione pelo menos um ingrediente
+Receta guardada|Receita salva
+¿Borrar la receta?|Apagar a receita?
+Lo que ya registraste en tu diario no cambia.|O que você já registrou no diário não muda.
+Elige una fecha y hora válidas|Escolha uma data e hora válidas
+La hora de inicio no puede ser futura|O horário de início não pode estar no futuro
+Exportar a Excel (CSV)|Exportar para Excel (CSV)
+Descargar archivo .csv|Baixar arquivo .csv
+CSV descargado|CSV baixado
+CSV copiado|CSV copiado
+Mi entreno en PandarIA Fit|Meu treino no PandarIA Fit
+Imagen guardada|Imagem salva
+Código copiado|Código copiado
+Pega el código que te compartieron.|Cole o código que compartilharam com você.
+Rutina importada: revísala y guarda|Rotina importada: revise e salve
+El código no es válido. Revisa que esté completo.|O código não é válido. Confira se está completo.
+¿Volver a los datos anteriores?|Voltar aos dados anteriores?
+Perderás lo que hayas registrado después de actualizar. Te recomendamos exportar una copia antes.|Você vai perder o que registrou depois de atualizar. Recomendamos exportar um backup antes.
+Datos anteriores recuperados|Dados anteriores recuperados
+No se pudo leer la copia|Não foi possível ler o backup
+Copia borrada|Backup apagado
+Instalar voz|Instalar voz
+No se pudo completar. Prueba con Compartir.|Não foi possível concluir. Tente Compartilhar.
+Compartir copia|Compartilhar backup
+Guardar en el teléfono|Salvar no celular
+Compartir archivo .csv|Compartilhar arquivo .csv
+Abrir ajuste|Abrir configuração
+💧 Agua añadida|💧 Água adicionada
+Llegará en 5 segundos. Puedes bloquear el teléfono.|Vai chegar em 5 segundos. Você pode bloquear o celular.
+No se pudo programar|Não foi possível agendar
+El enlace de la rutina no es válido|O link da rotina não é válido
+Crea una rutina para empezar|Crie uma rotina para começar
+El ayuno no es recomendable para ti sin supervisión|O jejum não é recomendável para você sem supervisão
+Health Connect no está disponible|O Health Connect não está disponível
+Falta Health Connect|Falta o Health Connect
+Health Connect conectado|Health Connect conectado
+No se pudo conectar con Salud|Não foi possível conectar com o Saúde
+No se pudo conectar. Revisa los permisos en Health Connect.|Não foi possível conectar. Confira as permissões no Health Connect.
+Falta el permiso en Health Connect|Falta a permissão no Health Connect
+¿Desconectar Health Connect?|Desconectar o Health Connect?
+Dejaremos de leer y guardar datos. Para quitar también los permisos, hazlo en los ajustes de Health Connect.|Vamos parar de ler e salvar dados. Para tirar também as permissões, faça isso nas configurações do Health Connect.
+Recuperamos tus datos de la copia interna|Recuperamos seus dados do backup interno
+Desbloqueo PandarIA Fit|Desbloqueio PandarIA Fit
+Estado|Status
+Activa|Ativa
+Activada|Ativada
+Cuenta|Conta
+Teléfono|Celular
+Activar|Ativar
+Ahora no|Agora não
+Copiado|Copiado
+En la bienvenida eliges el idioma; si tu teléfono está en portugués, la app ya empieza en portugués|Na tela de boas-vindas você escolhe o idioma; se seu celular está em português, o app já começa em português
