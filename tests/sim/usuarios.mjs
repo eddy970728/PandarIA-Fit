@@ -83,6 +83,10 @@ DBG('comida');
         const rid = a.ev(`(()=>{ const x=nextInPlan(); return x&&x.r?x.r.id:''; })()`);
         if (rid) {
           a.tocar('startWorkout', rid); a.avanzar(500); prob.intentos++;
+          // 1.9.5.1: si un ejercicio quedó con dolor, primero pregunta cómo sigue: responde una nota y cierra el resultado
+          if (/Cómo sigue tu molestia|How is your discomfort|Como está seu incômodo/.test(a.ev(`(document.querySelector('#modals .scrim:last-child')||{}).textContent||''`))) {
+            const nb = [...a.w.document.querySelectorAll('#modals .scrim:last-child button')].filter(b => /^\d+$/.test(b.textContent.trim())); if (nb.length) { nb[Math.floor(r() * nb.length)].click(); a.avanzar(400); }
+            const ok = [...a.w.document.querySelectorAll('#modals .scrim:last-child button')].find(b => /^(Entendido|Got it|Entendi|Cerrar|Close|Fechar)$/.test(b.textContent.trim())); if (ok) { ok.click(); a.avanzar(500); } }
           // puede haber otro aviso encima (p. ej. el del ayuno): se pulsa el botón Empezar del check-in, no el primero que haya
           const emp = [...a.w.document.querySelectorAll('#modals .btn.pri[data-a="cbm"]')].find(b => /^(Empezar|Start)/.test(b.textContent.trim())); if (emp) { emp.click(); a.avanzar(500); }
           if (!a.ev(`!!S.active`)) prob.datos.push(`día ${dia}: el entreno no empezó`);

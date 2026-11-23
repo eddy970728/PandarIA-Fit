@@ -1514,7 +1514,7 @@ function exHistory(exId, limit){
     if (!it) continue;
     const work=it.sets.filter(x=>x.done && x.t!=='c');
     if (!work.length) continue;
-    out.push({date:s.end||s.start, sets:work, all:it.sets, intensity:s.intensity||6, sid:s.id, chk:s.checkin||null, aj:s.ajuste&&s.ajuste.f<1?s.ajuste.f:0});
+    out.push({date:s.end||s.start, sets:work, all:it.sets, intensity:s.intensity||6, sid:s.id, chk:s.checkin||null, aj:(f=>f<1?f:0)((s.ajuste&&s.ajuste.f<1?s.ajuste.f:1)*(it.dolorAj>0&&it.dolorAj<1?it.dolorAj:1)), dol:!!it.dolorAj}); // 1.9.5.1: los días con la carga bajada por dolor tampoco son referencia
     if (limit && out.length>=limit) break;
   }
   return out;
@@ -1629,23 +1629,32 @@ function inDeloadWindow(ts){ return !!((S.deload && ts>=S.deload.start && ts<=S.
 // 1.9.5.1 · Semáforo del dolor de 0 a 10 (Silbernagel y col., 2007)
 function dolorNivel(v, prev){ const K=kb('dolor.semaforo'); return v<=K.verde?0:(v<=K.amarillo && !(prev!=null && prev>K.verde && v>prev))?1:2; } // amarillo que sube = rojo
 function dolorUltimo(exId){ const L=(((S.settings||{}).dolor||{})[exId])||[]; return L[L.length-1]||null; }
-function dolorRojo(exId){ const u=dolorUltimo(exId); return !!(u && u.n===2 && Date.now()-u.d<kb('dolor.semaforo').dias*DAY); }
+// la carga sigue bajada mientras la última nota sea roja, o amarilla justo después de una roja; un verde la quita
+function dolorRojo(exId){ const L=(((S.settings||{}).dolor||{})[exId])||[], u=L[L.length-1], p=L[L.length-2], K=kb('dolor.semaforo'); if (!u || Date.now()-u.d>=K.dias*DAY) return false;
+  return u.n===2 || (u.n===1 && !!p && p.n===2); }
+// hay que preguntar cómo sigue: última nota amarilla o roja, de hace 12 h o más y menos de 3 semanas, sin seguimiento todavía
+function dolorPendiente(exId){ const u=dolorUltimo(exId); return !!(u && u.n>=1 && !u.seg && Date.now()-u.d>=12*3600e3 && Date.now()-u.d<21*DAY); }
 function dolorSemanasRojo(exId){ const K=kb('dolor.semaforo'), L=((S.settings.dolor||{})[exId])||[], R=[]; for (let i=L.length-1;i>=0 && L[i].n===2;i--) R.unshift(L[i]);
   return R.length>=2 && R[R.length-1].d-R[0].d>=(K.semanas*7-1)*DAY; }
-function dolorPreguntar(exId, after){ const K=kb('dolor.semaforo'), ex=getEx(exId);
-  const bt=v=>`<button class="btn sm" style="min-width:44px;${v<=K.verde?'border-color:var(--ok)':v<=K.amarillo?'border-color:var(--gold)':'border-color:var(--bad)'}" data-a="cbm" data-v="${cb(()=>dolorGuardar(exId,v,after))}">${v}</button>`;
-  openModal(`<div class="sheet"><div class="grab"></div><h3>${tx('¿Cuánto te duele?','How much does it hurt?',{pt:'Quanto dói?'})}</h3><p class="sm mut" style="margin:-6px 4px 12px;line-height:1.45">${esc(trS(ex.n))} · ${tx('0 es nada y 10 es el peor dolor que imaginas.','0 is nothing and 10 is the worst pain you can imagine.',{pt:'0 é nada e 10 é a pior dor que você imagina.'})}</p>
+function dolorPreguntar(exId, after, seg){ const K=kb('dolor.semaforo'), ex=getEx(exId);
+  const bt=v=>`<button class="btn sm" style="min-width:44px;${v<=K.verde?'border-color:var(--ok)':v<=K.amarillo?'border-color:var(--gold)':'border-color:var(--bad)'}" data-a="cbm" data-v="${cb(()=>dolorGuardar(exId,v,after,seg))}">${v}</button>`;
+  openModal(`<div class="sheet"><div class="grab"></div><h3>${seg?tx('¿Cómo sigue tu molestia?','How is your discomfort now?',{pt:'Como está seu incômodo?'}):tx('¿Cuánto te duele?','How much does it hurt?',{pt:'Quanto dói?'})}</h3><p class="sm mut" style="margin:-6px 4px 12px;line-height:1.45">${esc(trS(ex.n))} · ${tx('0 es nada y 10 es el peor dolor que imaginas.','0 is nothing and 10 is the worst pain you can imagine.',{pt:'0 é nada e 10 é a pior dor que você imagina.'})}</p>
     <div class="row" style="gap:6px;flex-wrap:wrap;justify-content:center">${[0,1,2,3,4,5,6,7,8,9,10].map(bt).join('')}</div>
-    <p class="xs mut" style="margin:14px 4px 0;line-height:1.45">${tx('Para y consulta si notas dolor agudo o punzante, hinchazón, hormigueo, pérdida de fuerza o dolor que te despierta por la noche.','Stop and see someone if you notice sharp or stabbing pain, swelling, tingling, loss of strength or pain that wakes you at night.',{pt:'Pare e procure ajuda se notar dor aguda ou pontada, inchaço, formigamento, perda de força ou dor que acorda você à noite.'})}</p></div>`); }
-function dolorGuardar(exId, v, after){ const D=S.settings.dolor=S.settings.dolor||{}, L=D[exId]=D[exId]||[], u=L[L.length-1], prev=u&&Date.now()-u.d<7*DAY?u.v:null;
-  const n=dolorNivel(v,prev); L.push({d:Date.now(), v, n}); if (L.length>20) L.splice(0,L.length-20);
-  if (n===2) S.settings.avoid[exId]='molesta'; save(); if (after) after();
-  const marcar=()=>{ S.settings.avoid[exId]='molesta'; save(); if (after) after(); toast(tx('Marcado: te molesta','Marked: it bothers you',{pt:'Marcado: incomoda você'})); };
+    <p class="xs mut" style="margin:14px 4px 0;line-height:1.45">${tx('Para y consulta si notas dolor agudo o punzante, hinchazón, hormigueo, pérdida de fuerza o dolor que te despierta por la noche.','Stop and see someone if you notice sharp or stabbing pain, swelling, tingling, loss of strength or pain that wakes you at night.',{pt:'Pare e procure ajuda se notar dor aguda ou pontada, inchaço, formigamento, perda de força ou dor que acorda você à noite.'})}</p>${seg?`<button class="btn wide" style="margin-top:12px" data-a="cbm" data-v="${cb(()=>{ const u=dolorUltimo(exId); if (u) u.seg=true; save(); if (after) after(); })}">${tx('Ahora no','Not now',{pt:'Agora não'})}</button>`:''}</div>`); }
+function dolorGuardar(exId, v, after, seg){ const D=S.settings.dolor=S.settings.dolor||{}, L=D[exId]=D[exId]||[], u=L[L.length-1], prev=u&&Date.now()-u.d<7*DAY?u.v:null, M=S.settings.dolorMarca=S.settings.dolorMarca||{};
+  const n=dolorNivel(v,prev); if (u) u.seg=true; L.push({d:Date.now(), v, n}); if (L.length>20) L.splice(0,L.length-20);
+  if (n===2 && S.settings.avoid[exId]!=='molesta'){ S.settings.avoid[exId]='molesta'; M[exId]=true; } // marca puesta por el semáforo: se quita sola con un verde
+  let quitada=false;
+  if (n===0 && M[exId]){ if (S.settings.avoid[exId]==='molesta') delete S.settings.avoid[exId]; delete M[exId]; quitada=true;
+    (S.routines||[]).forEach(r=>{ if (r.sugg) r.sugg=r.sugg.filter(x=>!(x.kind==='cambiar'&&x.exId===exId)); }); }
+  save(); if (after && !seg) after();
+  const fin=()=>{ if (after && seg) after(); };
+  const marcar=()=>{ S.settings.avoid[exId]='molesta'; delete M[exId]; save(); if (after && !seg) after(); toast(tx('Marcado: te molesta','Marked: it bothers you',{pt:'Marcado: incomoda você'})); fin(); };
   const sube=prev!=null&&prev>kb('dolor.semaforo').verde&&v>prev&&v<=kb('dolor.semaforo').amarillo;
-  const T=[[tx('Verde: puedes seguir','Green: you can carry on',{pt:'Verde: pode continuar'}), tx('Un dolor de 0 a 2 es seguro para seguir entrenando. Vigila que no suba durante la sesión.','Pain from 0 to 2 is safe to keep training. Watch that it does not go up during the session.',{pt:'Uma dor de 0 a 2 é segura para continuar treinando. Observe se não aumenta durante a sessão.'})],
-    [tx('Amarillo: con cuidado','Yellow: carefully',{pt:'Amarelo: com cuidado'}), tx('De 3 a 5 es aceptable si mañana por la mañana vuelves a tu nivel de siempre. Si no vuelve o sube, márcalo otra vez y PandarIA bajará la carga.','From 3 to 5 is acceptable if tomorrow morning you are back to your usual level. If it does not settle or goes up, mark it again and PandarIA will lower the load.',{pt:'De 3 a 5 é aceitável se amanhã de manhã você voltar ao seu nível de sempre. Se não voltar ou aumentar, marque de novo e o PandarIA vai baixar a carga.'})],
+  const T=[[tx('Verde: puedes seguir','Green: you can carry on',{pt:'Verde: pode continuar'}), (quitada?tx('Ya no te molesta: PandarIA vuelve a tu carga normal y quita la marca. ','It no longer bothers you: PandarIA goes back to your normal load and removes the mark. ',{pt:'Já não incomoda: o PandarIA volta à sua carga normal e tira a marcação. '}):'')+tx('Un dolor de 0 a 2 es seguro para seguir entrenando. Vigila que no suba durante la sesión.','Pain from 0 to 2 is safe to keep training. Watch that it does not go up during the session.',{pt:'Uma dor de 0 a 2 é segura para continuar treinando. Observe se não aumenta durante a sessão.'})],
+    [tx('Amarillo: con cuidado','Yellow: carefully',{pt:'Amarelo: com cuidado'}), (dolorRojo(exId)?tx('Mejoró, pero la carga sigue un 25 % más baja hasta que te duela 2 o menos. ','It improved, but the load stays 25 % lower until it hurts 2 or less. ',{pt:'Melhorou, mas a carga continua 25 % mais baixa até doer 2 ou menos. '}):'')+tx('De 3 a 5 es aceptable si mañana por la mañana vuelves a tu nivel de siempre. Si no vuelve o sube, márcalo otra vez y PandarIA bajará la carga.','From 3 to 5 is acceptable if tomorrow morning you are back to your usual level. If it does not settle or goes up, mark it again and PandarIA will lower the load.',{pt:'De 3 a 5 é aceitável se amanhã de manhã você voltar ao seu nível de sempre. Se não voltar ou aumentar, marque de novo e o PandarIA vai baixar a carga.'})],
     [tx('Rojo: para este ejercicio','Red: stop this exercise',{pt:'Vermelho: pare este exercício'}), (sube?tx('El dolor está subiendo. ','The pain is going up. ',{pt:'A dor está aumentando. '}):'')+tx('Hoy no sigas con él. La próxima vez PandarIA bajará la carga un 25 % y al terminar te propondrá cambiarlo por otro que trabaje lo mismo.','Do not carry on with it today. Next time PandarIA will lower the load by 25 % and, when you finish, suggest swapping it for one that works the same.',{pt:'Hoje não continue com ele. Na próxima vez o PandarIA vai baixar a carga em 25 % e, ao terminar, vai propor trocá-lo por outro que trabalhe o mesmo.'})+(dolorSemanasRojo(exId)?' '+tx('Llevas 2 semanas con dolor alto: te recomendamos ver a un fisioterapeuta o a un médico.','You have had high pain for 2 weeks: we recommend seeing a physiotherapist or a doctor.',{pt:'Você está há 2 semanas com dor alta: recomendamos procurar um fisioterapeuta ou um médico.'}):'')]][n];
-  confirmBox({title:T[0], text:esc(T[1])+kbLink('dolor.semaforo',tx('Fuente','Source',{pt:'Fonte'})), okText:tx('Entendido','Got it',{pt:'Entendi'}), ok:()=>{}, noText:n<2?tx('Marcarlo igualmente','Mark it anyway',{pt:'Marcar mesmo assim'}):tx('Cerrar','Close',{pt:'Fechar'}), no:n<2?marcar:null}); }
+  confirmBox({title:T[0], text:esc(T[1])+kbLink('dolor.semaforo',tx('Fuente','Source',{pt:'Fonte'})), okText:tx('Entendido','Got it',{pt:'Entendi'}), ok:fin, noText:n<2?tx('Marcarlo igualmente','Mark it anyway',{pt:'Marcar mesmo assim'}):tx('Cerrar','Close',{pt:'Fechar'}), no:n<2?marcar:fin}); }
 function suggestSet(routine, item, idx){
   const ex=getEx(item.exId), set=item.sets[idx]||{};
   const hist0=exHistory(item.exId,8);
@@ -1717,7 +1726,7 @@ function suggestSet(routine, item, idx){
     const RPE=kb('carga.esfuerzo').rpe;
     // 1.8: las repeticiones en reserva de cada serie dicen más que la nota de toda la sesión: con RIR medio de 3 o más, la sesión no frena la progresión
     const rirL=mainS(last).map(x=>x.rir).filter(x=>x!=null), rirLm=rirL.length>=2?rirL.reduce((a,b)=>a+b,0)/rirL.length:null, duro=last.intensity>=RPE && !(rirLm!=null && rirLm>=kb('carga.esfuerzo').rirOk);
-    if (last.aj){ kg=roundTo(kg/last.aj,incFor(ex)); res.why='Mismo peso que antes del día suave'; } // solo hay días aligerados: se vuelve al peso de antes, sin subir
+    if (last.aj){ kg=roundTo(kg/last.aj,incFor(ex)); res.why=last.dol?tx('Mismo peso que antes de la molestia','Same weight as before the discomfort',{pt:'Mesmo peso de antes do incômodo'}):'Mismo peso que antes del día suave'; } // solo hay días aligerados: se vuelve al peso de antes, sin subir
     // 1.8.2: si la sesión fue muy dura pero en este ejercicio te quedó al menos 1 repetición de media, se sube igual (un disco, sin extras)
     else if (allTop && duro && rirLm!=null && rirLm>=1){ const sa=saltoGrande(kg, roundTo(kg+incFor(ex),incFor(ex)));
       if (sa){ reps=sa; res.why='El siguiente peso es un salto grande: suma una repetición más antes de subir'; } else { kg=roundTo(kg+incFor(ex),incFor(ex)); reps=range[0]; res.why='Completaste todas las series: sube el peso'; } }
@@ -6783,6 +6792,7 @@ function activeItemFrom(tplItem, r){
   let src=tplItem.sets; const KDs=kb('descarga'), desc=r&&r.pandaria&&(deloadActive()||((typeof periodPhase==='function')&&periodPhase(r)==='descarga'));
   const nW=src.filter(s=>s.t!=='c').length;
   if (desc && nW>=KDs.quitaSerie){ const lw=src.map(s=>s.t).lastIndexOf(src.filter(s=>s.t!=='c').pop().t); src=src.filter((s,i)=>i!==lw); }
+  if (r && r.pandaria && getEx(tplItem.exId).mode==='p' && dolorRojo(tplItem.exId)) it.dolorAj=kb('dolor.semaforo').baja; else delete it.dolorAj;
   it.sets=src.map((s,i)=>{
     const g=suggestSet(r,tplItem,i);
     const o={t:s.t||'n', kg:null, reps:null, time:null, done:false, sk:g.kg, sr:g.reps, st:g.time, why:g.why, tk:s.kg, tr:s.reps, tt:s.time}; if (s.m) o.m=s.m;
@@ -7158,7 +7168,7 @@ function finishWorkout(mode){
   if (!a) return; // 1.8: doble toque en «Terminar»: el segundo llega cuando el entreno ya se guardó
   const r=findR(a.routineId);
   const session={id:uid(), routineId:a.routineId, routineName:a.name, start:a.start, end, planned:a.items.filter(it=>!it.warm&&!it.cool).map(it=>it.exId), intensity:a.intensity||6, checkin:a.checkin||null, ...(a.ajuste&&a.ajuste.f<1?{ajuste:{f:a.ajuste.f}}:{}),
-    items:a.items.map(it=>({exId:it.exId, note:it.note||'', sets:it.sets.filter(s=>s.done).map(s=>{ const o={t:s.t,kg:s.kg,reps:s.reps,time:s.time,done:true,pr:!!s.pr,rir:s.rir??null}; if(s.rd!=null) o.rd=s.rd; if(s.m) o.m=s.m; return o; })})).filter(x=>x.sets.length)};
+    items:a.items.map(it=>({exId:it.exId, note:it.note||'', ...(it.dolorAj?{dolorAj:it.dolorAj}:{}), sets:it.sets.filter(s=>s.done).map(s=>{ const o={t:s.t,kg:s.kg,reps:s.reps,time:s.time,done:true,pr:!!s.pr,rir:s.rir??null}; if(s.rd!=null) o.rd=s.rd; if(s.m) o.m=s.m; return o; })})).filter(x=>x.sets.length)};
   session.vol=sessionVolume(session);
   session.prs=[]; session.items.forEach(it=>it.sets.forEach(s=>{ if(s.pr) session.prs.push({exId:it.exId,kg:s.kg,reps:s.reps,time:s.time}); }));
   S.sessions.push(session); S.firstSession=S.firstSession||end; S.periodStart=S.periodStart||end;
@@ -7775,7 +7785,7 @@ function cuerpoIndicesHtml(){ const ca=cinturaAltura(), bm=bmi(), rc=recomposici
   if (bm && !embarazada()) L.push(`<div class="kv"><span class="mut">${tx('Índice de masa corporal','Body mass index',{pt:'Índice de massa corporal'})}</span><span><b>${fmtNum(Math.round(bm*10)/10)}</b></span></div>`);
   if (!L.length) return '';
   let nota='';
-  if (ca && bm && bm>=K.imc && ca.nivel===0) nota=tx('Tu IMC sale alto, pero tu cintura está en rango sano. El IMC no distingue músculo de grasa: si entrenas fuerza, tu cintura dice más.','Your BMI comes out high, but your waist is in the healthy range. BMI does not tell muscle from fat: if you strength train, your waist says more.',{pt:'Seu IMC sai alto, mas sua cintura está na faixa saudável. O IMC não distingue músculo de gordura: se você treina força, sua cintura diz mais.'});
+  if (ca && bm && bm>=K.imc && ca.nivel===0) { const al=bm>=27; nota=tx(`Tu IMC sale ${al?'alto':'algo alto'}, pero tu cintura está en rango sano. El IMC no distingue músculo de grasa: si entrenas fuerza, tu cintura dice más.`,`Your BMI comes out ${al?'high':'a little high'}, but your waist is in the healthy range. BMI does not tell muscle from fat: if you strength train, your waist says more.`,{pt:`Seu IMC sai ${al?'alto':'um pouco alto'}, mas sua cintura está na faixa saudável. O IMC não distingue músculo de gordura: se você treina força, sua cintura diz mais.`}); }
   else if (ca && ca.nivel>0) nota=tx('Por encima de 0,5 la grasa de la cintura se asocia con más riesgo para la salud. Bajar unos centímetros ya ayuda.','Above 0.5, waist fat is associated with more health risk. Losing a few centimetres already helps.',{pt:'Acima de 0,5, a gordura da cintura se associa a mais risco para a saúde. Perder alguns centímetros já ajuda.'});
   else if (!ca) nota=tx('Registra tu cintura para ver la relación cintura / altura: dice más que el IMC.','Log your waist to see your waist-to-height ratio: it says more than BMI.',{pt:'Registre sua cintura para ver a relação cintura / altura: ela diz mais que o IMC.'});
   let h=`<div class="sec">${tx('Tu cuerpo en números','Your body in numbers',{pt:'Seu corpo em números'})}</div><div class="card" style="padding:4px 14px">${L.join('')}${nota?`<div class="xs mut" style="padding:8px 0 10px;line-height:1.45">${esc(nota)}${kbLink('cuerpo.cintura_altura',tx('Fuente','Source',{pt:'Fonte'}))}</div>`:''}</div>`;
@@ -7996,6 +8006,14 @@ A.startWorkout=rid=>{
     ${q('sleep','¿Cómo dormiste?',['Mal','Regular','Bien'])}${q('energy','¿Cómo está tu energía?',['Baja','Normal','Alta'])}${q('sore','¿Agujetas o molestias?',['Muchas','Algunas','Nada'])}
     <button class="btn pri big" data-a="cbm" data-v="${cb(go)}">${I('play',20)} Empezar</button>
     <button class="btn ghost wide" style="margin-top:6px" data-a="cbm" data-v="${cb(()=>_startWorkout(rid))}">Saltar</button></div>`);
+};
+// 1.9.5.1: seguimiento del dolor: al empezar el siguiente entreno con un ejercicio en amarillo o rojo, PandarIA pregunta cómo sigue (antes de calcular los pesos)
+const _swDolor=A.startWorkout;
+A.startWorkout=rid=>{
+  if (S.active && S.active.routineId===rid) return _swDolor(rid);
+  const R=(S.routines||[]).find(r=>r.id===rid), pend=R?(R.items||[]).map(i=>i.exId).find(dolorPendiente):null;
+  if (!pend) return _swDolor(rid);
+  dolorPreguntar(pend, ()=>_swDolor(rid), true);
 };
 const _wkScreen=SCREENS.workout;
 SCREENS.workout=p=>{

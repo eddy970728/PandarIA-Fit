@@ -939,6 +939,14 @@ if (fs.existsSync(COPIA07)) {
     S.sessions=[sesion(3,[{t:'n',kg:60,reps:8,done:true},{t:'n',kg:60,reps:8,done:true}])]; S.settings.dolor={};
     const k0=suggestSet(R,IT,0).kg; S.settings.dolor={press_banca:[{d:Date.now()-D,v:7,n:2}]}; const s1=suggestSet(R,IT,0);
     out.baja=s1.kg<k0 && s1.kg>=k0*0.7 && /Te dolía/.test(s1.why); out.bajaVal=[k0,s1.kg];
+    // seguimiento: rojo de ayer → pendiente; amarillo después mantiene la bajada; verde la quita junto con la marca y la propuesta de cambio
+    S.settings.avoid={}; S.settings.dolorMarca={}; S.settings.dolor={}; dolorGuardar('press_banca',7); MODALS.length=0;
+    S.settings.dolor.press_banca[0].d=Date.now()-D; out.pend=dolorPendiente('press_banca');
+    dolorGuardar('press_banca',4,null,true); MODALS.length=0; out.sigueBaja=dolorRojo('press_banca') && !dolorPendiente('press_banca') && S.settings.avoid.press_banca==='molesta';
+    R.sugg=[{kind:'cambiar',exId:'press_banca',uid:IT.uid}]; dolorGuardar('press_banca',1,null,true); MODALS.length=0;
+    out.verdeQuita=!dolorRojo('press_banca') && !S.settings.avoid.press_banca && !R.sugg.length;
+    // una marca puesta a mano no la quita el semáforo
+    S.settings.avoid.press_banca='molesta'; dolorGuardar('press_banca',0); MODALS.length=0; out.manual=S.settings.avoid.press_banca==='molesta'; S.settings.avoid={}; MODALS.length=0; renderModals();
     // diabetes: queda bloqueado el ayuno y se explica por qué
     f.screened=true; f.blocked=true; f.motivos=['diabetes']; out.diab=/bajadas de azúcar/.test(fastCard());
     return JSON.stringify(out); })()`));
@@ -950,6 +958,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9.5.1: recomposición con peso quieto, cintura abajo y récords', r.recomp && r.recompNo, JSON.stringify([r.recomp, r.recompNo]));
   comprobar('1.9.5.1: semáforo del dolor (verde, amarillo, empeora = rojo, 2 semanas → profesional)', r.verde && r.amarillo && r.empeora && r.prof, JSON.stringify([r.verde, r.amarillo, r.empeora, r.prof]));
   comprobar('1.9.5.1: con dolor rojo la siguiente sugerencia baja un 25 %', r.baja, JSON.stringify(r.bajaVal));
+  comprobar('1.9.5.1: seguimiento del dolor (pregunta al día siguiente, el amarillo mantiene la bajada, el verde la quita, la marca manual se respeta)', r.pend && r.sigueBaja && r.verdeQuita && r.manual, JSON.stringify([r.pend, r.sigueBaja, r.verdeQuita, r.manual]));
   comprobar('1.9.5.1: diabetes con medicación explica el riesgo de bajadas de azúcar (ADA 2026)', r.diab);
   a.cerrar();
 }
