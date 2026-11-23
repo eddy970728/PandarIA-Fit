@@ -980,6 +980,13 @@ if (fs.existsSync(COPIA07)) {
   a.cerrar();
 }
 
+/* ---------- 1.9.5: ayuno y diario: avisos solo con datos reales y recientes ---------- */
+{
+  let sal = '', ok = true; try { sal = execFileSync(process.execPath, [new URL('./sim/ayuno-registros.mjs', import.meta.url).pathname], { encoding: 'utf8' }); } catch (e) { ok = false; sal = String(e.stdout || e); }
+  for (const l of sal.split('\n').filter(l => /^[✓✗] /.test(l))) comprobar('1.9.5 ayuno y diario: ' + l.slice(2).split('  ')[0], l[0] === '✓', l.split('  ')[1]);
+  comprobar('1.9.5 ayuno y diario: la simulación termina sin errores', ok && /sin errores de la app/.test(sal), sal.slice(-300));
+}
+
 /* ---------- 1.8.2: lo que encontró la simulación de un año ---------- */
 {
   // cambio de hora: racha, gráfica y informe semanal con la hora de España y la de Nueva York

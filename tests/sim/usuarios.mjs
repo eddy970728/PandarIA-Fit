@@ -16,7 +16,7 @@ const COMIDAS = [['20038', 70, 'desayuno'], ['01077', 250, 'desayuno'], ['09040'
 const usuarios = [];
 for (let c = 0; c < 32; c++) {
   const u = { id: c, agua: !!(c & 1), comida: !!(c & 2), ayuno: !!(c & 4), entreno: !!(c & 8), premium: !!(c & 16) };
-  u.medidas = c % 3 !== 0; u.checkin = c % 2 === 0; u.en = c % 4 === 3; u.mini = c % 5 === 1 || c % 5 === 4;
+  u.medidas = c % 3 !== 0; u.checkin = c % 2 === 0; u.en = c % 4 === 3; u.lang = c % 4 === 3 ? 'en' : c % 4 === 1 ? 'pt' : 'es'; u.mini = c % 5 === 1 || c % 5 === 4;
   u.meta = ['fuerza', 'musculo', 'grasa', 'salud'][c % 4]; u.sexo = c % 2 ? 'm' : 'h';
   usuarios.push(u);
 }
@@ -25,14 +25,14 @@ const nombre = u => `#${String(u.id).padStart(2, '0')} ${[u.agua && 'agua', u.co
 const resumen = []; let _tdbg = Date.now(); const DBG = process.env.DBG ? (...x) => { console.log('  ·', ...x, Date.now() - _tdbg, 'ms'); _tdbg = Date.now(); } : () => {};
 const SOLO = process.env.SOLO ? process.env.SOLO.split(',').map(Number) : null;
 const t0 = Date.now();
-for (const u of usuarios) {
+for (const u of usuarios.filter(u => !process.env.USU || (u.id >= +process.env.USU.split('-')[0] && u.id <= +process.env.USU.split('-')[1]))) {
   if (SOLO && !SOLO.includes(u.id)) continue;
   const r = rng(SEMILLA * 100 + u.id);
   const a = await abrirApp({ t0: T0, seed: SEMILLA * 100 + u.id });
   const prob = { errores: new Set(), raros: new Map(), datos: [], fuzz: 0, pantallas: 0, intentos: 0 };
   const nota = (tipo, msg) => { if (tipo === 'raro') { if (!prob.raros.has(msg)) prob.raros.set(msg, 1); } else prob.errores.add(msg); };
   // perfil y ajustes, como al terminar la bienvenida
-  a.ev(`S=DEF(); S.settings.onboarded=true; S.settings.cloudAsked=true; S.settings.ui='${u.mini ? 'mini' : 'completa'}'; S.settings.lang='${u.en ? 'en' : 'es'}'; S.settings.checkin=${u.checkin}; S.settings.equip=${['["pc","est"]','["pc","est","man","ban","bnd"]','EQUIP_GYM.slice()'][u.id%3]};
+  a.ev(`S=DEF(); S.settings.onboarded=true; S.settings.cloudAsked=true; S.settings.ui='${u.mini ? 'mini' : 'completa'}'; S.settings.lang='${u.lang}'; S.settings.checkin=${u.checkin}; S.settings.equip=${['["pc","est"]','["pc","est","man","ban","bnd"]','EQUIP_GYM.slice()'][u.id%3]};
     S.profile={name:'U${u.id}',age:${25 + u.id % 20},height:${u.sexo === 'h' ? 176 : 163},weight:${u.sexo === 'h' ? 82 : 64},sex:'${u.sexo}',fitness:'activo',injuries:[]};
     S.measures.push({id:'m0',date:Date.now()-30*DAY,peso:S.profile.weight}); window.isPremium=()=>${u.premium}; save(true); LAYERS.length=0; renderLayers(); MODALS.length=0; renderModals(); render();`);
 DBG('perfil');
@@ -103,7 +103,9 @@ DBG('entreno');
       if (u.medidas && dow === 1) { peso += (u.meta === 'grasa' ? -0.4 : u.meta === 'musculo' ? 0.2 : 0) + (r() - 0.5) * 0.6;
         a.w.__T = base + 1 * H; a.tocar('addMeasure'); a.ev(`(()=>{ const i=document.querySelector('#m_peso'); if (i) i.value='${peso.toFixed(1)}'; })()`); a.tocar('mSave'); a.ev(`LAYERS.length=0; renderLayers();`); }
       // ayuno: empieza a las 20:00
-      if (u.ayuno) { a.w.__T = base + 13 * H; a.ev(`if (!nut().fast.active) A.fastStart();`); }
+      if (u.ayuno) { a.w.__T = base + 13 * H; a.ev(`if (!nut().fast.active) A.fastStart();`); a.avanzar(300);
+        // 1.9.5: si PandarIA pregunta antes («¿Ayunar ahora?» por comer poco), la persona decide empezar igualmente
+        if (a.ev(`!nut().fast.active && !!document.querySelector('#modals [data-a="cbm"]')`)) { a.tocar('cbm'); prob.avisoAyuno = (prob.avisoAyuno || 0) + 1; } }
 DBG('medidas+ayuno');
       // noche: recorrer todas las pantallas, el panda y el estado del día, y tocar botones al azar
       a.w.__T = base + 14 * H;
