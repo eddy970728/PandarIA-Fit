@@ -33,7 +33,7 @@ desde {0}, em média em ${plural(p.n,'exercício','exercícios')}
 Há {0} ${Math.round(dias)===1?'dia':'dias'} você pesava {2} e agora escreveu <b>{3}</b>. Uma mudança tão grande costuma ser erro de digitação.
 Você chegou a {0} fotos: a de {1} foi apagada. A primeira é mantida.
 Você tem {0} de {1} fotos. Depois a mais antiga será apagada (a primeira é mantida).
-{0} ${total===1?'conquista':'conquistas'} alcançadas
+{0} ${total===1?'conquista alcançada':'conquistas alcançadas'}
 nível {0}
 Próximo: {0}
 O que faz com ${trS(INJURIES[k].n).toLowerCase()}

@@ -1,6 +1,6 @@
 # 1.9.5 · Textos nuevos de esta versión (español|portugués). construir.mjs los añade a PT_DATA.
 Pan de queso brasileño|Pão de queijo
-Porotos carioca cocidos|Feijão carioca cozido
+Porotos carioca cocidos|Feijão-carioca cozido
 Pulpa de açaí|Polpa de açaí
 Açaí con guaraná|Açaí com xarope de guaraná
 Tapioca con manteca|Tapioca com manteiga
@@ -225,7 +225,7 @@ Teléfono|Celular
 Activar|Ativar
 Ahora no|Agora não
 Copiado|Copiado
-En la bienvenida eliges el idioma; si tu teléfono está en portugués, la app ya empieza en portugués|Na tela de boas-vindas você escolhe o idioma; se seu celular está em português, o app já começa em português
+La primera pantalla te saluda en cada idioma de la app y ahí eliges el tuyo (si tu teléfono está en portugués, ya viene marcado); al elegir uno en beta, la app te explica cómo avisar al creador si algo suena raro|A primeira tela cumprimenta você em cada idioma do app e ali você escolhe o seu (se seu celular está em português, ele já vem marcado); ao escolher um em beta, o app explica como avisar o criador se algo soar estranho
 # iPhone (version-ios.mjs cambia estos textos)
 Apple Health no está disponible|O Apple Saúde não está disponível
 Este dispositivo no tiene la app Salud de Apple (algunos iPad no la tienen).|Este dispositivo não tem o app Saúde da Apple (alguns iPads não têm).

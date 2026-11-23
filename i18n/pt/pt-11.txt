@@ -143,7 +143,7 @@ Igual ao exercício
 SEGURE
 Hoje você já treinou!
 Monte seu plano semanal
-O PandarIA vai dizer todo dia qual rotina tem.
+O PandarIA vai dizer todo dia qual rotina fazer.
 Treinar mesmo assim hoje
 Você tem um treino em andamento
 Hoje tem treino

@@ -1,13 +1,13 @@
-Recolhe
-Arredonda
-Sente
-Sobe rápido
-Sobe e empurra
-Sobe e arremessa
-Solta
-Puxa
+Recolha
+Arredonde
+Sente-se
+Suba rápido
+Suba e empurre
+Suba e arremesse
+Solte
+Puxe
 Vaca
-Volta
+Volte
 Num horário fixo, se você não estiver jejuando
 Ativar Premium
 Água inteligente

@@ -55,7 +55,7 @@ Toque na estrela de um alimento para tê-lo aqui.
 Você ainda não salvou refeições. No diário, toque em «Salvar refeição» para repetir um café da manhã ou almoço com um toque.
 Adicionar
 Salvar alterações
-Tirar do diário
+Remover do diário
 Quantidade
 Gramas
 Fonte: USDA, base de dados de nutrientes de referência.

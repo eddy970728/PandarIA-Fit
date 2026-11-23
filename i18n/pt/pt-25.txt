@@ -15,7 +15,7 @@ Os números não podem ser negativos
 Está anotado certo?
 Sim, está certo
 Corrigir
-Começa agora sua rotina de hoje?
+Começar agora sua rotina de hoje?
 continua pendente. O cardio de antes serve de aquecimento.
 Barra
 Terminar
@@ -57,7 +57,7 @@ Treine pelo menos 2 semanas para ver sua tendência. Cada semana com treinos som
 Registro excluído
 O peso está certo?
 Os marcos e as conquistas que se repetem nunca acabam.
-Se repetem
+Recorrentes
 Semana perfeita
 Cumpra seu plano semanal
 Crie um plano semanal

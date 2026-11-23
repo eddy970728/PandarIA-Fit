@@ -29,7 +29,7 @@ Pernil de porco
 Bisteca de porco
 Lombo de porco
 Lombo de porco assado
-Copa lombo (sobrepaleta) de porco
+Copa-lombo de porco
 Costelinha de porco
 Carne moída de porco
 Bacon (barriga de porco)
@@ -109,7 +109,7 @@ Nabo
 Legumes congelados mistos
 Agrião
 Inhame
-Jicama
+Jacatupé (jicama)
 Suco de cenoura
 Pimenta poblano
 Batata assada
@@ -129,7 +129,7 @@ Nopal (palma)
 Nopal cozido
 Pimenta serrano
 Pimenta
-Epazote
+Mastruz (epazote)
 Sementes de chia
 Sementes de abóbora
 Gergelim

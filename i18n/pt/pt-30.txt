@@ -105,7 +105,7 @@ Privado
 Vai para uma pasta oculta do seu Drive. Ninguém mais vê.
 Sempre disponível em Configurações › seu nome › Minha conta.
 Interface
-Completa: tudo à vista, organizado. Minimalista: só o essencial; o resto abre com um toque. Também dá para mudar com o botão de vista em Minhas rotinas.
+Completa: tudo à vista, organizado. Minimalista: só o essencial; o resto abre com um toque. Também dá para mudar com o botão de visualização em Minhas rotinas.
 Tradução em beta: se algo soar estranho, conte ao criador.
 Contatar
 Unidades de medida

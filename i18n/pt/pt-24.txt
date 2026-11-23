@@ -117,9 +117,9 @@ Não foi possível salvar: a memória do celular está cheia.
 Desfazer
 Desfeito
 Histórico
-Vista minimalista
-Vista completa
-Mudar vista
+Visualização minimalista
+Visualização completa
+Mudar visualização
 Biblioteca
 toque para voltar
 Crie a sua, deixe o PandarIA montar ou escolha uma no Explorar.
@@ -144,7 +144,7 @@ Volta para Nutrição, junto com Comida e Água. Se você está jejuando, vai ve
 Blocos que se abrem
 O diário, o objetivo, a água e o histórico mostram o importante; toque num título para ver o resto.
 Como você prefere ver o app?
-Você pode mudar quando quiser com o botão de vista em Minhas rotinas ou em Configurações.
+Você pode mudar quando quiser com o botão de visualização em Minhas rotinas ou em Configurações.
 Completa
 Tudo à vista, organizado
 Minimalista

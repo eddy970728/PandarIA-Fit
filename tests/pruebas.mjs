@@ -274,7 +274,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('copia de Drive: guardar y recuperar devuelve los mismos datos', r.igual, 'los datos cambiaron');
   comprobar('copia de Drive: al recuperar sigue conectada la misma cuenta', r.sigue);
   comprobar('copia de Drive: el resumen cuenta bien los entrenos', r.resumen);
-  comprobar('bienvenida sin Google: no muestra el paso de la cuenta', !r.pasos.includes('cuenta') && r.pasos.startsWith('hola,ia,nombre,unidades,edad,cuerpo,semana,lesiones,objetivos,analisis,partida'), r.pasos);
+  comprobar('bienvenida sin Google: no muestra el paso de la cuenta', !r.pasos.includes('cuenta') && r.pasos.startsWith('idioma,hola,ia,nombre,unidades,edad,cuerpo,semana,lesiones,objetivos,analisis,partida'), r.pasos);
   a.cerrar();
 }
 
@@ -1187,7 +1187,7 @@ if (fs.existsSync(COPIA07)) {
     out.tx=[tx('a','b',{pt:'c'}), (S.settings.lang='en', tx('a','b',{pt:'c'})), (S.settings.lang='pt', tx('a','b',{pt:'c'})), tx('Entreno','Workout')]; S.settings.lang='es';
     // 1.9.5: portugués de Brasil
     S.settings.lang='pt'; applyLang(); out.pt=[fmtNum(1234.5), trS('Pecho'), trS('Hace 3 días'), trS('2 cucharadas'), DIAS_N(0), String(calOff(new Date(2026,10,1))), tx('2 x','b',{pt:'2 y'}), ALIM.BR01&&ALIM.BR01.taco?'taco':'', alimSearch('feijão').slice(0,1).map(f=>f.n).join()];
-    window.navigator.__defineGetter__('languages',()=>['pt-BR','pt']); const s0=S.settings.lang; S.settings.lang='es'; idiomaInicial(); out.ptAuto=S.settings.lang; S.settings.lang='es'; applyLang();
+    delete S.settings.betaVisto; A.setLang('pt'); const bv1=!!(S.settings.betaVisto&&S.settings.betaVisto.pt); A.setLang('es'); const t0=S.settings.betaVisto.pt; A.setLang('pt'); out.beta=[bv1, S.settings.betaVisto.pt===t0, typeof avisoBeta]; A.setLang('es'); window.navigator.__defineGetter__('languages',()=>['pt-BR','pt']); const s0=S.settings.lang; S.settings.lang='es'; idiomaInicial(); out.ptAuto=S.settings.lang; S.settings.lang='es'; applyLang();
     // contacto: correo ordenado y como mucho uno al día
     const c=contactoCorreo(['idioma','nutricion'],'Hola, una idea'); out.asunto=c.asunto; out.cuerpo=/Apartados: Nutrición, Idioma y traducción/.test(c.cuerpo)&&/Hola, una idea/.test(c.cuerpo)&&/Versión: /.test(c.cuerpo)&&c.url.startsWith('mailto:lunadoggybrustudios@gmail.com?subject=');
     delete S.contactoDia; A.contacto('idioma'); out.abre=LAYERS.length&&LAYERS[LAYERS.length-1].t==='contacto'&&pkP().sel.join()==='idioma';
@@ -1205,6 +1205,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9.2 unidades: en métrico todo sigue igual', JSON.stringify(r.metrico) === '["80 kg","180 cm","2,5 L"]', JSON.stringify(r.metrico));
   comprobar('1.9.5 portugués: coma decimal, traducciones, porciones, domingos, calendario desde domingo, tx, comidas TACO y búsqueda en portugués', JSON.stringify(r.pt) === JSON.stringify(['1.234,5','Peito','Há 3 dias','2 colheres de sopa','domingos','0','2 y','taco','Porotos carioca cocidos']), JSON.stringify(r.pt));
   comprobar('1.9.5 portugués: con el teléfono en portugués, una instalación nueva empieza en portugués', r.ptAuto === 'pt', r.ptAuto);
+  comprobar('1.9.5 portugués: al elegir un idioma en beta sale el aviso una sola vez', JSON.stringify(r.beta) === '[true,true,"function"]', JSON.stringify(r.beta));
   comprobar('1.9.2 idiomas: registro, idioma desconocido vuelve a español y tx con tercer idioma', r.idiomas === 'es,en,pt' && r.desconocido === 'es' && r.tx.join() === 'a,b,c,Treino', JSON.stringify([r.idiomas, r.desconocido, r.tx]));
   comprobar('1.9.2 contacto: asunto filtrable con versión e idioma', /^\[PandarIA Fit [\d.]+ · es\] Sugerencias: Nutrición, Idioma y traducción$/.test(r.asunto) && r.cuerpo, r.asunto);
   comprobar('1.9.2 contacto: abre con el apartado elegido, pide mensaje y limita a 1 al día', r.abre && r.pideMsg && r.enviado && r.limite, JSON.stringify([r.abre, r.pideMsg, r.enviado, r.limite]));
@@ -1216,12 +1217,13 @@ for (const lang of ['es', 'en']) {
   const a = abrir();
   await espera(1200);
   const w = a.w, ev = c => w.eval(c), txt = () => ev(`document.querySelector('#layers').textContent.replace(/\\s+/g,' ')`);
-  const es = new Set(); const mira = paso => { if (lang !== 'en') return; ev(`trTree(document.querySelector('#layers'))`); const t = txt().replace(/LunaDoggyBru Studios|PandarIA Fit|Español/g, ''); const m = t.match(/[^.!?]*(?:[áéíóúñ¿¡]|\b(?:días|tus|para|con|del|las|los|una)\b)[^.!?]*/gi); if (m) m.slice(0, 3).forEach(x => es.add(paso + ': ' + x.trim().slice(0, 90))); };
+  const es = new Set(); const mira = paso => { if (lang !== 'en') return; ev(`trTree(document.querySelector('#layers'))`); const t = txt().replace(/LunaDoggyBru Studios|PandarIA Fit|Español|Hola|Olá|Português \(Brasil\)/g, ''); const m = t.match(/[^.!?]*(?:[áéíóúñ¿¡]|\b(?:días|tus|para|con|del|las|los|una)\b)[^.!?]*/gi); if (m) m.slice(0, 3).forEach(x => es.add(paso + ': ' + x.trim().slice(0, 90))); };
   const r = {};
   r.abre = ev(`LAYERS.length && LAYERS[LAYERS.length-1].t`) === 'onboard';
   ev(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); window.isPremium=()=>false; pkP().premPaso=null; refreshTop();`);
   const paso = () => ev(`pkP().paso`);
   const sig = () => ev(`A.obNext()`);
+  r.primero = paso(); mira('idioma'); sig();
   mira('hola'); sig(); r.ia = paso(); mira('ia'); sig();
   ev(`document.getElementById('ob_name').value='Ana'`); sig(); r.unidades = paso(); mira('unidades');
   ev(`A.obUnidad('unit|lb'); A.obUnidad('uLong|in'); A.obUnidad('uAgua|oz')`); r.uImp = ev(`uP()+uL()+uA()`);
@@ -1255,7 +1257,7 @@ for (const lang of ['es', 'en']) {
   a.cerrar();
   const L = lang === 'en' ? ' (inglés)' : '';
   comprobar('1.9.4 bienvenida' + L + ': tras el nombre se eligen las unidades (y se pueden pasar a métricas)', r.unidades === 'unidades' && r.uImp === 'lbinoz' && r.uMet === 'kgcmml|true', JSON.stringify([r.unidades, r.uImp, r.uMet]));
-  comprobar('1.9.3 bienvenida' + L + ': se abre sola y pasa por qué es PandarIA, edad y cuerpo', r.abre && r.ia === 'ia' && r.edad === 'edad' && r.cuerpo === 'cuerpo', JSON.stringify([r.abre, r.ia, r.edad, r.cuerpo]));
+  comprobar('1.9.3 bienvenida' + L + ': se abre sola en la pantalla de idioma y pasa por qué es PandarIA, edad y cuerpo', r.abre && r.primero === 'idioma' && r.ia === 'ia' && r.edad === 'edad' && r.cuerpo === 'cuerpo', JSON.stringify([r.abre, r.ia, r.edad, r.cuerpo]));
   comprobar('1.9.3 bienvenida' + L + ': la casilla de embarazo solo aparece con mujer y se puede quitar', r.embOn && r.embOff, JSON.stringify([r.embOn, r.embOff]));
   comprobar('1.9.3 bienvenida' + L + ': pide objetivo principal y como mucho 2 más', r.sinObj && r.sec === 'agua,dormir', JSON.stringify([r.sinObj, r.sec]));
   comprobar('1.9.3 bienvenida' + L + ': antes del análisis guarda perfil, semana, nivel y objetivo', r.analisis && r.aplicado === '[60,165,4,45,"grasa","bajar","intermedio","rodilla"]', r.aplicado);

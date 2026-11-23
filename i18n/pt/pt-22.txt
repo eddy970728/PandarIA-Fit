@@ -7,7 +7,7 @@ Boas-vindas em 4 passos com perfil: idade, sexo, nível e lesões
 Boas-vindas novas: telas curtas com barra de progresso, «Continuar com o Google» ou «Usar sem conta», seu nome, dados sobre você com «Agora não», onde você treina e as permissões opcionais
 Botões +/− para peso e repetições
 Botão «Fixar» para salvar o descanso que você ajustou com +15/−15
-Botão ⟲ na ficha para girar a vista
+Botão ⟲ na ficha para girar a câmera
 Qualidade do dia no diário (Premium): fibra frente aos 25 g da EFSA, sódio frente aos 2 g da OMS e refeições com proteína suficiente, com dicas leves
 Cardio em 3D: 31 exercícios com suas máquinas (esteira normal, inclinada e curva, bicicletas ergométrica, de spinning, reclinada e air bike, elíptico, arc trainer, remo, SkiErg, escada, stepper, VersaClimber, trenó e cordas navais) e os de peso corporal (burpees, saltos, corda, boxe, escalador, passada de urso…). Não resta nenhuma animação em 2D
 Check-in com efeito: se você dormiu mal ou tem pouca energia, a carga sugerida cai 10 %; «Hoje tem» avisa sobre sua recuperação e oferece começar leve
@@ -125,26 +125,26 @@ Não foi possível verificar. Confira sua conexão.
 Só funciona no app instalado
 Buscar atualizações
 O arquivo PandarIA-Fit.apk é baixado. Abra e instale por cima: suas rotinas e seu histórico são mantidos. Na primeira vez, o Android pode pedir para permitir "Instalar apps desconhecidos" para seu navegador.
-↓ Desce
-↑ Sobe
-Sobe
-Abre
+↓ Desça
+↑ Suba
+Suba
+Abra
 Para a frente
-Contrai
-Arqueia
-Desce devagar
-Fecha
-Contrai
-Empurra
-Alonga
-Estende
-Flexiona
+Aperte
+Arqueie
+Desça devagar
+Feche
+Contraia
+Empurre
+Alongue
+Estenda
+Flexione
 Gato
-Gira
-Gira e empurra
-Bate
+Gire
+Gire e empurre
+Golpeie
 Guarda
-Impulsiona
-Junta
-Arremessa
-Levanta
+Impulsione
+Junte
+Arremesse
+Levante-se

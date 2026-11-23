@@ -55,7 +55,7 @@ Sair sem salvar?
 Sair sem salvar
 Continuar editando
 Excluir rotina?
-Arquivar no lugar
+Arquivar em vez disso
 Excluir mesmo assim
 Você ainda não tem rotinas
 Ir para Explorar

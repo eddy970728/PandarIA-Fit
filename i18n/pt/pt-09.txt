@@ -110,7 +110,7 @@ Normal
 Alta
 Muitos
 Alguns
-Nada
+Nenhum
 HOJE TEM
 HOJE
 Dia de descanso

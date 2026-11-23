@@ -11,16 +11,16 @@ Ler do Health Connect
 Passos
 Hoje e média de 7 dias
 Peso
-Entra sozinho em Meu histórico › Corpo
+Vai direto para Meu histórico › Corpo
 Batimentos
 Em repouso ou a última medida
 Salvar no Health Connect
 Treinos
-Como calorias ativas estimadas pela duração e intensidade
+Como calorias ativas, estimadas pela duração e pela intensidade
 Quando você registra seu peso em Corpo
 As calorias do que você adiciona hoje ao seu diário
 Água
-Cada copo ou garrafa que você soma
+Cada copo ou garrafa que você adiciona
 Se você tirar algo do diário ou da água, apague também no Health Connect: o PandarIA só adiciona.
 PandarIA
 Usar meus passos nas recomendações
