@@ -293,7 +293,7 @@ if (fs.existsSync(COPIA07)) {
       // en inglés se apunta todo texto que, después de traducir, sigue pareciendo español
       // 1.9.5: en portugués, lo mismo con palabras que solo existen en español
       if (lang === 'pt') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
-        if (o.length>1 && !/doi\\.org|www\\.|https?:/.test(o) && (/[ñ¿¡]|ción\\b|ciones\\b/i.test(o.replace(/Español|España|piñón|Piñón|Muñoz|Ibáñez|Peña|Núñez|Jäger|Rosé|choripán|Choripán/g,'')) || /(^|[^\\wÀ-ÿ-])(del|los|las|el|y|con|una|unos|unas|hoy|más|también|tienes|puedes|aquí|entreno|entrenos|rutina|rutinas|ejercicio|ejercicios|serie|series|sin|hay|tus|día|días|semanas de racha|mañana|ayuno|desayuno|almuerzo|cena)([^\\wÀ-ÿ-]|$)/.test(o))) __ES.add(o); return r; };`);
+        if (o.length>1 && !/doi\\.org|www\\.|https?:|meta-regressions/.test(o) && (/[ñ¿¡]|ción\\b|ciones\\b/i.test(o.replace(/Español|España|piñón|Piñón|Muñoz|Ibáñez|Peña|Núñez|Jäger|Rosé|choripán|Choripán/g,'')) || /(^|[^\\wÀ-ÿ-])(del|los|las|el|y|con|una|unos|unas|hoy|más|también|tienes|puedes|aquí|entreno|entrenos|rutina|rutinas|ejercicio|ejercicios|serie|series|sin|hay|tus|día|días|semanas de racha|mañana|ayuno|desayuno|almuerzo|cena)([^\\wÀ-ÿ-]|$)/.test(o))) __ES.add(o); return r; };`);
       if (lang === 'en') w.eval(`const __tt=trText; window.__ES=new Set(); window.trText=t=>{ const r=__tt(t); const o=(r==null?t:r).replace(/\\s+/g,' ').trim();
         if (o.length>1 && !/^(Jäger|Rosé)|doi\\.org|www\\.|https?:/.test(o) && (/[áéíóúñ¿¡]/i.test(o.replace(/Jäger|Rosé|Pérez|choripán|Choripán|Jesús|pão de queijo|[Aa]çaí/g,'')) || /(^|[^\\wÀ-ÿ])(de|del|las|los|para|con|que|una|sin|más|tus|hoy|semana|entreno|rutina|ejercicio|serie|toca|cada|pero|hay|esta|este|también|tienes|puedes|aquí)([^\\wÀ-ÿ]|$)/.test(o.replace(/pão de queijo/g,'')))) __ES.add(o); return r; };`);
       w.eval(`S.settings.lang=${JSON.stringify(lang)}; applyLang(); const __f=alimGet('05064'); nd().diario[dayKey()]=[Object.assign(alimMac(__f,150),{id:'x1',fid:'05064',n:__f.n,gr:150,m:'almuerzo',t:Date.now()-3600000})]; save(true); window.__SNAP=JSON.stringify(S);`);
@@ -871,7 +871,7 @@ if (fs.existsSync(COPIA07)) {
     out.calib=it.sets[1].sk>sug && it.sets[1].why==='Ajusté el peso con tu primera serie'; S.active=null; LAYERS.length=0; renderLayers(); MODALS.length=0; renderModals();
     // calorías del entreno (Compendio) y meta de pasos según la edad (Paluch)
     out.kcal=gastoSesion({start:0,end:3600000,intensity:8})===Math.round(6*S.profile.weight/10)*10 && gastoSesion({start:0,end:3600000,intensity:5})===Math.round(3.5*S.profile.weight/10)*10;
-    out.pasos=pasosMeta()[0]===8000; S.profile.age=65; out.pasos=out.pasos&&pasosMeta()[0]===6000; S.profile.age=30;
+    out.pasos=pasosMeta()[0]===7000&&pasosMeta()[1]===10000; S.profile.age=65; out.pasos=out.pasos&&pasosMeta()[0]===7000; S.profile.age=30;
     // FAO/OMS: el factor de actividad ya no se queda corto; Schoenfeld y Aragon: 0,4 g/kg por comida
     out.fao=kb('nut.actividad').sedentario===1.4; out.protComida=kb('nut.proteina_comida').gkg===0.4;
     return JSON.stringify(out); })()`));
@@ -894,8 +894,63 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.8 fuentes: el máximo estimado usa las series de 10 o menos si las hay (Mayhew 2008)', r.e1);
   comprobar('1.8 fuentes: en descarga una serie menos y un 10 % menos de peso (Bell 2023)', r.descSerie && r.normalSerie, JSON.stringify([r.descSerie, r.normalSerie]));
   comprobar('1.8 fuentes: la primera serie de un ejercicio nuevo calibra las siguientes', r.calib);
-  comprobar('1.8 fuentes: calorías del entreno con el Compendio 2024 y meta de pasos según la edad (Paluch 2022)', r.kcal && r.pasos, JSON.stringify([r.kcal, r.pasos]));
+  comprobar('1.8 fuentes: calorías del entreno con el Compendio 2024 y meta de 7.000 pasos con 10.000 opcional (Ding 2025)', r.kcal && r.pasos, JSON.stringify([r.kcal, r.pasos]));
   comprobar('1.8 fuentes: factor de actividad de la FAO/OMS y proteína por comida de Schoenfeld y Aragon', r.fao && r.protComida);
+}
+
+/* ---------- 1.9.5.1: reglas nuevas, seguridad y cuerpo ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}; const H=3600000, D=86400000; window.isPremium=()=>true;
+    const sesion=(dias,sets,extra)=>Object.assign({id:'s'+dias+Math.random(),start:Date.now()-dias*D-H,end:Date.now()-dias*D,intensity:7,items:[{exId:'press_banca',sets}]},extra||{});
+    // déficit > 500 kcal entrenando: avisa solo si entrenas
+    nut().goal='bajar'; nut().ritmo='rapido'; S.sessions=[]; out.defSin=!calcNutrition().notes.some(n=>/500/.test(n));
+    S.sessions=[sesion(2,[{t:'n',kg:60,reps:8,done:true}]),sesion(5,[{t:'n',kg:60,reps:8,done:true}])]; const c=calcNutrition();
+    out.defCon=(c.tdee-c.kcal>500)===c.notes.some(n=>/500 suele frenar/.test(n)); out.defVal=c.tdee-c.kcal;
+    // ayuno + fuerza con poca proteína (1,6 g/kg)
+    nut().goal='mantener'; const f=nut().fast; f.screened=true; f.blocked=false; f.plan='16:8';
+    for (let i=1;i<=4;i++){ const k=dayKey(Date.now()-i*D); S.nutri.diario=S.nutri.diario||{}; S.nutri.diario[k]=[{fid:'01123',gr:100,k:150,p:12,c:1,g:10},{fid:'01123',gr:100,k:150,p:12,c:1,g:10}]; }
+    out.ayFuerza=calcNutrition().notes.some(n=>/1,6 g por kg/.test(n));
+    f.plan=null; out.ayFuerzaNo=!calcNutrition().notes.some(n=>/1,6 g por kg/.test(n)); S.nutri.diario={};
+    // informe: más de 25 series en un músculo
+    S.sessions=[sesion(0,Array.from({length:27},()=>({t:'n',kg:40,reps:10,done:true})))]; const wr=weekReport(weekKey(Date.now()));
+    out.alto=wr.alto.length===1 && wr.alto[0][0]==='pecho' && /series esta semana/.test(informeAvisos(wr,0));
+    // RIR alto 2 semanas
+    S.sessions=[1,4,8].map(d=>sesion(d,[{t:'n',kg:40,reps:10,rir:6,done:true},{t:'n',kg:40,reps:10,rir:5,done:true}]));
+    out.rir=!!rirAlto() && /te sobraron 5/.test(informeAvisos({alto:[]},0)); S.sessions[0].items[0].sets[0].rir=2; out.rirNo=!rirAlto();
+    // cintura / altura e IMC con matiz (180 cm)
+    S.profile.height=180; S.profile.weight=90; S.measures=[{id:'m1',date:Date.now()-D,peso:90,cintura:85}];
+    out.ca=cinturaAltura().r===0.47 && cinturaAltura().nivel===0; out.imcMatiz=/cintura está en rango sano/.test(cuerpoIndicesHtml());
+    S.measures=[{id:'m1',date:Date.now()-D,peso:90,cintura:110}]; out.caAlto=cinturaAltura().nivel===2;
+    // recomposición: peso igual, cintura −2 cm, 3 récords en 5 semanas
+    S.measures=[{id:'a',date:Date.now()-30*D,peso:80,cintura:88},{id:'b',date:Date.now()-D,peso:80.3,cintura:86}];
+    S.sessions=[sesion(3,[{t:'n',kg:60,reps:8,done:true}],{prs:['a','b']}),sesion(10,[{t:'n',kg:60,reps:8,done:true}],{prs:['c']})];
+    out.recomp=!!recomposicion() && /Recomposición/.test(cuerpoIndicesHtml()); S.measures[1].peso=77; out.recompNo=!recomposicion();
+    // semáforo del dolor
+    S.settings.avoid={}; S.settings.dolor={};
+    dolorGuardar('press_banca',1); MODALS.length=0; out.verde=!S.settings.avoid.press_banca && dolorUltimo('press_banca').n===0;
+    dolorGuardar('press_banca',4); MODALS.length=0; out.amarillo=!S.settings.avoid.press_banca && dolorUltimo('press_banca').n===1;
+    dolorGuardar('press_banca',5); MODALS.length=0; out.empeora=dolorUltimo('press_banca').n===2 && S.settings.avoid.press_banca==='molesta';
+    S.settings.dolor={press_banca:[{d:Date.now()-15*D,v:7,n:2}]}; dolorGuardar('press_banca',8); out.prof=dolorSemanasRojo('press_banca') && /fisioterapeuta/.test(MODALS[MODALS.length-1].html); MODALS.length=0; renderModals();
+    // con dolor rojo, la próxima sugerencia baja un 25 %
+    S.routines=[newRoutine({name:'D',pandaria:true,items:[buildItem('press_banca','musculo',2)]})]; const R=S.routines[0], IT=R.items[0];
+    S.sessions=[sesion(3,[{t:'n',kg:60,reps:8,done:true},{t:'n',kg:60,reps:8,done:true}])]; S.settings.dolor={};
+    const k0=suggestSet(R,IT,0).kg; S.settings.dolor={press_banca:[{d:Date.now()-D,v:7,n:2}]}; const s1=suggestSet(R,IT,0);
+    out.baja=s1.kg<k0 && s1.kg>=k0*0.7 && /Te dolía/.test(s1.why); out.bajaVal=[k0,s1.kg];
+    // diabetes: queda bloqueado el ayuno y se explica por qué
+    f.screened=true; f.blocked=true; f.motivos=['diabetes']; out.diab=/bajadas de azúcar/.test(fastCard());
+    return JSON.stringify(out); })()`));
+  comprobar('1.9.5.1: aviso de déficit de más de 500 kcal solo si entrenas (Murphy 2022)', r.defSin && r.defCon, JSON.stringify(r));
+  comprobar('1.9.5.1: ayuno + fuerza con proteína baja avisa de 1,6 g/kg; sin ayuno no (Ho 2024)', r.ayFuerza && r.ayFuerzaNo, JSON.stringify([r.ayFuerza, r.ayFuerzaNo]));
+  comprobar('1.9.5.1: informe semanal avisa con más de 25 series en un músculo (Pelland 2025)', r.alto);
+  comprobar('1.9.5.1: informe semanal avisa si te sobran 5 o más repeticiones 2 semanas (Robinson 2024)', r.rir && r.rirNo, JSON.stringify([r.rir, r.rirNo]));
+  comprobar('1.9.5.1: cintura / altura y matiz del IMC (NICE 2025)', r.ca && r.imcMatiz && r.caAlto, JSON.stringify([r.ca, r.imcMatiz, r.caAlto]));
+  comprobar('1.9.5.1: recomposición con peso quieto, cintura abajo y récords', r.recomp && r.recompNo, JSON.stringify([r.recomp, r.recompNo]));
+  comprobar('1.9.5.1: semáforo del dolor (verde, amarillo, empeora = rojo, 2 semanas → profesional)', r.verde && r.amarillo && r.empeora && r.prof, JSON.stringify([r.verde, r.amarillo, r.empeora, r.prof]));
+  comprobar('1.9.5.1: con dolor rojo la siguiente sugerencia baja un 25 %', r.baja, JSON.stringify(r.bajaVal));
+  comprobar('1.9.5.1: diabetes con medicación explica el riesgo de bajadas de azúcar (ADA 2026)', r.diab);
 }
 
 /* ---------- 1.8: lastre en ejercicios de peso corporal y ejercicios nuevos ---------- */
