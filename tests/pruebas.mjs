@@ -951,6 +951,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9.5.1: semáforo del dolor (verde, amarillo, empeora = rojo, 2 semanas → profesional)', r.verde && r.amarillo && r.empeora && r.prof, JSON.stringify([r.verde, r.amarillo, r.empeora, r.prof]));
   comprobar('1.9.5.1: con dolor rojo la siguiente sugerencia baja un 25 %', r.baja, JSON.stringify(r.bajaVal));
   comprobar('1.9.5.1: diabetes con medicación explica el riesgo de bajadas de azúcar (ADA 2026)', r.diab);
+  a.cerrar();
 }
 
 /* ---------- 1.8: lastre en ejercicios de peso corporal y ejercicios nuevos ---------- */
