@@ -10,7 +10,7 @@ const HTML = fs.readFileSync(new URL('../../www/index.html', import.meta.url), '
 
 export function rng(seed) { let s = seed >>> 0 || 1; return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
-export async function abrirApp({ t0, storage = {}, seed = 1 } = {}) {
+export async function abrirApp({ t0, storage = {}, seed = 1, antes = null } = {}) {
   const errores = [];
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => errores.push('jsdom: ' + String(e.message || e).slice(0, 300)));
@@ -39,6 +39,7 @@ export async function abrirApp({ t0, storage = {}, seed = 1 } = {}) {
       w.addEventListener('error', e => errores.push('error: ' + (e.message || e.error)));
       w.addEventListener('unhandledrejection', e => errores.push('promesa: ' + String(e.reason && (e.reason.stack || e.reason)).slice(0, 300)));
       for (const [k, v] of Object.entries(storage)) w.localStorage.setItem(k, v);
+      if (antes) antes(w);
     }
   });
   const w = dom.window;

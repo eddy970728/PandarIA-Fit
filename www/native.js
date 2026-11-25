@@ -826,7 +826,8 @@
       } else if (path === 'rutinas') A.tab('rutinas');
       else if (path === 'comida'){ NSEG = 'comida'; A.tab('nutricion'); if (typeof A.dAdd === 'function') A.dAdd(); }
       else if (path === 'historial') A.tab('historial');
-      else if (path === 'premium'){ const c = q.get('c'); A.openPremium(); if (c) setTimeout(() => { const el = $('#pfcode'); if (el){ el.value = c; A.pfActivate(); } }, 400); }
+      else if (path === 'premium'){ const c = q.get('c'); // 1.9.5.2: el cuadro del código está en «¿No puedes pagarlo?»; antes el enlace abría Premium y no encontraba dónde pegarlo
+        if (c && typeof A.pfRegalo === 'function') A.pfRegalo(); else A.openPremium(); if (c) setTimeout(() => { const el = $('#pfcode'); if (el){ el.value = c; A.pfActivate(); } else toast(tx('Abre Ajustes › PandarIA Premium › ¿No puedes pagarlo? y pega el código','Open Settings › PandarIA Premium › Can\'t afford it? and paste the code',{pt:'Abra Ajustes › PandarIA Premium › Não pode pagar? e cole o código'})); }, 400); }
       else if (path === 'rutina'){ const c = q.get('c'); if (c) importRoutineCode(c); }
     }catch(e){} }, 450);
   }
