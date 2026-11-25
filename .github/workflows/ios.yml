@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   ipa:
-    runs-on: macos-15
+    runs-on: macos-26  # 1.9.5.2: App Store exige compilar con Xcode 26 (SDK de iOS 26) desde el 28 de abril de 2026
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

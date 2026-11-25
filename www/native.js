@@ -912,11 +912,13 @@
     }catch(e){}
     relojPend();
     if (s.hrv) try{
-      const r = await HC.readSamples({dataType:'heartRateVariability', startDate: iso(now - 28 * 86400000), endDate: iso(now), limit: 60});
+      // 1.9.5.2: 60 días, para comparar la media de 7 días con la línea base
+      const r = await HC.readSamples({dataType:'heartRateVariability', startDate: iso(now - 60 * 86400000), endDate: iso(now), limit: 200});
       const L = (r.samples || []).filter(y => +y.value > 5 && +y.value < 300).sort((a, b) => Date.parse(b.startDate) - Date.parse(a.startDate));
       const x = L[0];
       if (x){ HD.hrv = Math.round(+x.value); const prev = L.slice(1), at = Date.parse(x.startDate);
-        window.PF_HRV = prev.length && now - at < 36 * 3600000 ? {last: Math.round(+x.value), avg: Math.round(prev.reduce((a, y) => a + (+y.value), 0) / prev.length), n: prev.length, at} : null; }
+        const L7 = L.filter(y => now - Date.parse(y.startDate) < 7 * 86400000), LB = L.filter(y => now - Date.parse(y.startDate) >= 7 * 86400000), med = A => A.length ? Math.round(A.reduce((a, y) => a + (+y.value), 0) / A.length) : null;
+        window.PF_HRV = prev.length && now - at < 36 * 3600000 ? {last: Math.round(+x.value), avg: Math.round(prev.reduce((a, y) => a + (+y.value), 0) / prev.length), n: prev.length, at, m7: med(L7), n7: L7.length, base: med(LB), nb: LB.length} : null; }
       else { HD.hrv = null; window.PF_HRV = null; }
     }catch(e){}
   }

@@ -556,7 +556,8 @@ if (fs.existsSync(COPIA07)) {
     const T=pesoTendencia(); out.peso={now:T.now, rate:T.rate, eta:T.eta?Math.round((T.eta-Date.now())/86400000):null};
     // sueño y variabilidad
     window.PF_SUENO={last:330,avg:420,n:6,at:Date.now()-5*H}; out.sueno=!!suenoCorto(); window.PF_SUENO={last:400,avg:420,n:6,at:Date.now()-5*H}; out.suenoOk=!suenoCorto();
-    window.PF_HRV={last:40,avg:50,n:6,at:Date.now()-5*H}; out.hrv=hrvBaja()&&hrvBaja().pct; window.PF_HRV={last:47,avg:50,n:6,at:Date.now()-5*H}; out.hrvOk=!hrvBaja();
+    S.checkinDia={day:dayKey(),sleep:0,energy:1,sore:2}; window.PF_HRV={last:40,avg:50,n:6,at:Date.now()-5*H,m7:40,n7:5,base:50,nb:20}; out.hrv=hrvBaja()&&hrvBaja().pct; window.PF_HRV={last:47,avg:50,n:6,at:Date.now()-5*H,m7:47,n7:5,base:50,nb:20}; out.hrvOk=!hrvBaja();
+    window.PF_HRV={last:30,avg:50,n:6,at:Date.now()-5*H,m7:49,n7:5,base:50,nb:20}; out.hrvUna=!hrvBaja(); S.checkinDia={day:dayKey(),sleep:2,energy:2,sore:2}; window.PF_HRV={last:40,avg:50,n:6,at:Date.now()-5*H,m7:40,n7:5,base:50,nb:20}; out.hrvCk=!hrvBaja(); S.checkinDia=null;
     window.PF_SUENO=null; window.PF_HRV=null;
     // hora habitual: 5 entrenos empezando a las 18:00-18:40 (hora local del navegador simulado = UTC)
     S.sessions=[0,10,20,30,40].map((m,i)=>({id:'s'+i,routineId:'r',start:Date.UTC(2026,10,1+i,18,m),end:Date.UTC(2026,10,1+i,19,m),items:[]}));
@@ -568,7 +569,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('proteína: 3 ideas con 8 g o más por 100 kcal, solo con Premium', r.prot && r.protGratis);
   comprobar('peso: tendencia suavizada, ritmo semanal y fecha estimada de la meta', r.peso.now > 80 && r.peso.now < 81.5 && r.peso.rate < -0.3 && r.peso.eta > 0, JSON.stringify(r.peso));
   comprobar('sueño: menos de 6 h cuenta; 6 h 40 no', r.sueno && r.suenoOk);
-  comprobar('variabilidad del pulso: un 20 % bajo la media cuenta; un 6 % no', r.hrv === 20 && r.hrvOk, JSON.stringify([r.hrv, r.hrvOk]));
+  comprobar('variabilidad del pulso (1.9.5.2): la media de 7 días un 20 % bajo la base cuenta si el check-in va mal; un 6 %, una sola lectura baja o un buen check-in no', r.hrv === 20 && r.hrvOk && r.hrvUna && r.hrvCk, JSON.stringify([r.hrv, r.hrvOk, r.hrvUna, r.hrvCk]));
   comprobar('hora habitual: mediana 18:20, aviso 17:50', r.hora && r.hora.hora === '18:20' && r.hora.aviso === '17:50', JSON.stringify(r.hora));
   a.cerrar();
   const prem = fs.readFileSync(path.join(DIR, '..', 'www', 'premium.js'), 'utf8');
@@ -764,7 +765,7 @@ if (fs.existsSync(COPIA07)) {
     S.sessions=[]; S.checkinDia=null; out.eSin=estadoDia().score===null;
     S.checkinDia={day:dayKey(),sleep:2,energy:2,sore:2}; const e1=estadoDia(); out.eBien=e1.score===100&&e1.w==='listo';
     S.checkinDia={day:dayKey(),sleep:0,energy:0,sore:0}; const e2=estadoDia(); out.eMal=e2.score===60&&e2.w==='normal'&&e2.top.length===3;
-    window.PF_SUENO={last:300,avg:420,n:10,at:Date.now()}; window.PF_HRV={last:40,avg:60,n:10,at:Date.now()}; const e3=estadoDia(); out.eSuave=e3.score===38&&e3.w==='descansa'&&e3.soft;
+    window.PF_SUENO={last:300,avg:420,n:10,at:Date.now()}; window.PF_HRV={last:40,avg:60,n:10,at:Date.now(),m7:40,n7:5,base:60,nb:20}; S.checkinDia={day:dayKey(),sleep:0,energy:1,sore:2}; const e3=estadoDiaCalc(); window.PF_HRV={last:60,avg:60,n:10,at:Date.now(),m7:60,n7:5,base:60,nb:20}; const e3b=estadoDiaCalc(); out.e3=[e3.score,e3b.score]; S.checkinDia=null; out.eSuave=e3.score===Math.max(0,e3b.score-kb('estado.dia').p.hrv);
     window.PF_SUENO=null; window.PF_HRV=null; S.checkinDia=null;
     // tu línea base: con menos de 14 días no compara
     const n=nut(); n.water={}; for (let i=1;i<=10;i++) n.water[dayKey(Date.now()-i*86400000)]=2000; out.lbFalta=lineaBase().find(o=>o.id==='agua').falta===4;
@@ -818,7 +819,7 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.8: Historial en 4 pestañas con subpestañas (nada se pierde)', r.h4 && r.h4b && r.h4c, JSON.stringify([r.h4, r.h4b, r.h4c]));
   comprobar('1.8: Nutrición con suplementos y menús en la cabecera, y la gráfica del agua en Estadísticas', r.nutHdr && r.aguaSin, JSON.stringify([r.nutHdr, r.aguaSin]));
   comprobar('1.8: Ayuno con el plan en un botón (selector con explicación) y un solo consejo', r.ayBtn && r.ayUno && r.aySel, JSON.stringify([r.ayBtn, r.ayUno, r.aySel]));
-  comprobar('1.8: estado del día (sin datos no da número; check-in, sueño y variabilidad restan lo que dice la regla)', r.eSin && r.eBien && r.eMal && r.eSuave, JSON.stringify([r.eSin, r.eBien, r.eMal, r.eSuave]));
+  comprobar('1.8: estado del día (sin datos no da número; check-in, sueño y variabilidad restan lo que dice la regla)', r.eSin && r.eBien && r.eMal && r.eSuave, JSON.stringify([r.eSin, r.eBien, r.eMal, r.eSuave, r.e3]));
   comprobar('1.8: tu línea base solo con 14 días de datos y frente a tu propia media', r.lbFalta && r.lbOk, JSON.stringify([r.lbFalta, r.lbOk]));
   comprobar('1.8: cansancio acumulado con 3 señales repetidas, nunca justo después de una descarga', r.caSi && r.caNo, JSON.stringify([r.caSi, r.caNo]));
   comprobar('1.8: la propuesta llega por el panda, se aplica solo con «Aplicar» y como mucho una al día', r.pProp && r.pBtn && r.pAplica && r.pDia, JSON.stringify([r.pProp, r.pBtn, r.pAplica, r.pDia]));
@@ -960,6 +961,56 @@ if (fs.existsSync(COPIA07)) {
   comprobar('1.9.5.1: con dolor rojo la siguiente sugerencia baja un 25 %', r.baja, JSON.stringify(r.bajaVal));
   comprobar('1.9.5.1: seguimiento del dolor (pregunta al día siguiente, el amarillo mantiene la bajada, el verde la quita, la marca manual se respeta)', r.pend && r.sigueBaja && r.verdeQuita && r.manual, JSON.stringify([r.pend, r.sigueBaja, r.verdeQuita, r.manual]));
   comprobar('1.9.5.1: diabetes con medicación explica el riesgo de bajadas de azúcar (ADA 2026)', r.diab);
+  a.cerrar();
+}
+
+/* ---------- 1.9.5.2: recuperación, cardio, hábitos y ánimo ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}, D=86400000; window.isPremium=()=>true;
+    // ánimo: 10 de 14 días bajo → aviso de apoyo (una vez)
+    S.diaLog={}; for (let i=1;i<=10;i++) S.diaLog[dayKey(Date.now()-i*D)]={ck:{sleep:1,energy:1,sore:2,mood:0}};
+    S.checkinDia={day:dayKey(),sleep:1,energy:1,sore:2,mood:0}; MODALS.length=0; S.settings.animoAviso=0; animoRevisar();
+    out.apoyo=animoBajosMuchos(); 
+    // guía: tarjeta de sesión (Premium) y consejo (gratis)
+    out.cardPrem=/Te preparo una sesión suave/.test(animoCardHtml()); window.isPremium=()=>false; out.cardGratis=/caminata de 10 minutos/.test(animoCardHtml()) && !/Te preparo/.test(animoCardHtml()); window.isPremium=()=>true;
+    const O=animoOpciones(); out.opc=O.o.length>=3 && !!O.rec;
+    animoEmpezar('yoga',12); out.yoga=!!INT && INT.cfg.ex.length>=4 && INT.cfg.ex.every(id=>getEx(id).pat==='yoga') && /Yoga/.test(INT.cfg.nombre); INT=null; delete S.intActivo; LAYERS.length=0;
+    // diabetes: ya no bloquea
+    // calibrar RIR
+    out.rir=rirCalibra({items:[{exId:'press_banca',sets:[{t:'n',kg:60,reps:10,rir:3,done:true},{t:'n',kg:60,reps:5,done:true}]}]}).length===1;
+    out.rirNo=rirCalibra({items:[{exId:'press_banca',sets:[{t:'n',kg:60,reps:10,rir:1,done:true},{t:'n',kg:60,reps:5,done:true}]}]}).length===0;
+    // progresión del cardio
+    S.sessions=[1,3].map(d=>({id:'c'+d,routineId:'__cardio',routineName:'Cardio',start:Date.now()-d*D-1800e3,end:Date.now()-d*D,intensity:6,items:[],prs:[],vol:0,cardio:{act:'eliptica',int:'moderada',work:1800}}));
+    S.sessions.unshift(...[20,24,28].map(d=>({id:'f'+d,routineId:'x',routineName:'F',start:Date.now()-d*D-3600e3,end:Date.now()-d*D,intensity:7,items:[{exId:'press_banca',sets:[{t:'n',kg:60,reps:8,done:true}]}],prs:[],vol:480})));
+    const pg=cardioProgresion('eliptica'); out.prog=pg&&pg.min===30&&pg.subir;
+    // informe semanal: fuerza mínima y cardio OMS
+    const html=informeAvisos({alto:[]},0); out.fuerza=/de fuerza esta semana/.test(html); out.cardioOMS=/minutos recomendados por la OMS/.test(html);
+    // noches cortas
+    S.diaLog={}; for (let i=0;i<3;i++) S.diaLog[dayKey(Date.now()-i*D)]={su:330}; out.noches=nochesCortas()===3 && recoveryState(null).msgs.some(m=>/noches cortas/.test(m));
+    // ciclo
+    S.profile.sex='m'; out.cicloOff=/Ciclo y rendimiento \\(opcional\\)/.test(cicloHtml()); A.cicloOn(); A.cicloHoy(); out.cicloOn=S.ciclo.inicios.length===1 && /Hoy empezó/.test(cicloHtml());
+    S.ciclo.inicios=[Date.now()-100*D]; out.sinRegla=/más de 3 meses/.test(cicloHtml()); S.profile.sex='h'; delete S.ciclo;
+    return JSON.stringify(out); })()`));
+  await espera(900);
+  const r2 = JSON.parse(a.w.eval(`JSON.stringify({modal:MODALS.some(m=>/ánimo bajo/.test(m.html))})`));
+  comprobar('1.9.5.2: ánimo bajo 10 de 14 días → mensaje de apoyo para todos', r.apoyo && r2.modal, JSON.stringify([r.apoyo, r2.modal]));
+  comprobar('1.9.5.2: ánimo bajo hoy → sesión de PandarIA (Premium) o consejo (gratis)', r.cardPrem && r.cardGratis && r.opc, JSON.stringify([r.cardPrem, r.cardGratis, r.opc]));
+  comprobar('1.9.5.2: la sesión de yoga se arma con posturas de yoga compatibles', r.yoga);
+  comprobar('1.9.5.2: calibrar repeticiones en reserva (2+ que sobran y 4 repeticiones menos con el mismo peso)', r.rir && r.rirNo, JSON.stringify([r.rir, r.rirNo]));
+  comprobar('1.9.5.2: progresión del cardio (+5 min tras dos sesiones iguales)', r.prog);
+  comprobar('1.9.5.2: informe con fuerza mínima (Momma 2022) y minutos de cardio (OMS)', r.fuerza && r.cardioOMS, JSON.stringify([r.fuerza, r.cardioOMS]));
+  comprobar('1.9.5.2: 3 noches cortas en la semana → sesión de técnica', r.noches);
+  comprobar('1.9.5.2: ciclo opcional, solo mujeres, aviso con más de 90 días sin regla', r.cicloOff && r.cicloOn && r.sinRegla, JSON.stringify([r.cicloOff, r.cicloOn, r.sinRegla]));
+  a.cerrar();
+}
+{ // la diabetes con medicación ya no bloquea el ayuno (también a quien ya estaba bloqueado solo por eso)
+  const a = abrir({'pandaria-fit-v1': JSON.stringify({settings:{onboarded:true,ui:'completa',orden181:1}, profile:{name:'X',age:30,sex:'h',height:178,weight:80,injuries:[]}, nutri:{fast:{screened:true,blocked:true,motivos:['diabetes'],plan:'16:8',history:[],days52:[]}}})});
+  await espera(900);
+  const d = JSON.parse(a.w.eval(`JSON.stringify({b:nut().fast.blocked, dia:nut().fast.diabetes, aviso:/Diabetes con medicación/.test(fastCard())})`));
+  comprobar('1.9.5.2: diabetes con medicación ya no bloquea el ayuno y muestra su aviso', d.b===false && d.dia && d.aviso, JSON.stringify(d));
   a.cerrar();
 }
 
