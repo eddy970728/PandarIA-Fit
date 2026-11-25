@@ -128,6 +128,11 @@ m = m.replace('</manifest>', ['android.hardware.camera', 'android.hardware.camer
 // 1.8: el lector de códigos de ML Kit (GmsBarcodeScanningDelegateActivity) se abre siempre en vertical, y Play deduce de ahí que la app
 // exige pantalla vertical: avisa que excluye tablets, Chromebooks y Android XR. La pantalla vertical no es obligatoria.
 m = m.replace('</manifest>', '    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />\n</manifest>');
+// 1.9.5.1: Play avisa que la app restringe la orientación (Android 16 la ignora en tablets y plegables).
+// La única restricción venía del escáner de Google (GmsBarcodeScanningDelegateActivity, fijo en vertical): se quita.
+m = m.replace('</application>', `    <activity android:name="com.google.mlkit.vision.codescanner.internal.GmsBarcodeScanningDelegateActivity" tools:remove="android:screenOrientation" />
+    </application>`);
+if (/screenOrientation="(portrait|landscape)/.test(m)) throw new Error('android-extra: queda una orientación fija en el manifiesto');
 writeFileSync(mf, m);
 
 // 4) Health Connect necesita Android 8 o superior
@@ -151,6 +156,16 @@ const rel = /(release\s*\{[^}]*?)minifyEnabled\s+false/;
 if (!rel.test(bg)) throw new Error('android-extra: no se encontró minifyEnabled false en el bloque release');
 bg = bg.replace(rel, "$1minifyEnabled true\n            // 1.4: símbolos del código nativo dentro del AAB (Play los usa para explicar los cierres)\n            ndk { debugSymbolLevel 'SYMBOL_TABLE' }").replace("getDefaultProguardFile('proguard-android.txt')", "getDefaultProguardFile('proguard-android-optimize.txt')");
 if (!/minifyEnabled true/.test(bg) || !/proguard-android-optimize\.txt/.test(bg)) throw new Error('android-extra: no se pudo activar R8');
+// 1.9.5.1: la app solo usa el escáner de Google (scan), que no necesita las librerías nativas del modelo empaquetado
+// ni de CameraX (eso es para startScan, que no se usa). Sin ellas la app pesa unos 20 MB menos y Play deja de pedir
+// símbolos de depuración de código nativo que no es nuestro (vienen sin símbolos y no se pueden subir).
+if (!/android\s*\{/.test(bg)) throw new Error('android-extra: no se encontró el bloque android');
+bg = bg.replace(/android\s*\{/, `android {
+    packaging {
+        jniLibs {
+            excludes += ['**/libbarhopper_v3.so', '**/libimage_processing_util_jni.so', '**/libsurface_util_jni.so']
+        }
+    }`);
 writeFileSync(ab, bg);
 const REGLAS = `
 # ---- PandarIA Fit (scripts/android-extra.mjs) ----
@@ -163,6 +178,9 @@ const REGLAS = `
 -keep class ee.forgr.** { *; }
 -keep class org.apache.cordova.** { *; }
 -keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
+# 1.9.5.1: Play comprueba que la app llama a EdgeToEdge.enable (borde a borde en Android 15+). R8 la metía dentro
+# de MainActivity y le cambiaba el nombre, así que Play no la veía: se conserva tal cual.
+-keep class androidx.activity.EdgeToEdge { *; }
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod,Exceptions,SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 # Proveedores de inicio de sesión que no se incluyen (solo Google)
