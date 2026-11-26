@@ -1014,6 +1014,17 @@ if (fs.existsSync(COPIA07)) {
   a.cerrar();
 }
 
+/* ---------- 1.9.5.4: proteína con peso de referencia en obesidad ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); S.profile.height=175; S.profile.weight=150; S.profile.sex='m'; S.measures=[{id:'m',date:Date.now()-DAY,peso:150}]; nut().goal='bajar';
+    const n=calcNutrition(); S.profile.weight=80; S.measures=[{id:'m',date:Date.now()-DAY,peso:80}]; const m=calcNutrition(); return JSON.stringify({wr:n.wr,prot:n.prot,carbs:n.carbs,nota:n.notes.some(x=>/peso de referencia/.test(x)),normal:m.wr===undefined&&m.prot===160}); })()`));
+  comprobar('1.9.5.4: con IMC de 30 o más la proteína usa un peso de referencia (150 kg y 1,75 m → ~106 kg) y deja carbohidratos', r.wr > 100 && r.wr < 112 && r.prot < 230 && r.carbs >= 100 && r.nota && r.normal, JSON.stringify(r));
+  a.cerrar();
+}
+
 /* ---------- 1.9.5.3: Pregunta a PandarIA ---------- */
 {
   const a = abrir();
