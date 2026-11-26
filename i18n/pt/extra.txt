@@ -314,3 +314,71 @@ Un metaanálisis de 218 ensayos (Noetel y col., 2024) encontró que el ejercicio
 Variabilidad del pulso como tendencia de 7 días, semana con noches cortas, fuerza mínima para la salud, cardio compatible con el músculo, cardio en día de pierna, minutos de cardio de la OMS, progresión del cardio, hábito de 66 días, calibrar tus repeticiones en reserva, volumen frente a progreso, sueño frente a rendimiento, ciclo menstrual opcional y ánimo y movimiento. La diabetes ya no bloquea el ayuno.|Variabilidade da frequência cardíaca como tendência de 7 dias, semana com noites curtas, força mínima para a saúde, cardio compatível com o músculo, cardio em dia de perna, minutos de cardio da OMS, progressão do cardio, hábito de 66 dias, calibrar suas repetições em reserva, volume versus progresso, sono versus desempenho, ciclo menstrual opcional e ânimo e movimento. A diabetes já não bloqueia o jejum.
 PandarIA no registra tu glucosa ni sustituye ese seguimiento: si marcas diabetes con medicación, no te bloquea el ayuno, pero te lo recuerda con estas guías antes de empezar.|O PandarIA não registra sua glicose nem substitui esse acompanhamento: se você marca diabetes com medicação, ele não bloqueia o jejum, mas lembra você dessas diretrizes antes de começar.
 Las guías de la Asociación Americana de Diabetes (ADA, 2026) recomiendan a los adultos con diabetes al menos 150 minutos de actividad moderada a la semana, fuerza 2 o 3 días y cortar los ratos largos sentado. Con insulina o con fármacos que bajan el azúcar (como las sulfonilureas), el ejercicio y el ayuno pueden causar bajadas de azúcar: la ADA y la Federación Internacional de Diabetes (IDF, 2021) piden ajustar la medicación y planificar el ayuno con el médico. PandarIA no registra tu glucosa ni sustituye ese seguimiento: si marcas diabetes con medicación, no te bloquea el ayuno, pero te lo recuerda con estas guías antes de empezar.|As diretrizes da Associação Americana de Diabetes (ADA, 2026) recomendam aos adultos com diabetes pelo menos 150 minutos de atividade moderada por semana, força 2 ou 3 dias e interromper os longos períodos sentado. Com insulina ou com remédios que baixam o açúcar (como as sulfonilureias), o exercício e o jejum podem causar quedas de açúcar: a ADA e a Federação Internacional de Diabetes (IDF, 2021) pedem ajustar a medicação e planejar o jejum com o médico. O PandarIA não registra sua glicose nem substitui esse acompanhamento: se você marca diabetes com medicação, ele não bloqueia o jejum, mas lembra você dessas diretrizes antes de começar.
+# 1.9.5.3
+¿Cuántos pasos necesito al día?|Quantos passos preciso dar por dia?
+¿Puedo entrenar con dolor?|Posso treinar com dor?
+¿El cardio me quita músculo?|O cardio tira meu músculo?
+¿Cuánta proteína aprovecho por comida?|Quanta proteína aproveito por refeição?
+¿Cuántas series son demasiadas?|Quantas séries são demais?
+¿Qué tan cerca del fallo debo llegar?|Quão perto da falha devo chegar?
+¿Qué pasa si duermo poco?|O que acontece se eu durmo pouco?
+¿Cuánto tarda en formarse un hábito?|Quanto tempo leva para formar um hábito?
+¿La creatina mejora la memoria?|A creatina melhora a memória?
+¿El ciclo menstrual cambia mi rendimiento?|O ciclo menstrual muda meu desempenho?
+¿Qué hago hoy si estoy bajo de ánimo?|O que faço hoje se estou com o ânimo baixo?
+¿Qué valoración le das a mis rutinas?|Que nota você dá às minhas rotinas?
+¿Qué rutina me toca hoy?|Qual rotina é hoje?
+¿Mi rutina sirve para mi objetivo?|Minha rotina serve para meu objetivo?
+¿Qué cambiarías de mis rutinas?|O que você mudaria nas minhas rotinas?
+¿Qué músculo tengo atrasado?|Qual músculo está atrasado?
+¿Cuánto deberían durar mis sesiones?|Quanto deveriam durar minhas sessões?
+¿Estoy listo para subir de nivel?|Estou pronto para subir de nível?
+Si ya entrené hoy, ¿puedo hacer otro entreno?|Se já treinei hoje, posso fazer outro treino?
+¿Dormí lo suficiente para ir fuerte hoy?|Dormi o suficiente para ir forte hoje?
+¿Hoy hago cardio o descanso?|Hoje faço cardio ou descanso?
+¿Estoy progresando en {ej}?|Estou progredindo em {ej}?
+¿{ej} es seguro con mis zonas sensibles?|{ej} é seguro com minhas zonas sensíveis?
+¿Por qué cambio {ej} si no tengo la máquina?|Por qual troco {ej} se não tenho a máquina?
+¿Cómo voy este mes?|Como estou indo este mês?
+¿Entreno lo suficiente?|Treino o suficiente?
+¿Qué día de la semana rindo mejor?|Em que dia da semana rendo melhor?
+¿Por qué bajé de rendimiento?|Por que meu desempenho caiu?
+¿Qué como ahora para llegar a mi proteína?|O que como agora para chegar à minha proteína?
+¿Cómo va mi semana de comida?|Como vai minha semana de alimentação?
+¿Como poco para lo que entreno?|Como pouco para o quanto treino?
+¿Bebo suficiente hoy?|Bebo o suficiente hoje?
+¿Puedo entrenar hoy con mi ayuno?|Posso treinar hoje com meu jejum?
+¿Mi ayuno es demasiado agresivo?|Meu jejum é agressivo demais?
+¿Estoy ganando músculo o grasa?|Estou ganhando músculo ou gordura?
+¿Qué dice mi cintura?|O que diz minha cintura?
+¿Cuándo llego a mi meta?|Quando chego à minha meta?
+¿Cómo va mi molestia en {ej}?|Como está meu incômodo em {ej}?
+¿Cuánto me afecta a mí dormir poco?|Quanto dormir pouco me afeta?
+¿Cómo va mi hábito?|Como está meu hábito?
+¿Cuántos minutos de cardio llevo esta semana?|Quantos minutos de cardio fiz nesta semana?
+Tus rutinas|Suas rotinas
+Mitos|Mitos
+Pregunta a PandarIA|Pergunte ao PandarIA
+Preguntas generales con la regla y su fuente|Perguntas gerais com a regra e sua fonte
+Pregunta sobre ti: valora tus rutinas, te dice qué toca hoy y responde con tus datos|Pergunte sobre você: avalia suas rotinas, diz o que é hoje e responde com seus dados
+Las preguntas sobre ti, respondidas con tus datos, son parte de Premium. Las preguntas generales se responden completas también en la versión gratis.|As perguntas sobre você, respondidas com seus dados, fazem parte do Premium. As perguntas gerais são respondidas por completo também na versão gratuita.
+«Solo aprovechas 20–30 g de proteína por comida»|«Você só aproveita 20–30 g de proteína por refeição»
+«Hay que llegar al fallo en cada serie»|«É preciso chegar à falha em cada série»
+«El cardio mata las ganancias»|«O cardio mata os ganhos»
+«10.000 pasos o nada»|«10.000 passos ou nada»
+«Un hábito se forma en 21 días»|«Um hábito se forma em 21 dias»
+«Si no tengo agujetas, el entreno no sirvió»|«Se não tenho dor muscular, o treino não serviu»
+«Las pesas ponen a las mujeres enormes»|«Musculação deixa as mulheres enormes»
+«Comer de noche engorda»|«Comer à noite engorda»
+«El ayuno quema músculo»|«O jejum queima músculo»
+«Hay que beber 8 vasos de agua sí o sí»|«É preciso beber 8 copos de água de qualquer jeito»
+«Sudar más quema más grasa»|«Suar mais queima mais gordura»
+«Los abdominales quitan la barriga»|«Abdominais tiram a barriga»
+«Hay que tomar proteína en los 30 minutos después de entrenar»|«É preciso tomar proteína nos 30 minutos depois de treinar»
+«Estirar antes de entrenar evita lesiones»|«Alongar antes de treinar evita lesões»
+«Más series siempre es mejor»|«Mais séries é sempre melhor»
+PandarIA más sabio: pregunta a PandarIA|PandarIA mais sábio: pergunte ao PandarIA
+La consulta del panda pasa de 38 a 94 preguntas, con al menos 6 en cada pantalla y ordenadas según el momento (si ya entrenaste, si ayunas o si tienes el ánimo bajo)|A consulta do panda passa de 38 para 94 perguntas, com pelo menos 6 em cada tela e ordenadas segundo o momento (se você já treinou, se está em jejum ou se está com o ânimo baixo)
+Premium: preguntas sobre ti respondidas con tus datos, como «¿Qué valoración le das a mis rutinas?», «¿Qué rutina me toca hoy?» o «Si ya entrené, ¿puedo hacer otro?»|Premium: perguntas sobre você respondidas com seus dados, como «Que nota você dá às minhas rotinas?», «Qual rotina é hoje?» ou «Se já treinei, posso fazer outro?»
+Gratis: las preguntas generales se responden completas, con la regla y su fuente|Grátis: as perguntas gerais são respondidas por completo, com a regra e sua fonte
+Tema nuevo «Mitos» con 15 creencias populares y lo que dicen los estudios, y un buscador que entiende errores de una letra y sinónimos|Tema novo «Mitos» com 15 crenças populares e o que dizem os estudos, e uma busca que entende erros de uma letra e sinônimos

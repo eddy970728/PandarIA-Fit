@@ -698,7 +698,7 @@ if (fs.existsSync(COPIA07)) {
     A.wCalor(); out.a5calor=waterGoal()===g0+500; A.wCalor(); out.a5calorOff=waterGoal()===g0;
     LAYERS.push({t:'aguaStats',p:{y:new Date().getFullYear(),m:new Date().getMonth()}}); renderLayers(); out.a5stats=/Media 7 días/.test(document.querySelector('.layer:last-child').textContent); LAYERS.length=0; renderLayers();
     return JSON.stringify(out); })()`));
-  comprobar('Consulta a PandarIA: 30 preguntas o más en las 9 secciones, todas responden con sus datos y su regla', r.consulta.preguntas >= 30 && r.consulta.secciones === 9 && !r.consulta.malos.length, JSON.stringify(r.consulta));
+  comprobar('Consulta a PandarIA (1.9.5.3): 80 preguntas o más en las 11 secciones, todas responden con sus datos y su regla', r.consulta.preguntas >= 80 && r.consulta.secciones === 11 && !r.consulta.malos.length, JSON.stringify(r.consulta));
   comprobar('Consulta: ve el estancamiento del press de banca y calcula la proteína (2 g/kg al bajar… 1,6 al mantener: 128 g)', /no sube desde hace/.test(r.estanco) && /128 g/.test(r.proteina), JSON.stringify([r.estanco, r.proteina]));
   comprobar('Consulta: el buscador encuentra «creatina»', r.buscar === 'creatina', r.buscar);
   comprobar('Consulta: con Premium el informe completo; gratis solo la respuesta corta con candado', r.premCompleto && r.gratis);
@@ -1011,6 +1011,37 @@ if (fs.existsSync(COPIA07)) {
   await espera(900);
   const d = JSON.parse(a.w.eval(`JSON.stringify({b:nut().fast.blocked, dia:nut().fast.diabetes, aviso:/Diabetes con medicación/.test(fastCard())})`));
   comprobar('1.9.5.2: diabetes con medicación ya no bloquea el ayuno y muestra su aviso', d.b===false && d.dia && d.aviso, JSON.stringify(d));
+  a.cerrar();
+}
+
+/* ---------- 1.9.5.3: Pregunta a PandarIA ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const out={}, D=86400000;
+    S.routines=[newRoutine({name:'A',goal:'musculo',items:[buildItem('press_banca','musculo',2),buildItem('remo_barra','musculo',2),buildItem('sentadilla','musculo',2)]})];
+    out.nota=rutinaNota(S.routines[0]).nota; out.notaOk=out.nota>=6&&out.nota<=10;
+    // gratis: general completa, «sobre ti» bloqueada
+    window.isPremium=()=>false; LAYERS.length=0; openLayer('consultaQ',{id:'cardioMusculo',p:{}}); const g=document.querySelector('.layer:last-child').innerHTML;
+    out.genGratis=/La explicación|The explanation/.test(g) && !/filter:blur/.test(g);
+    LAYERS.length=0; openLayer('consultaQ',{id:'valoraRutinas',p:{}}); out.yoGratis=/filter:blur/.test(document.querySelector('.layer:last-child').innerHTML); LAYERS.length=0;
+    window.isPremium=()=>true; openLayer('consultaQ',{id:'valoraRutinas',p:{}}); out.yoPrem=/de 10/.test(document.querySelector('.layer:last-child').textContent); LAYERS.length=0; renderLayers();
+    // contexto: ≥ 6 por pantalla y «¿puedo hacer otro?» primero si ya entrenaste
+    out.ctx=Object.entries(CQ_CTX).filter(([k,v])=>v.filter(id=>CQ.some(q=>q.id===id)).length<6).map(([k])=>k);
+    S.sessions=[{id:'h',routineId:S.routines[0].id,routineName:'A',start:Date.now()-3600e3,end:Date.now()-60e3,intensity:7,items:[{exId:'press_banca',sets:[{t:'n',kg:60,reps:8,done:true}]}],prs:[]}];
+    TAB='rutinas'; out.otro=cqContexto().ids[0]==='otroEntreno';
+    // buscador: errores de una letra y sinónimos
+    out.b1=cqBuscar(null,'creatna').some(q=>q.id==='creatina'); out.b2=cqBuscar(null,'barriga').some(q=>q.id==='cinturaDice'||q.id==='mito12');
+    out.mitos=CQ.filter(q=>q.s==='mitos').length;
+    // todas responden sin errores (también las nuevas) en gratis y Premium
+    out.err=[]; [true,false].forEach(pr=>{ window.isPremium=()=>pr; CQ.forEach(q=>{ try{ const p={}; if (q.p) p[q.p]=CQ_PARAMS[q.p].ops()[0][0]; const R=q.f(p); if (!R||!R.corta) out.err.push(q.id); }catch(e){ out.err.push(q.id+': '+e.message); } }); });
+    return JSON.stringify(out); })()`));
+  comprobar('1.9.5.3: valoración de rutinas de 0 a 10', r.notaOk, String(r.nota));
+  comprobar('1.9.5.3: gratis ve completas las preguntas generales y bloqueadas las de «sobre ti»; Premium las ve con sus datos', r.genGratis && r.yoGratis && r.yoPrem, JSON.stringify([r.genGratis, r.yoGratis, r.yoPrem]));
+  comprobar('1.9.5.3: al menos 6 preguntas en cada pantalla y orden según el momento', !r.ctx.length && r.otro, JSON.stringify([r.ctx, r.otro]));
+  comprobar('1.9.5.3: el buscador entiende errores de una letra y sinónimos', r.b1 && r.b2, JSON.stringify([r.b1, r.b2]));
+  comprobar('1.9.5.3: 15 mitos y todas las preguntas responden sin errores', r.mitos === 15 && !r.err.length, JSON.stringify([r.mitos, r.err.slice(0, 6)]));
   a.cerrar();
 }
 
