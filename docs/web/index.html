@@ -17039,7 +17039,10 @@ const mpEntre=(a,b)=>Math.round((mpK(b)-mpK(a))/DAY);
 function mpS(){ S.mp=S.mp||{}; S.mp.vis=S.mp.vis||{}; return S.mp; }
 const mpTemp=k=>MP_TEMP.find(t=>k>=t.a&&k<=t.b)||null;
 const mpTempAct=()=>mpTemp(dayKey())||MP_TEMP.find(t=>t.a>dayKey())||MP_TEMP[MP_TEMP.length-1];
-const mpPlanDia=k=>!!(S.plan&&S.plan.days&&S.plan.days.includes(new Date(mpK(k)).getDay()));
+// 1.9.6: los días del plan se recuerdan con su fecha, así cambiar el plan no cambia los puntos de días pasados
+function mpPlanHist(){ const M=mpS(), cur=JSON.stringify((S.plan&&S.plan.days)||[]); M.plan=M.plan||[]; const u=M.plan[M.plan.length-1];
+  if (!u||JSON.stringify(u.days)!==cur){ const hoy=dayKey(); if (u&&u.desde===hoy) u.days=JSON.parse(cur); else M.plan.push({desde:M.plan.length?hoy:MP_INI,days:JSON.parse(cur)}); } return M.plan; }
+const mpPlanDia=k=>{ const L=mpPlanHist(); let d=L[0].days; for (const x of L) if (x.desde<=k) d=x.days; return d.includes(new Date(mpK(k)).getDay()); };
 
 /* ---------- Actividades del día (temporizador de intervalos) ---------- */
 const MP_EXTRAS=[
@@ -17131,7 +17134,7 @@ function mpCalc(){
   let total=0; Object.values(dias).forEach(x=>{ x.total=x.base+x.bono; total+=x.total; });
   return MP_MEMO={firma,dias,retos,semanas,racha,mejor,comodines,total,usaAgua,usaComida,usaAyuno};
 }
-function mpRango(total){ let r=0; MP_RANGOS.forEach((x,i)=>{ if (total>=x[3]) r=i; }); const a=MP_RANGOS[r][3], b=r<MP_RANGOS.length-1?MP_RANGOS[r+1][3]:a+25000, paso=(b-a)/5, nivel=Math.min(4,Math.floor((total-a)/paso));
+function mpRango(total){ if (S&&S.mp){ S.mp.maxTot=Math.max(S.mp.maxTot||0,total); total=S.mp.maxTot; } let r=0; MP_RANGOS.forEach((x,i)=>{ if (total>=x[3]) r=i; }); const a=MP_RANGOS[r][3], b=r<MP_RANGOS.length-1?MP_RANGOS[r+1][3]:a+25000, paso=(b-a)/5, nivel=Math.min(4,Math.floor((total-a)/paso));
   const sig=a+paso*(nivel+1); return {r, nivel, nombre:mpL(MP_RANGOS[r]), color:MP_RANGOS[r][4], txt:mpL(MP_RANGOS[r])+' '+MP_ROM[nivel], falta:Math.max(0,Math.ceil(sig-total)), pct:Math.round(((total-a)-paso*nivel)/paso*100),
     sigTxt:nivel<4?mpL(MP_RANGOS[r])+' '+MP_ROM[nivel+1]:r<MP_RANGOS.length-1?mpL(MP_RANGOS[r+1])+' I':mpL(MP_RANGOS[r])+' V'}; }
 

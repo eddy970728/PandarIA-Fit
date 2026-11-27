@@ -1034,12 +1034,13 @@ if (fs.existsSync(COPIA07)) {
     S.profile.injuries=['rodilla']; o.rodilla=mpExtrasPosibles().every(x=>x.exOk.every(id=>!profileBlocks(id))); S.profile.injuries=[];
     // ocultar y mostrar
     S.settings.mpOff=true; render(); o.oculta=![...document.querySelectorAll('#nav button')].some(b=>b.dataset.v==='mipandaria'); delete S.settings.mpOff; render();
-    o.rangos=[0,600,1800,25000,40000].map(n=>mpRango(n).txt).join('|');
+    S.plan={days:[1,3,5],order:[]}; MP_MEMO=null; const k0=mpSum(dayKey(),-2), antes=mpPlanDia(k0); __setNow(Date.UTC(2026, 11, 4, 12, 0, 0)); S.plan={days:[0,2,4,6],order:[]}; MP_MEMO=null; o.planFijo=mpPlanDia(k0)===antes;
+    S.mp.maxTot=0; o.rangos=[0,600,1800,25000,40000].map(n=>mpRango(n).txt).join('|'); o.nuncaBaja=mpRango(10).txt;
     return JSON.stringify(o); })()`));
   comprobar('1.9.6: Mi PandarIA es la quinta pestaña y se ve con candado hasta 3 entrenos o 7 días con actividad', /mipandaria/.test(r.tabs) && r.bloq && r.candado && r.abre && r.rango, JSON.stringify(r));
   comprobar('1.9.6: el contenido cubre del 27 de noviembre al 31 de enero en 3 idiomas, con tarjetas para menores', !r.faltan.length && r.menor && r.mas18 === 5, JSON.stringify([r.faltan, r.menor, r.mas18]));
   comprobar('1.9.6: puntos entre 0 y 150 al día, 1 actividad gratis y 2 con Premium que respetan las lesiones, y se puede ocultar', r.puntos && r.gratis === 1 && r.prem === 2 && r.rodilla && r.oculta, JSON.stringify(r));
-  comprobar('1.9.6: rangos de Cachorro a Leyenda que suben con los puntos', r.rangos === 'Cachorro I|Explorador I|Constante I|Leyenda I|Leyenda IV', r.rangos);
+  comprobar('1.9.6: rangos de Cachorro a Leyenda que suben con los puntos y nunca bajan; cambiar el plan no cambia los días pasados', r.rangos === 'Cachorro I|Explorador I|Constante I|Leyenda I|Leyenda IV' && r.nuncaBaja === 'Leyenda IV' && r.planFijo, JSON.stringify([r.rangos, r.nuncaBaja, r.planFijo]));
   a.cerrar();
 }
 

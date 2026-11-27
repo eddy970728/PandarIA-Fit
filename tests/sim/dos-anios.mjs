@@ -168,6 +168,18 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
           if (!(ult > 25 && ult < 400)) f.datos.add(`peso guardado ${ult} al escribir «${v}»`);
           if (p.us && /^\d/.test(v) && Math.abs(ult - peso) > 1.5 && !p.datosRaros) f.datos.add(`en EE. UU. escribió ${v} lb y se guardó ${ult} kg (esperado ~${peso.toFixed(1)}) · día ${dia} · tras guardar: ${trasGuardar} · ${a.ev(`LAYERS.map(l=>l.t).join(',')+' | '+((document.querySelector('#modals')||{}).textContent||'').replace(/\\s+/g,' ').slice(0,140)+' | med '+S.measures.slice(-2).map(m=>new Date(m.date).toISOString().slice(0,10)+':'+m.peso).join(' ')`)}`);
           erroresDe('peso'); }
+        // Mi PandarIA cada día: pestaña, puntos que nunca bajan, rapidez del cálculo
+        if (process.env.MPDIARIO && a.ev(`typeof mpAbierta==='function'&&dayKey()>=MP_INI`)) {
+          a.w.__T = b0 + 14.5 * H; limpiar(); a.ev(`MP_MEMO=null; A.tab('mipandaria')`); a.avanzar(300); raro('mi pandaria'); a.ev(`MODALS.length=0; renderModals();`);
+          const t1 = Date.now(); const tot = a.ev(`(MP_MEMO=null, mpCalc().total)`); const ms = Date.now() - t1; (f.lento.mpcalc = f.lento.mpcalc || []).push([dia, ms]);
+          
+          const rg = a.ev(`mpRango(mpCalc().total).r`); if (f.mpRg != null && rg < f.mpRg) f.ciencia.add(`Mi PandarIA: el rango bajó (día ${dia})`); f.mpRg = Math.max(f.mpRg || 0, rg);
+          const dd = JSON.parse(a.ev(`JSON.stringify((()=>{ const d=mpCalc().dias[dayKey()]; return d?{b:d.base,t:d.total,cont:!!mpCont(dayKey()),edad:+(S.profile.age||0),alt:!!(MP_CONT.find(x=>x.d===dayKey())||{}).alt,menor:!!(mpCont(dayKey())||{}).menor}:null; })())`));
+          if (!dd) f.datos.add(`Mi PandarIA sin día de hoy (día ${dia})`);
+          else { if (!(dd.b >= 0 && dd.b <= 150)) f.ciencia.add(`Mi PandarIA: ${dd.b} puntos base`); if (dd.edad && dd.edad < 18 && dd.alt && !dd.menor) f.identidad.add(`Mi PandarIA: un menor ve una tarjeta +18 (día ${dia})`);
+            if (!dd.cont && a.ev(`dayKey()<='2027-01-31'`)) f.datos.add(`Mi PandarIA: sin contenido el ${a.ev('dayKey()')}`); }
+          limpiar(); erroresDe('mi pandaria');
+        }
         // Mi PandarIA: ver el contenido y hacer una actividad del día (si está abierta)
         if (r() < 0.35 && a.ev(`typeof mpAbierta==='function'&&dayKey()>=MP_INI&&mpAbierta()`)) {
           a.w.__T = b0 + 12 * H; limpiar(); a.ev(`A.mpCont()`); a.avanzar(200); raro('mp contenido'); limpiar();
