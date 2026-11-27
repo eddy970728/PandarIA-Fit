@@ -6,6 +6,8 @@ name: Subir app de iPhone a TestFlight (firmada)
 # Se lanza a mano (Actions › este flujo › Run workflow) para no subir una versión a Apple en cada cambio.
 on:
   workflow_dispatch:
+  push:
+    branches: [testflight]   # empujar a esta rama sube a TestFlight sin tocar main
 
 permissions:
   contents: read
