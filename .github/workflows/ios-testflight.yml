@@ -1,0 +1,102 @@
+name: Subir app de iPhone a TestFlight (firmada)
+
+# 1.9.7 · Compila en un Mac de GitHub, firma con la clave de la API de App Store Connect y sube la app a TestFlight.
+# No hace falta Mac ni certificados a mano: Xcode crea el certificado y el perfil (firma automática gestionada por Apple).
+# Secretos del repositorio (Settings › Secrets and variables › Actions): ASC_KEY_ID, ASC_ISSUER_ID y ASC_KEY_P8 (contenido del .p8).
+# Se lanza a mano (Actions › este flujo › Run workflow) para no subir una versión a Apple en cada cambio.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testflight:
+    runs-on: macos-26
+    timeout-minutes: 75
+    env:
+      TEAM_ID: B7QA53SPD9
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Comprobar los secretos de Apple
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          for v in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8; do [ -n "${!v}" ] || { echo "ERROR: falta el secreto $v"; exit 1; }; done
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$ASC_KEY_P8" > ~/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8
+          grep -q "BEGIN PRIVATE KEY" ~/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8 || { echo "ERROR: ASC_KEY_P8 no parece un .p8"; exit 1; }
+          echo "KEY_PATH=$HOME/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8" >> $GITHUB_ENV
+
+      - name: Instalar Capacitor
+        run: npm install
+
+      - name: Leer la version de la app
+        run: |
+          node -e "const h=require('fs').readFileSync('www/index.html','utf8');const v=h.match(/const APP_VERSION='([^']+)'/)[1];const p=(h.match(/const APP_PARCHE='([^']*)'/)||[])[1]||'';const n=p?v+'.'+p:v;console.log('VNOM='+n.split('.').slice(0,3).join('.'))" >> $GITHUB_ENV
+          cat $GITHUB_ENV | grep VNOM
+
+      - name: Pruebas automaticas (si fallan, no se sube)
+        run: |
+          npm install --no-save jsdom@25
+          node tests/pruebas.mjs
+
+      - name: Preparar el HTML para iPhone
+        run: |
+          node -e "
+          const fs=require('fs');let h=fs.readFileSync('www/index.html','utf8');
+          if(!h.includes('<script src=\"premium.js\">')) h=h.replace('</body>','<script src=\"native.js\"></script><script src=\"premium.js\"></script></body>');
+          h=h.replace('<head>','<head><script>window.PF_BUILD=${{ github.run_number }}</script>');
+          fs.writeFileSync('www/index.html',h);"
+          node scripts/version-play.mjs www/index.html
+          node scripts/version-ios.mjs
+
+      - name: Crear proyecto iOS (CocoaPods)
+        run: |
+          npx cap add ios --packagemanager CocoaPods || echo "pod install se repite tras ajustar el Podfile"
+          test -f ios/App/Podfile || { echo "ERROR: no se creó el proyecto iOS"; exit 1; }
+          npx @capacitor/assets generate --ios --iconBackgroundColor '#12151a' --splashBackgroundColor '#12151a' --splashBackgroundColorDark '#12151a'
+          node scripts/ios-extra.mjs
+          npx cap sync ios
+
+      - name: Archivar y firmar
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/App.xcarchive \
+            MARKETING_VERSION=${{ env.VNOM }} CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" -authenticationKeyID "${{ secrets.ASC_KEY_ID }}" -authenticationKeyIssuerID "${{ secrets.ASC_ISSUER_ID }}" \
+            archive | tail -n 60
+          codesign -d --entitlements - build/App.xcarchive/Products/Applications/App.app | grep -q healthkit || { echo "ERROR: falta el permiso de HealthKit en la firma"; exit 1; }
+
+      - name: Subir a App Store Connect (TestFlight)
+        run: |
+          set -o pipefail
+          cat > ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" -authenticationKeyID "${{ secrets.ASC_KEY_ID }}" -authenticationKeyIssuerID "${{ secrets.ASC_ISSUER_ID }}" | tail -n 40
+          echo "Subida: PandarIA Fit ${{ env.VNOM }} (${{ github.run_number }}). Aparecerá en App Store Connect › TestFlight en unos 10-30 minutos."
+
+      - name: Borrar la clave
+        if: always()
+        run: rm -rf ~/.appstoreconnect

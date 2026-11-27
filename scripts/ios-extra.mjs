@@ -60,4 +60,14 @@ writeFileSync('ios-entitlements.plist', `<?xml version="1.0" encoding="UTF-8"?>
 </dict>
 </plist>
 `);
+// 1.9.7 · Firma para App Store / TestFlight: entitlements dentro del proyecto y equipo de Apple en el target App
+// (solo en el target App: los Pods no los necesitan y pasarlos por línea de comandos rompe sus rutas)
+writeFileSync('ios/App/App/App.entitlements', readFileSync('ios-entitlements.plist', 'utf8'));
+let pbx2 = readFileSync(PBX, 'utf8');
+if (!pbx2.includes('CODE_SIGN_ENTITLEMENTS')) {
+  const n0 = (pbx2.match(/INFOPLIST_FILE = App\/Info.plist;/g) || []).length;
+  if (!n0) fallo('no se encontró INFOPLIST_FILE del target App');
+  pbx2 = pbx2.replace(/INFOPLIST_FILE = App\/Info.plist;/g, 'INFOPLIST_FILE = App/Info.plist;\n\t\t\t\tCODE_SIGN_ENTITLEMENTS = App/App.entitlements;\n\t\t\t\tDEVELOPMENT_TEAM = B7QA53SPD9;\n\t\t\t\tCODE_SIGN_STYLE = Automatic;');
+  writeFileSync(PBX, pbx2);
+}
 console.log('Proyecto iOS listo: permisos, Archivos, enlaces, iOS 15.5 y HealthKit');
