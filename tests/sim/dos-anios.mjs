@@ -109,7 +109,18 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
       }
       const activo = !(p.constancia === 'abandona' && dia > 120 && dia < 300) && !(p.constancia === 'temporadas' && Math.floor(dia / 60) % 2 === 1);
       const prob = { alta: 0.85, media: 0.6, baja: 0.3, abandona: 0.8, temporadas: 0.8 }[p.constancia];
-      if (activo) {
+      const rapido = process.env.RAPIDO && dia >= +process.env.RAPIDO && dow !== 1; // años siguientes: 6 de cada 7 días sin pantallas (los lunes, completos)
+      if (activo && rapido) {
+        a.w.__T = b0 + 3 * H; for (let k = 0; k < 3; k++) a.ev(`A.water(${[250, 330, 500][k]})`);
+        if (p.comida !== 'nada' && r() < 0.7) a.ev(`(()=>{ const f=alimGet('05062'), k=dayKey(), n=nd(); const it=Object.assign(alimMac(f,180),{id:uid(),fid:'05062',n:f.n,gr:180,m:'almuerzo',t:Date.now()}); n.diario[k]=(n.diario[k]||[]).concat([it]); save(); })()`);
+        a.w.__T = b0 + 11 * H;
+        if (a.ev(`!!(S.plan&&S.plan.days.includes(new Date().getDay()))`) && r() < prob) {
+          const ok = a.ev(`(()=>{ try{ const x=nextInPlan(); if (!x||!x.r) return 0; const it=x.r.items.map(i=>({exId:i.exId,uid:uid(),sets:(i.sets||[]).map(s=>Object.assign({},s,{kg:s.kg??s.sk??null,reps:s.reps??s.sr??null,time:s.time??s.st??null,done:true}))})); S.sessions.push({id:uid(),routineId:x.r.id,routineName:x.r.name,start:Date.now()-50*60000,end:Date.now(),intensity:7,items:it,prs:[]}); save(); return 1; }catch(e){ return String(e); } })()`);
+          if (ok !== 1 && ok !== 0) f.errores.add('entreno rápido: ' + ok); else if (ok) { sesionesUI++; misIds.push(a.ev(`(S.sessions[S.sessions.length-1]||{}).id+'|'+(S.sessions[S.sessions.length-1]||{}).routineId`)); }
+        }
+        erroresDe('día rápido');
+      }
+      if (activo && !rapido) {
         // check-in
         if (r() < 0.5) { a.ev(`A.checkinHoy()`); a.avanzar(200);
           for (const k of ['sleep', 'energy', 'sore', 'mood']) { const bajo = (k === 'mood' && st.animo === 'bajo') || (k === 'sleep' && p.sueno === 'poco'); a.tocar('ckhSet', `${k}|${bajo ? (r() < 0.75 ? 0 : 1) : 1 + Math.floor(r() * 2)}`); }
@@ -144,7 +155,7 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
             }
             if (!a.ev(`!!S.active`)) { limpiar(); continue; }
             const sets = JSON.parse(a.ev(`JSON.stringify(S.active.items.flatMap(it=>it.sets.map((s,i)=>({u:it.uid,i,m:getEx(it.exId).mode,kg:s.kg??s.sk??s.tk,reps:s.reps??s.sr??s.tr}))))`));
-            const ui = intentos % 3 === 1; // 1 de cada 3 entrenos serie a serie en pantalla; el resto se marcan y se terminan
+            const ui = intentos % (+process.env.UICADA || 3) === 1; // 1 de cada 3 entrenos serie a serie en pantalla; el resto se marcan y se terminan
             if (!ui) a.ev(`S.active.items.forEach(it=>it.sets.forEach(s=>{ if (Math.random()<0.95){ if (s.kg==null&&s.sk!=null) s.kg=s.sk; if (s.reps==null&&s.sr!=null) s.reps=s.sr; if (s.time==null&&s.st!=null) s.time=s.st; s.done=true; } }))`);
             for (const s of ui ? sets : []) {
               if (r() < 0.05) continue;
@@ -169,7 +180,14 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
           if (p.us && /^\d/.test(v) && Math.abs(ult - peso) > 1.5 && !p.datosRaros) f.datos.add(`en EE. UU. escribió ${v} lb y se guardó ${ult} kg (esperado ~${peso.toFixed(1)}) · día ${dia} · tras guardar: ${trasGuardar} · ${a.ev(`LAYERS.map(l=>l.t).join(',')+' | '+((document.querySelector('#modals')||{}).textContent||'').replace(/\\s+/g,' ').slice(0,140)+' | med '+S.measures.slice(-2).map(m=>new Date(m.date).toISOString().slice(0,10)+':'+m.peso).join(' ')`)}`);
           erroresDe('peso'); }
         // Mi PandarIA cada día: pestaña, puntos que nunca bajan, rapidez del cálculo
-        if (process.env.MPDIARIO && a.ev(`typeof mpAbierta==='function'&&dayKey()>=MP_INI`)) {
+        // 1.9.7: después del final de la temporada, Mi PandarIA tiene que estar en pausa y pedir actualizar
+        if (process.env.MPDIARIO && dia % 15 === 7 && a.ev(`typeof mpTerminada==='function'&&mpTerminada()&&mpAbierta()`)) {
+          limpiar(); a.ev(`MP_MEMO=null; A.tab('mipandaria')`); a.avanzar(200); const vv = a.texto(); raro('mi pandaria terminada');
+          if (!/TERMINADA|FINISHED|ENCERRADA/.test(vv) || !/Actualiza|Update|Atualize/.test(vv)) f.datos.add(`Mi PandarIA no muestra la temporada terminada (día ${dia})`);
+          const ult = a.ev(`Object.keys(mpCalc().dias).pop()||''`); if (ult > a.ev('MP_FIN()')) f.datos.add(`Mi PandarIA sigue contando después del final (${ult})`);
+          limpiar(); erroresDe('mi pandaria terminada');
+        }
+        if (process.env.MPDIARIO && a.ev(`typeof mpAbierta==='function'&&dayKey()>=MP_INI&&!mpTerminada()`)) {
           a.w.__T = b0 + 14.5 * H; limpiar(); a.ev(`MP_MEMO=null; A.tab('mipandaria')`); a.avanzar(300); raro('mi pandaria'); a.ev(`MODALS.length=0; renderModals();`);
           const t1 = Date.now(); const tot = a.ev(`(MP_MEMO=null, mpCalc().total)`); const ms = Date.now() - t1; (f.lento.mpcalc = f.lento.mpcalc || []).push([dia, ms]);
           
@@ -195,7 +213,7 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
       }
       // cada 2 semanas: todas las pantallas, la guía, el estado y botones al azar; cada 90 días, mucho más
       a.w.__T = b0 + 15 * H;
-      const gira = dia % 21 === 20, grande = dia % 120 === 119 || dia === DIAS - 1;
+      const G = process.env.RAPIDO && dia >= +process.env.RAPIDO ? 63 : (+process.env.GIRA || 21), gira = dia % G === G - 1, grande = dia % 120 === 119 || dia === DIAS - 1;
       if (gira || grande) {
         for (const t of ['rutinas', 'explorar', 'nutricion', 'ayuno', 'mipandaria', 'historial', 'ajustes']) {
           limpiar(); const t1 = Date.now(); a.ev(`A.tab('${t}')`); const ms = Date.now() - t1;
