@@ -1040,6 +1040,20 @@ if (fs.existsSync(COPIA07)) {
   a.cerrar();
 }
 
+/* ---------- 1.9.5.4: aviso por ánimo bajo aunque no hagas el check-in a diario ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); S.diaLog={}; const pon=(i,m)=>{ S.diaLog[dayKey(Date.now()-i*DAY)]={ck:{mood:m}}; };
+    [1,3,5,7,9,11,13].forEach(i=>pon(i,0)); pon(2,1); const siete=animoBajosMuchos();
+    S.diaLog={}; [1,3,5,7].forEach(i=>pon(i,0)); const pocos=animoBajosMuchos();
+    S.diaLog={}; [1,2,3,4,5,6,7].forEach(i=>pon(i,0)); [8,9,10,11,12].forEach(i=>pon(i,2)); const mitad=animoBajosMuchos();
+    return JSON.stringify({siete,pocos,mitad}); })()`));
+  comprobar('1.9.5.4: el aviso de hablar con alguien sale con ánimo bajo en el 70 % de los días anotados (mínimo 7), no con pocos registros ni con la mitad', r.siete && !r.pocos && !r.mitad, JSON.stringify(r));
+  a.cerrar();
+}
+
 /* ---------- 1.9.5.3: Pregunta a PandarIA ---------- */
 {
   const a = abrir();
