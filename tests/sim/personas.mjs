@@ -193,10 +193,10 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
   if (fin.pred && /ERR|NaN|Infinity|-\d{3,}/.test(fin.pred)) f.ciencia.add('predicción de peso rara: ' + fin.pred);
   if (intentos > fin.ses + 1) f.datos.add(`empezó ${intentos} entrenos y hay ${fin.ses}`);
   const res = { p: nombre(p), errores: [...f.errores], raros: [...f.raros], ciencia: [...f.ciencia], identidad: [...f.identidad], datos: [...f.datos], lento: Object.fromEntries(f.lento), consulta: C.n, fin };
-  out.push(res); fs.appendFileSync(new URL('./resultado-personas.jsonl', import.meta.url), JSON.stringify(res) + '\n');
+  out.push(res); fs.appendFileSync(new URL('./resultado-personas' + (process.env.PLAT ? '-' + process.env.PLAT : '') + '.jsonl', import.meta.url), JSON.stringify(res) + '\n');
   console.log(`${res.p}: ${res.errores.length} err · ${res.raros.length} raros · ${res.ciencia.length} ciencia · ${res.identidad.length} identidad · ${res.datos.length} datos · ${fin.ses} entrenos · máx ${Math.max(...f.lento.values())} ms`);
   a.cerrar();
 }
-fs.writeFileSync(new URL(`./resultado-personas-${DESDE}-${HASTA}.json`, import.meta.url), JSON.stringify(out, null, 1));
+fs.writeFileSync(new URL(`./resultado-personas${process.env.PLAT ? '-' + process.env.PLAT : ''}-${DESDE}-${HASTA}.json`, import.meta.url), JSON.stringify(out, null, 1));
 console.log(`\n${out.length} personas · ${DIAS} días · ${Math.round((Date.now() - t0) / 1000)} s`);
 process.exit(0);

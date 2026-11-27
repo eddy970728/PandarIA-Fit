@@ -1040,6 +1040,33 @@ if (fs.existsSync(COPIA07)) {
   a.cerrar();
 }
 
+/* ---------- 1.10: lanzamiento (versión, enlaces legales en las pantallas de pago, versión de iPhone) ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const o={}; o.ver=verTxt(); o.and=pfLegal(); window.PF_IOS=true; o.ios=pfLegal(); delete window.PF_IOS; return JSON.stringify(o); })()`));
+  comprobar('1.10: la versión es 1.10 y las pantallas de pago enlazan la privacidad (y en iPhone los términos de uso de Apple)', r.ver === '1.10' && /privacidad\.html/.test(r.and) && !/stdeula/.test(r.and) && /stdeula/.test(r.ios), JSON.stringify(r).slice(0, 300));
+  a.cerrar();
+  // versión de iPhone: sin Google Play en la bienvenida, botón de Drive con su nombre y esquema de Google en Info.plist
+  const { execFileSync } = await import('node:child_process'); const os = await import('node:os'); const path = await import('node:path'); const fs2 = await import('node:fs');
+  const raiz = new URL('../', import.meta.url).pathname, d = fs2.mkdtempSync(path.join(os.tmpdir(), 'pf-t-'));
+  fs2.cpSync(path.join(raiz, 'www'), path.join(d, 'www'), { recursive: true });
+  execFileSync(process.execPath, [path.join(raiz, 'scripts', 'version-play.mjs'), path.join(d, 'www', 'index.html')], { stdio: 'pipe' });
+  execFileSync(process.execPath, [path.join(raiz, 'scripts', 'version-ios.mjs')], { cwd: d, stdio: 'pipe' });
+  const h = fs2.readFileSync(path.join(d, 'www', 'index.html'), 'utf8');
+  comprobar('1.10: en iPhone la bienvenida no habla de Google Play y Google se presenta como copia en Drive', !/Cancela cuando quieras en Google Play|Cancel anytime in Google Play/.test(h) && h.includes("tx('Copia en Google Drive'") && !h.includes("tx('Continuar con Google'"), '');
+  fs2.mkdirSync(path.join(d, 'ios/App/App'), { recursive: true }); fs2.mkdirSync(path.join(d, 'ios/App/App.xcodeproj'), { recursive: true });
+  fs2.writeFileSync(path.join(d, 'ios/App/App/Info.plist'), '<plist><dict>\n</dict></plist>'); fs2.writeFileSync(path.join(d, 'ios/App/Podfile'), "platform :ios, '14.0'");
+  fs2.writeFileSync(path.join(d, 'ios/App/App.xcodeproj/project.pbxproj'), 'INFOPLIST_FILE = App/Info.plist;');
+  const nat = fs2.readFileSync(path.join(d, 'www/native.js'), 'utf8'); fs2.writeFileSync(path.join(d, 'www/native.js'), nat.replace("GOOGLE_IOS_ID = ''", "GOOGLE_IOS_ID = '12345-abc.apps.googleusercontent.com'"));
+  execFileSync(process.execPath, [path.join(raiz, 'scripts', 'ios-extra.mjs')], { cwd: d, stdio: 'pipe' });
+  const pl = fs2.readFileSync(path.join(d, 'ios/App/App/Info.plist'), 'utf8');
+  comprobar('1.10: con el ID de cliente de iOS, el proyecto añade el esquema de Google para volver a la app', pl.includes('<string>com.googleusercontent.apps.12345-abc</string>') && pl.includes('<key>GIDClientID</key>') && pl.includes('<string>pandariafit</string>'), pl.slice(0, 200));
+  fs2.rmSync(d, { recursive: true, force: true });
+}
+
+
 /* ---------- 1.9.6: Mi PandarIA ---------- */
 {
   const a = abrir();

@@ -5,8 +5,21 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 const idl = createRequire(import.meta.url)('jsdom/lib/jsdom/living/generated/utils.js');
 
+// 1.10 · PLAT=ios: la app tal como se compila para iPhone (version-play.mjs + version-ios.mjs) y con PF_IOS activo
+import { execFileSync } from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
+function htmlIos() {
+  const raiz = new URL('../../', import.meta.url).pathname, d = fs.mkdtempSync(path.join(os.tmpdir(), 'pf-ios-'));
+  fs.cpSync(path.join(raiz, 'www'), path.join(d, 'www'), { recursive: true });
+  execFileSync(process.execPath, [path.join(raiz, 'scripts', 'version-play.mjs'), path.join(d, 'www', 'index.html')], { stdio: 'pipe' });
+  execFileSync(process.execPath, [path.join(raiz, 'scripts', 'version-ios.mjs')], { cwd: d, stdio: 'pipe' });
+  return { idx: fs.readFileSync(path.join(d, 'www', 'index.html'), 'utf8'), pre: fs.readFileSync(path.join(d, 'www', 'premium.js'), 'utf8') };
+}
+export const IOS = process.env.PLAT === 'ios';
+const FUENTE = IOS ? htmlIos() : null;
 // como en la versión web: la app y después premium.js (candados, pagos y licencias)
-const HTML = fs.readFileSync(new URL('../../www/index.html', import.meta.url), 'utf8').replace(/<\/body>(?![\s\S]*<\/body>)/, () => `<script>${fs.readFileSync(new URL('../../www/premium.js', import.meta.url), 'utf8')}</script></body>`);
+const HTML = (FUENTE ? FUENTE.idx : fs.readFileSync(new URL('../../www/index.html', import.meta.url), 'utf8')).replace(/<\/body>(?![\s\S]*<\/body>)/, () => `<script>${FUENTE ? FUENTE.pre : fs.readFileSync(new URL('../../www/premium.js', import.meta.url), 'utf8')}</script></body>`);
 
 export function rng(seed) { let s = seed >>> 0 || 1; return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
@@ -19,7 +32,8 @@ export async function abrirApp({ t0, storage = {}, seed = 1, antes = null } = {}
     runScripts: 'dangerously', pretendToBeVisual: false, url: 'https://localhost/', virtualConsole: vc,
     beforeParse(w) {
       w.PF_REGION = 'ES'; // 1.9.2: unidades métricas en las pruebas, aunque el navegador simulado sea de EE. UU.
-      w.open = () => null; // en el móvil abre la tienda; jsdom no lo implementa
+      w.open = () => null;
+      if (IOS) { w.PF_IOS = true; w.Capacitor = { getPlatform: () => 'ios', isNativePlatform: () => false, Plugins: {} }; } // en el móvil abre la tienda; jsdom no lo implementa
       w.__T = t0;
       const RD = w.Date;
       class FD extends RD { constructor(...a) { if (a.length === 0) super(w.__T); else super(...a); } static now() { return w.__T; } }

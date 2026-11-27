@@ -24,6 +24,13 @@ for (const [k, v] of Object.entries(claves)) if (!pl.includes(`<key>${k}</key>`)
 for (const k of ['UIFileSharingEnabled', 'LSSupportsOpeningDocumentsInPlace']) if (!pl.includes(`<key>${k}</key>`)) extra += `\t<key>${k}</key>\n\t<true/>\n`;
 if (!pl.includes('<key>ITSAppUsesNonExemptEncryption</key>')) extra += '\t<key>ITSAppUsesNonExemptEncryption</key>\n\t<false/>\n';
 if (!pl.includes('pandariafit')) extra += '\t<key>CFBundleURLTypes</key>\n\t<array>\n\t\t<dict>\n\t\t\t<key>CFBundleURLName</key>\n\t\t\t<string>com.pandaria.fit</string>\n\t\t\t<key>CFBundleURLSchemes</key>\n\t\t\t<array>\n\t\t\t\t<string>pandariafit</string>\n\t\t\t</array>\n\t\t</dict>\n\t</array>\n';
+// 1.10 · Copia en Google Drive: con el ID de cliente de iOS en native.js, se añade el esquema que Google usa para volver a la app
+{ const m = readFileSync('www/native.js', 'utf8').match(/GOOGLE_IOS_ID = '([^']*)'/); const id = m ? m[1] : '';
+  if (id) { if (!/^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$/.test(id)) fallo('GOOGLE_IOS_ID no tiene forma de ID de cliente de iOS');
+    const inv = 'com.googleusercontent.apps.' + id.replace('.apps.googleusercontent.com', '');
+    if (!pl.includes(inv)) extra += `\t<key>GIDClientID</key>\n\t<string>${id}</string>\n`;
+    extra = extra.replace('<string>pandariafit</string>', `<string>pandariafit</string>\n\t\t\t\t<string>${inv}</string>`);
+    if (!extra.includes(inv) && !pl.includes(inv)) fallo('no se pudo añadir el esquema de Google'); } }
 pl = pl.slice(0, fin) + extra + pl.slice(fin);
 writeFileSync(PL, pl);
 

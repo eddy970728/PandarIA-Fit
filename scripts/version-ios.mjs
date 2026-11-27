@@ -28,6 +28,13 @@ for (const [a, b] of [
   ['do Samsung Health ou de outros apps', 'do iPhone, do Apple Watch ou de outros apps'],
   ['Passos, peso e frequência cardíaca do Samsung Health', 'Passos, peso e frequência cardíaca do iPhone ou do Apple Watch']
 ]){ const n = (idx.includes(a) ? 1 : 0) + (nat.includes(a) ? 1 : 0); if (!n) fallo('no se encontró «' + a + '»'); idx = idx.split(a).join(b); nat = nat.split(a).join(b); }
+// 1.10: en iPhone, Google solo guarda la copia en Drive (no es una cuenta de la app): así no se confunde con un inicio de sesión
+// y no hace falta «Iniciar sesión con Apple» (norma 4.8 de la App Store).
+idx = cambiar(idx, "tx('Continuar con Google','Continue with Google')", "tx('Copia en Google Drive','Backup to Google Drive',{pt:'Backup no Google Drive'})", 'botón de Google');
+// 1.10: en la bienvenida (index.html) la suscripción se cancela en los ajustes del iPhone, no en Google Play
+for (const [x, y] of [['Cancela cuando quieras en Google Play', 'Cancela cuando quieras en Ajustes › tu Apple ID › Suscripciones'],
+  ['Cancel anytime in Google Play', 'Cancel anytime in Settings › your Apple ID › Subscriptions'],
+  ['Cancele quando quiser no Google Play', 'Cancele quando quiser em Ajustes › seu Apple ID › Assinaturas']]) idx = cambiar(idx, x, y, '«' + x + '»');
 nat = cambiar(nat, 'Se guarda en Documentos › PandarIA Fit.', 'Se guarda en Archivos › En mi iPhone › PandarIA Fit.', 'texto de Documentos');
 
 // Nombre general

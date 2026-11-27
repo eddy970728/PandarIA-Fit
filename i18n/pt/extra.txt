@@ -426,3 +426,8 @@ Pausa tu racha hasta 14 días si te enfermas o te vas de viaje|Pause sua sequên
 Celebración al subir de rango y 6 logros nuevos, de Explorador a Leyenda|Comemoração ao subir de nível e 6 conquistas novas, de Explorador a Lenda
 Pregunta a PandarIA: «¿Cómo voy en la Liga?», «¿Qué me falta para subir de rango?» y «¿Cómo cuido mi racha?»|Pergunte ao PandarIA: «Como estou indo na Liga?», «O que falta para eu subir de nível?» e «Como cuido da minha sequência?»
 Aviso cuando se abre Mi PandarIA, y al terminar la temporada te muestra tu resumen y te pide actualizar para la siguiente|Aviso quando o Mi PandarIA abre, e ao terminar a temporada mostra seu resumo e pede para atualizar para a próxima
+Lanzamiento oficial|Lançamento oficial
+PandarIA Fit sale oficialmente en Google Play y llega al iPhone en la App Store|O PandarIA Fit chega oficialmente ao Google Play e ao iPhone na App Store
+Mi PandarIA estrena la Temporada 0 (beta) del 1 de diciembre al 31 de enero: puntos, rangos, retos y Liga|O Mi PandarIA estreia a Temporada 0 (beta) de 1º de dezembro a 31 de janeiro: pontos, níveis, desafios e Liga
+En iPhone se conecta con la app Salud de Apple: pasos, peso, pulso y sueño|No iPhone, conecta-se ao app Saúde da Apple: passos, peso, frequência cardíaca e sono
+Más estabilidad después de miles de días de uso simulado con perfiles muy distintos|Mais estabilidade após milhares de dias de uso simulado com perfis muito diferentes
