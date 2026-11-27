@@ -498,6 +498,7 @@
         case 'report': HSEG = 'informes'; A.tab('historial'); break;
         case 'routine': if (x.rid && findR(x.rid)) A.openRoutine(x.rid); break;
         case 'backup': A.tab('ajustes'); A.exportData(); break;
+        case 'mp': A.tab('mipandaria'); break;
       }
     }catch(e){} }, 400);
   }
@@ -589,6 +590,8 @@
     fast:  ['12 h · Fasted state', 'This is how your fasting phases will look.', 'ayuno', null],
     all:   ['PandarIA Fit 🐼', 'Notifications are working! Lock your phone and wait…', 'entreno', null]
   };
+  // 1.9.7: aviso inmediato (p. ej., «Ya puedes entrar en Mi PandarIA»); solo si el usuario ya dio permiso de avisos
+  window.pfAvisoAhora = (title, body, go) => { if (!notifOk) return false; safe(() => LN.schedule({notifications: [mk(9100, title, body, new Date(Date.now() + 3000), 'recordatorios', {go: go || 'mp'})]})); return true; };
   A.nfTest = async kind => {
     if (!notifOk){ enableNotifs(); return; }
     const TESTS = ({en:TESTS_EN, pt:TESTS_PT})[LANG()] || TESTS_ES, t = TESTS[kind] || TESTS.all;

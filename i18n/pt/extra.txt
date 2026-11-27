@@ -405,3 +405,24 @@ Nueva pestaña Mi PandarIA: compites contigo mismo con puntos, 7 rangos que nunc
 Se abre con 3 entrenos o 7 días con actividad; antes se ve con un candado y lo que te falta|Abre com 3 treinos ou 7 dias com atividade; antes aparece com um cadeado e o que falta
 Misiones del día, racha con comodín, actividades de 4 a 8 minutos (2 a tu medida con Premium) y el calendario de todo lo que haces|Missões do dia, sequência com coringa, atividades de 4 a 8 minutos (2 sob medida com o Premium) e o calendário de tudo o que você faz
 Contenido del día: curiosidades con su estudio y recomendaciones con el porqué. Pretemporada del 27 al 30 de noviembre y Temporada 0 en beta desde el 1 de diciembre|Conteúdo do dia: curiosidades com o estudo e recomendações com o porquê. Pré-temporada de 27 a 30 de novembro e Temporada 0 em beta a partir de 1º de dezembro
+# 1.9.7
+¿Cómo voy en la Liga?|Como estou indo na Liga?
+¿Qué me falta para subir de rango?|O que falta para eu subir de nível?
+¿Cómo cuido mi racha?|Como cuido da minha sequência?
+Explorador de PandarIA|Explorador do PandarIA
+Constante de PandarIA|Constante do PandarIA
+Fuerte de PandarIA|Forte do PandarIA
+Atleta de PandarIA|Atleta do PandarIA
+Maestro de PandarIA|Mestre do PandarIA
+Leyenda de PandarIA|Lenda do PandarIA
+Llega a Explorador en Mi PandarIA|Chegue a Explorador no Mi PandarIA
+Llega a Constante en Mi PandarIA|Chegue a Constante no Mi PandarIA
+Llega a Fuerte en Mi PandarIA|Chegue a Forte no Mi PandarIA
+Llega a Atleta en Mi PandarIA|Chegue a Atleta no Mi PandarIA
+Llega a Maestro en Mi PandarIA|Chegue a Mestre no Mi PandarIA
+Llega a Leyenda en Mi PandarIA|Chegue a Lenda no Mi PandarIA
+Mi PandarIA más completa|Mi PandarIA mais completo
+Pausa tu racha hasta 14 días si te enfermas o te vas de viaje|Pause sua sequência por até 14 dias se ficar doente ou viajar
+Celebración al subir de rango y 6 logros nuevos, de Explorador a Leyenda|Comemoração ao subir de nível e 6 conquistas novas, de Explorador a Lenda
+Pregunta a PandarIA: «¿Cómo voy en la Liga?», «¿Qué me falta para subir de rango?» y «¿Cómo cuido mi racha?»|Pergunte ao PandarIA: «Como estou indo na Liga?», «O que falta para eu subir de nível?» e «Como cuido da minha sequência?»
+Aviso cuando se abre Mi PandarIA, y al terminar la temporada te muestra tu resumen y te pide actualizar para la siguiente|Aviso quando o Mi PandarIA abre, e ao terminar a temporada mostra seu resumo e pede para atualizar para a próxima

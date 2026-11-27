@@ -698,7 +698,7 @@ if (fs.existsSync(COPIA07)) {
     A.wCalor(); out.a5calor=waterGoal()===g0+500; A.wCalor(); out.a5calorOff=waterGoal()===g0;
     LAYERS.push({t:'aguaStats',p:{y:new Date().getFullYear(),m:new Date().getMonth()}}); renderLayers(); out.a5stats=/Media 7 días/.test(document.querySelector('.layer:last-child').textContent); LAYERS.length=0; renderLayers();
     return JSON.stringify(out); })()`));
-  comprobar('Consulta a PandarIA (1.9.5.3): 80 preguntas o más en las 11 secciones, todas responden con sus datos y su regla', r.consulta.preguntas >= 80 && r.consulta.secciones === 11 && !r.consulta.malos.length, JSON.stringify(r.consulta));
+  comprobar('Consulta a PandarIA (1.9.7): 80 preguntas o más en las 12 secciones, todas responden con sus datos y su regla', r.consulta.preguntas >= 80 && r.consulta.secciones === 12 && !r.consulta.malos.length, JSON.stringify(r.consulta));
   comprobar('Consulta: ve el estancamiento del press de banca y calcula la proteína (2 g/kg al bajar… 1,6 al mantener: 128 g)', /no sube desde hace/.test(r.estanco) && /128 g/.test(r.proteina), JSON.stringify([r.estanco, r.proteina]));
   comprobar('Consulta: el buscador encuentra «creatina»', r.buscar === 'creatina', r.buscar);
   comprobar('Consulta: con Premium el informe completo; gratis solo la respuesta corta con candado', r.premCompleto && r.gratis);
@@ -1011,6 +1011,32 @@ if (fs.existsSync(COPIA07)) {
   await espera(900);
   const d = JSON.parse(a.w.eval(`JSON.stringify({b:nut().fast.blocked, dia:nut().fast.diabetes, aviso:/Diabetes con medicación/.test(fastCard())})`));
   comprobar('1.9.5.2: diabetes con medicación ya no bloquea el ayuno y muestra su aviso', d.b===false && d.dia && d.aviso, JSON.stringify(d));
+  a.cerrar();
+}
+
+/* ---------- 1.9.7: pausa, fin de temporada, celebración y preguntas de Mi PandarIA ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); __setNow(Date.UTC(2026, 11, 20, 20, 0, 0)); const o={}; delete S.mp; S.plan={days:[0,1,2,3,4,5,6],order:[]}; window.isPremium=()=>false;
+    S.sessions=[]; for (let i=1;i<=12;i++) S.sessions.push({id:'p'+i,routineId:'r',routineName:'A',start:Date.now()-i*DAY-3600e3,end:Date.now()-i*DAY,items:[],prs:[]});
+    S.sessions=S.sessions.filter(s=>![3,4,5].includes(Math.round((Date.now()-s.end)/DAY))); MP_MEMO=null; mpAbierta();
+    o.sinPausa=mpCalc().racha; mpS().pausa={a:mpSum(dayKey(),-5),b:mpSum(dayKey(),-3)}; MP_MEMO=null; o.conPausa=mpCalc().racha;
+    // celebración al subir de rango
+    mpS().nivelVisto=0; S.mp.maxTot=0; TAB='mipandaria'; MODALS.length=0; render(); o.nivel=mpS().nivelVisto;
+    // preguntas
+    o.cq=['mpLiga','mpRango','mpRacha'].map(id=>{ try{ const R=CQ.find(q=>q.id===id).f({}); return !!(R&&R.corta); }catch(e){ return false; } }).every(Boolean);
+    o.ctx=(CQ_CTX.mipandaria||[]).length;
+    // logro de rango
+    S.mp.maxTot=700; checkAch(); o.logro=!!S.achievements.mp1;
+    // fin de la temporada: se pausa y pide actualizar
+    __setNow(Date.UTC(2027, 1, 3, 12, 0, 0)); MP_MEMO=null; MODALS.length=0; render(); const v=document.querySelector('#view').textContent;
+    o.fin=/TEMPORADA 0 · TERMINADA/.test(v)&&/Actualiza la app/.test(v); o.hasta=Object.keys(mpCalc().dias).pop();
+    return JSON.stringify(o); })()`));
+  comprobar('1.9.7: la pausa evita que los días sin cumplir rompan la racha', r.conPausa > r.sinPausa, JSON.stringify([r.sinPausa, r.conPausa]));
+  comprobar('1.9.7: al subir de rango se celebra y se gana el logro; 3 preguntas nuevas y 6 en el contexto de Mi PandarIA', r.nivel > 0 && r.logro && r.cq && r.ctx >= 6, JSON.stringify(r));
+  comprobar('1.9.7: al terminar la Temporada 0, Mi PandarIA se pausa, deja de contar y pide actualizar la app', r.fin && r.hasta === '2027-01-31', JSON.stringify([r.fin, r.hasta]));
   a.cerrar();
 }
 
