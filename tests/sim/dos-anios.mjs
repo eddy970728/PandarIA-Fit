@@ -10,7 +10,7 @@ import fs from 'node:fs';
 
 const DIAS = +process.argv[2] || 730, REAB = +process.env.REAB || 45;
 const [DESDE, HASTA] = (process.argv[3] || '0-119').split('-').map(Number);
-const T0 = Date.UTC(2026, 2, 2, 7, 0, 0), H = 3600000, D = 24 * H;
+const T0 = process.env.INICIO ? Date.parse(process.env.INICIO + "T07:00:00Z") : Date.UTC(2026, 2, 2, 7, 0, 0), H = 3600000, D = 24 * H;
 const CULPA = /\bvago\b|\bfloj[oa]\b|fracas|deber[ií]as avergonz|sin excusas|no tienes excusa|\bgord[oa]\b|\blazy\b|you failed|no excuses|\bpregui[cç]os/i;
 const BLOQ = /^(wipeData|cloud|exportFile|exportCSV|exportCopy|importData|importCode|updDownload|kbUrl|obGoogle|ciGoogle|alScan|mPhoto|retoCompartir|shareSession|shareRoutine|copyCode|openPremium|pfRegalo|buy|restore|setLang|ciLogin|mpLogin|logout)/;
 const LES = ['rodilla', 'lumbar', 'hombro', 'muneca', 'tobillo', 'codo', 'cadera', 'cuello'];
@@ -168,6 +168,13 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
           if (!(ult > 25 && ult < 400)) f.datos.add(`peso guardado ${ult} al escribir «${v}»`);
           if (p.us && /^\d/.test(v) && Math.abs(ult - peso) > 1.5 && !p.datosRaros) f.datos.add(`en EE. UU. escribió ${v} lb y se guardó ${ult} kg (esperado ~${peso.toFixed(1)}) · día ${dia} · tras guardar: ${trasGuardar} · ${a.ev(`LAYERS.map(l=>l.t).join(',')+' | '+((document.querySelector('#modals')||{}).textContent||'').replace(/\\s+/g,' ').slice(0,140)+' | med '+S.measures.slice(-2).map(m=>new Date(m.date).toISOString().slice(0,10)+':'+m.peso).join(' ')`)}`);
           erroresDe('peso'); }
+        // Mi PandarIA: ver el contenido y hacer una actividad del día (si está abierta)
+        if (r() < 0.35 && a.ev(`typeof mpAbierta==='function'&&dayKey()>=MP_INI&&mpAbierta()`)) {
+          a.w.__T = b0 + 12 * H; limpiar(); a.ev(`A.mpCont()`); a.avanzar(200); raro('mp contenido'); limpiar();
+          if (r() < 0.6) { const kx = a.ev(`(mpExtrasDe(dayKey())[0]||{}).k||''`); if (kx) { a.ev(`A.mpExtra('${kx}')`); for (let s = 0; s < 520; s += 4) a.avanzar(4000); for (let s = 0; s < 10; s++) a.avanzar(1000);
+            a.ev(`(()=>{ const b=[...document.querySelectorAll('#modals button')].find(x=>/Guardar|Save|Salvar/.test(x.textContent)); b&&b.click(); })()`); a.avanzar(1500); limpiar(); erroresDe('mp actividad'); } }
+          const pm = JSON.parse(a.ev(`JSON.stringify(Object.values(mpCalc().dias).map(d=>d.base))`)); if (pm.some(v => !(v >= 0 && v <= 150))) f.ciencia.add('Mi PandarIA: puntos fuera de 0-150');
+        }
         // ciclo
         if (p.ciclo && !st.embarazo && dia % 28 === 3) { a.ev(`if(!S.ciclo) A.cicloOn(); A.cicloHoy();`); erroresDe('ciclo'); }
         // ayuno: empieza a las 20 h (si PandarIA pregunta antes, la persona decide empezar)
@@ -178,7 +185,7 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
       a.w.__T = b0 + 15 * H;
       const gira = dia % 21 === 20, grande = dia % 120 === 119 || dia === DIAS - 1;
       if (gira || grande) {
-        for (const t of ['rutinas', 'explorar', 'nutricion', 'ayuno', 'historial', 'ajustes']) {
+        for (const t of ['rutinas', 'explorar', 'nutricion', 'ayuno', 'mipandaria', 'historial', 'ajustes']) {
           limpiar(); const t1 = Date.now(); a.ev(`A.tab('${t}')`); const ms = Date.now() - t1;
           (f.lento[t] = f.lento[t] || []).push([dia, ms]); a.avanzar(150); raro(t);
           for (let k = 0; k < (grande ? 14 : 3); k++) {

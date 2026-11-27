@@ -564,7 +564,7 @@ if (fs.existsSync(COPIA07)) {
     out.hora=horaHabitual();
     return JSON.stringify(out); })()`));
   comprobar('Nutrición: Comida, Agua y Ayuno por separado (1.8.1: el ayuno vuelve a Nutrición)', r.comida && r.agua && r.ayuno, JSON.stringify([r.comida, r.agua, r.ayuno]));
-  comprobar('barra de abajo: 4 pestañas; ir a Ayuno abre Nutrición › Ayuno', r.nav === 4 && r.navOn === 'nutricion/ayuno', JSON.stringify([r.nav, r.navOn]));
+  comprobar('barra de abajo: 5 pestañas (1.9.6: con Mi PandarIA); ir a Ayuno abre Nutrición › Ayuno', r.nav === 5 && r.navOn === 'nutricion/ayuno', JSON.stringify([r.nav, r.navOn]));
   comprobar('Ajustes › Nutrición y ayuno: objetivo nutricional y preferencias de comida', r.ajustes);
   comprobar('proteína: 3 ideas con 8 g o más por 100 kcal, solo con Premium', r.prot && r.protGratis);
   comprobar('peso: tendencia suavizada, ritmo semanal y fecha estimada de la meta', r.peso.now > 80 && r.peso.now < 81.5 && r.peso.rate < -0.3 && r.peso.eta > 0, JSON.stringify(r.peso));
@@ -1011,6 +1011,35 @@ if (fs.existsSync(COPIA07)) {
   await espera(900);
   const d = JSON.parse(a.w.eval(`JSON.stringify({b:nut().fast.blocked, dia:nut().fast.diabetes, aviso:/Diabetes con medicación/.test(fastCard())})`));
   comprobar('1.9.5.2: diabetes con medicación ya no bloquea el ayuno y muestra su aviso', d.b===false && d.dia && d.aviso, JSON.stringify(d));
+  a.cerrar();
+}
+
+/* ---------- 1.9.6: Mi PandarIA ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); __setNow(Date.UTC(2026, 11, 3, 12, 0, 0)); const o={}; S.sessions=[]; delete S.mp; window.isPremium=()=>true; render();
+    o.tabs=[...document.querySelectorAll('#nav button')].map(b=>b.dataset.v).join(',');
+    o.bloq=!mpAbierta(); A.tab('mipandaria'); o.candado=/Se abre con tu constancia/.test(document.querySelector('#view').textContent);
+    for (let i=0;i<3;i++) S.sessions.push({id:'m'+i,routineId:'r',routineName:'A',start:Date.now()-(i+1)*DAY-3600e3,end:Date.now()-(i+1)*DAY,items:[],prs:[]});
+    o.abre=mpAbierta(); MODALS.length=0; TAB='mipandaria'; render(); o.vista=document.querySelector('#view').textContent.slice(0,160); o.rango=/RANGO 1 DE 7/.test(document.querySelector('#view').textContent);
+    const C=mpCalc(); o.puntos=Object.values(C.dias).every(d=>d.base<=150&&d.base>=0);
+    // contenido: todos los días de la pretemporada y la temporada 0, en 3 idiomas y con tarjeta para menores donde hace falta
+    const fal=[]; for (let k='2026-11-27';k<='2027-01-31';k=mpSum(k,1)){ const it=MP_CONT.find(x=>x.d===k); if (!it||it.t.some(x=>!x)||it.por.some(x=>!x)||(it.x&&it.x.some(x=>!x))) fal.push(k); } o.faltan=fal;
+    o.menor=(S.profile.age=16, mpL(mpCont('2026-12-05').t))!==(S.profile.age=30, mpL(mpCont('2026-12-05').t));
+    o.mas18=MP_CONT.filter(x=>x.alt).length;
+    // actividades: gratis 1 segura; Premium 2; las lesiones se respetan
+    window.isPremium=()=>false; MP_MEMO=null; o.gratis=mpExtrasDe(dayKey()).length; window.isPremium=()=>true; MP_MEMO=null; o.prem=mpExtrasDe(dayKey()).length;
+    S.profile.injuries=['rodilla']; o.rodilla=mpExtrasPosibles().every(x=>x.exOk.every(id=>!profileBlocks(id))); S.profile.injuries=[];
+    // ocultar y mostrar
+    S.settings.mpOff=true; render(); o.oculta=![...document.querySelectorAll('#nav button')].some(b=>b.dataset.v==='mipandaria'); delete S.settings.mpOff; render();
+    o.rangos=[0,600,1800,25000,40000].map(n=>mpRango(n).txt).join('|');
+    return JSON.stringify(o); })()`));
+  comprobar('1.9.6: Mi PandarIA es la quinta pestaña y se ve con candado hasta 3 entrenos o 7 días con actividad', /mipandaria/.test(r.tabs) && r.bloq && r.candado && r.abre && r.rango, JSON.stringify(r));
+  comprobar('1.9.6: el contenido cubre del 27 de noviembre al 31 de enero en 3 idiomas, con tarjetas para menores', !r.faltan.length && r.menor && r.mas18 === 5, JSON.stringify([r.faltan, r.menor, r.mas18]));
+  comprobar('1.9.6: puntos entre 0 y 150 al día, 1 actividad gratis y 2 con Premium que respetan las lesiones, y se puede ocultar', r.puntos && r.gratis === 1 && r.prem === 2 && r.rodilla && r.oculta, JSON.stringify(r));
+  comprobar('1.9.6: rangos de Cachorro a Leyenda que suben con los puntos', r.rangos === 'Cachorro I|Explorador I|Constante I|Leyenda I|Leyenda IV', r.rangos);
   a.cerrar();
 }
 

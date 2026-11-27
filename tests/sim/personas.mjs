@@ -156,7 +156,7 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
       // por la noche: pantallas, guía, consulta
       a.w.__T = b0 + 14 * H;
       const full = dia % 5 === 4 || dia === DIAS - 1;
-      for (const t of full ? ['rutinas', 'explorar', 'nutricion', 'ayuno', 'historial', 'ajustes'] : ['rutinas']) {
+      for (const t of full ? ['rutinas', 'explorar', 'nutricion', 'ayuno', 'mipandaria', 'historial', 'ajustes'] : ['rutinas']) {
         a.ev(`MODALS.length=0; renderModals(); LAYERS.length=0; renderLayers();`);
         const t1 = Date.now(); a.ev(`A.tab('${t}')`); const ms = Date.now() - t1; if (ms > (f.lento.get(t) || 0)) f.lento.set(t, ms);
         a.avanzar(200); raro(t);
