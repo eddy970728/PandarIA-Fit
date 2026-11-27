@@ -33,7 +33,7 @@ const base = [
   [39,'h',179,83,'activo','musculo',['rodilla'],{casaMancuernas:true}], [45,'m',163,67,'activo','fuerza',[],{casaSinEquipo:true}], [60,'h',171,88,'sedentario','grasa',['lumbar'],{casaSinEquipo:true,ayuno:'16:8'}], [25,'h',184,85,'muy_activo','musculo',[],{todo:true}],
 ];
 base.forEach(([edad, sexo, alto, peso, forma, meta, les, x = {}], i) => P.push({ i, edad, sexo, alto, peso, forma, meta, les, ...x,
-  premium: i % 3 !== 2, lang: ['es', 'es', 'en', 'pt'][i % 4], mini: !!x.mini || i % 11 === 5 }));
+  premium: i % 3 !== 2, lang: process.env.LANGF || ['es', 'es', 'en', 'pt'][i % 4], mini: !!x.mini || i % 11 === 5 }));
 
 const nombre = p => `P${String(p.i).padStart(2, '0')} ${p.edad}${p.sexo} ${p.peso}kg ${p.meta}${p.les.length ? ' [' + p.les + ']' : ''}${Object.keys(p).filter(k => !['i', 'edad', 'sexo', 'alto', 'peso', 'forma', 'meta', 'les', 'premium', 'lang', 'mini'].includes(k)).map(k => ' ' + k).join('')} ${p.premium ? 'Pre' : 'Grat'} ${p.lang}`;
 const out = []; const t0 = Date.now();
@@ -170,11 +170,11 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
       }
       a.ev(`A.tab('rutinas'); A.guiaAbrir();`); a.avanzar(200); raro('guía');
       // identidad: con ánimo bajo varios días, la guía tiene que ofrecer apoyo
-      if (p.animo === 'bajo' && dia > 6 && p.premium && dia % 7 === 0) { const g = a.texto(); if (!/ánimo|animo|mood|humor|Muévete|movimiento suave|gentle|leve|apoyo|support/i.test(g)) f.identidad.add(`día ${dia}: ánimo bajo varios días y la guía no lo menciona`); }
+      if (p.animo === 'bajo' && dia >= 14 && p.premium && dia % 7 === 0) /* 1.9.5.4: el aviso pide 7 días anotados como mínimo */ { const g = a.texto(); if (process.env.DBGG) console.log('GUIA', dia, a.ev(`JSON.stringify([animoBajosMuchos(), animoDias(14), Object.keys(S.diaLog||{}).length])`), /nimo/.test(g)); if (!/[áâa]nimo|mood|humor|Muévete|movimiento suave|gentle|leve|apoyo|apoio|support/i.test(g)) f.identidad.add(`día ${dia}: ánimo bajo varios días y la guía no lo menciona`); }
       a.ev(`MODALS.length=0; renderModals();`);
     } catch (e) { f.errores.add(`día ${dia}: ${String(e && (e.stack || e)).slice(0, 300)}`); }
     a.errores.splice(0).forEach(e => f.errores.add(e.slice(0, 300)));
-    if (dia % 3 === 2) a.purgar(); if (process.env.MEM) console.log("día", dia, Math.round(process.memoryUsage().heapUsed/1e6), "MB", a.ev("JSON.stringify(S).length"), a.ev("S.sessions.length"), a.ev("document.body.innerHTML.length"), a.ev("MODALS.length+'/'+LAYERS.length"), a.pendientes());
+    if (dia % 3 === 2) a.purgar(); if (process.env.MEM) console.log("día", dia, Math.round(process.memoryUsage().heapUsed/1e6), "MB", a.ev("JSON.stringify(S).length"), a.ev("S.sessions.length"), a.ev("document.body.innerHTML.length"), a.ev("MODALS.length+'/'+LAYERS.length"), a.pendientes(), a.ev("JSON.stringify(window.__L)"), a.ev("document.getElementsByTagName('*').length"));
   }
 
   // al final: todas las preguntas de la consulta, con sus datos, sin NaN y sin culpa

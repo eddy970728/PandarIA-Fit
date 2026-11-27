@@ -55,7 +55,10 @@ const EQ = { gym: 'EQUIP_GYM', casa: "['pc','est']", mancuernas: "['pc','est','m
 for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
   const t0 = Date.now(), r = rng(7000 + p.i);
   const f = { errores: new Set(), raros: new Set(), ciencia: new Set(), identidad: new Set(), datos: new Set(), lento: {}, reaperturas: 0, toques: 0 };
-  const abrir = async (storage, t) => abrirApp({ t0: t, storage, seed: 7000 + p.i, antes: w => { if (p.us) w.PF_REGION = 'US'; } });
+  const borrados = new Set();
+  const abrir = async (storage, t) => { const x = await abrirApp({ t0: t, storage, seed: 7000 + p.i, antes: w => { if (p.us) w.PF_REGION = 'US'; } });
+    // entrenos que el usuario simulado intentó borrar (toque al azar en «Eliminar entreno»): si faltan al final, no cuentan como pérdida
+    x.w.__borrado = id => borrados.add(id); x.ev(`(()=>{ const o=A.delSession; A.delSession=id=>{ window.__borrado(id); return o(id); }; })()`); return x; };
   let a = await abrir({}, T0);
   const misIds = [];
   const raro = donde => { const t = a.texto(); const m = t.match(RAROS); if (m) f.raros.add(`${donde}: «${t.slice(Math.max(0, m.index - 50), m.index + 30).replace(/\s+/g, ' ').trim()}»`);
@@ -273,7 +276,7 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
   }
   const fin = JSON.parse(a.ev(`JSON.stringify({ses:S.sessions.length, med:S.measures.length, kb:Math.round(usoDatos().c/1024), pct:usoDatos().pct, racha:streakWeeks(), ayunos:(nut().fast.history||[]).length})`));
   if (fin.pct > 60) f.datos.add(`datos al ${fin.pct} % del límite tras 2 años`);
-  { const R = JSON.parse(a.ev(`JSON.stringify({ids:S.sessions.map(s=>s.id), rut:S.routines.map(r=>r.id)})`)); const faltan = misIds.map(x => x.split('|')).filter(([id]) => !R.ids.includes(id));
+  { const R = JSON.parse(a.ev(`JSON.stringify({ids:S.sessions.map(s=>s.id), rut:S.routines.map(r=>r.id)})`)); const faltan = misIds.map(x => x.split('|')).filter(([id]) => !R.ids.includes(id) && !borrados.has(id));
     const sinRutina = faltan.filter(([, rid]) => !R.rut.includes(rid)).length, sueltos = faltan.length - sinRutina;
     if (faltan.length) f.datos.add(`faltan ${faltan.length} de ${misIds.length} entrenos: ${sinRutina} por rutina eliminada (con aviso) y ${sueltos} sueltos`); }
   const lento = Object.fromEntries(Object.entries(f.lento).map(([k, v]) => [k, { primero: v[0] ? v[0][1] : 0, ultimo: v.length ? v[v.length - 1][1] : 0, max: Math.max(0, ...v.map(x => x[1])) }]));
