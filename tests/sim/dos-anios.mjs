@@ -181,9 +181,9 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
           erroresDe('peso'); }
         // Mi PandarIA cada día: pestaña, puntos que nunca bajan, rapidez del cálculo
         // 1.9.7: después del final de la temporada, Mi PandarIA tiene que estar en pausa y pedir actualizar
-        if (process.env.MPDIARIO && dia % 15 === 7 && a.ev(`typeof mpTerminada==='function'&&mpTerminada()&&mpAbierta()`)) {
+        if (process.env.MPDIARIO && dia % 15 === 7 && a.ev(`typeof mpTerminada==='function'&&mpTerminada()&&mpAbierta()&&!S.settings.mpOff`)) {
           limpiar(); a.ev(`MP_MEMO=null; A.tab('mipandaria')`); a.avanzar(200); const vv = a.texto(); raro('mi pandaria terminada');
-          if (!/TERMINADA|FINISHED|ENCERRADA/.test(vv) || !/Actualiza|Update|Atualize/.test(vv)) f.datos.add(`Mi PandarIA no muestra la temporada terminada (día ${dia})`);
+          if (!/TERMINADA|FINISHED|ENCERRADA/.test(vv) || !/Actualiza|Update|Atualize/.test(vv)) { f.datos.add(`Mi PandarIA no muestra la temporada terminada (día ${dia})`); if (process.env.DBGMP) console.log("MPFIN", dia, a.ev(`TAB+"|"+JSON.stringify(mpS())+"|"+(S.settings.mpOff||"")`), vv.slice(0,400)); }
           const ult = a.ev(`Object.keys(mpCalc().dias).pop()||''`); if (ult > a.ev('MP_FIN()')) f.datos.add(`Mi PandarIA sigue contando después del final (${ult})`);
           limpiar(); erroresDe('mi pandaria terminada');
         }
