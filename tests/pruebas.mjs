@@ -1021,7 +1021,22 @@ if (fs.existsSync(COPIA07)) {
   a.w.eval(AYUDAS());
   const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); S.profile.height=175; S.profile.weight=150; S.profile.sex='m'; S.measures=[{id:'m',date:Date.now()-DAY,peso:150}]; nut().goal='bajar';
     const n=calcNutrition(); S.profile.weight=80; S.measures=[{id:'m',date:Date.now()-DAY,peso:80}]; const m=calcNutrition(); return JSON.stringify({wr:n.wr,prot:n.prot,carbs:n.carbs,nota:n.notes.some(x=>/peso de referencia/.test(x)),normal:m.wr===undefined&&m.prot===160}); })()`));
+  const r2 = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); S.profile.age=85; S.profile.height=157; S.profile.weight=66.6; S.profile.sex='m'; S.profile.fitness='sedentario'; S.measures=[{id:'m',date:Date.now()-DAY,peso:66.6}]; nut().goal='bajar'; const n=calcNutrition(); return JSON.stringify({kcal:n.kcal,carbs:n.carbs,tdee:n.tdee}); })()`));
+  comprobar('1.9.5.4: para bajar grasa la meta no baja de 1200 kcal en mujeres (ni del gasto si es menor) y deja carbohidratos', r2.kcal >= Math.min(1200, r2.tdee) && r2.carbs >= 60, JSON.stringify(r2));
   comprobar('1.9.5.4: con IMC de 30 o más la proteína usa un peso de referencia (150 kg y 1,75 m → ~106 kg) y deja carbohidratos', r.wr > 100 && r.wr < 112 && r.prot < 230 && r.carbs >= 100 && r.nota && r.normal, JSON.stringify(r));
+  a.cerrar();
+}
+
+/* ---------- 1.9.5.4: eliminar una rutina se puede deshacer, con sus entrenos ---------- */
+{
+  const a = abrir();
+  await espera(900);
+  a.w.eval(AYUDAS());
+  const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const R=newRoutine({name:'A',goal:'musculo',items:[buildItem('press_banca','musculo',2)]}); S.routines=[R];
+    S.sessions=[{id:'s1',routineId:R.id,routineName:'A',start:Date.now()-DAY,end:Date.now()-DAY+3600e3,items:[],prs:[]},{id:'s2',routineId:R.id,routineName:'A',start:Date.now()-2*DAY,end:Date.now()-2*DAY+3600e3,items:[],prs:[]}];
+    deleteRoutine(R.id); const borrado=S.routines.length===0&&S.sessions.length===0; const b=document.querySelector('.toast.undo button'); if (b) b.click();
+    return JSON.stringify({borrado, vuelve:S.routines.length===1&&S.sessions.length===2}); })()`));
+  comprobar('1.9.5.4: eliminar una rutina avisa con «Deshacer» y recupera sus entrenos', r.borrado && r.vuelve, JSON.stringify(r));
   a.cerrar();
 }
 
