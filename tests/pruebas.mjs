@@ -1062,10 +1062,12 @@ if (fs.existsSync(COPIA07)) {
   fs2.mkdirSync(path.join(d, 'ios/App/App'), { recursive: true }); fs2.mkdirSync(path.join(d, 'ios/App/App.xcodeproj'), { recursive: true });
   fs2.writeFileSync(path.join(d, 'ios/App/App/Info.plist'), '<plist><dict>\n</dict></plist>'); fs2.writeFileSync(path.join(d, 'ios/App/Podfile'), "platform :ios, '14.0'");
   fs2.writeFileSync(path.join(d, 'ios/App/App.xcodeproj/project.pbxproj'), 'INFOPLIST_FILE = App/Info.plist;');
-  const nat = fs2.readFileSync(path.join(d, 'www/native.js'), 'utf8'); fs2.writeFileSync(path.join(d, 'www/native.js'), nat.replace("GOOGLE_IOS_ID = ''", "GOOGLE_IOS_ID = '12345-abc.apps.googleusercontent.com'"));
+  const nat = fs2.readFileSync(path.join(d, 'www/native.js'), 'utf8'); fs2.writeFileSync(path.join(d, 'www/native.js'), nat.replace(/GOOGLE_IOS_ID = '[^']*'/, "GOOGLE_IOS_ID = '12345-abc.apps.googleusercontent.com'"));
   execFileSync(process.execPath, [path.join(raiz, 'scripts', 'ios-extra.mjs')], { cwd: d, stdio: 'pipe' });
   const pl = fs2.readFileSync(path.join(d, 'ios/App/App/Info.plist'), 'utf8');
   comprobar('1.10: con el ID de cliente de iOS, el proyecto añade el esquema de Google para volver a la app', pl.includes('<string>com.googleusercontent.apps.12345-abc</string>') && pl.includes('<key>GIDClientID</key>') && pl.includes('<string>pandariafit</string>'), pl.slice(0, 200));
+  { const id = (fs2.readFileSync(path.join(raiz, 'www/native.js'), 'utf8').match(/GOOGLE_IOS_ID = '([^']*)'/) || [])[1] || '';
+    comprobar('1.10: la copia en Google Drive está activada en iPhone con un ID de cliente de iOS del mismo proyecto que el web', /^879792644217-[a-z0-9]+\.apps\.googleusercontent\.com$/.test(id) && !id.includes('pd24e4p8954m522jvjf1mhj0skg74t2u'), id); }
   fs2.rmSync(d, { recursive: true, force: true });
 }
 

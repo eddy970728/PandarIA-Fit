@@ -19,7 +19,7 @@
   // Inicio de sesión con el sistema de Android (Credential Manager) y permiso drive.appdata:
   // solo la carpeta oculta de la app en el Drive del usuario. El ID de cliente web no es secreto.
   // En iPhone, Google pide además un ID de cliente de iOS (no secreto). Mientras esté vacío, la copia en Drive no aparece en iPhone.
-  const GOOGLE_IOS_ID = '';
+  const GOOGLE_IOS_ID = '879792644217-n2v4k0653rp1v1ihfh9ukpdcg8gplrul.apps.googleusercontent.com';
   const SL = IOS && !GOOGLE_IOS_ID ? null : P('SocialLogin');
   const GOOGLE_WEB_ID = '879792644217-pd24e4p8954m522jvjf1mhj0skg74t2u.apps.googleusercontent.com';
   const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
