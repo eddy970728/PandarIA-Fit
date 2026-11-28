@@ -432,3 +432,4 @@ Mi PandarIA estrena la Temporada 0 (beta) del 1 de diciembre al 31 de enero: pun
 En iPhone se conecta con la app Salud de Apple: pasos, peso, pulso y sueño|No iPhone, conecta-se ao app Saúde da Apple: passos, peso, frequência cardíaca e sono
 Más estabilidad después de miles de días de uso simulado con perfiles muy distintos|Mais estabilidade após milhares de dias de uso simulado com perfis muito diferentes
 Confía en PandarIA respeta los minutos que eliges: las rutinas de fuerza ya no se alargan al doble|Confie no PandarIA respeita os minutos que você escolhe: as rotinas de força não demoram mais o dobro
+Más fluidez con historiales largos y animaciones de ejercicios que gastan menos batería|Mais fluidez com históricos longos e animações de exercícios que gastam menos bateria
