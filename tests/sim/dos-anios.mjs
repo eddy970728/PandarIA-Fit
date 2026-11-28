@@ -72,12 +72,14 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
     S.measures.push({id:'m0',date:Date.now()-7*DAY,peso:${p.peso}}); window.isPremium=()=>${st.premium};
     const n=nut(); n.goal='${goalN(st.meta)}'; ${st.ayuno ? `n.fast.screened=true; n.fast.plan='${st.ayuno}';${p.diabetes ? ' n.fast.diabetes=true;' : ''}` : ''}
     save(true); render();`);
+  const dia0 = () => a.ev('dayKey()');
   const rutinas = () => {
     limpiar();
     a.ev(`S.routines.forEach(r=>r.archived=true); S.plan=null; save(true);`);
     if (st.premium) {
       a.ev(`openLayer('wizPandaria',{step:0,goal:'${st.meta}',days:${p.doble ? 5 : p.edad > 65 ? 2 : 3 + Math.floor(r() * 2)},minutes:${p.edad > 60 ? 35 : [30, 45, 60][Math.floor(r() * 3)]},level:'${p.forma === 'sedentario' ? 'principiante' : p.forma === 'activo' ? 'intermedio' : 'avanzado'}',priorities:[],program:null}); refreshTop();`);
       for (let k = 0; k < 4; k++) a.tocar('wpStep', '1');
+      if (process.env.DBGW) console.log('WIZPRE', dia0(), a.ev(`JSON.stringify({L:LAYERS.map(l=>l.t), prem:isPremium(), btn:[...document.querySelectorAll('#layers .layer:last-child [data-a]')].map(b=>b.dataset.a+':'+(b.dataset.v||'')).slice(-12), txt:(document.querySelector('#layers .layer:last-child')||{textContent:''}).textContent.replace(/\\s+/g,' ').slice(0,700)})`));
       a.tocar('wpAdd');
     } else {
       for (const t of st.equipo === 'gym' ? ['gym|3', 'gym|1', 'piernas|0'] : ['casa|0', 'casa|1', 'casa|2']) { limpiar(); a.tocar('openTpl', t); a.tocar('tplAdd'); }
@@ -86,7 +88,7 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
     limpiar(); erroresDe('rutinas');
     const bloq = JSON.parse(a.ev(`JSON.stringify(S.routines.filter(r=>!r.archived).flatMap(r=>r.items.map(it=>it.exId)).filter(id=>profileBlocks(id)))`));
     if (bloq.length) (st.premium ? f.ciencia : f.identidad).add(`${st.premium ? 'asistente' : 'plantilla'} con ejercicios desaconsejados para su perfil: ${[...new Set(bloq)].slice(0, 4).join(', ')}`);
-    if (!a.ev(`S.routines.filter(r=>!r.archived).length`)) f.datos.add('sin rutinas activas tras crear');
+    if (!a.ev(`S.routines.filter(r=>!r.archived).length`) && !a.ev(`!isPremium() && S.routines.length>=3`) /* gratis: las archivadas cuentan para el límite de 3 (decisión de 1.9.5.4) */) { f.datos.add('sin rutinas activas tras crear'); if (process.env.DBGW) console.log('WIZ', a.ev(`JSON.stringify({L:LAYERS.map(l=>l.t+':'+JSON.stringify(l.p).slice(0,300)),M:MODALS.length,txt:(document.querySelector('#layers')||{}).textContent.slice(0,600),eq:S.settings.equip,rut:S.routines.length})`)); }
   };
   rutinas();
 
@@ -175,12 +177,13 @@ for (const p of P.filter(p => p.i >= DESDE && p.i <= HASTA)) {
         // peso cada lunes (con el ritmo que su objetivo y su comida explican), cintura el día 1 de cada mes
         if (dow === 1) { const tend = (st.meta === 'grasa' ? -0.3 : st.meta === 'musculo' ? 0.12 : 0) * (dia > 300 ? 0.3 : 1) + (p.comida === 'mucho' ? 0.2 : p.comida === 'poco' ? -0.2 : 0) + (st.embarazo ? 0.35 : 0);
           peso = Math.max(38, Math.min(220, peso + tend + (r() - 0.5) * 0.6));
-          const v = p.datosRaros && r() < 0.2 ? ['0', '-5', '999', '72,5', ' 70 ', 'abc', ''][Math.floor(r() * 7)] : (p.us ? (peso * 2.20462).toFixed(1) : peso.toFixed(1));
+          const enLb = a.ev(`S.settings.unit==='lb'`); // escribe en la unidad que ve en pantalla (un toque al azar en Ajustes puede cambiarla)
+          const v = p.datosRaros && r() < 0.2 ? ['0', '-5', '999', '72,5', ' 70 ', 'abc', ''][Math.floor(r() * 7)] : (enLb ? (peso * 2.20462).toFixed(1) : peso.toFixed(1));
           a.w.__T = b0 + H; limpiar(); a.tocar('addMeasure'); a.ev(`(()=>{ const i=document.querySelector('#m_peso'); if (i) i.value='${v}'; const c=document.querySelector('#m_cintura'); if (c && ${new Date(b0).getUTCDate() <= 7}) c.value='${((cintura += (st.meta === 'grasa' ? -0.4 : 0.05)) / (p.us ? 2.54 : 1)).toFixed(1)}'; })()`); a.tocar('mSave'); const trasGuardar = a.ev(`LAYERS.map(l=>l.t).join(',')+' | '+((document.querySelector('#modals')||{}).textContent||'').replace(/\\s+/g,' ').slice(0,160)`); limpiar();
           const ult = a.ev(`(S.measures.filter(m=>m.peso).slice(-1)[0]||{}).peso`);
           if (process.env.DBGP) console.log('lunes', dia, v, ult, a.ev(`S.settings.unit+'/'+S.settings.uLong`), trasGuardar.slice(0,120), a.ev(`[...document.querySelectorAll('.toast')].map(t=>t.textContent).join('|')`));
           if (!(ult > 25 && ult < 400)) f.datos.add(`peso guardado ${ult} al escribir «${v}»`);
-          if (p.us && /^\d/.test(v) && Math.abs(ult - peso) > 1.5 && !p.datosRaros) f.datos.add(`en EE. UU. escribió ${v} lb y se guardó ${ult} kg (esperado ~${peso.toFixed(1)}) · día ${dia} · tras guardar: ${trasGuardar} · ${a.ev(`LAYERS.map(l=>l.t).join(',')+' | '+((document.querySelector('#modals')||{}).textContent||'').replace(/\\s+/g,' ').slice(0,140)+' | med '+S.measures.slice(-2).map(m=>new Date(m.date).toISOString().slice(0,10)+':'+m.peso).join(' ')`)}`);
+          if (enLb && /^\d/.test(v) && Math.abs(ult - peso) > 1.5 && !p.datosRaros) f.datos.add(`en EE. UU. escribió ${v} lb y se guardó ${ult} kg (esperado ~${peso.toFixed(1)}) · día ${dia} · tras guardar: ${trasGuardar} · ${a.ev(`LAYERS.map(l=>l.t).join(',')+' | '+((document.querySelector('#modals')||{}).textContent||'').replace(/\\s+/g,' ').slice(0,140)+' | med '+S.measures.slice(-2).map(m=>new Date(m.date).toISOString().slice(0,10)+':'+m.peso).join(' ')`)}`);
           erroresDe('peso'); }
         // Mi PandarIA cada día: pestaña, puntos que nunca bajan, rapidez del cálculo
         // 1.9.7: después del final de la temporada, Mi PandarIA tiene que estar en pausa y pedir actualizar
