@@ -54,6 +54,10 @@ end
 const PBX = 'ios/App/App.xcodeproj/project.pbxproj';
 let pbx = readFileSync(PBX, 'utf8');
 pbx = pbx.replace(/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]+;/g, 'IPHONEOS_DEPLOYMENT_TARGET = 15.5;');
+// 1.10 · Solo iPhone por ahora (sin iPad): la interfaz está pensada para móvil y así la App Store no pide capturas de iPad.
+// En iPad se podrá instalar igual en modo compatibilidad de iPhone.
+pbx = pbx.replace(/TARGETED_DEVICE_FAMILY = "?[0-9,]+"?;/g, 'TARGETED_DEVICE_FAMILY = 1;');
+if (!/TARGETED_DEVICE_FAMILY = 1;/.test(pbx)) pbx = pbx.replace(/INFOPLIST_FILE = App\/Info.plist;/g, 'INFOPLIST_FILE = App/Info.plist;\n\t\t\t\tTARGETED_DEVICE_FAMILY = 1;');
 writeFileSync(PBX, pbx);
 
 writeFileSync('ios-entitlements.plist', `<?xml version="1.0" encoding="UTF-8"?>
