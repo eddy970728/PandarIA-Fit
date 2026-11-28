@@ -35,6 +35,14 @@ idx = cambiar(idx, "tx('Continuar con Google','Continue with Google')", "tx('Cop
 for (const [x, y] of [['Cancela cuando quieras en Google Play', 'Cancela cuando quieras en Ajustes › tu Apple ID › Suscripciones'],
   ['Cancel anytime in Google Play', 'Cancel anytime in Settings › your Apple ID › Subscriptions'],
   ['Cancele quando quiser no Google Play', 'Cancele quando quiser em Ajustes › seu Apple ID › Assinaturas']]) idx = cambiar(idx, x, y, '«' + x + '»');
+// 1.10: en iPhone sin etiquetas de «beta» ni «experimental» (la App Store rechaza apps que se presentan como beta, norma 2.2)
+idx = cambiar(idx, "{id:'pre',n:['Pretemporada','Preseason','Pré-temporada'],a:'2026-11-27',b:'2026-11-30',beta:true}", "{id:'pre',n:['Pretemporada','Preseason','Pré-temporada'],a:'2026-11-27',b:'2026-11-30',beta:false}", 'pretemporada beta');
+idx = cambiar(idx, "{id:'t0',n:['Temporada 0','Season 0','Temporada 0'],a:'2026-12-01',b:'2027-01-31',beta:true}", "{id:'t0',n:['Temporada 0','Season 0','Temporada 0'],a:'2026-12-01',b:'2027-01-31',beta:false}", 'Temporada 0 beta');
+idx = cambiar(idx, "tx('Función en desarrollo (experimental)','Feature in development (experimental)')", "tx('Responde con tus datos','Answers with your data',{pt:'Responde com seus dados'})", 'etiqueta experimental de la consulta');
+idx = cambiar(idx, "tx('Experimental · con tus datos','Experimental · with your data')", "tx('Con tus datos','With your data',{pt:'Com seus dados'})", 'etiqueta experimental de la guía');
+idx = cambiar(idx, "tx('Guía de PandarIA (experimental)','PandarIA guide (experimental)')", "tx('Guía de PandarIA','PandarIA guide')", 'nombre accesible de la guía');
+idx = cambiar(idx, "tx('Opinar sobre la beta','Give feedback on the beta',{pt:'Opinar sobre a beta'})", "tx('Enviar tu opinión','Send feedback',{pt:'Enviar sua opinião'})", 'opinar sobre la beta');
+for (const [x, y] of [['Temporada 0 (beta) del 1 de diciembre', 'Temporada 0 del 1 de diciembre'], ['Season 0 (beta) from 1 December', 'Season 0 from 1 December'], ['Temporada 0 (beta) de 1º de dezembro', 'Temporada 0 de 1º de dezembro']]) idx = cambiar(idx, x, y, '«' + x + '»');
 nat = cambiar(nat, 'Se guarda en Documentos › PandarIA Fit.', 'Se guarda en Archivos › En mi iPhone › PandarIA Fit.', 'texto de Documentos');
 
 // Nombre general
