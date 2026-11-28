@@ -1057,6 +1057,8 @@ if (fs.existsSync(COPIA07)) {
   execFileSync(process.execPath, [path.join(raiz, 'scripts', 'version-play.mjs'), path.join(d, 'www', 'index.html')], { stdio: 'pipe' });
   execFileSync(process.execPath, [path.join(raiz, 'scripts', 'version-ios.mjs')], { cwd: d, stdio: 'pipe' });
   const h = fs2.readFileSync(path.join(d, 'www', 'index.html'), 'utf8');
+  { const pr = fs2.readFileSync(path.join(raiz, 'www/premium.js'), 'utf8');
+    comprobar('1.10: en iPhone Premium solo con Apple: sin códigos propios, con «Canjear código de Apple»', /const licOk = \(\) => !IOS && /.test(pr) && /if \(IOS \|\| !l \|\| !l\.code\) return;/.test(pr) && /A\.pfActivate = async \(\) => \{\n    if \(IOS\) return;/.test(pr) && pr.includes('presentOfferCodeRedeemSheet') && pr.includes('data-a="pfRedeem"') && !pr.includes('Mientras tanto puedes pedir Premium con tu código'), ''); }
   comprobar('1.10: en iPhone las temporadas de Mi PandarIA no se marcan como beta', h.includes("b:'2027-01-31',beta:false}") && !h.includes("Función en desarrollo (experimental)','Feature") && !h.includes("tx('Opinar sobre la beta'"), '');
   comprobar('1.10: en iPhone la bienvenida no habla de Google Play y Google se presenta como copia en Drive', !/Cancela cuando quieras en Google Play|Cancel anytime in Google Play/.test(h) && h.includes("tx('Copia en Google Drive'") && !h.includes("tx('Continuar con Google'"), '');
   fs2.mkdirSync(path.join(d, 'ios/App/App'), { recursive: true }); fs2.mkdirSync(path.join(d, 'ios/App/App.xcodeproj'), { recursive: true });

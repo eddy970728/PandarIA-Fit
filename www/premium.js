@@ -134,7 +134,9 @@
     return MAXD;
   }
   const expired = l => l && l.exp !== 'P' && hoyGuard() > l.exp;
-  const licOk = () => !!(PREM && !expired(PREM) && (PREM.kind !== 'acct' || PREM.acc === ACC));
+  // 1.10 · iPhone/iPad: Premium solo con compras de Apple (norma 3.1.1 de la App Store). Los códigos de regalo propios valen solo en Android;
+  // en iPhone, para regalar Premium se usan los códigos de oferta de Apple (App Store Connect › Suscripciones › Códigos de oferta).
+  const licOk = () => !IOS && !!(PREM && !expired(PREM) && (PREM.kind !== 'acct' || PREM.acc === ACC));
   window.isPremium = () => licOk() || subOk();
   window.premiumInfo = () => PREM;
   async function loadLicense(){
@@ -154,7 +156,7 @@
   window.pfAccountChanged = async () => { try{ ACC = await accountCode(); }catch(e){ ACC = null; } render.keep = true; render(); if (LAYERS.length) refreshTop(); if (typeof scheduleNotifs === 'function') scheduleNotifs(); };
   window.pfAccountLicense = () => (PREM && PREM.kind === 'acct') ? {code: PREM.code, acc: PREM.acc, at: PREM.at} : null;
   window.pfRestoreAccountLicense = async l => {
-    try{ if (!l || !l.code) return; if (!ACC) ACC = await accountCode(); if (PREM && PREM.kind === 'dev' && !expired(PREM)) return;
+    try{ if (IOS || !l || !l.code) return; if (!ACC) ACC = await accountCode(); if (PREM && PREM.kind === 'dev' && !expired(PREM)) return;
       const v = await verify(l.code, null, ACC); if (!v || expired(v)) return;
       PREM = Object.assign({at: l.at || Date.now()}, v); await saveLicense(); render.keep = true; render(); toast('Premium recuperado con tu cuenta');
     }catch(e){} };
@@ -197,7 +199,7 @@
       b += `<div class="sec">${tx('Suscripción','Subscription')}</div><div class="card">`;
       if (!NP) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción se compra en la app instalada desde Google Play.','The subscription is bought in the app installed from Google Play.')}</p>`;
       else if (!PRODS) b += `<p class="sm mut" style="margin:0">${tx('Cargando precios…','Loading prices…')}</p>`;
-      else if (!Object.keys(PRODS).length && IOS) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('En iPhone y iPad la suscripción llegará cuando PandarIA Fit esté en el App Store. Mientras tanto puedes pedir Premium con tu código (abajo).','On iPhone and iPad the subscription will arrive when PandarIA Fit is on the App Store. Meanwhile you can ask for Premium with your code (below).')}</p>`;
+      else if (!Object.keys(PRODS).length && IOS) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción no está disponible ahora. Revisa tu conexión y vuelve a intentarlo.','The subscription is not available right now. Check your connection and try again.')}</p>`;
       else if (!Object.keys(PRODS).length) b += `<p class="sm mut" style="margin:0;line-height:1.5">${tx('La suscripción no está disponible ahora. Revisa tu conexión y vuelve a intentarlo.','The subscription is not available right now. Check your connection and try again.')}</p>`;
       else {
         const m = PRODS.mensual, q = PRODS.trimestral;
@@ -254,6 +256,13 @@
   };
   A.openHazte = () => { openLayer('hazte', {}); loadProducts(); subRefresh(); };
   SCREENS.premiumRegalo = () => {
+    if (IOS){
+      let b = `<p class="sm" style="line-height:1.5;margin-top:0">${tx('Escríbele al desarrollador y cuéntale por qué no puedes pagarlo. Si podemos ayudarte, te enviaremos por correo un código de Apple con Premium gratis por un tiempo.','Write to the developer and tell them why you can\'t afford it. If we can help, we\'ll email you an Apple code with free Premium for a while.',{pt:'Escreva ao desenvolvedor e conte por que você não pode pagar. Se pudermos ajudar, enviaremos por e-mail um código da Apple com Premium grátis por um tempo.'})}</p>`;
+      b += `<div class="card"><button class="btn pri wide" data-a="pfMail">${I('note',18)} ${tx('Escribir al desarrollador','Write to the developer')}</button></div>`;
+      b += `<div class="sec">${tx('¿Ya tienes un código?','Already have a code?',{pt:'Já tem um código?'})}</div><div class="card"><p class="sm mut" style="margin:0 0 10px;line-height:1.5">${tx('Los códigos se canjean con Apple: Premium se activa en tu Apple ID sin ningún cobro durante el tiempo del código.','Codes are redeemed with Apple: Premium is activated on your Apple ID at no charge for the length of the code.',{pt:'Os códigos são resgatados com a Apple: o Premium é ativado no seu Apple ID sem cobrança durante o tempo do código.'})}</p>
+      <button class="btn ok wide" data-a="pfRedeem">${I('check',18)} ${tx('Canjear código de Apple','Redeem Apple code',{pt:'Resgatar código da Apple'})}</button></div>`;
+      return lhdr(tx('Pedir Premium','Ask for Premium')) + `<div class="lbody">${b}</div>`;
+    }
     let b = `<p class="sm" style="line-height:1.5;margin-top:0">${tx('Envíale un mensaje al desarrollador con tu código y el motivo por el que no puedes pagarlo. Analizaremos tu petición y te diremos si podemos regalarte un tiempo de Premium.','Send the developer a message with your code and the reason you can\'t pay. We will review your request and let you know if we can give you some Premium time.')}</p>`;
     b += `<div class="card"><div class="xs mut b" style="letter-spacing:1px;margin-bottom:6px">${ACC ? tx('TU CÓDIGO DE CUENTA','YOUR ACCOUNT CODE') : tx('TU CÓDIGO DE TELÉFONO','YOUR PHONE CODE')}</div>
       <div class="codebox" style="font-size:19px">${ACC ? fmtAcc(ACC) : fmtDev(DEV)}</div>
@@ -265,6 +274,12 @@
     return lhdr(tx('Pedir Premium','Ask for Premium')) + `<div class="lbody">${b}</div>`;
   };
   A.pfRegalo = () => openLayer('premiumRegalo', {});
+  // 1.10 · iPhone: ventana oficial de Apple para canjear códigos de oferta; al volver se comprueba la suscripción
+  A.pfRedeem = async () => {
+    if (!IOS || !NP || !NP.presentOfferCodeRedeemSheet){ toast(tx('Canjea el código en la App Store: tu foto › Canjear tarjeta o código.','Redeem the code in the App Store: your photo › Redeem Gift Card or Code.',{pt:'Resgate o código na App Store: sua foto › Resgatar cartão ou código.'})); return; }
+    try{ await NP.presentOfferCodeRedeemSheet(); }catch(e){ toast(tx('No se pudo abrir la ventana de Apple. Prueba desde la App Store.','Couldn\'t open Apple\'s window. Try from the App Store.',{pt:'Não foi possível abrir a janela da Apple. Tente pela App Store.'})); return; }
+    setTimeout(() => subRefresh(), 4000); setTimeout(() => subRefresh(), 15000);
+  };
   A.pfBuy = async plan => {
     const o = PRODS && PRODS[plan]; if (!NP || !o || BUSY) return;
     BUSY = true; refreshTop();
@@ -289,15 +304,16 @@
   A.openPremium = () => { openLayer('premium', {}); loadProducts(); subRefresh(); };
   const copyText = t => { try{ navigator.clipboard.writeText(t).then(() => toast('Copiado'), () => fallbackCopy(t)); }catch(e){ fallbackCopy(t); } };
   A.pfCopyDev = () => copyText(ACC ? fmtAcc(ACC) : fmtDev(DEV));
-  const mailBody = () => ACC ? `Hola, quiero pedir PandarIA Fit Premium.\n\nMi código de cuenta: ${fmtAcc(ACC)}\nMotivo por el que no puedo pagarlo: \nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!` : `Hola, quiero pedir PandarIA Fit Premium.\n\nMi código de teléfono: ${fmtDev(DEV)}\nMotivo por el que no puedo pagarlo: \nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!`;
+  const mailBody = () => IOS ? `Hola, quiero pedir PandarIA Fit Premium en iPhone.\n\nMotivo por el que no puedo pagarlo: \nTeléfono: ${DEVMODEL || 'iPhone'}\n\nSi me lo regalan, envíenme el código de Apple a este correo. ¡Gracias!` : ACC ? `Hola, quiero pedir PandarIA Fit Premium.\n\nMi código de cuenta: ${fmtAcc(ACC)}\nMotivo por el que no puedo pagarlo: \nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!` : `Hola, quiero pedir PandarIA Fit Premium.\n\nMi código de teléfono: ${fmtDev(DEV)}\nMotivo por el que no puedo pagarlo: \nTeléfono: ${DEVMODEL || 'no indicado'}\n\n¡Gracias!`;
   A.pfShareDev = () => {
     const text = mailBody();
     if (Share) Share.share({title:'Desbloqueo PandarIA Fit', text, dialogTitle:'Enviar código'}).catch(() => {});
     else if (navigator.share) navigator.share({title:'Desbloqueo PandarIA Fit', text}).catch(() => {});
     else copyText(text);
   };
-  A.pfMail = () => { location.href = `mailto:${MAIL}?subject=${encodeURIComponent('Desbloqueo PandarIA Fit')}&body=${encodeURIComponent(mailBody())}`; };
+  A.pfMail = () => { location.href = `mailto:${MAIL}?subject=${encodeURIComponent(IOS ? 'Premium PandarIA Fit (iPhone)' : 'Desbloqueo PandarIA Fit')}&body=${encodeURIComponent(mailBody())}`; };
   A.pfActivate = async () => {
+    if (IOS) return;
     const el = $('#pfcode'), v = el && el.value.trim();
     if (!v){ toast('Pega primero el código de desbloqueo'); return; }
     const r = await activate(v);
