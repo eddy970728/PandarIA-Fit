@@ -1046,6 +1046,8 @@ if (fs.existsSync(COPIA07)) {
   await espera(900);
   a.w.eval(AYUDAS());
   const r = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const o={}; o.ver=verTxt(); o.and=pfLegal(); window.PF_IOS=true; o.ios=pfLegal(); delete window.PF_IOS; return JSON.stringify(o); })()`));
+  const mins = JSON.parse(a.w.eval(`(()=>{ __reset(HOMBRE); const o=[]; for (const [g,m] of [['fuerza',35],['fuerza',45],['musculo',30],['grasa',35]]) { const P=generateProgram({goal:g,days:3,minutes:m,level:3,priorities:[],equip:S.settings.equip}); o.push([g,m,Math.max(...P.map(d=>Math.round(d.items.reduce((a,x)=>a+itemMinutes(x),0))))]); } return JSON.stringify(o); })()`));
+  comprobar('1.10: Confía en PandarIA no se pasa más de un 15 % de los minutos elegidos', mins.every(([, m, t]) => t <= m * 1.15), JSON.stringify(mins));
   comprobar('1.10: la versión es 1.10 y las pantallas de pago enlazan la privacidad (y en iPhone los términos de uso de Apple)', r.ver === '1.10' && /privacidad\.html/.test(r.and) && !/stdeula/.test(r.and) && /stdeula/.test(r.ios), JSON.stringify(r).slice(0, 300));
   a.cerrar();
   // versión de iPhone: sin Google Play en la bienvenida, botón de Drive con su nombre y esquema de Google en Info.plist

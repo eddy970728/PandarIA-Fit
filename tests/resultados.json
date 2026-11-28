@@ -4048,12 +4048,6 @@
        "reps": 10,
        "kg": null,
        "time": null
-      },
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
       }
      ],
      "rest": 90,
@@ -4084,12 +4078,6 @@
        "reps": 10,
        "kg": null,
        "time": null
-      },
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
       }
      ],
      "rest": 90,
@@ -4103,12 +4091,6 @@
     {
      "exId": "handstand_pushup",
      "sets": [
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
-      },
       {
        "t": "n",
        "reps": 10,
@@ -4323,12 +4305,6 @@
        "reps": 10,
        "kg": null,
        "time": null
-      },
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
       }
      ],
      "rest": 90,
@@ -4342,12 +4318,6 @@
     {
      "exId": "zancadas_pc",
      "sets": [
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
-      },
       {
        "t": "n",
        "reps": 10,
@@ -4462,12 +4432,6 @@
        "reps": 10,
        "kg": null,
        "time": null
-      },
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
       }
      ],
      "rest": 90,
@@ -4498,12 +4462,6 @@
        "reps": 10,
        "kg": null,
        "time": null
-      },
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
       }
      ],
      "rest": 90,
@@ -4517,12 +4475,6 @@
     {
      "exId": "pike_pushup",
      "sets": [
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
-      },
       {
        "t": "n",
        "reps": 10,
@@ -4590,12 +4542,6 @@
     {
      "exId": "sentarse_levantarse",
      "sets": [
-      {
-       "t": "n",
-       "reps": 10,
-       "kg": null,
-       "time": null
-      },
       {
        "t": "n",
        "reps": 10,
